@@ -9,7 +9,7 @@ async function callFunction(name, payload = {}) {
     body: JSON.stringify(payload),
   });
   let data = {};
-  try { data = await response.json(); } catch (_) { /* not json */ }
+  try { data = await response.json(); } catch (e) { /* not json */ }
   if (!response.ok) {
     throw new Error(data.error || data.message || `Function ${name} failed`);
   }
@@ -44,7 +44,7 @@ export function useOverlayData(enabled = true) {
         setData(result);
         setLoading(false);
       }
-    } catch (_) {
+    } catch (err) {
       // silent poll fail
     }
   }, []);

@@ -14,7 +14,7 @@ const SCREENS = [
 
 export default function ScreenSwitcher({ overlayState, onAction }) {
   const currentScreen = overlayState?.current_screen || 'setup_blank';
-  const [busyId, setBusyId] = React.useState(null);
+  const [busyId, setBusyId] = useState(null);
 
   const handleClick = async (screenId) => {
     setBusyId(screenId);

@@ -1,6 +1,5 @@
 import { Outlet, Link, useLocation } from 'react-router-dom';
 import { Gamepad2, Monitor } from 'lucide-react';
-import { Toaster } from 'react-hot-toast';
 
 export default function MainLayout() {
   const location = useLocation();
@@ -34,17 +33,6 @@ export default function MainLayout() {
         </div>
       </nav>
       <Outlet />
-      <Toaster
-        position="bottom-right"
-        toastOptions={{
-          style: {
-            background: '#15151f',
-            color: '#fff',
-            border: '1px solid rgba(249,115,22,0.3)',
-            fontFamily: 'Rajdhani, sans-serif',
-          },
-        }}
-      />
     </div>
   );
 }

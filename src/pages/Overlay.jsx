@@ -53,11 +53,7 @@ export default function Overlay() {
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden bg-[#050508]" style={{ scrollbarWidth: 'none' }}>
-      <style>{`
-        ::-webkit-scrollbar { display: none; }
-        body { overflow: hidden; margin: 0; }
-      `}</style>
+    <div className="overlay-canvas fixed inset-0 overflow-hidden bg-[#050508]">
       <div
         style={{
           width: '1920px',
