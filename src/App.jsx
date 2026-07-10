@@ -1,30 +1,90 @@
-import { BrowserRouter, Routes, Route, Link, useLocation } from "react-router-dom";
-import ControlPanel from "./pages/ControlPanel";
-import Overlay from "./pages/Overlay";
+import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+import { Toaster } from 'react-hot-toast';
+import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import UserNotRegisteredError from '@/components/UserNotRegisteredError';
+import ScrollToTop from '@/components/ScrollToTop';
+import ControlPanel from './pages/ControlPanel';
+import Overlay from './pages/Overlay';
+
+const queryClient = new QueryClient();
 
 function NavBar() {
   const loc = useLocation();
-  if (loc.pathname === "/overlay") return null;
+  if (loc.pathname === '/overlay') return null;
+  const isControl = loc.pathname === '/control-panel' || loc.pathname === '/';
   return (
-    <nav style={{background:"#07070f",borderBottom:"1px solid rgba(249,115,22,0.2)",padding:"0 24px",height:"40px",display:"flex",alignItems:"center",gap:"24px",position:"fixed",top:0,left:0,right:0,zIndex:1000}}>
-      <span style={{color:"#f97316",fontWeight:"black",fontSize:"13px",letterSpacing:"0.2em",fontFamily:"monospace"}}>⚡ BOOYAH DIRECTOR</span>
-      <Link to="/control-panel" style={{color:loc.pathname==="/control-panel"?"#f97316":"rgba(255,255,255,0.5)",textDecoration:"none",fontSize:"12px",fontWeight:"bold",letterSpacing:"0.1em"}}>CONTROL PANEL</Link>
-      <Link to="/overlay" target="_blank" style={{color:"rgba(255,255,255,0.4)",textDecoration:"none",fontSize:"12px",letterSpacing:"0.1em"}}>OVERLAY ↗</Link>
+    <nav className="sticky top-0 z-50 flex items-center justify-between border-b border-orange-500/20 bg-[#07070f] px-6 py-3">
+      <div className="flex items-center gap-2">
+        <span className="font-orbitron text-lg font-black tracking-wider text-orange-500">BOOYAH</span>
+        <span className="font-orbitron text-lg font-black tracking-wider text-white">DIRECTOR</span>
+      </div>
+      <div className="flex items-center gap-2">
+        <Link
+          to="/control-panel"
+          className={`rounded-lg px-4 py-1.5 text-sm font-bold transition ${
+            isControl ? 'bg-orange-500 text-black' : 'text-gray-400 hover:bg-white/5 hover:text-white'
+          }`}
+        >
+          Control Panel
+        </Link>
+        <Link
+          to="/overlay"
+          target="_blank"
+          className="rounded-lg px-4 py-1.5 text-sm font-bold text-gray-400 transition hover:bg-white/5 hover:text-white"
+        >
+          OBS Overlay ↗
+        </Link>
+      </div>
     </nav>
   );
 }
 
-export default function App() {
+function AuthenticatedApp() {
+  const { user, loading } = useAuth();
+
+  if (loading) {
+    return (
+      <div className="flex h-full items-center justify-center bg-[#0a0a0f] text-gray-600">
+        <span className="font-orbitron text-sm">Loading...</span>
+      </div>
+    );
+  }
+
   return (
-    <BrowserRouter>
+    <div className="flex h-screen flex-col bg-[#0a0a0f] text-white">
       <NavBar />
-      <div style={{paddingTop:"40px",minHeight:"100vh"}}>
+      <div className="flex-1 overflow-hidden">
         <Routes>
           <Route path="/" element={<ControlPanel />} />
           <Route path="/control-panel" element={<ControlPanel />} />
           <Route path="/overlay" element={<Overlay />} />
         </Routes>
       </div>
-    </BrowserRouter>
+    </div>
+  );
+}
+
+export default function App() {
+  return (
+    <QueryClientProvider client={queryClient}>
+      <Router>
+        <AuthProvider>
+          <ScrollToTop />
+          <AuthenticatedApp />
+        </AuthProvider>
+      </Router>
+      <Toaster
+        position="top-right"
+        toastOptions={{
+          style: {
+            background: '#18181f',
+            color: '#fff',
+            border: '1px solid rgba(249,115,22,0.3)',
+            fontSize: '13px',
+          },
+        }}
+      />
+    </QueryClientProvider>
   );
 }

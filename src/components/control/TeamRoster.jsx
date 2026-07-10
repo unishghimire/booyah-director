@@ -9,10 +9,7 @@ function TeamRow({ team, players }) {
 
   return (
     <div className="overflow-hidden rounded-lg border border-white/10 bg-black/30">
-      <button
-        onClick={() => setExpanded(!expanded)}
-        className="flex w-full items-center justify-between px-3 py-2.5 text-left hover:bg-white/5"
-      >
+      <button onClick={() => setExpanded(!expanded)} className="flex w-full items-center justify-between px-3 py-2.5 text-left hover:bg-white/5">
         <div className="flex items-center gap-2">
           <ChevronDown className={`h-3.5 w-3.5 text-gray-500 transition ${expanded ? 'rotate-180' : ''}`} />
           <span className="text-sm font-semibold text-white">{team.name}</span>
@@ -51,16 +48,13 @@ export default function TeamRoster({ tournament, teams, players, onAction }) {
 
   const handleAddTeam = async (e) => {
     e.preventDefault();
-    if (!teamName.trim()) {
-      toast.error('Team name required');
-      return;
-    }
+    if (!teamName.trim()) { toast.error('Team name required'); return; }
     setSubmitting(true);
     try {
       await overlayApi.addTeam({
-        tournament_id: tournament.id || tournament._id,
-        name: teamName.trim(),
-        players: playerNames.map(n => n.trim()).filter(Boolean),
+        tournament_id: tournament.id,
+        team_name: teamName.trim(),
+        player_names: playerNames.map(n => n.trim()).filter(Boolean),
       });
       toast.success(`${teamName} added!`);
       setTeamName('');
@@ -77,59 +71,38 @@ export default function TeamRoster({ tournament, teams, players, onAction }) {
   return (
     <div className="space-y-3">
       <div>
-        <button
-          onClick={() => setShowAdd(!showAdd)}
-          className="flex w-full items-center justify-between rounded-lg border border-orange-500/30 bg-orange-500/10 px-3 py-2 text-sm font-semibold text-orange-400 hover:bg-orange-500/20"
-        >
+        <button onClick={() => setShowAdd(!showAdd)}
+          className="flex w-full items-center justify-between rounded-lg border border-orange-500/30 bg-orange-500/10 px-3 py-2 text-sm font-semibold text-orange-400 hover:bg-orange-500/20">
           <span className="flex items-center gap-2"><Plus className="h-4 w-4" /> Add Team</span>
           <ChevronDown className={`h-4 w-4 transition ${showAdd ? 'rotate-180' : ''}`} />
         </button>
         {showAdd && (
           <form onSubmit={handleAddTeam} className="mt-2 space-y-2 rounded-lg border border-white/10 bg-black/40 p-3">
-            <input
-              value={teamName}
-              onChange={e => setTeamName(e.target.value)}
-              placeholder="Team Name"
-              className="w-full rounded-md border border-white/10 bg-black/50 px-2.5 py-1.5 text-sm text-white outline-none focus:border-orange-500"
-            />
+            <input value={teamName} onChange={e => setTeamName(e.target.value)} placeholder="Team Name"
+              className="w-full rounded-md border border-white/10 bg-black/50 px-2.5 py-1.5 text-sm text-white outline-none focus:border-orange-500" />
             {playerNames.map((pn, i) => (
-              <input
-                key={i}
-                value={pn}
-                onChange={e => {
-                  const next = [...playerNames];
-                  next[i] = e.target.value;
-                  setPlayerNames(next);
-                }}
+              <input key={i} value={pn} onChange={e => { const next = [...playerNames]; next[i] = e.target.value; setPlayerNames(next); }}
                 placeholder={`Player ${i + 1}`}
-                className="w-full rounded-md border border-white/10 bg-black/50 px-2.5 py-1.5 text-sm text-white outline-none focus:border-orange-500"
-              />
+                className="w-full rounded-md border border-white/10 bg-black/50 px-2.5 py-1.5 text-sm text-white outline-none focus:border-orange-500" />
             ))}
-            <button
-              type="submit"
-              disabled={submitting}
-              className="w-full rounded-md bg-orange-500 py-2 text-sm font-bold text-black hover:opacity-90 disabled:opacity-50"
-            >
+            <button type="submit" disabled={submitting}
+              className="w-full rounded-md bg-orange-500 py-2 text-sm font-bold text-black hover:opacity-90 disabled:opacity-50">
               {submitting ? 'Adding...' : 'ADD TEAM'}
             </button>
           </form>
         )}
       </div>
-
       <div className="flex items-center gap-2 text-gray-400">
         <Users className="h-3.5 w-3.5" />
         <span className="text-xs font-medium uppercase tracking-wide">Roster ({teams.length})</span>
       </div>
-
-      <div className="space-y-1.5 overflow-y-auto" style={{ maxHeight: 'calc(100vh - 420px)' }}>
+      <div className="space-y-1.5">
         {teams.length === 0 && (
           <p className="rounded-lg border border-dashed border-white/10 px-3 py-6 text-center text-xs text-gray-600">
             No teams yet. Add your first team above.
           </p>
         )}
-        {teams.map(team => (
-          <TeamRow key={team.id || team._id} team={team} players={players} />
-        ))}
+        {teams.map(team => <TeamRow key={team.id} team={team} players={players} />)}
       </div>
     </div>
   );

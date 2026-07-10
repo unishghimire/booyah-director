@@ -1,39 +1,43 @@
 import React, { useMemo } from 'react';
-import { Activity } from 'lucide-react';
+import { ScrollText } from 'lucide-react';
 
 export default function KillFeedLog({ killFeed }) {
   const recent = useMemo(() => {
-    return [...killFeed]
-      .sort((a, b) => new Date(b.timestamp || 0) - new Date(a.timestamp || 0))
+    return [...(killFeed || [])]
+      .sort((a, b) => new Date(b.timestamp || b.created_date) - new Date(a.timestamp || a.created_date))
       .slice(0, 10);
   }, [killFeed]);
 
-  const formatTime = (ts) => {
-    if (!ts) return '';
+  const fmtTime = (ts) => {
     try {
-      return new Date(ts).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
+      const d = new Date(ts);
+      return d.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit', second: '2-digit' });
     } catch { return ''; }
   };
 
   return (
-    <div className="rounded-xl border border-white/10 bg-[#11111a] p-4">
-      <div className="mb-3 flex items-center gap-2">
-        <Activity className="h-4 w-4 text-orange-500" />
-        <h3 className="font-orbitron text-sm font-bold text-white">KILL FEED LOG</h3>
+    <div className="rounded-xl border border-white/10 bg-[#11111a] p-3">
+      <div className="mb-2 flex items-center gap-2">
+        <ScrollText className="h-3.5 w-3.5 text-orange-500" />
+        <h3 className="font-orbitron text-xs font-bold text-white">KILL FEED</h3>
       </div>
-      <div className="space-y-1 overflow-y-auto" style={{ maxHeight: '300px' }}>
-        {recent.length === 0 && (
-          <p className="py-4 text-center text-xs text-gray-600">No kills recorded yet</p>
-        )}
-        {recent.map((kill, i) => (
-          <div key={i} className="flex items-center gap-2 rounded-md bg-black/30 px-2 py-1.5 text-xs">
-            <span className="flex-shrink-0 text-[10px] text-gray-600">{formatTime(kill.timestamp)}</span>
-            <span className="truncate font-semibold text-orange-400">{kill.killer_name || '?'}</span>
-            <span className="flex-shrink-0 text-gray-600">💀</span>
-            <span className="truncate text-gray-300">{kill.killed_player_name || '?'}</span>
-          </div>
-        ))}
-      </div>
+      {recent.length === 0 ? (
+        <p className="py-3 text-center text-[10px] text-gray-600">No kills recorded</p>
+      ) : (
+        <div className="max-h-40 space-y-1 overflow-y-auto">
+          {recent.map((kill, i) => (
+            <div key={kill.id || i} className="flex items-center gap-1.5 rounded bg-white/5 px-2 py-1 text-[10px]">
+              <span className="text-gray-500">{fmtTime(kill.timestamp || kill.created_date)}</span>
+              <span className="font-bold text-orange-400">{kill.killer_name}</span>
+              {kill.killed_player_name ? (
+                <><span className="text-gray-600">→</span><span className="text-red-400">{kill.killed_player_name}</span></>
+              ) : (
+                <span className="text-gray-600">got a kill</span>
+              )}
+            </div>
+          ))}
+        </div>
+      )}
     </div>
   );
 }
