@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "match_id": {
+      "type": "string"
+    },
+    "tournament_id": {
+      "type": "string"
+    },
+    "eliminated_player_id": {
+      "type": "string"
+    },
+    "eliminated_player_name": {
+      "type": "string"
+    },
+    "eliminated_team_name": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string"
+    }
+  },
+  "required": [],
+  "name": "EliminationEvent"
+}

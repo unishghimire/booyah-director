@@ -1,0 +1,22 @@
+{
+  "type": "object",
+  "properties": {
+    "tournament_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "logo_url": {
+      "type": "string"
+    },
+    "total_tournament_points": {
+      "type": "number"
+    },
+    "total_tournament_kills": {
+      "type": "number"
+    }
+  },
+  "required": [],
+  "name": "Team"
+}
