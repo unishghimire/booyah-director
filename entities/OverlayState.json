@@ -1,0 +1,46 @@
+{
+  "type": "object",
+  "properties": {
+    "tournament_id": {
+      "type": "string"
+    },
+    "current_screen": {
+      "type": "string",
+      "enum": [
+        "setup_blank",
+        "pre_match_map",
+        "scoreboard",
+        "kill_feed",
+        "elimination_alert",
+        "mvp",
+        "champions"
+      ]
+    },
+    "mvp_player_id": {
+      "type": "string"
+    },
+    "mvp_player_name": {
+      "type": "string"
+    },
+    "mvp_team_name": {
+      "type": "string"
+    },
+    "mvp_kills": {
+      "type": "number"
+    },
+    "champion_team_id": {
+      "type": "string"
+    },
+    "champion_team_name": {
+      "type": "string"
+    },
+    "champion_total_points": {
+      "type": "number"
+    },
+    "last_updated_at": {
+      "type": "string"
+    }
+  },
+  "required": [],
+  "name": "OverlayState"
+}

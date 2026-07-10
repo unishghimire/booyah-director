@@ -1,0 +1,33 @@
+{
+  "type": "object",
+  "properties": {
+    "tournament_id": {
+      "type": "string"
+    },
+    "match_number": {
+      "type": "number"
+    },
+    "state": {
+      "type": "string",
+      "enum": [
+        "idle",
+        "pre_match",
+        "in_game",
+        "post_match",
+        "mvp",
+        "champions"
+      ]
+    },
+    "map_name": {
+      "type": "string"
+    },
+    "started_at": {
+      "type": "string"
+    },
+    "ended_at": {
+      "type": "string"
+    }
+  },
+  "required": [],
+  "name": "Match"
+}

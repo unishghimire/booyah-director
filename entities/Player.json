@@ -1,0 +1,25 @@
+{
+  "type": "object",
+  "properties": {
+    "team_id": {
+      "type": "string"
+    },
+    "tournament_id": {
+      "type": "string"
+    },
+    "name": {
+      "type": "string"
+    },
+    "is_alive": {
+      "type": "boolean"
+    },
+    "current_match_kills": {
+      "type": "number"
+    },
+    "total_tournament_kills": {
+      "type": "number"
+    }
+  },
+  "required": [],
+  "name": "Player"
+}

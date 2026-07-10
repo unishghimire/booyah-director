@@ -1,0 +1,31 @@
+{
+  "type": "object",
+  "properties": {
+    "match_id": {
+      "type": "string"
+    },
+    "tournament_id": {
+      "type": "string"
+    },
+    "killer_player_id": {
+      "type": "string"
+    },
+    "killer_name": {
+      "type": "string"
+    },
+    "killer_team_name": {
+      "type": "string"
+    },
+    "killed_player_name": {
+      "type": "string"
+    },
+    "killed_team_name": {
+      "type": "string"
+    },
+    "timestamp": {
+      "type": "string"
+    }
+  },
+  "required": [],
+  "name": "KillEvent"
+}
