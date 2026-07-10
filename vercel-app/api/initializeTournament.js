@@ -1,63 +1,43 @@
-const { db, genId } = require('./_db');
+const { loadDb, saveDb, genId } = require('./_db');
 
-module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json'
+};
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(455).json({ error: 'Method Not Allowed' });
-  }
+module.exports = (req, res) => {
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const { name, total_matches, points_per_kill, placement_points_config } = req.body || {};
+    if (!name || !total_matches) return res.status(400).json({ error: 'name and total_matches required' });
 
-    if (!name) {
-      return res.status(400).json({ error: 'Tournament name is required' });
-    }
+    const defaultConfig = { 1:15,2:12,3:10,4:8,5:6,6:4,7:2,8:1,9:1,10:1,11:1,12:1 };
+    const finalConfig = placement_points_config || defaultConfig;
 
-    const defaultPlacementConfig = {
-      1: 15, 2: 12, 3: 10, 4: 8, 5: 6, 6: 4, 7: 2, 8: 1, 9: 1, 10: 1, 11: 1, 12: 1
+    const db = loadDb();
+    const tournament = {
+      id: genId(),
+      name,
+      total_matches: parseInt(total_matches),
+      points_per_kill: points_per_kill || 1,
+      placement_points_config: JSON.stringify(finalConfig),
+      current_match_number: 0,
+      status: 'setup',
+      created_at: new Date().toISOString()
     };
 
-    const finalConfig = placement_points_config || defaultPlacementConfig;
-    const configString = JSON.stringify(finalConfig);
+    db.tournaments.push(tournament);
+    db.overlay_state.tournament_id = tournament.id;
+    db.overlay_state.current_screen = 'setup_blank';
+    db.overlay_state.last_updated_at = new Date().toISOString();
+    saveDb(db);
 
-    const tournamentId = genId();
-    const createdAt = new Date().toISOString();
-
-    const insertTournament = db.prepare(`
-      INSERT INTO tournaments (id, name, total_matches, points_per_kill, placement_points_config, current_match_number, status, created_at)
-      VALUES (?, ?, ?, ?, ?, 0, 'setup', ?)
-    `);
-    
-    insertTournament.run(
-      tournamentId,
-      name,
-      total_matches || 6,
-      points_per_kill !== undefined ? points_per_kill : 1,
-      configString,
-      createdAt
-    );
-
-    const updateOverlay = db.prepare(`
-      UPDATE overlay_state
-      SET tournament_id = ?, current_screen = 'setup_blank', last_updated_at = ?
-      WHERE id = 'singleton'
-    `);
-    updateOverlay.run(tournamentId, createdAt);
-
-    const tournament = db.prepare("SELECT * FROM tournaments WHERE id = ?").get(tournamentId);
-
-    return res.status(200).json({
-      success: true,
-      tournament
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+    res.json({ success: true, tournament });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

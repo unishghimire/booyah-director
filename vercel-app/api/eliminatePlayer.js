@@ -1,65 +1,45 @@
-const { db, genId } = require('./_db');
+const { loadDb, saveDb, genId } = require('./_db');
 
-module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json'
+};
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(455).json({ error: 'Method Not Allowed' });
-  }
+module.exports = (req, res) => {
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const { player_id, match_id } = req.body || {};
+    if (!player_id || !match_id) return res.status(400).json({ error: 'player_id and match_id required' });
 
-    if (!player_id || !match_id) {
-      return res.status(400).json({ error: 'player_id and match_id are required' });
-    }
+    const db = loadDb();
+    const pIdx = db.players.findIndex(p => p.id === player_id);
+    if (pIdx === -1) return res.status(404).json({ error: 'Player not found' });
 
-    const now = new Date().toISOString();
+    const player = db.players[pIdx];
+    const team = db.teams.find(t => t.id === player.team_id);
 
-    const player = db.prepare("SELECT * FROM players WHERE id = ?").get(player_id);
-    if (!player) {
-      return res.status(404).json({ error: 'Player not found' });
-    }
+    db.players[pIdx].is_alive = false;
 
-    const team = db.prepare("SELECT * FROM teams WHERE id = ?").get(player.team_id);
-    const teamName = team ? team.name : 'Unknown Team';
+    const elimEvent = {
+      id: genId(),
+      match_id,
+      tournament_id: player.tournament_id,
+      eliminated_player_id: player_id,
+      eliminated_player_name: player.name,
+      eliminated_team_name: team?.name || 'Unknown',
+      timestamp: new Date().toISOString()
+    };
+    db.elimination_events.push(elimEvent);
 
-    // Set player is_alive=0
-    db.prepare(`
-      UPDATE players
-      SET is_alive = 0
-      WHERE id = ?
-    `).run(player_id);
+    db.overlay_state.last_updated_at = new Date().toISOString();
+    saveDb(db);
 
-    // Create elimination_event row
-    const eliminationEventId = genId();
-    db.prepare(`
-      INSERT INTO elimination_events (id, match_id, tournament_id, eliminated_player_id, eliminated_player_name, eliminated_team_name, timestamp)
-      VALUES (?, ?, ?, ?, ?, ?, ?)
-    `).run(eliminationEventId, match_id, player.tournament_id, player_id, player.name, teamName, now);
-
-    // Update overlay_state timestamp
-    db.prepare(`
-      UPDATE overlay_state
-      SET last_updated_at = ?
-      WHERE id = 'singleton'
-    `).run(now);
-
-    const updatedPlayer = db.prepare("SELECT * FROM players WHERE id = ?").get(player_id);
-    const eliminationEvent = db.prepare("SELECT * FROM elimination_events WHERE id = ?").get(eliminationEventId);
-
-    return res.status(200).json({
-      success: true,
-      player: updatedPlayer,
-      elimination_event: eliminationEvent
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+    res.json({ success: true, player: { id: player_id, name: player.name, team: team?.name }, elimination_event: elimEvent });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

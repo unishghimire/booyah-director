@@ -1,35 +1,27 @@
-const { db } = require('./_db');
+const { loadDb, saveDb } = require('./_db');
 
-module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json'
+};
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(455).json({ error: 'Method Not Allowed' });
-  }
+module.exports = (req, res) => {
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const { screen } = req.body || {};
+    if (!screen) return res.status(400).json({ error: 'screen required' });
 
-    if (!screen) {
-      return res.status(400).json({ error: 'screen name is required' });
-    }
+    const db = loadDb();
+    db.overlay_state.current_screen = screen;
+    db.overlay_state.last_updated_at = new Date().toISOString();
+    saveDb(db);
 
-    const now = new Date().toISOString();
-
-    db.prepare(`
-      UPDATE overlay_state
-      SET current_screen = ?, last_updated_at = ?
-      WHERE id = 'singleton'
-    `).run(screen, now);
-
-    return res.status(200).json({ success: true });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

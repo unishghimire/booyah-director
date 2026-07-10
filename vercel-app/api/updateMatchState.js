@@ -1,58 +1,34 @@
-const { db } = require('./_db');
+const { loadDb, saveDb } = require('./_db');
 
-module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json'
+};
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(455).json({ error: 'Method Not Allowed' });
-  }
+module.exports = (req, res) => {
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const { match_id, state } = req.body || {};
+    if (!match_id || !state) return res.status(400).json({ error: 'match_id and state required' });
 
-    if (!match_id || !state) {
-      return res.status(400).json({ error: 'match_id and state are required' });
-    }
+    const db = loadDb();
+    const mIdx = db.matches.findIndex(m => m.id === match_id);
+    if (mIdx === -1) return res.status(404).json({ error: 'Match not found' });
 
-    const now = new Date().toISOString();
-
-    if (state === 'ended') {
-      db.prepare(`
-        UPDATE matches
-        SET state = ?, ended_at = ?
-        WHERE id = ?
-      `).run(state, now, match_id);
-    } else {
-      db.prepare(`
-        UPDATE matches
-        SET state = ?
-        WHERE id = ?
-      `).run(state, match_id);
-    }
-
-    // If state is live, update overlay screen to scoreboard
+    db.matches[mIdx].state = state;
+    if (state === 'ended') db.matches[mIdx].ended_at = new Date().toISOString();
     if (state === 'live') {
-      db.prepare(`
-        UPDATE overlay_state
-        SET current_screen = 'scoreboard', last_updated_at = ?
-        WHERE id = 'singleton'
-      `).run(now);
-    } else {
-      db.prepare(`
-        UPDATE overlay_state
-        SET last_updated_at = ?
-        WHERE id = 'singleton'
-      `).run(now);
+      db.overlay_state.current_screen = 'scoreboard';
+      db.overlay_state.last_updated_at = new Date().toISOString();
     }
 
-    return res.status(200).json({ success: true });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+    saveDb(db);
+    res.json({ success: true });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

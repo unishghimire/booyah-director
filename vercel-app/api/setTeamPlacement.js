@@ -1,110 +1,70 @@
-const { db, genId } = require('./_db');
+const { loadDb, saveDb, genId } = require('./_db');
 
-module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json'
+};
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(455).json({ error: 'Method Not Allowed' });
-  }
+module.exports = (req, res) => {
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const { team_id, match_id, placement, tournament_id } = req.body || {};
+    if (!team_id || !match_id || placement === undefined) return res.status(400).json({ error: 'team_id, match_id, and placement required' });
 
-    if (!team_id || !match_id || !placement || !tournament_id) {
-      return res.status(400).json({ error: 'Missing required fields' });
+    const db = loadDb();
+
+    // Check duplicate placement
+    const duplicate = db.match_standings.find(s => s.match_id === match_id && s.placement === placement && s.team_id !== team_id);
+    if (duplicate) return res.status(400).json({ error: `Placement ${placement} already assigned to ${duplicate.team_name}` });
+
+    const tournament = db.tournaments.find(t => t.id === tournament_id) || db.tournaments.find(t => t.status === 'active');
+    const defaultConfig = { 1:15,2:12,3:10,4:8,5:6,6:4,7:2,8:1,9:1,10:1,11:1,12:1 };
+    let config = defaultConfig;
+    if (tournament?.placement_points_config) {
+      try { config = { ...defaultConfig, ...JSON.parse(tournament.placement_points_config) }; } catch {}
     }
+    const placementPoints = config[String(placement)] || config[placement] || 0;
 
-    const now = new Date().toISOString();
+    const team = db.teams.find(t => t.id === team_id);
+    if (!team) return res.status(404).json({ error: 'Team not found' });
 
-    // Check no duplicate placement for same match
-    const duplicatePlacement = db.prepare(`
-      SELECT * FROM match_standings
-      WHERE match_id = ? AND placement = ? AND team_id != ?
-    `).get(match_id, placement, team_id);
+    const teamKillEvents = db.kill_events.filter(k => k.match_id === match_id && k.killer_team_name === team.name);
+    const teamKills = teamKillEvents.length;
+    const pointsPerKill = tournament?.points_per_kill || 1;
+    const killPoints = teamKills * pointsPerKill;
 
-    if (duplicatePlacement) {
-      return res.status(400).json({ error: `Placement ${placement} already awarded to team: ${duplicatePlacement.team_name}` });
-    }
+    const sIdx = db.match_standings.findIndex(s => s.match_id === match_id && s.team_id === team_id);
+    const tIdx = db.teams.findIndex(t => t.id === team_id);
 
-    // Get tournament config
-    const tournament = db.prepare("SELECT * FROM tournaments WHERE id = ?").get(tournament_id);
-    if (!tournament) {
-      return res.status(404).json({ error: 'Tournament not found' });
-    }
-
-    let config = {};
-    try {
-      config = JSON.parse(tournament.placement_points_config);
-    } catch (e) {
-      // Default fallback
-      config = {1:15,2:12,3:10,4:8,5:6,6:4,7:2,8:1,9:1,10:1,11:1,12:1};
-    }
-
-    const placementPoints = parseFloat(config[placement] || 0);
-
-    // Get the team name
-    const team = db.prepare("SELECT * FROM teams WHERE id = ?").get(team_id);
-    if (!team) {
-      return res.status(404).json({ error: 'Team not found' });
-    }
-
-    // Get current match standing for this team
-    let standing = db.prepare(`
-      SELECT * FROM match_standings
-      WHERE match_id = ? AND team_id = ?
-    `).get(match_id, team_id);
-
-    let originalPlacementPoints = 0;
-    let killPoints = 0;
-    const pointsPerKill = tournament.points_per_kill !== undefined ? tournament.points_per_kill : 1;
-
-    if (standing) {
-      originalPlacementPoints = standing.placement_points_awarded || 0;
-      killPoints = (standing.team_kills_this_match || 0) * pointsPerKill;
-
-      // Update standing
-      db.prepare(`
-        UPDATE match_standings
-        SET placement = ?,
-            placement_points_awarded = ?,
-            total_match_points = ? + ?
-        WHERE id = ?
-      `).run(placement, placementPoints, killPoints, placementPoints, standing.id);
+    if (sIdx !== -1) {
+      const oldPlacementPts = db.match_standings[sIdx].placement_points_awarded || 0;
+      db.teams[tIdx].total_tournament_points = Math.max(0, (db.teams[tIdx].total_tournament_points || 0) - oldPlacementPts + placementPoints);
+      db.match_standings[sIdx].placement = placement;
+      db.match_standings[sIdx].placement_points_awarded = placementPoints;
+      db.match_standings[sIdx].team_kills_this_match = teamKills;
+      db.match_standings[sIdx].total_match_points = placementPoints + killPoints;
     } else {
-      const standingId = genId();
-      db.prepare(`
-        INSERT INTO match_standings (id, match_id, tournament_id, team_id, team_name, placement, placement_points_awarded, team_kills_this_match, total_match_points)
-        VALUES (?, ?, ?, ?, ?, ?, ?, 0, ?)
-      `).run(standingId, match_id, tournament_id, team_id, team.name, placement, placementPoints, placementPoints);
+      db.match_standings.push({
+        id: genId(),
+        match_id,
+        tournament_id: tournament?.id || tournament_id,
+        team_id,
+        team_name: team.name,
+        placement,
+        placement_points_awarded: placementPoints,
+        team_kills_this_match: teamKills,
+        total_match_points: placementPoints + killPoints
+      });
+      db.teams[tIdx].total_tournament_points = (db.teams[tIdx].total_tournament_points || 0) + placementPoints;
     }
 
-    // Update team total_tournament_points: remove old placement points, add new placement points
-    const pointsDifference = placementPoints - originalPlacementPoints;
-    db.prepare(`
-      UPDATE teams
-      SET total_tournament_points = total_tournament_points + ?
-      WHERE id = ?
-    `).run(pointsDifference, team_id);
-
-    // Update overlay_state timestamp
-    db.prepare(`
-      UPDATE overlay_state
-      SET last_updated_at = ?
-      WHERE id = 'singleton'
-    `).run(now);
-
-    return res.status(200).json({
-      success: true,
-      placement_points: placementPoints,
-      kill_points: killPoints
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+    saveDb(db);
+    res.json({ success: true, team: team.name, placement, placement_points: placementPoints, kill_points: killPoints });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

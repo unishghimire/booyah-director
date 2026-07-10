@@ -1,69 +1,38 @@
-const { db } = require('./_db');
+const { loadDb } = require('./_db');
 
-module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json'
+};
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(455).json({ error: 'Method Not Allowed' });
-  }
+module.exports = (req, res) => {
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const { match_id } = req.body || {};
+    if (!match_id) return res.status(400).json({ error: 'match_id required' });
 
-    if (!match_id) {
-      return res.status(400).json({ error: 'match_id is required' });
+    const db = loadDb();
+    const killEvents = db.kill_events.filter(k => k.match_id === match_id);
+
+    const killMap = {};
+    for (const evt of killEvents) {
+      const pid = evt.killer_player_id;
+      if (!killMap[pid]) killMap[pid] = { name: evt.killer_name, team: evt.killer_team_name, kills: 0, player_id: pid };
+      killMap[pid].kills++;
     }
 
-    // Count kill_events per killer_player_id
-    const killCounts = db.prepare(`
-      SELECT killer_player_id, COUNT(*) as kills
-      FROM kill_events
-      WHERE match_id = ?
-      GROUP BY killer_player_id
-      ORDER BY kills DESC
-    `).all(match_id);
+    const sorted = Object.values(killMap).sort((a, b) => b.kills - a.kills);
+    if (sorted.length === 0) return res.json({ mvp: null, tied: false, message: 'No kills recorded' });
 
-    if (killCounts.length === 0) {
-      return res.status(200).json({
-        mvp: null,
-        tied: false,
-        max_kills: 0
-      });
-    }
+    const maxKills = sorted[0].kills;
+    const topPlayers = sorted.filter(p => p.kills === maxKills);
 
-    const maxKills = killCounts[0].kills;
-    const leaders = killCounts.filter(k => k.kills === maxKills);
-    const tied = leaders.length > 1;
-
-    // Get mvp details (take the first one)
-    const mvpPlayerId = leaders[0].killer_player_id;
-    const player = db.prepare("SELECT * FROM players WHERE id = ?").get(mvpPlayerId);
-
-    let teamName = 'Unknown Team';
-    if (player) {
-      const team = db.prepare("SELECT * FROM teams WHERE id = ?").get(player.team_id);
-      if (team) {
-        teamName = team.name;
-      }
-    }
-
-    return res.status(200).json({
-      mvp: {
-        player_id: mvpPlayerId,
-        name: player ? player.name : 'Unknown Player',
-        team: teamName,
-        kills: maxKills
-      },
-      tied,
-      max_kills: maxKills
-    });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+    res.json({ mvp: topPlayers[0], tied: topPlayers.length > 1, tied_players: topPlayers, max_kills: maxKills });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

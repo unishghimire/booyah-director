@@ -1,73 +1,70 @@
-const { db } = require('./_db');
+const { loadDb } = require('./_db');
 
-module.exports = async (req, res) => {
-  // CORS Headers
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json'
+};
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'GET') {
-    return res.status(455).json({ error: 'Method Not Allowed' });
-  }
+module.exports = (req, res) => {
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
-    // 1. Get active tournament (status='active') or first tournament
-    let tournament = db.prepare("SELECT * FROM tournaments WHERE status = 'active' LIMIT 1").get();
+    const db = loadDb();
+    const tournament = db.tournaments.find(t => t.status === 'active') || db.tournaments[0] || null;
+
     if (!tournament) {
-      tournament = db.prepare("SELECT * FROM tournaments ORDER BY created_at DESC LIMIT 1").get();
+      return res.json({
+        tournament: null,
+        overlay_state: db.overlay_state,
+        teams: [], players: [], current_match: null,
+        kill_feed: [], eliminations: [], standings: []
+      });
     }
 
-    // 2. Get overlay_state singleton
-    const overlay_state = db.prepare("SELECT * FROM overlay_state WHERE id = 'singleton'").get();
+    const tid = tournament.id;
+    const teams = db.teams
+      .filter(t => t.tournament_id === tid)
+      .sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
 
-    let teams = [];
-    let players = [];
-    let current_match = null;
-    let kill_feed = [];
+    const players = db.players.filter(p => p.tournament_id === tid);
+
+    const matches = db.matches
+      .filter(m => m.tournament_id === tid)
+      .sort((a, b) => (b.match_number || 0) - (a.match_number || 0));
+    const currentMatch = matches[0] || null;
+
+    let killFeed = [];
     let eliminations = [];
     let standings = [];
 
-    if (tournament) {
-      const tourneyId = tournament.id;
+    if (currentMatch) {
+      killFeed = db.kill_events
+        .filter(k => k.match_id === currentMatch.id)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 10);
 
-      // 3. Get teams for tournament sorted by total_tournament_points DESC
-      teams = db.prepare("SELECT * FROM teams WHERE tournament_id = ? ORDER BY total_tournament_points DESC").all(tourneyId);
+      eliminations = db.elimination_events
+        .filter(e => e.match_id === currentMatch.id)
+        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp))
+        .slice(0, 5);
 
-      // 4. Get players for tournament
-      players = db.prepare("SELECT * FROM players WHERE tournament_id = ?").all(tourneyId);
-
-      // 5. Get most recent match for tournament
-      current_match = db.prepare("SELECT * FROM matches WHERE tournament_id = ? ORDER BY match_number DESC LIMIT 1").get();
-
-      if (current_match) {
-        const matchId = current_match.id;
-
-        // 6. Get last 10 kill_events for current match
-        kill_feed = db.prepare("SELECT * FROM kill_events WHERE match_id = ? ORDER BY timestamp DESC LIMIT 10").all(matchId);
-
-        // 7. Get last 5 elimination_events for current match
-        eliminations = db.prepare("SELECT * FROM elimination_events WHERE match_id = ? ORDER BY timestamp DESC LIMIT 5").all(matchId);
-
-        // 8. Get match_standings for current match
-        standings = db.prepare("SELECT * FROM match_standings WHERE match_id = ?").all(matchId);
-      }
+      standings = db.match_standings.filter(s => s.match_id === currentMatch.id);
     }
 
-    return res.status(200).json({
+    res.json({
       tournament,
-      overlay_state,
+      overlay_state: db.overlay_state,
       teams,
       players,
-      current_match,
-      kill_feed,
+      current_match: currentMatch,
+      kill_feed: killFeed,
       eliminations,
       standings
     });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };

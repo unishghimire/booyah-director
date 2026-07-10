@@ -1,63 +1,39 @@
-const { db } = require('./_db');
+const { loadDb, saveDb } = require('./_db');
 
-module.exports = async (req, res) => {
-  res.setHeader('Access-Control-Allow-Origin', '*');
-  res.setHeader('Access-Control-Allow-Methods', 'GET,POST,OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type');
+const CORS = {
+  'Access-Control-Allow-Origin': '*',
+  'Access-Control-Allow-Methods': 'GET,POST,OPTIONS',
+  'Access-Control-Allow-Headers': 'Content-Type',
+  'Content-Type': 'application/json'
+};
 
-  if (req.method === 'OPTIONS') {
-    return res.status(200).end();
-  }
-
-  if (req.method !== 'POST') {
-    return res.status(455).json({ error: 'Method Not Allowed' });
-  }
+module.exports = (req, res) => {
+  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+  if (req.method === 'OPTIONS') return res.status(200).end();
 
   try {
     const { tournament_id } = req.body || {};
+    if (!tournament_id) return res.status(400).json({ error: 'tournament_id required' });
 
-    if (!tournament_id) {
-      return res.status(400).json({ error: 'tournament_id is required' });
-    }
+    const db = loadDb();
+    const tIdx = db.tournaments.findIndex(t => t.id === tournament_id);
+    if (tIdx !== -1) db.tournaments[tIdx].status = 'completed';
 
-    // Get all teams for tournament sorted by total_tournament_points DESC
-    const teams = db.prepare(`
-      SELECT id, name, logo_url, total_tournament_points, total_tournament_kills
-      FROM teams
-      WHERE tournament_id = ?
-      ORDER BY total_tournament_points DESC
-    `).all(tournament_id);
+    const teams = db.teams
+      .filter(t => t.tournament_id === tournament_id)
+      .sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
 
-    // Update tournament status='completed'
-    db.prepare(`
-      UPDATE tournaments
-      SET status = 'completed'
-      WHERE id = ?
-    `).run(tournament_id);
-
-    // Update overlay_state timestamp
-    const now = new Date().toISOString();
-    db.prepare(`
-      UPDATE overlay_state
-      SET last_updated_at = ?
-      WHERE id = 'singleton'
-    `).run(now);
-
-    const rankings = teams.map(t => ({
-      team: {
-        id: t.id,
-        name: t.name,
-        logo_url: t.logo_url
-      },
-      total_points: t.total_tournament_points,
-      total_kills: t.total_tournament_kills
-    }));
-
-    return res.status(200).json({
+    saveDb(db);
+    res.json({
       success: true,
-      rankings
+      rankings: teams.map((t, i) => ({
+        rank: i + 1,
+        team: t.name,
+        total_points: t.total_tournament_points,
+        total_kills: t.total_tournament_kills
+      }))
     });
-  } catch (error) {
-    return res.status(500).json({ error: error.message });
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 };
