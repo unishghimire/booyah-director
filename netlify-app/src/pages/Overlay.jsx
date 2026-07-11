@@ -1,23 +1,17 @@
-/**
- * OBS OVERLAY — Professional Free Fire Official Tournament Style
- * Broadcast Industry Standard
- * 
- * OBS SETUP: In OBS Browser Source, check 'Transparent background' and uncheck 'Shutdown source when not visible'
- */
 import React, { useEffect, useState, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useOverlayData } from '@/lib/overlayApi';
-import { Skull, Star, Crown, Zap } from 'lucide-react';
+import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award } from 'lucide-react';
 
 /* ── Design tokens helper ── */
 const tok = {
   acc:  x => x?.accentColor  || '#f97316',
   acc2: x => x?.accentColor2 || '#00d4ff',
-  bg:   x => x?.bgColor      || '#050814',
+  bg:   x => x?.bgColor      || '#060915',
   txt:  x => x?.textColor    || '#ffffff',
-  name: x => x?.tournamentName    || 'FF CHAMPIONSHIP',
+  name: x => x?.tournamentName    || 'BOOYAH CUP',
   sub:  x => x?.tournamentSubtitle || 'GRAND FINALS',
-  game: x => x?.gameLabel    || 'MATCH',
+  game: x => x?.gameLabel    || 'GAME',
   font: x => {
     const f = x?.fontStyle || 'orbitron';
     if (f === 'rajdhani') return 'Rajdhani, sans-serif';
@@ -26,64 +20,42 @@ const tok = {
   },
 };
 
-const MAP_COLORS = {
-  Bermuda: '#10b981',
-  Kalahari: '#f59e0b',
-  Purgatory: '#a855f7',
-  Alpine: '#3b82f6',
-  Nexterra: '#06b6d4'
-};
+const carbonFiberBg = `repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 4px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 4px), #060915`;
 
 /* ── Garena-style Header Bar (For Solid BG Screens) ── */
 function FFHeader({ design, title, right }) {
   const primary = tok.acc(design);
   const cyan    = tok.acc2(design);
   return (
-    <div className="flex items-center justify-between px-6 py-3"
+    <div className="relative flex h-14 w-full items-center justify-between px-6"
       style={{ 
-        background: `linear-gradient(135deg, ${primary}22 0%, ${tok.bg(design)} 50%, ${cyan}22 100%)`, 
-        borderBottom: `2px solid ${primary}` 
+        background: 'rgba(0,0,0,0.6)', 
+        borderBottom: `1px solid ${primary}4d` 
       }}>
-      {/* Left logo */}
-      <div className="flex items-center gap-2">
-        {design?.logoUrl ? (
-          <img src={design.logoUrl} alt="" className="h-6 object-contain" onError={e => e.target.style.display = 'none'} />
-        ) : (
-          <div className="flex h-6 w-6 items-center justify-center rounded-full" style={{ background: primary + '33' }}>
-            <Zap className="h-3.5 w-3.5" style={{ color: primary }} />
-          </div>
-        )}
-        <span className="font-orbitron text-[11px] font-black tracking-wider" style={{ color: primary }}>GARENA ESPORTS</span>
+      {/* Left logo / Garena G */}
+      <div className="flex items-center gap-3">
+        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-orange-500/30" style={{ background: `radial-gradient(circle, ${primary}33 0%, transparent 100%)` }}>
+          <span className="font-orbitron text-base font-black text-white" style={{ color: primary }}>G</span>
+        </div>
+        <div className="flex flex-col">
+          <span className="font-orbitron text-[11px] font-black tracking-[0.2em] text-white">GARENA ESPORTS</span>
+          <span className="font-orbitron text-[8px] font-bold tracking-[0.1em] text-gray-400">OFFICIAL PARTNER</span>
+        </div>
       </div>
       {/* Center title */}
-      <div className="flex items-center gap-3">
-        <div className="h-[2px] w-12" style={{ background: `linear-gradient(to right, transparent, ${primary})` }} />
-        <span className="font-orbitron text-sm font-black tracking-widest text-white uppercase">{title || tok.name(design)}</span>
-        <div className="h-[2px] w-12" style={{ background: `linear-gradient(to left, transparent, ${cyan})` }} />
+      <div className="flex items-center gap-4">
+        <div className="h-[1px] w-16" style={{ background: `linear-gradient(to right, transparent, ${primary})` }} />
+        <span className="font-orbitron text-base font-black tracking-[0.3em] text-white uppercase">{title || tok.name(design)}</span>
+        <div className="h-[1px] w-16" style={{ background: `linear-gradient(to left, transparent, ${cyan})` }} />
       </div>
       {/* Right side banner */}
-      <span className="font-orbitron text-[11px] font-black tracking-wider" style={{ color: cyan }}>
-        {right || tok.sub(design)}
-      </span>
-    </div>
-  );
-}
-
-/* ── HUD Bracket Box ── */
-function Brackets({ design, children, className = '', style = {} }) {
-  const c = tok.acc(design);
-  const c2 = tok.acc2(design);
-  return (
-    <div className={`relative ${className}`} style={style}>
-      {/* Top Left */}
-      <div className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2" style={{ borderColor: c }} />
-      {/* Top Right */}
-      <div className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2" style={{ borderColor: c2 }} />
-      {/* Bottom Left */}
-      <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2" style={{ borderColor: c2 }} />
-      {/* Bottom Right */}
-      <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2" style={{ borderColor: c }} />
-      {children}
+      <div className="flex flex-col items-end">
+        <span className="font-orbitron text-xs font-black tracking-[0.2em]" style={{ color: primary }}>
+          {right || tok.sub(design)}
+        </span>
+      </div>
+      {/* Orange LED strip on very bottom */}
+      <div className="absolute bottom-0 left-0 h-[1px] w-full" style={{ background: `linear-gradient(90deg, ${primary}, transparent, ${primary})` }} />
     </div>
   );
 }
@@ -96,606 +68,271 @@ function SetupBlank() {
 }
 
 /* ══════════════════════════════════════════════════
-   2. PRE-MATCH MAP INTRO (Solid BG)
-══════════════════════════════════════════════════ */
-function PreMatchMap({ match, teams, players, design }) {
-  const mapName  = (match?.map_name || 'BERMUDA').toUpperCase();
-  const matchNum = match?.match_number || 1;
-  const primary  = tok.acc(design);
-  const cyan     = tok.acc2(design);
-
-  return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: tok.bg(design) }}>
-      {/* Animated technical background grids */}
-      <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}22 1px, transparent 1px), linear-gradient(90deg, ${primary}22 1px, transparent 1px)`, backgroundSize: '50px 50px' }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 40%, ${primary}1e, transparent 70%)` }} />
-
-      <FFHeader design={design} title="MAP SELECTION" right={`${tok.game(design)} ${matchNum}`} />
-
-      {/* Dramatic Map Presentation */}
-      <div className="flex flex-1 flex-col items-center justify-center">
-        <motion.p 
-          initial={{ opacity: 0, y: -30 }} 
-          animate={{ opacity: 1, y: 0 }}
-          className="mb-2 font-orbitron font-black uppercase tracking-[0.6em]"
-          style={{ fontSize: 20, color: cyan }}>
-          {tok.game(design)} {matchNum}
-        </motion.p>
-
-        <motion.h1 
-          initial={{ opacity: 0, scale: 0.5 }} 
-          animate={{ opacity: 1, scale: 1 }} 
-          transition={{ type: 'spring', stiffness: 90, damping: 15 }}
-          className="font-orbitron font-black tracking-wider leading-none"
-          style={{ 
-            fontSize: 140, 
-            color: '#ffffff',
-            textShadow: `0 0 40px ${primary}88, 0 0 80px ${primary}33`,
-            WebkitTextStroke: `1px ${primary}`
-          }}>
-          {mapName}
-        </motion.h1>
-
-        <motion.div 
-          initial={{ scaleX: 0 }} 
-          animate={{ scaleX: 1 }} 
-          transition={{ delay: 0.4, duration: 0.6 }}
-          className="mt-6 h-1 w-[600px]"
-          style={{ background: `linear-gradient(to right, transparent, ${primary}, ${cyan}, transparent)` }} />
-      </div>
-
-      {/* Grid of registered teams */}
-      {(teams || []).length > 0 && (
-        <motion.div 
-          initial={{ opacity: 0, y: 40 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          transition={{ delay: 0.6 }}
-          className="grid grid-cols-6 gap-3 px-12 py-6 border-t"
-          style={{ borderColor: `${primary}33`, background: `${tok.bg(design)}cc`, backdropFilter: 'blur(8px)' }}>
-          {teams.map((team, i) => {
-            const teamColor = [primary, cyan, '#a855f7', '#10b981', '#ef4444', '#eab308'][i % 6];
-            return (
-              <div key={team.id} className="flex items-center gap-3 rounded-lg border p-2"
-                style={{ borderColor: `${teamColor}44`, background: `${teamColor}0c` }}>
-                {team.logo_url ? (
-                  <img src={team.logo_url} alt="" className="h-8 w-8 rounded-full object-cover" onError={e => e.target.style.display = 'none'} />
-                ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full font-black text-xs" style={{ background: `${teamColor}33`, color: teamColor }}>
-                    {team.name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
-                <span className="font-orbitron text-[11px] font-black truncate text-white uppercase">{team.name}</span>
-              </div>
-            );
-          })}
-        </motion.div>
-      )}
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════
-   3. FF BOARD / SCOREBOARD (Transparent OBS Overlay)
-   - sits on bottom-right of the screen (width 480px max)
-   - semi-transparent backdrop with blur
-   - compact heights (28-32px) to guarantee fit for 12 teams
+   2. FF BOARD / SCOREBOARD (Transparent OBS Overlay)
 ══════════════════════════════════════════════════ */
 function FFBoard({ teams, players, currentMatch, design }) {
   const primary = tok.acc(design);
   const cyan    = tok.acc2(design);
-  const font    = tok.font(design);
+  const matchNum = currentMatch?.match_number || 1;
 
   const rows = useMemo(() => {
-    return [...(teams || [])].sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0))
+    return [...(teams || [])]
+      .sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0))
+      .slice(0, 12)
       .map((team, i) => {
-        const tp = (players || []).filter(p => p.team_id === team.id);
-        const alive = tp.filter(p => p.is_alive).length;
-        const total = tp.length || 4;
+        const teamPlayers = (players || []).filter(p => p.team_id === team.id);
+        const aliveCount = teamPlayers.filter(p => p.is_alive).length;
+        const totalCount = teamPlayers.length || 4;
         return {
-          team, rank: i + 1, alive, total,
+          team,
+          rank: i + 1,
+          alive: aliveCount,
+          total: totalCount,
           kills: team.total_tournament_kills || 0,
           booyah: team.booyahs_count || 0,
           pts: team.total_tournament_points || 0,
-          isOut: alive === 0 && tp.length > 0,
+          isOut: aliveCount === 0 && teamPlayers.length > 0,
         };
       });
   }, [teams, players]);
 
   return (
-    <div className="absolute right-6 bottom-6 flex flex-col overflow-hidden rounded-xl border border-orange-500/30"
+    <div className="absolute right-6 top-1/2 w-[420px] -translate-y-1/2 flex flex-col overflow-hidden rounded-lg"
       style={{ 
-        background: 'rgba(5, 8, 20, 0.88)', 
-        backdropFilter: 'blur(12px)',
-        width: 460,
-        maxHeight: 520
+        background: 'rgba(5, 8, 20, 0.92)', 
+        backdropFilter: 'blur(16px)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: `0 0 60px rgba(249,115,22,0.08), 0 24px 48px rgba(0,0,0,0.6), inset 0 1px 0 rgba(249,115,22,0.3)`
       }}>
       
-      {/* Garena-style top Orange strip */}
-      <div className="h-1 w-full" style={{ background: `linear-gradient(90deg, ${primary}, ${cyan})` }} />
+      {/* Top LED accent line */}
+      <div className="h-[2px] w-full" style={{ background: `linear-gradient(90deg, ${primary}, ${cyan})` }} />
 
       {/* Header bar */}
-      <div className="flex items-center justify-between px-3 py-1.5 border-b" style={{ borderColor: `${primary}33` }}>
-        <div className="flex items-center gap-1.5">
-          <span className="h-2 w-2 rounded-full bg-orange-500 animate-pulse" />
-          <span className="font-orbitron text-[10px] font-black text-white uppercase tracking-wider">FF LIVE SCOREBOARD</span>
+      <div className="flex items-center justify-between px-4 py-2 border-b border-white/5">
+        <div className="flex items-center gap-2">
+          {design?.logoUrl ? (
+            <img src={design.logoUrl} alt="" className="h-4 object-contain" />
+          ) : (
+            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-orange-500/20">
+              <Zap className="h-2.5 w-2.5" style={{ color: primary }} />
+            </div>
+          )}
+          <span className="font-orbitron text-[9px] font-black tracking-[0.3em] text-white">
+            {tok.name(design).toUpperCase()}
+          </span>
         </div>
-        <span className="font-orbitron text-[9px] font-bold text-gray-400">
-          {tok.game(design)} {currentMatch?.match_number || 1}
+        <span className="font-orbitron text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: primary }}>
+          GAME {matchNum}
         </span>
       </div>
 
       {/* Column Titles */}
-      <div className="flex items-center px-3 py-1 text-[8px] font-black tracking-widest text-gray-400 uppercase"
-        style={{ background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid ${primary}22` }}>
-        <span className="w-8 text-center">#</span>
-        <span className="w-7 text-center">LOGO</span>
-        <span className="flex-1 pl-1">TEAM</span>
-        <span className="w-12 text-center">KILLS</span>
-        <span className="w-12 text-center">BOOYAH</span>
-        <span className="w-12 text-center">PTS</span>
-        <span className="w-14 text-center">ALIVE</span>
+      <div className="grid grid-cols-[30px_35px_1fr_40px_40px_50px_40px] items-center px-4 py-1 text-[10px] font-black tracking-[0.15em] text-white/35 uppercase border-b border-white/5 bg-black/20">
+        <div>#</div>
+        <div>LOGO</div>
+        <div>TEAM</div>
+        <div className="text-right">K</div>
+        <div className="text-right">BP</div>
+        <div className="text-right">PTS</div>
+        <div className="text-center">HP</div>
       </div>
 
-      {/* Team Rows */}
-      <div className="flex-1 overflow-y-auto space-y-[2px] p-1.5 scrollbar-none">
+      {/* Rows */}
+      <div className="flex flex-col">
         {rows.map((row, idx) => {
           const isTop3 = row.rank <= 3;
-          const isRank1 = row.rank === 1;
+          const leftBarColor = row.rank === 1 ? '#fbbf24' : row.rank === 2 ? '#94a3b8' : row.rank === 3 ? '#b45309' : null;
           
           return (
             <motion.div 
               key={row.team.id}
               initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ delay: idx * 0.02 }}
-              className="flex items-center rounded-md px-2"
-              style={{ 
-                height: 30,
-                background: row.isOut 
-                  ? 'rgba(255,255,255,0.02)' 
-                  : isRank1 
-                    ? `linear-gradient(90deg, ${primary}22, rgba(5,8,20,0.5))` 
-                    : isTop3 
-                      ? 'rgba(255,255,255,0.06)' 
-                      : 'rgba(0,0,0,0.25)',
-                borderLeft: isRank1 
-                  ? `2px solid ${primary}` 
-                  : isTop3 
-                    ? `2px solid ${cyan}` 
-                    : '2px solid transparent',
-                opacity: row.isOut ? 0.4 : 1,
-                boxShadow: isRank1 ? `0 0 8px ${primary}1e` : 'none'
-              }}>
-              
-              {/* Rank */}
-              <span className="w-8 text-center font-orbitron text-xs font-black" 
-                style={{ color: isRank1 ? primary : isTop3 ? cyan : '#9ca3af', fontFamily: font }}>
-                {row.rank}
-              </span>
-
-              {/* Logo */}
-              <div className="w-7 flex justify-center">
-                {row.team.logo_url ? (
-                  <img src={row.team.logo_url} alt="" className="h-5 w-5 rounded-full object-cover" onError={e => e.target.style.display = 'none'} />
-                ) : (
-                  <div className="flex h-5 w-5 items-center justify-center rounded-full font-black text-[8px]" 
-                    style={{ background: isTop3 ? `${primary}33` : 'rgba(255,255,255,0.1)', color: isTop3 ? primary : '#9ca3af' }}>
-                    {row.team.name.slice(0,2).toUpperCase()}
-                  </div>
-                )}
-              </div>
-
-              {/* Team Name */}
-              <span className="flex-1 pl-1 font-orbitron text-[10px] font-black uppercase text-white truncate" style={{ fontFamily: font }}>
-                {row.team.name}
-              </span>
-
-              {/* Kills */}
-              <span className="w-12 text-center font-orbitron text-[11px] font-black" style={{ color: cyan, fontFamily: font }}>
-                {row.kills}
-              </span>
-
-              {/* Booyah */}
-              <span className="w-12 text-center font-orbitron text-[11px] font-black text-amber-400" style={{ fontFamily: font }}>
-                {row.booyah}
-              </span>
-
-              {/* Points */}
-              <span className="w-12 text-center font-orbitron text-xs font-black text-white" style={{ fontFamily: font }}>
-                {row.pts}
-              </span>
-
-              {/* Alive bars */}
-              <div className="w-14 flex items-center justify-center gap-[2px]">
-                {row.isOut ? (
-                  <span className="font-orbitron text-[8px] font-black text-red-500/80">ELIM</span>
-                ) : (
-                  Array.from({ length: row.total }).map((_, i) => (
-                    <div key={i} className="w-[3px] h-3 rounded-full" 
-                      style={{ background: i < row.alive ? primary : 'rgba(255,255,255,0.15)' }} />
-                  ))
-                )}
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════
-   4. FULL STANDINGS / TOURNAMENT TABLE (Transparent OBS Overlay)
-   - Wide centered elegant leaderboards overlay
-══════════════════════════════════════════════════ */
-function FullStandings({ teams, design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
-  const font    = tok.font(design);
-
-  const sorted = useMemo(() => {
-    return [...(teams || [])].sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
-  }, [teams]);
-
-  return (
-    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 flex flex-col overflow-hidden rounded-2xl border"
-      style={{ 
-        background: 'rgba(5, 8, 20, 0.9)', 
-        backdropFilter: 'blur(16px)',
-        borderColor: `${primary}33`,
-        width: 740,
-        height: 640
-      }}>
-      
-      {/* Highlight Top bar */}
-      <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, ${primary}, ${cyan})` }} />
-
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-3 border-b" style={{ borderColor: `${primary}22` }}>
-        <div className="flex flex-col">
-          <span className="font-orbitron text-sm font-black text-white uppercase tracking-widest">{tok.name(design)}</span>
-          <span className="text-[9px] font-bold text-gray-500 tracking-wider uppercase">{tok.sub(design)}</span>
-        </div>
-        <div className="rounded border border-orange-500/40 bg-orange-500/10 px-3 py-1 font-orbitron text-xs font-black text-orange-400">
-          OVERALL STANDINGS
-        </div>
-      </div>
-
-      {/* Table Headers */}
-      <div className="flex items-center px-6 py-2.5 text-[9px] font-black tracking-widest text-gray-400 uppercase"
-        style={{ background: 'rgba(0,0,0,0.3)', borderBottom: `1px solid ${primary}22` }}>
-        <span className="w-12 text-center">RANK</span>
-        <span className="w-12 text-center">LOGO</span>
-        <span className="flex-1 pl-4">TEAM NAME</span>
-        <span className="w-24 text-center">TOTAL KILLS</span>
-        <span className="w-24 text-center">BOOYAH</span>
-        <span className="w-32 text-center">TOTAL POINTS</span>
-      </div>
-
-      {/* List */}
-      <div className="flex-1 overflow-y-auto space-y-1 p-3 scrollbar-none">
-        {sorted.map((team, idx) => {
-          const rank = idx + 1;
-          const isTop3 = rank <= 3;
-          const medalColor = rank === 1 ? '#fbbf24' : rank === 2 ? '#9ca3af' : rank === 3 ? '#b45309' : null;
-
-          return (
-            <motion.div key={team.id}
-              initial={{ opacity: 0, y: 15 }}
-              animate={{ opacity: 1, y: 0 }}
+              animate={{ opacity: row.isOut ? 0.45 : 1, x: 0 }}
               transition={{ delay: idx * 0.03 }}
-              className="flex items-center rounded-lg px-4 py-2"
-              style={{ 
-                background: isTop3 ? `linear-gradient(90deg, ${primary}15, rgba(255,255,255,0.02))` : 'rgba(0,0,0,0.2)',
-                border: isTop3 ? `1px solid ${primary}22` : '1px solid rgba(255,255,255,0.05)'
-              }}>
+              className="grid grid-cols-[30px_35px_1fr_40px_40px_50px_40px] items-center px-4 h-7 border-b border-white/5 relative"
+              style={{
+                background: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.015)',
+                borderLeft: leftBarColor ? `3px solid ${leftBarColor}` : 'none',
+                boxShadow: row.rank === 1 ? `inset 2px 0 0 ${primary}` : undefined
+              }}
+            >
+              {/* Rank */}
+              <div className="font-orbitron text-xs font-bold text-white/80">{row.rank}</div>
               
-              {/* Rank column with Medal Accents */}
-              <div className="w-12 text-center flex items-center justify-center relative">
-                {isTop3 && (
-                  <div className="absolute left-0 w-1 h-5 rounded-full" style={{ background: medalColor }} />
-                )}
-                <span className="font-orbitron text-base font-black" style={{ color: medalColor || '#ffffff', fontFamily: font }}>
-                  {rank}
-                </span>
-              </div>
-
-              {/* Logo */}
-              <div className="w-12 flex justify-center">
-                {team.logo_url ? (
-                  <img src={team.logo_url} alt="" className="h-8 w-8 rounded-full object-cover border" style={{ borderColor: medalColor || '#ffffff22' }} onError={e => e.target.style.display = 'none'} />
+              {/* Team Logo / Initials */}
+              <div>
+                {row.team.logo_url ? (
+                  <img src={row.team.logo_url} alt="" className="h-[18px] w-[18px] rounded-full object-cover" />
                 ) : (
-                  <div className="flex h-8 w-8 items-center justify-center rounded-full font-black text-[10px]" 
-                    style={{ background: isTop3 ? `${primary}33` : 'rgba(255,255,255,0.1)', color: isTop3 ? primary : '#9ca3af' }}>
-                    {team.name.slice(0,2).toUpperCase()}
+                  <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full text-[9px] font-black text-white" style={{ background: primary }}>
+                    {row.team.name.slice(0, 2).toUpperCase()}
                   </div>
                 )}
               </div>
 
               {/* Team Name */}
-              <div className="flex flex-1 pl-4 items-center">
-                <span className="font-orbitron text-xs font-black uppercase text-white" style={{ fontFamily: font }}>
-                  {team.name}
-                </span>
+              <div className="font-orbitron text-xs font-black truncate uppercase text-white tracking-wide">
+                {row.team.name}
               </div>
 
               {/* Kills */}
-              <span className="w-24 text-center font-orbitron text-sm font-black" style={{ color: cyan, fontFamily: font }}>
-                {team.total_tournament_kills || 0}
-              </span>
+              <div className="font-mono text-xs text-right font-bold" style={{ color: row.kills > 0 ? primary : 'rgba(255,255,255,0.6)' }}>
+                {row.kills}
+              </div>
 
-              {/* Booyah (placement wins) */}
-              <span className="w-24 text-center font-orbitron text-sm font-black text-amber-400" style={{ fontFamily: font }}>
-                {team.booyahs_count || 0}
-              </span>
+              {/* Booyah / Placement points */}
+              <div className="font-mono text-xs text-right font-bold" style={{ color: cyan }}>
+                {row.booyah}
+              </div>
 
               {/* Total points */}
-              <span className="w-32 text-center font-orbitron text-base font-black text-white" style={{ fontFamily: font }}>
-                {team.total_tournament_points || 0}
-              </span>
+              <div className="font-orbitron text-xs text-right font-black text-white">
+                {row.pts}
+              </div>
 
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════
-   5. TODAY'S MATCHES (Solid BG)
-══════════════════════════════════════════════════ */
-function TodaysMatches({ tournament, design }) {
-  const total   = tournament?.total_matches || 5;
-  const current = tournament?.current_match_number || 0;
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
-  const maps    = ['Bermuda', 'Kalahari', 'Purgatory', 'Alpine', 'Nexterra'];
-  const times   = ['14:00', '15:15', '16:30', '17:45', '19:00'];
-
-  return (
-    <div className="flex h-full w-full flex-col overflow-hidden" style={{ background: tok.bg(design) }}>
-      {/* Background Grids */}
-      <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}22 1px, transparent 1px), linear-gradient(90deg, ${cyan}22 1px, transparent 1px)`, backgroundSize: '60px 60px' }} />
-
-      <FFHeader design={design} title="TODAY'S SCHEDULE" right={tok.name(design)} />
-
-      <div className="flex flex-1 items-center justify-center gap-6 px-12 py-10">
-        {Array.from({ length: total }).map((_, i) => {
-          const mapName = maps[i % maps.length];
-          const matchTime = times[i] || 'TBD';
-          const isDone  = i < current - 1;
-          const isLive  = i === current - 1;
-          const mapCol  = MAP_COLORS[mapName] || primary;
-
-          return (
-            <motion.div key={i}
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: i * 0.1 }}
-              className="flex flex-col items-center flex-1">
-              
-              <Brackets design={design} className="w-full rounded-2xl border overflow-hidden"
-                style={{ borderColor: isLive ? primary : 'rgba(255,255,255,0.08)', background: isLive ? 'rgba(5, 8, 20, 0.8)' : 'rgba(0,0,0,0.4)' }}>
-                
-                {/* Match title header */}
-                <div className="border-b py-2 text-center" style={{ borderColor: 'rgba(255,255,255,0.06)', background: 'rgba(0,0,0,0.3)' }}>
-                  <span className="font-orbitron text-[10px] font-black uppercase tracking-wider" style={{ color: isLive ? primary : '#9ca3af' }}>
-                    {tok.game(design)} {i + 1}
-                  </span>
-                </div>
-
-                {/* Map Name Icon Block */}
-                <div className="flex flex-col items-center py-6 px-4">
-                  <div className="mb-4 flex h-20 w-20 items-center justify-center rounded-full border-2"
-                    style={{ borderColor: `${mapCol}55`, background: `${mapCol}11`, boxShadow: isLive ? `0 0 15px ${mapCol}33` : 'none' }}>
-                    <span className="font-orbitron text-[10px] font-black tracking-wider text-center" style={{ color: mapCol }}>
-                      {mapName.toUpperCase()}
-                    </span>
-                  </div>
-                  <h3 className="font-orbitron text-xs font-black text-white uppercase tracking-widest">{mapName}</h3>
-                </div>
-
-                {/* Status bottom bar */}
-                <div className="border-t py-2.5 text-center" style={{ borderColor: 'rgba(255,255,255,0.06)' }}>
-                  {isLive ? (
-                    <span className="font-orbitron text-sm font-black text-red-500 animate-pulse tracking-widest uppercase">LIVE</span>
-                  ) : (
-                    <span className="font-orbitron text-xs font-bold text-gray-400">{matchTime}</span>
-                  )}
-                </div>
-              </Brackets>
-
-              {/* Status Badge below */}
-              <div className="mt-3">
-                {isLive && (
-                  <span className="rounded-full bg-red-500/10 border border-red-500/40 px-3 py-1 text-[9px] font-black text-red-400 uppercase tracking-widest animate-pulse">
-                    LIVE NOW
-                  </span>
-                )}
-                {isDone && (
-                  <span className="rounded-full bg-green-500/10 border border-green-500/20 px-3 py-1 text-[9px] font-black text-green-400 uppercase tracking-widest">
-                    COMPLETED
-                  </span>
-                )}
-                {!isDone && !isLive && (
-                  <span className="rounded-full bg-white/5 border border-white/10 px-3 py-1 text-[9px] font-bold text-gray-500 uppercase tracking-widest">
-                    UPCOMING
-                  </span>
-                )}
+              {/* Status / Health bars */}
+              <div className="flex justify-center gap-[2px]">
+                {[...Array(4)].map((_, bIdx) => {
+                  const active = bIdx < row.alive;
+                  return (
+                    <div 
+                      key={bIdx} 
+                      className="w-[3px] rounded-sm transition-all"
+                      style={{ 
+                        height: active ? 14 : 7,
+                        background: active ? primary : 'rgba(255,255,255,0.1)'
+                      }} 
+                    />
+                  );
+                })}
               </div>
             </motion.div>
           );
         })}
       </div>
+
+      {/* Footer strip */}
+      <div className="flex items-center justify-center h-6 bg-black/40 border-t border-white/5">
+        <span className="font-orbitron text-[8px] font-black tracking-[0.2em] flex items-center gap-1.5" style={{ color: primary }}>
+          <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
+          ● LIVE
+          <span className="text-white/60">|</span>
+          <span className="text-white uppercase">{(currentMatch?.map_name || 'Bermuda')}</span>
+        </span>
+      </div>
     </div>
   );
 }
 
 /* ══════════════════════════════════════════════════
-   6. MEET THE TEAMS SCREEN (Solid BG)
+   3. SCOREBOARD / OVERALL STANDINGS (Transparent OBS Overlay)
 ══════════════════════════════════════════════════ */
-function TeamsToday({ teams, design }) {
+function FullStandings({ teams, players, design }) {
   const primary = tok.acc(design);
   const cyan    = tok.acc2(design);
-  const colors  = [primary, cyan, '#a855f7', '#10b981', '#ef4444', '#eab308'];
 
   const rows = useMemo(() => {
-    const list = teams || [];
-    const mid = Math.ceil(list.length / 2);
-    return [list.slice(0, mid), list.slice(mid)];
-  }, [teams]);
+    return [...(teams || [])]
+      .sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0))
+      .map((team, i) => {
+        const teamPlayers = (players || []).filter(p => p.team_id === team.id);
+        const alive = teamPlayers.filter(p => p.is_alive).length;
+        return {
+          team,
+          rank: i + 1,
+          kills: team.total_tournament_kills || 0,
+          booyahs: team.booyahs_count || 0,
+          points: team.total_tournament_points || 0,
+          isOut: alive === 0 && teamPlayers.length > 0,
+        };
+      });
+  }, [teams, players]);
 
   return (
-    <div className="flex h-full w-full flex-col overflow-hidden" style={{ background: tok.bg(design) }}>
-      {/* Background patterns */}
-      <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}33 1px, transparent 1px), linear-gradient(90deg, ${cyan}22 1px, transparent 1px)`, backgroundSize: '70px 70px' }} />
+    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[820px] max-h-[680px] flex flex-col overflow-hidden rounded-xl"
+      style={{ 
+        background: 'rgba(5, 8, 20, 0.92)', 
+        backdropFilter: 'blur(20px) saturate(180%)',
+        border: '1px solid rgba(255,255,255,0.08)',
+        boxShadow: `0 0 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1)`
+      }}>
+      
+      {/* Top gradient line */}
+      <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, ${primary}, ${cyan}, ${primary})` }} />
 
-      <FFHeader design={design} title="PARTICIPATING TEAMS" right={tok.name(design)} />
-
-      <div className="flex flex-1 flex-col items-center justify-center gap-8 px-16">
-        
-        {/* Row 1 */}
-        <div className="flex flex-wrap items-center justify-center gap-10">
-          {rows[0].map((team, idx) => {
-            const hue = colors[idx % colors.length];
-            return (
-              <motion.div key={team.id}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 100, delay: idx * 0.05 }}
-                className="flex flex-col items-center gap-3">
-                <div className="relative">
-                  <div className="absolute inset-0 rounded-full animate-pulse opacity-20" style={{ background: hue, filter: 'blur(8px)' }} />
-                  {team.logo_url ? (
-                    <img src={team.logo_url} alt="" className="relative h-20 w-20 rounded-full object-cover border-2" style={{ borderColor: hue }} onError={e => e.target.style.display = 'none'} />
-                  ) : (
-                    <div className="relative flex h-20 w-20 items-center justify-center rounded-full border-2 font-orbitron text-xl font-black"
-                      style={{ borderColor: hue, background: `${hue}22`, color: hue }}>
-                      {team.name.slice(0,2).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-                <span className="font-orbitron text-[10px] font-black text-white uppercase tracking-wider text-center w-24 truncate">
-                  {team.name}
-                </span>
-              </motion.div>
-            );
-          })}
+      {/* Header */}
+      <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-black/20">
+        <div className="flex items-center gap-3">
+          <Award className="h-6 w-6 text-yellow-500" />
+          <div className="flex flex-col">
+            <span className="font-orbitron text-lg font-black tracking-[0.2em] text-white">OVERALL STANDINGS</span>
+            <span className="font-orbitron text-[10px] tracking-[0.15em] text-white/40 uppercase">TOURNAMENT LEADERS</span>
+          </div>
         </div>
-
-        {/* Divider styling */}
-        <div className="flex items-center gap-6 w-full max-w-[800px]">
-          <div className="h-[1px] flex-1" style={{ background: `linear-gradient(to right, transparent, ${primary})` }} />
-          <span className="font-orbitron text-xs font-black text-white tracking-[0.4em] uppercase">MEET THE TEAMS</span>
-          <div className="h-[1px] flex-1" style={{ background: `linear-gradient(to left, transparent, ${cyan})` }} />
-        </div>
-
-        {/* Row 2 */}
-        <div className="flex flex-wrap items-center justify-center gap-10">
-          {rows[1].map((team, idx) => {
-            const hue = colors[(idx + rows[0].length) % colors.length];
-            return (
-              <motion.div key={team.id}
-                initial={{ scale: 0, opacity: 0 }}
-                animate={{ scale: 1, opacity: 1 }}
-                transition={{ type: 'spring', stiffness: 100, delay: (idx + rows[0].length) * 0.05 }}
-                className="flex flex-col items-center gap-3">
-                <div className="relative">
-                  <div className="absolute inset-0 rounded-full animate-pulse opacity-20" style={{ background: hue, filter: 'blur(8px)' }} />
-                  {team.logo_url ? (
-                    <img src={team.logo_url} alt="" className="relative h-20 w-20 rounded-full object-cover border-2" style={{ borderColor: hue }} onError={e => e.target.style.display = 'none'} />
-                  ) : (
-                    <div className="relative flex h-20 w-20 items-center justify-center rounded-full border-2 font-orbitron text-xl font-black"
-                      style={{ borderColor: hue, background: `${hue}22`, color: hue }}>
-                      {team.name.slice(0,2).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-                <span className="font-orbitron text-[10px] font-black text-white uppercase tracking-wider text-center w-24 truncate">
-                  {team.name}
-                </span>
-              </motion.div>
-            );
-          })}
-        </div>
-
+        <span className="font-orbitron text-xs font-bold tracking-[0.15em] text-white/60">
+          {tok.name(design).toUpperCase()}
+        </span>
       </div>
-    </div>
-  );
-}
 
-/* ══════════════════════════════════════════════════
-   7. CASTERS SCREEN (Solid BG)
-══════════════════════════════════════════════════ */
-function CastersScreen({ design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
-  const casters = design?.casters || [
-    { name: 'SPECTRE', handle: '@spectre_ff', role: 'PLAY-BY-PLAY' },
-    { name: 'CYPHER', handle: '@cypher_esports', role: 'COLOR COMMENTATOR' },
-  ];
+      {/* Columns Header */}
+      <div className="grid grid-cols-[50px_60px_1fr_100px_100px_120px] items-center px-6 py-2 text-xs font-black tracking-[0.15em] text-white/35 uppercase border-b border-white/5 bg-black/40">
+        <div>RANK</div>
+        <div>LOGO</div>
+        <div>TEAM</div>
+        <div className="text-right">KILLS</div>
+        <div className="text-right">BOOYAH</div>
+        <div className="text-right">TOTAL PTS</div>
+      </div>
 
-  return (
-    <div className="flex h-full w-full flex-col overflow-hidden" style={{ background: tok.bg(design) }}>
-      {/* Visual backdrop grids */}
-      <div className="absolute inset-0 opacity-5"
-        style={{ backgroundImage: `linear-gradient(${primary}44 1px, transparent 1px), linear-gradient(90deg, ${cyan}22 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
+      {/* Rows Container */}
+      <div className="flex flex-col overflow-y-auto" style={{ maxHeight: 460 }}>
+        {rows.map((row, idx) => {
+          const isTop3 = row.rank <= 3;
+          const metalColor = row.rank === 1 ? '#fbbf24' : row.rank === 2 ? '#94a3b8' : row.rank === 3 ? '#b45309' : null;
 
-      <FFHeader design={design} title="CASTER TALENT" right={tok.name(design)} />
-
-      <div className="flex flex-1 items-center justify-center gap-10 px-16">
-        {casters.slice(0, 2).map((caster, idx) => {
-          const mainCol = idx === 0 ? primary : cyan;
           return (
-            <motion.div key={idx}
-              initial={{ opacity: 0, x: idx === 0 ? -100 : 100 }}
-              animate={{ opacity: 1, x: 0 }}
-              transition={{ type: 'spring', damping: 20 }}
-              className="flex flex-col w-[480px]">
-              
-              <Brackets design={idx === 0 ? design : { ...design, accentColor: cyan, accentColor2: primary }}
-                className="rounded-2xl border overflow-hidden"
-                style={{ borderColor: `${mainCol}44`, background: 'rgba(0,0,0,0.5)' }}>
-                
-                {/* Simulated live feed camera screen */}
-                <div className="relative flex flex-col items-center justify-center py-10"
-                  style={{ background: `linear-gradient(135deg, rgba(5,8,20,0.9), ${mainCol}1e)`, minHeight: 260 }}>
-                  
-                  {/* Camera hud elements */}
-                  <div className="absolute left-6 top-6 flex items-center gap-2">
-                    <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />
-                    <span className="font-mono text-[9px] text-gray-500 tracking-wider">REC</span>
-                  </div>
-                  <div className="absolute right-6 top-6 text-gray-500 font-mono text-[9px]">
-                    1080p HD
-                  </div>
+            <motion.div
+              key={row.team.id}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ delay: idx * 0.04 }}
+              className="grid grid-cols-[50px_60px_1fr_100px_100px_120px] items-center px-6 h-8 border-b border-white/5 relative"
+              style={{
+                background: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.015)',
+                borderLeft: metalColor ? `4px solid ${metalColor}` : 'none',
+                boxShadow: row.rank === 1 ? `inset 0 0 20px rgba(251,191,36,0.05)` : undefined
+              }}
+            >
+              {/* Rank */}
+              <div className="font-orbitron text-sm font-black text-white/80">{row.rank}</div>
 
-                  {/* Avatar box icon */}
-                  <div className="flex h-24 w-24 items-center justify-center rounded-full border-2"
-                    style={{ borderColor: mainCol, background: `${mainCol}1a` }}>
-                    <span className="font-orbitron text-2xl font-black" style={{ color: mainCol }}>
-                      {(caster.name || '?').slice(0, 1)}
-                    </span>
+              {/* Logo */}
+              <div>
+                {row.team.logo_url ? (
+                  <img src={row.team.logo_url} alt="" className="h-6 w-6 rounded-full object-cover border border-white/10" />
+                ) : (
+                  <div className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-black text-white" style={{ background: primary }}>
+                    {row.team.name.slice(0, 2).toUpperCase()}
                   </div>
+                )}
+              </div>
 
-                  {/* Role label badge */}
-                  <div className="absolute bottom-4 right-4 rounded border px-2 py-1 text-[8px] font-black uppercase tracking-widest"
-                    style={{ borderColor: `${mainCol}44`, background: 'rgba(0,0,0,0.8)', color: mainCol }}>
-                    {caster.role || (idx === 0 ? 'HOST / DESK' : 'ANALYSIS')}
-                  </div>
-                </div>
+              {/* Team Name */}
+              <div className="font-orbitron text-sm font-black text-white uppercase tracking-wider">
+                {row.team.name}
+              </div>
 
-                {/* Presenter Name Banner */}
-                <div className="px-6 py-4 border-t" style={{ borderColor: `${mainCol}33`, background: 'rgba(5, 8, 20, 0.95)' }}>
-                  <h4 className="font-orbitron text-base font-black text-white uppercase tracking-wider">{caster.name}</h4>
-                  <p className="font-mono text-xs mt-0.5" style={{ color: mainCol }}>{caster.handle}</p>
-                </div>
+              {/* Kills */}
+              <div className="font-mono text-sm text-right font-bold text-white/80">{row.kills}</div>
 
-              </Brackets>
+              {/* Booyahs */}
+              <div className="font-mono text-sm text-right font-bold" style={{ color: cyan }}>{row.booyahs}</div>
+
+              {/* Total points */}
+              <div className="font-orbitron text-sm text-right font-black text-white" style={{ color: isTop3 ? metalColor : '#ffffff' }}>
+                {row.points}
+              </div>
             </motion.div>
           );
         })}
@@ -705,260 +342,367 @@ function CastersScreen({ design }) {
 }
 
 /* ══════════════════════════════════════════════════
-   8. UPCOMING MAP SCREEN (Solid BG)
-══════════════════════════════════════════════════ */
-function UpcomingMap({ tournament, design }) {
-  const [secs, setSecs] = useState(300);
-
-  useEffect(() => {
-    const timer = setInterval(() => setSecs(prev => Math.max(0, prev - 1)), 1000);
-    return () => clearInterval(timer);
-  }, []);
-
-  const mm = String(Math.floor(secs / 60)).padStart(2, '0');
-  const ss = String(secs % 60).padStart(2, '0');
-
-  const matchNum = (tournament?.current_match_number || 0) + 1;
-  const maps     = ['Bermuda', 'Kalahari', 'Purgatory', 'Alpine', 'Nexterra'];
-  const mapName  = maps[(matchNum - 1) % maps.length];
-  const primary  = tok.acc(design);
-  const cyan     = tok.acc2(design);
-  const mapCol   = MAP_COLORS[mapName] || primary;
-
-  return (
-    <div className="flex h-full w-full flex-col overflow-hidden" style={{ background: tok.bg(design) }}>
-      <div className="absolute inset-0 opacity-5"
-        style={{ backgroundImage: `linear-gradient(${primary}44 1px, transparent 1px), linear-gradient(90deg, ${cyan}22 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
-
-      <FFHeader design={design} title="UPCOMING MATCH INFO" right={tok.name(design)} />
-
-      <div className="flex flex-1 items-center justify-between px-20">
-        
-        {/* Left Side: Countdown Map presentation */}
-        <div className="flex flex-col items-start justify-center flex-1">
-          <motion.p initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }}
-            className="font-orbitron font-black text-xs uppercase tracking-[0.4em]" style={{ color: cyan }}>
-            {tok.game(design)} {matchNum} — PREPARING
-          </motion.p>
-          <motion.h1 initial={{ opacity: 0, x: -50 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: 0.1 }}
-            className="font-orbitron font-black text-7xl mt-2 leading-none uppercase"
-            style={{ 
-              color: '#ffffff',
-              textShadow: `0 0 40px ${mapCol}88`,
-              WebkitTextStroke: `1px ${mapCol}`
-            }}>
-            {mapName}
-          </motion.h1>
-          
-          <span className="font-orbitron text-[10px] font-black uppercase text-gray-500 tracking-widest mt-8">
-            MATCH COMENCING IN
-          </span>
-
-          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3 }}
-            className="mt-2 rounded-xl border px-8 py-3 bg-black/60"
-            style={{ borderColor: `${primary}55`, boxShadow: `0 0 20px ${primary}22` }}>
-            <span className="font-orbitron text-5xl font-black text-white tracking-widest">
-              {mm}:{ss}
-            </span>
-          </motion.div>
-        </div>
-
-        {/* Right Side: Map HUD representation */}
-        <div className="flex items-center justify-center flex-1">
-          <motion.div initial={{ opacity: 0, scale: 0.8 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.2 }}>
-            <Brackets design={design} className="p-8 rounded-2xl border" style={{ borderColor: `${mapCol}55`, background: `${mapCol}05` }}>
-              <div className="flex h-56 w-56 flex-col items-center justify-center rounded-xl border bg-black/40" style={{ borderColor: `${mapCol}33` }}>
-                <div className="flex h-24 w-24 items-center justify-center rounded-full border-2" style={{ borderColor: mapCol, background: `${mapCol}11` }}>
-                  <span className="font-orbitron text-[11px] font-black text-center" style={{ color: mapCol }}>
-                    {mapName.toUpperCase()}
-                  </span>
-                </div>
-                <p className="mt-4 font-orbitron text-[10px] font-bold text-gray-500 uppercase tracking-widest">MAP SECTOR</p>
-              </div>
-            </Brackets>
-          </motion.div>
-        </div>
-
-      </div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════
-   9. KILL FEED (Transparent OBS Overlay)
-   - Bottom-left corner elegant HUD feed
-   - Holds maximum of 5 recent logs
+   4. KILL FEED (Transparent OBS Overlay)
 ══════════════════════════════════════════════════ */
 function KillFeedScreen({ killFeed, design }) {
   const primary = tok.acc(design);
   const cyan    = tok.acc2(design);
-  const recent = useMemo(() => {
-    return [...(killFeed || [])].slice(0, 5);
-  }, [killFeed]);
 
   return (
-    <div className="absolute left-6 bottom-6 flex flex-col gap-1.5"
-      style={{ width: 360, background: 'transparent' }}>
-      
-      <AnimatePresence>
-        {recent.map((kill, i) => (
-          <motion.div key={kill.id || i}
-            initial={{ opacity: 0, x: -40 }}
-            animate={{ opacity: 1, x: 0 }}
-            exit={{ opacity: 0, x: -40 }}
-            transition={{ type: 'spring', stiffness: 120 }}
-            className="flex items-center gap-3 rounded-lg border px-3 py-1.5"
-            style={{ 
-              background: 'rgba(5, 8, 20, 0.82)', 
-              borderColor: `${primary}33`,
-              backdropFilter: 'blur(8px)',
-              boxShadow: '0 2px 8px rgba(0,0,0,0.3)'
-            }}>
-            
-            <Skull className="h-4.5 w-4.5 flex-shrink-0 text-red-500 animate-pulse" />
-            
-            {/* Killer */}
-            <span className="font-orbitron text-[10px] font-black text-white uppercase truncate max-w-[100px]">
-              {kill.killer_name}
-            </span>
+    <div className="absolute left-6 bottom-20 w-[340px] flex flex-col gap-2 pointer-events-none">
+      <AnimatePresence initial={false}>
+        {(killFeed || []).slice(0, 5).map((kill, i) => {
+          const ageOpacity = 1 - (i * 0.12);
+          return (
+            <motion.div
+              key={kill.id}
+              initial={{ opacity: 0, x: -50 }}
+              animate={{ opacity: ageOpacity, x: 0 }}
+              exit={{ opacity: 0, x: -50 }}
+              transition={{ type: 'spring', stiffness: 120, damping: 14 }}
+              className="flex items-center justify-between h-9 px-3 rounded-md border border-white/5 relative overflow-hidden"
+              style={{
+                background: 'rgba(6, 9, 21, 0.85)',
+                backdropFilter: 'blur(12px)',
+                boxShadow: `0 4px 12px rgba(0,0,0,0.4)`
+              }}
+            >
+              {/* Left design glow border */}
+              <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ background: `linear-gradient(to bottom, ${primary}, ${cyan})` }} />
 
-            {/* Weapon / Icon */}
-            <div className="flex flex-1 justify-center items-center">
-              <div className="h-[1px] flex-1 bg-gradient-to-r from-orange-500 to-red-500/20" />
-              <span className="mx-1 px-1.5 py-0.5 rounded bg-red-600/20 text-[8px] font-black text-red-400 font-mono">
-                {kill.weapon || 'ELIM'}
-              </span>
-              <div className="h-[1px] flex-1 bg-gradient-to-l from-orange-500 to-red-500/20" />
-            </div>
+              {/* Killer Info */}
+              <div className="font-orbitron text-xs font-black truncate max-w-[120px] uppercase" style={{ color: primary }}>
+                {kill.killer_name}
+              </div>
 
-            {/* Victim */}
-            <span className="font-orbitron text-[10px] font-black text-red-400 uppercase truncate max-w-[100px]">
-              {kill.killed_player_name || 'PLAYER'}
-            </span>
-          </motion.div>
-        ))}
+              {/* Weapon icon / Crosshair */}
+              <div className="flex items-center gap-1 opacity-60">
+                <Skull className="h-3.5 w-3.5 text-white/40" />
+                <span className="font-mono text-[9px] text-white/40">🎯</span>
+              </div>
+
+              {/* Victim Info */}
+              <div className="font-orbitron text-xs italic font-bold truncate max-w-[120px] uppercase text-white/50">
+                {kill.killed_player_name}
+              </div>
+            </motion.div>
+          );
+        })}
       </AnimatePresence>
     </div>
   );
 }
 
 /* ══════════════════════════════════════════════════
-   10. ELIMINATION ALERT (Full Screen dramatic Overlay)
+   5. PRE MATCH MAP (Solid BG)
 ══════════════════════════════════════════════════ */
-function EliminationAlert({ eliminations, design }) {
-  const latest = useMemo(() => {
-    if (!eliminations?.length) return null;
-    return [...eliminations].sort((a,b) => new Date(b.timestamp) - new Date(a.timestamp))[0];
-  }, [eliminations]);
-
-  const [visible, setVisible] = useState(true);
-
-  useEffect(() => {
-    setVisible(true);
-    const timeout = setTimeout(() => setVisible(false), 4000);
-    return () => clearTimeout(timeout);
-  }, [latest]);
-
-  if (!latest || !visible) return null;
+function PreMatchMap({ match, teams, design }) {
+  const mapName  = (match?.map_name || 'BERMUDA').toUpperCase();
+  const matchNum = match?.match_number || 1;
+  const primary  = tok.acc(design);
+  const cyan     = tok.acc2(design);
 
   return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none"
-      style={{ background: 'radial-gradient(circle, rgba(239,68,68,0.2) 0%, rgba(0,0,0,0.85) 80%)' }}>
-      
-      <motion.div 
-        initial={{ scale: 0.3, opacity: 0 }} 
-        animate={{ scale: 1, opacity: 1 }} 
-        exit={{ scale: 0.5, opacity: 0 }}
-        className="flex flex-col items-center">
-        
-        {/* Animated skull */}
-        <motion.div 
-          animate={{ rotate: [0, -5, 5, -5, 0], scale: [1, 1.05, 1] }} 
-          transition={{ repeat: Infinity, duration: 1.5 }}
-          className="mb-4">
-          <Skull className="h-24 w-24 text-red-500" style={{ filter: 'drop-shadow(0 0 20px rgba(239,68,68,0.8))' }} />
-        </motion.div>
+    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
+      {/* Background Grids and Glows */}
+      <div className="absolute inset-0 opacity-10"
+        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 50% 40%, ${primary}18, transparent)` }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.7) 100%)` }} />
 
-        {/* HUD Box text alert */}
-        <Brackets design={{ ...design, accentColor: '#ef4444', accentColor2: '#ef4444' }}
-          className="rounded-2xl border-2 px-12 py-6 text-center"
-          style={{ borderColor: '#ef4444', background: 'rgba(5, 8, 20, 0.95)', boxShadow: '0 0 40px rgba(239,68,68,0.3)' }}>
-          <span className="font-orbitron text-xs font-black uppercase tracking-[0.5em] text-red-500">
-            TEAM ELIMINATED
-          </span>
-          <h2 className="font-orbitron text-3xl font-black text-white uppercase tracking-wider mt-1">
-            {latest.eliminated_team_name || latest.eliminated_player_name || 'SPECTATOR'}
-          </h2>
-        </Brackets>
-      </motion.div>
+      <FFHeader design={design} title="PRE-MATCH BRIEF" right={`${tok.game(design)} ${matchNum}`} />
+
+      {/* Center Hero Panel */}
+      <div className="flex flex-1 flex-col items-center justify-center relative">
+        <motion.p 
+          initial={{ opacity: 0, y: -20 }} 
+          animate={{ opacity: 1, y: 0 }}
+          className="font-orbitron text-[13px] font-black uppercase tracking-[0.5em]"
+          style={{ color: cyan }}>
+          UPCOMING MAP
+        </motion.p>
+        
+        <span className="font-orbitron text-xs font-black tracking-[0.3em] text-white/30 uppercase mt-1">
+          {tok.game(design)} {matchNum}
+        </span>
+
+        <motion.div 
+          initial={{ scaleX: 0 }} 
+          animate={{ scaleX: 1 }} 
+          className="h-[1px] w-[300px] my-4"
+          style={{ background: `linear-gradient(to right, transparent, ${primary}, transparent)` }}
+        />
+
+        <motion.h1 
+          initial={{ opacity: 0, scale: 0.7 }} 
+          animate={{ opacity: 1, scale: 1 }} 
+          transition={{ type: 'spring', stiffness: 80, damping: 15 }}
+          className="font-orbitron font-black leading-none text-white tracking-widest"
+          style={{ 
+            fontSize: 160, 
+            textShadow: `0 0 80px ${primary}cc, 0 0 160px ${primary}33`,
+            WebkitTextStroke: `1px rgba(249,115,22,0.5)`
+          }}>
+          {mapName}
+        </motion.h1>
+
+        <p className="font-orbitron text-[11px] tracking-[0.4em] text-white/40 uppercase mt-4">
+          BATTLE ROYALE MODE
+        </p>
+      </div>
+
+      {/* Bottom Participation strip */}
+      <div className="h-24 w-full bg-black/70 border-t border-white/10 px-8 flex items-center justify-between">
+        <div className="flex flex-col">
+          <span className="font-orbitron text-xs font-black tracking-[0.2em]" style={{ color: primary }}>PARTICIPANTS</span>
+          <span className="font-orbitron text-[10px] text-white/40 tracking-[0.1em] uppercase">{(teams || []).length} TEAMS COMPETING</span>
+        </div>
+        <div className="flex items-center gap-2">
+          {(teams || []).slice(0, 12).map((team, idx) => (
+            <div key={team.id} className="relative group">
+              {team.logo_url ? (
+                <img src={team.logo_url} alt="" className="h-10 w-10 rounded-full object-cover border border-white/20 hover:scale-110 transition-transform" />
+              ) : (
+                <div className="flex h-10 w-10 items-center justify-center rounded-full text-[10px] font-black text-white border border-white/20" style={{ background: primary }}>
+                  {team.name.slice(0, 2).toUpperCase()}
+                </div>
+              )}
+            </div>
+          ))}
+        </div>
+      </div>
     </div>
   );
 }
 
 /* ══════════════════════════════════════════════════
-   11. MVP SCREEN (Solid BG)
+   6. TODAYS MATCHES (Solid BG)
 ══════════════════════════════════════════════════ */
-function MVPScreen({ overlayState, design }) {
-  const name   = overlayState?.mvp_player_name || 'SPECTRE';
-  const team   = overlayState?.mvp_team_name   || 'ALPHA CLAN';
-  const kills  = overlayState?.mvp_kills       || 8;
+function TodaysMatches({ matches, design }) {
   const primary = tok.acc(design);
   const cyan    = tok.acc2(design);
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: tok.bg(design) }}>
-      
-      {/* Dynamic tech grids */}
+    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
+      {/* Visual Depth Background */}
       <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}22 1px, transparent 1px), linear-gradient(90deg, ${cyan}11 1px, transparent 1px)`, backgroundSize: '40px 40px' }} />
+        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 50% 40%, ${cyan}15, transparent)` }} />
 
-      <FFHeader design={design} title="MOST VALUABLE PLAYER" right={tok.name(design)} />
+      <FFHeader design={design} title="TODAYS SCHEDULE" right="BROADCAST RUN" />
 
-      <div className="flex flex-1 items-center justify-center gap-16 px-20">
+      {/* Center Match Cards Grid */}
+      <div className="flex-1 flex items-center justify-center px-12">
+        <div className="grid grid-cols-3 gap-6 w-full max-w-[1100px]">
+          {(matches || []).slice(0, 3).map((match, idx) => {
+            const isLive = match.state === 'live';
+            const isCompleted = match.state === 'ended';
+            const statusColor = isLive ? '#ef4444' : isCompleted ? '#10b981' : '#6b7280';
+
+            return (
+              <motion.div
+                key={idx}
+                initial={{ opacity: 0, y: 30 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ delay: idx * 0.1 }}
+                className="rounded-xl border border-white/10 overflow-hidden relative"
+                style={{
+                  background: 'rgba(255, 255, 255, 0.03)',
+                  boxShadow: `0 10px 30px rgba(0,0,0,0.5)`
+                }}
+              >
+                {/* Accent top line based on state */}
+                <div className="h-[3px] w-full" style={{ background: statusColor }} />
+
+                <div className="p-6 flex flex-col justify-between h-56">
+                  {/* Card top */}
+                  <div className="flex justify-between items-center">
+                    <span className="font-orbitron text-xs font-black text-white/50 tracking-[0.1em]">
+                      MATCH 0{match.match_number}
+                    </span>
+                    {/* Status badge */}
+                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-white/5 bg-black/40">
+                      {isLive && <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />}
+                      <span className="font-orbitron text-[9px] font-black uppercase tracking-wider" style={{ color: statusColor }}>
+                        {match.state}
+                      </span>
+                    </div>
+                  </div>
+
+                  {/* Card center (Map Name) */}
+                  <div className="my-4">
+                    <h2 className="font-orbitron text-3xl font-black text-white uppercase tracking-wider leading-none">
+                      {match.map_name}
+                    </h2>
+                    <span className="font-orbitron text-[10px] text-white/30 tracking-[0.2em] uppercase block mt-1">
+                      BATTLE ROYALE
+                    </span>
+                  </div>
+
+                  {/* Card footer */}
+                  <div className="border-t border-white/5 pt-3 flex justify-between items-center">
+                    <span className="font-orbitron text-[10px] text-white/40 tracking-[0.1em]">COMPETING TEAMS</span>
+                    <span className="font-orbitron text-xs font-bold text-white">12 TEAMS</span>
+                  </div>
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════
+   7. TEAMS TODAY (Solid BG)
+══════════════════════════════════════════════════ */
+function TeamsToday({ teams, design }) {
+  const primary = tok.acc(design);
+  const cyan    = tok.acc2(design);
+
+  return (
+    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
+      <div className="absolute inset-0 opacity-10"
+        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 50% 50%, ${cyan}12, transparent)` }} />
+
+      <FFHeader design={design} title="MEET THE TEAMS" right="TOURNAMENT LINEUP" />
+
+      {/* Main Title Center */}
+      <div className="flex flex-col items-center mt-8">
+        <h1 className="font-orbitron text-4xl font-black uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-cyan-400">
+          CONTESTANTS
+        </h1>
+        <p className="font-orbitron text-[10px] tracking-[0.3em] text-white/40 uppercase mt-1">
+          {tok.name(design)} | {tok.sub(design)}
+        </p>
+      </div>
+
+      {/* Grid Layout */}
+      <div className="flex-1 flex items-center justify-center px-12 pb-10">
+        <div className="grid grid-cols-4 gap-6 w-full max-w-[1000px]">
+          {(teams || []).slice(0, 12).map((team, idx) => {
+            const teamColor = idx % 2 === 0 ? primary : cyan;
+            return (
+              <motion.div
+                key={team.id}
+                initial={{ opacity: 0, scale: 0.8 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ type: 'spring', stiffness: 90, damping: 14, delay: idx * 0.05 }}
+                className="flex flex-col items-center justify-center p-4 rounded-xl border border-white/5 relative overflow-hidden h-36 bg-black/40"
+              >
+                {/* Logo circle with teamColor glow ring */}
+                <div 
+                  className="relative flex h-16 w-16 items-center justify-center rounded-full transition-transform"
+                  style={{
+                    boxShadow: `0 0 0 2px ${teamColor}, 0 0 20px ${teamColor}55`
+                  }}
+                >
+                  {team.logo_url ? (
+                    <img src={team.logo_url} alt="" className="h-full w-full rounded-full object-cover" />
+                  ) : (
+                    <div className="flex h-full w-full items-center justify-center rounded-full text-base font-black text-white" style={{ background: teamColor }}>
+                      {team.name.slice(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+
+                {/* Team label */}
+                <span className="font-orbitron text-xs font-black tracking-[0.2em] text-white uppercase text-center mt-4 truncate w-full">
+                  {team.name}
+                </span>
+              </motion.div>
+            );
+          })}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════
+   8. CASTERS (Solid BG)
+══════════════════════════════════════════════════ */
+function CastersScreen({ design }) {
+  const primary = tok.acc(design);
+  const cyan    = tok.acc2(design);
+
+  return (
+    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
+      <div className="absolute inset-0 opacity-10"
+        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 20% 50%, ${primary}15, transparent)` }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 80% 50%, ${cyan}15, transparent)` }} />
+
+      <FFHeader design={design} title="CASTER TALENT" right="ANALYSIS DESK" />
+
+      {/* Main split display */}
+      <div className="flex-1 flex items-center justify-center px-12 gap-12">
         
-        {/* Left portrait card frame */}
-        <Brackets design={design} className="rounded-2xl border-2 overflow-hidden w-72" style={{ borderColor: `${primary}44` }}>
-          <div className="flex flex-col items-center justify-center p-8 bg-black/50" style={{ minHeight: 320 }}>
-            {/* Player Frame placeholder */}
-            <div className="flex h-28 w-28 items-center justify-center rounded-xl border-2 mb-4"
-              style={{ borderColor: primary, background: `${primary}11`, boxShadow: `0 0 20px ${primary}33` }}>
-              <Star className="h-10 w-10 text-orange-500 animate-pulse" />
-            </div>
-            {/* Details */}
-            <div className="border-t pt-3 w-full text-center" style={{ borderColor: `${primary}22` }}>
-              <h3 className="font-orbitron text-base font-black text-white uppercase tracking-wider truncate">{name}</h3>
-              <p className="text-gray-400 font-bold text-[10px] uppercase tracking-widest mt-0.5">{team}</p>
-            </div>
+        {/* Caster 1 camera box */}
+        <div className="w-[480px] h-[300px] border border-white/5 relative bg-black/40 rounded overflow-hidden">
+          {/* HUD Brackets */}
+          <div className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2" style={{ borderColor: primary }} />
+          <div className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2" style={{ borderColor: primary }} />
+          <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2" style={{ borderColor: primary }} />
+          <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2" style={{ borderColor: primary }} />
+
+          {/* Top Camera HUD bar inside frame */}
+          <div className="absolute top-2 left-3 right-3 flex justify-between items-center">
+            <span className="font-orbitron text-[9px] font-black text-red-500 animate-pulse">● REC</span>
+            <span className="font-orbitron text-[9px] text-white/30">CAM 01</span>
           </div>
-        </Brackets>
 
-        {/* Right MVP giant texts + stats */}
-        <div className="flex flex-col items-start">
-          <motion.div initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }}
-            className="flex items-center gap-3">
-            <span className="font-orbitron text-7xl font-black text-orange-500 tracking-wider uppercase"
-              style={{ textShadow: `0 0 30px ${primary}aa` }}>
-              MVP
-            </span>
-          </motion.div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Video className="h-10 w-10 text-white/10" />
+          </div>
 
-          <span className="font-orbitron text-[10px] font-black tracking-widest text-gray-500 uppercase mt-4 mb-2">
-            MATCH STATISTICS
-          </span>
+          {/* Bottom name strip */}
+          <div className="absolute bottom-0 left-0 right-0 h-14 bg-black/90 border-t border-white/10 flex items-center justify-between px-4">
+            <div className="flex flex-col">
+              <span className="font-orbitron text-sm font-black text-white uppercase tracking-wider">CASTER ONE</span>
+              <span className="font-orbitron text-[10px] uppercase tracking-wider" style={{ color: primary }}>@CASTER_HANDLE</span>
+            </div>
+            <span className="font-orbitron text-[10px] text-white/50 tracking-widest border border-white/15 px-2 py-0.5 rounded uppercase">LEAD HOST</span>
+          </div>
+        </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
-            className="flex items-center gap-10">
-            {[
-              { label: 'KILLS', value: kills },
-              { label: 'DAMAGE', value: '1,450' },
-              { label: 'HEADSHOTS', value: '3' }
-            ].map((st, i) => (
-              <div key={i} className="flex flex-col">
-                <span className="text-gray-500 text-[9px] font-bold tracking-widest uppercase">{st.label}</span>
-                <span className="font-orbitron text-2xl font-black text-white mt-1">{st.value}</span>
-              </div>
-            ))}
-          </motion.div>
+        {/* VS Divider center */}
+        <div className="flex flex-col items-center">
+          <div className="h-20 w-[1px]" style={{ background: `linear-gradient(to bottom, transparent, ${primary})` }} />
+          <div className="relative flex items-center justify-center my-2 h-14 w-14 border border-white/20 rotate-45">
+            <span className="font-orbitron text-xl font-black -rotate-45 text-white">VS</span>
+          </div>
+          <div className="h-20 w-[1px]" style={{ background: `linear-gradient(to top, transparent, ${cyan})` }} />
+        </div>
+
+        {/* Caster 2 camera box */}
+        <div className="w-[480px] h-[300px] border border-white/5 relative bg-black/40 rounded overflow-hidden">
+          {/* HUD Brackets */}
+          <div className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2" style={{ borderColor: cyan }} />
+          <div className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2" style={{ borderColor: cyan }} />
+          <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2" style={{ borderColor: cyan }} />
+          <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2" style={{ borderColor: cyan }} />
+
+          {/* Top Camera HUD bar inside frame */}
+          <div className="absolute top-2 left-3 right-3 flex justify-between items-center">
+            <span className="font-orbitron text-[9px] font-black text-red-500 animate-pulse">● REC</span>
+            <span className="font-orbitron text-[9px] text-white/30">CAM 02</span>
+          </div>
+
+          <div className="absolute inset-0 flex items-center justify-center">
+            <Video className="h-10 w-10 text-white/10" />
+          </div>
+
+          {/* Bottom name strip */}
+          <div className="absolute bottom-0 left-0 right-0 h-14 bg-black/90 border-t border-white/10 flex items-center justify-between px-4">
+            <div className="flex flex-col">
+              <span className="font-orbitron text-sm font-black text-white uppercase tracking-wider">CASTER TWO</span>
+              <span className="font-orbitron text-[10px] uppercase tracking-wider" style={{ color: cyan }}>@CASTER_HANDLE</span>
+            </div>
+            <span className="font-orbitron text-[10px] text-white/50 tracking-widest border border-white/15 px-2 py-0.5 rounded uppercase">CO-ANALYST</span>
+          </div>
         </div>
 
       </div>
@@ -967,137 +711,398 @@ function MVPScreen({ overlayState, design }) {
 }
 
 /* ══════════════════════════════════════════════════
-   12. BOOYAH / CHAMPIONS (Solid BG)
+   9. UPCOMING MAP (Solid BG)
 ══════════════════════════════════════════════════ */
-function ChampionsScreen({ overlayState, teams, design }) {
-  const sorted   = useMemo(() => [...(teams||[])].sort((a,b)=>(b.total_tournament_points||0)-(a.total_tournament_points||0)),[teams]);
-  const teamName = overlayState?.champion_team_name || sorted[0]?.name || 'CHAMPION';
-  const teamTag  = sorted[0]?.name?.toUpperCase().slice(0,3) || 'WIN';
-  const points   = overlayState?.champion_total_points || sorted[0]?.total_tournament_points || 0;
-  const primary  = tok.acc(design);
-  const cyan     = tok.acc2(design);
+function UpcomingMap({ match, design }) {
+  const primary = tok.acc(design);
+  const cyan    = tok.acc2(design);
+  const mapName = (match?.map_name || 'BERMUDA').toUpperCase();
+
+  const [timeLeft, setTimeLeft] = useState(300);
+
+  useEffect(() => {
+    const timer = setInterval(() => {
+      setTimeLeft(prev => (prev > 0 ? prev - 1 : 300));
+    }, 1000);
+    return () => clearInterval(timer);
+  }, []);
+
+  const formatTime = (sec) => {
+    const m = Math.floor(sec / 60).toString().padStart(2, '0');
+    const s = (sec % 60).toString().padStart(2, '0');
+    return `${m}:${s}`;
+  };
 
   return (
-    <div className="relative flex h-full w-full flex-col items-center justify-center overflow-hidden" style={{ background: tok.bg(design) }}>
-      {/* Glow aura */}
-      <div className="absolute inset-0" style={{ background: `radial-gradient(circle, ${primary}33 0%, ${tok.bg(design)} 75%)` }} />
+    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
+      <div className="absolute inset-0 opacity-10"
+        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
 
-      <FFHeader design={design} title="VICTORY ROYAL" right={tok.name(design)} />
+      <FFHeader design={design} title="COUNTDOWN TO BATTLE" right="LOADING LOBBY" />
 
-      <div className="relative flex flex-col items-center" style={{ marginTop: 20 }}>
-        {/* Crown Icon */}
-        <motion.div initial={{ y: -30, opacity: 0 }} animate={{ y: 0, opacity: 1 }} transition={{ duration: 0.5 }}>
-          <Crown className="h-16 w-16 text-yellow-500" style={{ filter: `drop-shadow(0 0 15px ${primary})` }} />
-        </motion.div>
-
-        {/* Dramatic BOOYAH! title */}
-        <motion.h1 
-          initial={{ scale: 0.4, opacity: 0 }} 
-          animate={{ scale: 1, opacity: 1 }} 
-          transition={{ type: 'spring', stiffness: 80, delay: 0.1 }}
-          className="font-orbitron font-black text-8xl mt-1 tracking-widest"
-          style={{ 
-            color: primary,
-            textShadow: `0 0 40px ${primary}, 0 0 80px rgba(0,0,0,0.5)`,
-            WebkitTextStroke: `2px ${cyan}`
-          }}>
-          BOOYAH!
-        </motion.h1>
-
-        {/* Champion Details Card */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }} 
-          animate={{ opacity: 1, y: 0 }} 
-          transition={{ delay: 0.4 }}
-          className="mt-6 flex w-[500px] items-center gap-4 rounded-xl border-2 px-6 py-3 bg-black/80"
-          style={{ borderColor: `${primary}44`, boxShadow: `0 0 30px ${primary}22` }}>
+      {/* Main split content */}
+      <div className="flex-1 flex items-center justify-between px-16">
+        
+        {/* Left info box */}
+        <div className="flex flex-col max-w-[50%]">
+          <span className="font-orbitron text-[12px] font-black tracking-[0.5em]" style={{ color: cyan }}>NEXT MATCH</span>
+          <h1 className="font-orbitron text-7xl font-black text-white tracking-widest leading-none mt-2 drop-shadow-lg">
+            {mapName}
+          </h1>
+          <span className="font-orbitron text-xs font-bold tracking-[0.3em] text-white/40 uppercase mt-1">BATTLE ROYALE LOBBY</span>
           
-          {sorted[0]?.logo_url ? (
-            <img src={sorted[0].logo_url} alt="" className="h-10 w-10 rounded-full object-cover" onError={e => e.target.style.display = 'none'} />
-          ) : (
-            <div className="flex h-10 w-10 items-center justify-center rounded-full border bg-orange-500/20 font-black text-sm text-orange-500">
-              {teamTag}
+          <div className="mt-8">
+            <span className="font-orbitron text-[10px] text-white/40 tracking-[0.1em]">MATCH STARTS IN</span>
+            <div className="font-orbitron text-7xl font-black mt-1 animate-pulse" style={{ color: primary, textShadow: `0 0 30px ${primary}88` }}>
+              {formatTime(timeLeft)}
             </div>
-          )}
-
-          <div className="flex-1 min-w-0">
-            <h3 className="font-orbitron text-lg font-black text-white uppercase truncate">{teamName}</h3>
-            <p className="text-gray-500 text-[9px] font-bold tracking-wider uppercase">MATCH CHAMPIONS</p>
           </div>
+        </div>
 
-          <div className="text-right">
-            <span className="text-gray-500 text-[9px] font-bold uppercase tracking-widest">KILLS</span>
-            <p className="font-orbitron text-base font-black text-white">{sorted[0]?.total_tournament_kills || 0}</p>
+        {/* Right Watermark style map block */}
+        <div className="w-[420px] h-[280px] border border-white/5 relative bg-black/40 rounded flex items-center justify-center overflow-hidden">
+          {/* Brackets */}
+          <div className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2" style={{ borderColor: primary }} />
+          <div className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2" style={{ borderColor: primary }} />
+          <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2" style={{ borderColor: primary }} />
+          <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2" style={{ borderColor: primary }} />
+          
+          <div className="absolute inset-0 opacity-10 flex flex-wrap gap-2 p-4 text-[24px] font-black pointer-events-none font-orbitron text-white">
+            {Array(12).fill(mapName)}
           </div>
+          <span className="font-orbitron text-5xl font-black tracking-widest text-white/20 uppercase">
+            {mapName}
+          </span>
+        </div>
 
-          <div className="text-right pl-4 border-l border-white/10">
-            <span className="text-gray-500 text-[9px] font-bold uppercase tracking-widest">PTS</span>
-            <p className="font-orbitron text-base font-black" style={{ color: primary }}>{points}</p>
-          </div>
-
-        </motion.div>
       </div>
-
     </div>
   );
 }
 
 /* ══════════════════════════════════════════════════
-   MAIN OVERLAY ROUTER
+   10. ELIMINATION ALERT (Full Screen Alert overlay style)
+══════════════════════════════════════════════════ */
+function EliminationAlert({ eliminations, design }) {
+  const primary = tok.acc(design);
+  const latestElim = eliminations?.[0];
+
+  if (!latestElim) return <div className="h-full w-full" style={{ background: 'transparent' }} />;
+
+  return (
+    <div className="absolute inset-0 flex items-center justify-center pointer-events-none"
+      style={{
+        background: `radial-gradient(circle, rgba(239, 68, 68, 0.35) 0%, transparent 70%)`
+      }}
+    >
+      <motion.div
+        initial={{ opacity: 0, scale: 0.5 }}
+        animate={{ opacity: 1, scale: 1 }}
+        exit={{ opacity: 0 }}
+        className="flex flex-col items-center justify-center"
+      >
+        <Skull className="h-16 w-16 text-red-500 mb-2 animate-bounce" />
+        
+        <h1 className="font-orbitron text-6xl font-black tracking-[0.3em] text-white"
+          style={{ textShadow: `0 0 40px #ef4444` }}
+        >
+          ELIMINATED
+        </h1>
+
+        <span className="font-orbitron text-2xl font-black mt-2" style={{ color: primary }}>
+          {latestElim.eliminated_player_name}
+        </span>
+
+        <span className="font-orbitron text-xs tracking-[0.1em] text-white/40 uppercase mt-1">
+          {latestElim.eliminated_team_name}
+        </span>
+      </motion.div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════
+   11. MVP (Solid BG)
+══════════════════════════════════════════════════ */
+function MVPScreen({ players, teams, design }) {
+  const primary = tok.acc(design);
+  const cyan    = tok.acc2(design);
+
+  // Pick top player in tournament kills
+  const topPlayer = useMemo(() => {
+    return [...(players || [])].sort((a, b) => (b.total_tournament_kills || 0) - (a.total_tournament_kills || 0))[0] || null;
+  }, [players]);
+
+  const topTeam = useMemo(() => {
+    if (!topPlayer) return null;
+    return (teams || []).find(t => t.id === topPlayer.team_id) || null;
+  }, [topPlayer, teams]);
+
+  return (
+    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
+      <div className="absolute inset-0 opacity-10"
+        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 50% 50%, ${primary}15, transparent)` }} />
+
+      <FFHeader design={design} title="MATCH MVP" right="PERFORMANCE REVIEW" />
+
+      {/* Main content display split */}
+      <div className="flex-1 flex items-center justify-center gap-16 px-16">
+        
+        {/* Left Side: Avatar Display */}
+        <div className="w-[340px] h-[400px] border border-white/5 relative bg-black/40 rounded flex items-center justify-center overflow-hidden">
+          <div className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2" style={{ borderColor: primary }} />
+          <div className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2" style={{ borderColor: primary }} />
+          <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2" style={{ borderColor: primary }} />
+          <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2" style={{ borderColor: primary }} />
+
+          <div className="absolute inset-0 opacity-5 flex items-center justify-center text-[180px] font-black select-none pointer-events-none font-orbitron text-white">
+            MVP
+          </div>
+
+          <div className="flex flex-col items-center">
+            <Award className="h-20 w-20 text-yellow-500 mb-4" />
+            <span className="font-orbitron text-2xl font-black text-white uppercase tracking-wider">
+              {topPlayer?.name || 'PLAYER_ONE'}
+            </span>
+            <span className="font-orbitron text-sm uppercase tracking-widest mt-1" style={{ color: primary }}>
+              {topTeam?.name || 'TEAM ALPHA'}
+            </span>
+          </div>
+        </div>
+
+        {/* Right Side: Performance stats */}
+        <div className="flex flex-col max-w-[50%]">
+          <span className="font-orbitron text-[12px] font-black tracking-[0.4em]" style={{ color: cyan }}>TOURNAMENT STANDOUT</span>
+          <h1 className="font-orbitron text-8xl font-black text-white tracking-wider leading-none mt-2">
+            MVP
+          </h1>
+          
+          <div className="h-[2px] w-[300px] my-6" style={{ background: `linear-gradient(90deg, ${primary}, transparent)` }} />
+
+          {/* Stats grid */}
+          <div className="grid grid-cols-3 gap-4">
+            <div className="bg-black/40 border border-white/5 rounded p-4 flex flex-col justify-between w-32 h-24">
+              <span className="font-orbitron text-[10px] text-white/40 tracking-wider">TOTAL KILLS</span>
+              <span className="font-orbitron text-3xl font-black text-white">{topPlayer?.total_tournament_kills || 0}</span>
+            </div>
+            <div className="bg-black/40 border border-white/5 rounded p-4 flex flex-col justify-between w-32 h-24">
+              <span className="font-orbitron text-[10px] text-white/40 tracking-wider">MATCH KILLS</span>
+              <span className="font-orbitron text-3xl font-black text-white">{topPlayer?.current_match_kills || 0}</span>
+            </div>
+            <div className="bg-black/40 border border-white/5 rounded p-4 flex flex-col justify-between w-32 h-24">
+              <span className="font-orbitron text-[10px] text-white/40 tracking-wider">SURVIVAL</span>
+              <span className="font-orbitron text-3xl font-black" style={{ color: cyan }}>ALIVE</span>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════
+   12. CHAMPIONS / BOOYAH (Solid BG)
+══════════════════════════════════════════════════ */
+function ChampionsScreen({ teams, design }) {
+  const primary = tok.acc(design);
+  const cyan    = tok.acc2(design);
+
+  // Top ranking team
+  const championTeam = useMemo(() => {
+    return [...(teams || [])].sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0))[0] || null;
+  }, [teams]);
+
+  return (
+    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
+      {/* Golden volumetric glows */}
+      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 800px 600px at 50% 40%, rgba(251,191,36,0.2), transparent)` }} />
+      <div className="absolute inset-0 opacity-10"
+        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
+
+      {/* Confetti Particle System */}
+      <div className="absolute inset-0 pointer-events-none overflow-hidden">
+        {[...Array(30)].map((_, i) => {
+          const delay = Math.random() * 4;
+          const duration = 2 + Math.random() * 2;
+          const colors = ['#f97316', '#00d4ff', '#fbbf24', '#ffffff'];
+          const randomColor = colors[Math.floor(Math.random() * colors.length)];
+          const width = 2 + Math.random() * 4;
+          const height = 4 + Math.random() * 6;
+
+          return (
+            <div
+              key={i}
+              className="absolute bg-white rounded-sm"
+              style={{
+                left: `${Math.random() * 100}%`,
+                top: `-20px`,
+                width: width,
+                height: height,
+                background: randomColor,
+                opacity: 0.8,
+                animation: `confetti-fall ${duration}s linear infinite`,
+                animationDelay: `${delay}s`
+              }}
+            />
+          );
+        })}
+      </div>
+
+      <FFHeader design={design} title="VICTORY CEREMONY" right="FINAL STANDINGS" />
+
+      {/* Hero center presentation */}
+      <div className="flex-1 flex flex-col items-center justify-center relative">
+        <motion.div
+          initial={{ opacity: 0, y: -80 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ type: 'spring', stiffness: 80, damping: 15 }}
+          className="mb-2"
+        >
+          <Crown className="h-16 w-16 text-yellow-500" />
+        </motion.div>
+
+        <motion.h1
+          initial={{ opacity: 0, scale: 0.5 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ type: 'spring', stiffness: 90, damping: 14 }}
+          className="font-orbitron font-black text-9xl tracking-widest leading-none text-white uppercase"
+          style={{
+            textShadow: `0 0 60px #f97316cc, 0 0 120px #fbbf2455`,
+            WebkitTextStroke: `1px rgba(251,191,36,0.4)`
+          }}
+        >
+          BOOYAH!
+        </motion.h1>
+
+        <span className="font-orbitron text-lg font-black tracking-[0.6em] text-cyan-400 uppercase mt-4">
+          CHAMPIONS
+        </span>
+
+        {/* Winner display card */}
+        {championTeam && (
+          <motion.div
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ delay: 0.4 }}
+            className="mt-8 p-6 rounded-xl border border-yellow-500/30 w-[600px] flex items-center justify-between"
+            style={{
+              background: 'rgba(5, 8, 20, 0.92)',
+              backdropFilter: 'blur(16px)',
+              boxShadow: `0 0 40px rgba(251,191,36,0.15)`
+            }}
+          >
+            <div className="flex items-center gap-4">
+              {championTeam.logo_url ? (
+                <img src={championTeam.logo_url} alt="" className="h-14 w-14 rounded-full object-cover border border-white/20" />
+              ) : (
+                <div className="flex h-14 w-14 items-center justify-center rounded-full text-lg font-black text-white" style={{ background: primary }}>
+                  {championTeam.name.slice(0, 2).toUpperCase()}
+                </div>
+              )}
+              <div className="flex flex-col">
+                <span className="font-orbitron text-xl font-black text-white uppercase tracking-wide">
+                  {championTeam.name}
+                </span>
+                <span className="font-orbitron text-[10px] tracking-wider text-yellow-500 uppercase font-black">
+                  TOURNAMENT CHAMPION
+                </span>
+              </div>
+            </div>
+
+            {/* Performance numbers */}
+            <div className="grid grid-cols-2 gap-4 border-l border-white/10 pl-6">
+              <div className="flex flex-col">
+                <span className="font-orbitron text-[9px] text-white/40">TOTAL POINTS</span>
+                <span className="font-orbitron text-xl font-black text-white">{championTeam.total_tournament_points || 0}</span>
+              </div>
+              <div className="flex flex-col">
+                <span className="font-orbitron text-[9px] text-white/40">TOTAL KILLS</span>
+                <span className="font-orbitron text-xl font-black text-white">{championTeam.total_tournament_kills || 0}</span>
+              </div>
+            </div>
+          </motion.div>
+        )}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════
+   MAIN OVERLAY APP CANVAS COMPONENT
 ══════════════════════════════════════════════════ */
 export default function Overlay() {
-  const { data } = useOverlayData(true);
+  const { overlayState, design, teams, players, currentMatch, killFeed, eliminations } = useOverlayData();
   const [scale, setScale] = useState(1);
 
   useEffect(() => {
-    const resizeHandler = () => {
-      setScale(Math.min(window.innerWidth / 1920, window.innerHeight / 1080));
+    const handleResize = () => {
+      setScale(window.innerWidth / 1920);
     };
-    resizeHandler();
-    window.addEventListener('resize', resizeHandler);
-    return () => window.removeEventListener('resize', resizeHandler);
+    handleResize();
+    window.addEventListener('resize', handleResize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const screen = data?.overlay_state?.current_screen || 'setup_blank';
-  const design = data?.design || {};
-  const { teams, players, current_match, kill_feed, eliminations, overlay_state, tournament } = data || {};
+  const screen = overlayState?.current_screen || 'setup_blank';
 
+  // Transparent screens list
   const isTransparent = ['setup_blank', 'ff_scoreboard', 'scoreboard', 'kill_feed'].includes(screen);
 
   const renderScreen = () => {
     switch (screen) {
-      case 'pre_match_map':      return <PreMatchMap match={current_match} teams={teams} players={players} design={design} />;
-      case 'ff_scoreboard':      return <FFBoard teams={teams} players={players} currentMatch={current_match} design={design} />;
-      case 'scoreboard':         return <FullStandings teams={teams} design={design} />;
-      case 'kill_feed':          return <KillFeedScreen killFeed={kill_feed} design={design} />;
-      case 'elimination_alert':  return <EliminationAlert eliminations={eliminations} design={design} />;
-      case 'todays_matches':     return <TodaysMatches tournament={tournament} design={design} />;
-      case 'teams_today':        return <TeamsToday teams={teams} design={design} />;
-      case 'casters':            return <CastersScreen design={design} />;
-      case 'upcoming_map':       return <UpcomingMap tournament={tournament} design={design} />;
-      case 'mvp':                return <MVPScreen overlayState={overlay_state} design={design} />;
-      case 'champions':          return <ChampionsScreen overlayState={overlay_state} teams={teams} design={design} />;
-      default:                   return <SetupBlank />;
+      case 'setup_blank':
+        return <SetupBlank />;
+      case 'pre_match_map':
+        return <PreMatchMap match={currentMatch} teams={teams} design={design} />;
+      case 'ff_scoreboard':
+        return <FFBoard teams={teams} players={players} currentMatch={currentMatch} design={design} />;
+      case 'scoreboard':
+        return <FullStandings teams={teams} players={players} design={design} />;
+      case 'kill_feed':
+        return <KillFeedScreen killFeed={killFeed} design={design} />;
+      case 'todays_matches':
+        return <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />;
+      case 'teams_today':
+        return <TeamsToday teams={teams} design={design} />;
+      case 'casters':
+        return <CastersScreen design={design} />;
+      case 'upcoming_map':
+        return <UpcomingMap match={currentMatch} design={design} />;
+      case 'elimination_alert':
+        return <EliminationAlert eliminations={eliminations} design={design} />;
+      case 'mvp':
+        return <MVPScreen players={players} teams={teams} design={design} />;
+      case 'champions':
+        return <ChampionsScreen teams={teams} design={design} />;
+      default:
+        return <SetupBlank />;
     }
   };
 
   return (
-    <div className="fixed inset-0 overflow-hidden" 
-      style={{ background: isTransparent ? 'transparent' : 'black' }}>
-      <div style={{ width: 1920, height: 1080, transform: `scale(${scale})`, transformOrigin: 'top left' }}>
-        <AnimatePresence mode="wait">
-          <motion.div 
-            key={screen} 
-            initial={{ opacity: 0 }} 
-            animate={{ opacity: 1 }} 
-            exit={{ opacity: 0 }} 
-            transition={{ duration: 0.3 }} 
-            className="relative h-full w-full"
-            style={{ background: 'transparent' }}>
-            {renderScreen()}
-          </motion.div>
-        </AnimatePresence>
-      </div>
+    <div 
+      className="relative overflow-hidden w-[1920px] h-[1080px] origin-top-left"
+      style={{
+        transform: `scale(${scale})`,
+        background: isTransparent ? 'transparent' : '#060915',
+        width: 1920,
+        height: 1080
+      }}
+    >
+      <AnimatePresence mode="wait">
+        <motion.div
+          key={screen}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          exit={{ opacity: 0 }}
+          transition={{ duration: 0.3 }}
+          className="h-full w-full relative"
+        >
+          {renderScreen()}
+        </motion.div>
+      </AnimatePresence>
     </div>
   );
 }
