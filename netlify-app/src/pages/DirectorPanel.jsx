@@ -46,7 +46,7 @@ export default function DirectorPanel() {
   const handleSwitchScreen = async (key) => {
     setBusy(key);
     try {
-      await overlayApi.updateScreen(key);
+      await overlayApi.switchOverlayScreen({ screen: key });
       toast.success(`Screen switched to ${key.replace(/_/g, ' ').toUpperCase()}`);
     } catch (err) {
       toast.error(err.message || 'Error switching screen');
@@ -73,7 +73,7 @@ export default function DirectorPanel() {
     const nextNum = (state.match_count || 0) + 1;
     setBusy('start_match');
     try {
-      await overlayApi.startNewMatch({ map: mapSelect, match_number: nextNum });
+      await overlayApi.startNextMatch({ tournament_id: state.tournament?.id, map_name: mapSelect });
       toast.success(`Match #${nextNum} on ${mapSelect} Started!`);
     } catch (err) {
       toast.error(err.message);
@@ -86,7 +86,7 @@ export default function DirectorPanel() {
     if (!currentMatch?.id) return toast.error('No active match');
     setBusy('match_status');
     try {
-      await overlayApi.updateMatchStatus({ match_id: currentMatch.id, status });
+      await overlayApi.updateMatchState({ match_id: currentMatch.id, state: status });
       toast.success(`Match status updated to ${status}`);
     } catch (err) {
       toast.error(err.message);

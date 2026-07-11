@@ -22,6 +22,7 @@ export const overlayApi = {
   getOverlayData:         ()     => callFunction('getOverlayData', {}, 'GET'),
   initializeTournament:   (d)    => callFunction('initializeTournament', d),
   addTeam:                (d)    => callFunction('addTeam', d),
+  addPlayer:              (d)    => callFunction('addPlayer', d),
   deleteTeam:             (d)    => callFunction('deleteTeam', d),
   startNextMatch:         (d)    => callFunction('startNextMatch', d),
   updateMatchState:       (d)    => callFunction('updateMatchState', d),

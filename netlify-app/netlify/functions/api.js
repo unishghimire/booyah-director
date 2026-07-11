@@ -95,6 +95,21 @@ exports.handler = async (event) => {
       return ok({ success: true, team, players: createdPlayers });
     }
 
+    // ── ADD PLAYER ────────────────────────────────────────────────
+    if (route === 'addPlayer') {
+      const { team_id, name } = body;
+      if (!team_id || !name) return err(400, 'team_id and name required');
+      const team = db.teams.find(t => t.id === team_id);
+      if (!team) return err(404, 'Team not found');
+      const existing = db.players.filter(p => p.team_id === team_id);
+      if (existing.length >= 6) return err(400, 'Max 6 players per team');
+      const player = { id: genId(), team_id, tournament_id: team.tournament_id, name: name.trim(), is_alive: true, current_match_kills: 0, total_tournament_kills: 0, created_at: new Date().toISOString() };
+      db.players.push(player);
+      saveDb(db);
+      return ok({ success: true, player });
+    }
+
+
     // ── START NEXT MATCH ──────────────────────────────────────────
     if (route === 'startNextMatch') {
       const { tournament_id, map_name } = body;
