@@ -1,3 +1,7 @@
+import React, { useState, useEffect, useMemo } from 'react';
+import { AnimatePresence, motion } from 'framer-motion';
+import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award, XCircle } from 'lucide-react';
+import { useOverlayData } from '@/lib/overlayApi';
 import { MAP_IMAGES } from '@/lib/maps';
 
 function GamingBackground({ mapName, accent = '#f97316', accent2 = '#00d4ff' }) {
@@ -119,9 +123,6 @@ function GamingBackground({ mapName, accent = '#f97316', accent2 = '#00d4ff' }) 
   );
 }
 
-import { AnimatePresence, motion } from 'framer-motion';
-import { useOverlayData } from '@/lib/overlayApi';
-import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award, XCircle } from 'lucide-react';
 
 /* ── Design tokens helper ── */
 const tok = {
@@ -338,7 +339,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
               {/* Logo */}
               <div style={{ width: 26, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
                 {team.logo_url ? (
-                  <img src={team.logo_url} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />
+                  <img src={team.logo_url} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} onError={e => { e.target.style.display='none'; }} />
                 ) : (
                   <div style={{
                     width: 20, height: 20, borderRadius: 3,
@@ -493,9 +494,10 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
 function FullStandings({ teams = [], design }) {
   const sortedTeams = useMemo(() => {
     return [...teams].sort((a, b) => {
-      const aPts = (a.kills || 0) + (a.placementPoints || 0) + (a.booyahPoints || 0);
-      const bPts = (b.kills || 0) + (b.placementPoints || 0) + (b.booyahPoints || 0);
-      return bPts - aPts;
+      const aPts = (a.total_tournament_points || 0);
+      const bPts = (b.total_tournament_points || 0);
+      if (bPts !== aPts) return bPts - aPts;
+      return (b.total_tournament_kills || 0) - (a.total_tournament_kills || 0);
     });
   }, [teams]);
 
@@ -532,10 +534,10 @@ function FullStandings({ teams = [], design }) {
         <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 520, overflowY: 'auto' }}>
           {sortedTeams.map((team, idx) => {
             const rank = idx + 1;
-            const kills = team.kills || 0;
+            const kills = team.total_tournament_kills || 0;
             const booyahs = team.booyahs || 0;
-            const placementPts = team.placementPoints || 0;
-            const totalPoints = kills + placementPts + (team.booyahPoints || 0);
+            const placementPts = team.placement_points || 0;
+            const totalPoints = team.total_tournament_points || 0;
 
             let rowBg = idx % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.15)';
             let rankColor = '#ffffff';
@@ -573,8 +575,8 @@ function FullStandings({ teams = [], design }) {
 
                 {/* Logo */}
                 <div style={{ width: 32, display: 'flex', justifyContent: 'center' }}>
-                  {team.logo ? (
-                    <img src={team.logo} alt="" style={{ width: 24, height: 24, objectFit: 'contain' }} />
+                  {team.logo_url ? (
+                    <img src={team.logo_url || team.logo} alt="" style={{ width: 24, height: 24, objectFit: 'contain' }} onError={e => { e.target.style.display='none'; }} />
                   ) : (
                     <div style={{ width: 24, height: 24, borderRadius: '50%', background: team.color || '#FF6B00', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, color: '#000' }}>
                       {(team.name || 'T').substring(0, 2).toUpperCase()}
@@ -589,7 +591,7 @@ function FullStandings({ teams = [], design }) {
 
                 {/* Matches */}
                 <div style={{ width: 70, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
-                  {team.matchesPlayed || 5}
+                  {team.matches_played || '—'}
                 </div>
 
                 {/* Kills */}
@@ -1038,8 +1040,8 @@ function TeamsToday({ teams = [], design }) {
                   marginBottom: 10,
                   background: 'rgba(0,0,0,0.4)'
                 }}>
-                  {team.logo ? (
-                    <img src={team.logo} alt="" style={{ width: 36, height: 36, objectFit: 'contain' }} />
+                  {team.logo_url ? (
+                    <img src={team.logo_url || team.logo} alt="" style={{ width: 36, height: 36, objectFit: 'contain' }} onError={e => { e.target.style.display='none'; }} />
                   ) : (
                     <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff' }}>
                       {(team.name || 'T').substring(0, 2).toUpperCase()}
@@ -1132,8 +1134,8 @@ function CastersScreen({ design }) {
               alignItems: 'center',
               marginTop: 10
             }}>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff' }}>OMNIPEAK</span>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: '#FF6B00', letterSpacing: '0.1em' }}>ANALYST</span>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff' }}>{(design?.casters?.[0]?.name) || design?.caster1Name || 'CASTER ONE'}</span>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: '#FF6B00', letterSpacing: '0.1em' }}>{(design?.casters?.[0]?.role) || design?.caster1Role || 'SHOUTCASTER'}</span>
             </div>
           </div>
 
@@ -1181,8 +1183,8 @@ function CastersScreen({ design }) {
               alignItems: 'center',
               marginTop: 10
             }}>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff' }}>THE SHRE</span>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.1em' }}>SHOUTCASTER</span>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff' }}>{(design?.casters?.[1]?.name) || design?.caster2Name || 'CASTER TWO'}</span>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.1em' }}>{(design?.casters?.[1]?.role) || design?.caster2Role || 'ANALYST'}</span>
             </div>
           </div>
 

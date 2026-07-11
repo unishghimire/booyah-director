@@ -11,16 +11,25 @@ function ok(data) { return { statusCode: 200, headers: corsHeaders, body: JSON.s
 function err(code, msg) { return { statusCode: code, headers: corsHeaders, body: JSON.stringify({ error: msg }) }; }
 
 const DEFAULT_DESIGN = {
-  accentColor: '#f97316',
-  accentColor2: '#ef4444',
-  bgColor: '#0a0a0f',
-  textColor: '#ffffff',
-  tournamentName: 'BOOYAH CUP',
-  tournamentSubtitle: 'GRAND FINALS',
-  gameLabel: 'GAME',
-  logoUrl: '',
-  overlayStyle: 'default',   // 'default' | 'ff_classic'
-  fontStyle: 'orbitron',     // 'orbitron' | 'rajdhani' | 'impact'
+  accentColor:         '#FF6B00',
+  accentColor2:        '#00D4FF',
+  bgColor:             '#060915',
+  textColor:           '#ffffff',
+  tournamentName:      'BOOYAH CUP',
+  tournamentSubtitle:  'GRAND FINALS',
+  gameLabel:           'GAME',
+  logoUrl:             '',
+  overlayStyle:        'default',
+  fontStyle:           'orbitron',
+  // Casters array (used by CastersScreen and DesignStudio)
+  casters: [
+    { name: 'CASTER ONE',   role: 'SHOUTCASTER', handle: '@caster1' },
+    { name: 'CASTER TWO',   role: 'ANALYST',     handle: '@caster2' },
+    { name: 'CASTER THREE', role: 'HOST',         handle: '@caster3' },
+  ],
+  // Organiser / sponsor branding
+  organizerName:       'GARENA',
+  sponsorLogoUrl:      '',
 };
 
 exports.handler = async (event) => {
