@@ -1310,13 +1310,13 @@ function EliminationAlert({ eliminations = [], design }) {
 /* ──────────────────────────────────────────────────
    11. MVP (SOLID BG)
 ────────────────────────────────────────────────── */
-function MVPScreen({ players = [], teams = [], design }) {
-  // Extract MVP stats
-  const mvpPlayerName = 'VIPER_X';
-  const teamName = 'GODLIKE ESPORTS';
-  const kills = 12;
-  const damage = 2850;
-  const assists = 4;
+function MVPScreen({ players = [], teams = [], design, overlayState }) {
+  // Use overlayState data set by Director; fallback to first player by kills
+  const mvpPlayerName = overlayState?.mvp_player_name || (players.length ? players.reduce((a,b) => (a.total_tournament_kills||0) > (b.total_tournament_kills||0) ? a : b).name : 'TBD');
+  const teamName = overlayState?.mvp_team_name || '—';
+  const kills = overlayState?.mvp_kills || 0;
+  const damage = 0;
+  const assists = 0;
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
@@ -1456,8 +1456,9 @@ function MVPScreen({ players = [], teams = [], design }) {
 /* ──────────────────────────────────────────────────
    12. CHAMPIONS / BOOYAH (SOLID BG)
 ────────────────────────────────────────────────── */
-function ChampionsScreen({ teams = [], design }) {
-  const winnerTeam = teams[0]?.name || 'GLORY ESPORTS';
+function ChampionsScreen({ teams = [], design, overlayState }) {
+  const winnerTeam = overlayState?.champion_team_name || teams[0]?.name || 'GLORY ESPORTS';
+  const totalPoints = overlayState?.champion_total_points || teams[0]?.total_tournament_points || 0;
   
   // Confetti array
   const confettiParticles = Array.from({ length: 30 });
@@ -1650,9 +1651,9 @@ export default function Overlay() {
       case 'elimination_alert':
         return <EliminationAlert eliminations={eliminations} design={design} />;
       case 'mvp':
-        return <MVPScreen players={players} teams={teams} design={design} />;
+        return <MVPScreen players={players} teams={teams} design={design} overlayState={overlayState} />;
       case 'champions':
-        return <ChampionsScreen teams={teams} design={design} />;
+        return <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />;
       default:
         return <SetupBlank />;
     }

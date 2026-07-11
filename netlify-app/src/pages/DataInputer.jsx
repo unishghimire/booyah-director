@@ -53,7 +53,7 @@ export default function DataInputer() {
     if (!newTeamName) return toast.error('Team name is required');
     setTeamAdding(true);
     try {
-      await overlayApi.addTeam({ name: newTeamName, logo_url: newTeamLogo || '' });
+      await overlayApi.addTeam({ tournament_id: tournament?.id, team_name: newTeamName, logo_url: newTeamLogo || '' });
       toast.success(`Team "${newTeamName}" added successfully!`);
       setNewTeamName('');
       setNewTeamLogo('');

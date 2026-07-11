@@ -70,7 +70,7 @@ export default function DirectorPanel() {
 
   // Match control actions
   const startMatch = async () => {
-    const nextNum = (state.match_count || 0) + 1;
+    const nextNum = (tournament?.current_match_number || 0) + 1;
     setBusy('start_match');
     try {
       await overlayApi.startNextMatch({ tournament_id: state.tournament?.id, map_name: mapSelect });
@@ -203,7 +203,7 @@ export default function DirectorPanel() {
               {tournament?.name || 'CHAMPIONSHIP TOUR'}
             </h1>
             <p className="font-orbitron text-[9px] font-bold text-gray-500 tracking-widest mt-1">
-              MATCH {(state.match_count || 0) + 1} // ACTIVE
+              MATCH {(tournament?.current_match_number || 0) + 1} // ACTIVE
             </p>
           </div>
         </div>
@@ -521,7 +521,7 @@ export default function DirectorPanel() {
                       </div>
                       <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-center">
                         <p className="font-orbitron text-xl font-black text-[#FFB800] tabular-nums">
-                          {state.match_count || 0}
+                          {tournament?.current_match_number || 0}
                         </p>
                         <p className="text-[9px] text-gray-500 font-bold mt-0.5">MATCHES</p>
                       </div>
@@ -575,7 +575,7 @@ export default function DirectorPanel() {
                             Map
                           </p>
                           <p className="font-orbitron text-sm font-black text-white mt-0.5">
-                            {currentMatch.map || 'Unknown'}
+                            {currentMatch.map_name || 'Unknown'}
                           </p>
                         </div>
                         <div>
@@ -583,7 +583,7 @@ export default function DirectorPanel() {
                             Status
                           </p>
                           <span className="inline-block rounded px-2.5 py-0.5 text-[9px] font-orbitron font-black tracking-widest bg-[#10b981]/20 text-[#10b981] mt-1 border border-[#10b981]/30">
-                            {currentMatch.status?.toUpperCase() || 'PRE-MATCH'}
+                            {currentMatch.state?.toUpperCase() || 'PRE-MATCH'}
                           </span>
                         </div>
                       </div>
@@ -621,7 +621,7 @@ export default function DirectorPanel() {
                     >
                       {busy === 'start_match'
                         ? 'CREATING MATCH...'
-                        : `START MATCH #${(state.match_count || 0) + 1}`}
+                        : `START MATCH #${(tournament?.current_match_number || 0) + 1}`}
                     </button>
 
                     <div className="flex items-center gap-2">

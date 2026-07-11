@@ -9,6 +9,16 @@
       "current_match_number": 1,
       "status": "completed",
       "created_at": "2026-07-11T08:55:55.456Z"
+    },
+    {
+      "id": "mrg9wxuwwxwfd",
+      "name": "TEST CUP",
+      "total_matches": 6,
+      "points_per_kill": 1,
+      "placement_points_config": "{\"1\":15,\"2\":12,\"3\":10,\"4\":8,\"5\":6,\"6\":4,\"7\":2,\"8\":1,\"9\":1,\"10\":1,\"11\":1,\"12\":1}",
+      "current_match_number": 1,
+      "status": "active",
+      "created_at": "2026-07-11T11:20:45.416Z"
     }
   ],
   "teams": [
@@ -229,6 +239,15 @@
       "map_name": "Bermuda",
       "started_at": "2026-07-11T08:57:18.918Z",
       "ended_at": null
+    },
+    {
+      "id": "mrg9wy0sm5822",
+      "tournament_id": "mrg9wxuwwxwfd",
+      "match_number": 1,
+      "state": "live",
+      "map_name": "Bermuda",
+      "started_at": "2026-07-11T11:20:45.628Z",
+      "ended_at": null
     }
   ],
   "match_standings": [
@@ -264,6 +283,17 @@
       "placement_points_awarded": 10,
       "team_kills_this_match": 0,
       "total_match_points": 10
+    },
+    {
+      "id": "mrg9wy5rufx6o",
+      "match_id": "mrg9wy0sm5822",
+      "tournament_id": "mrg9wxuwwxwfd",
+      "team_id": "mrg9wxwxipuac",
+      "team_name": "NEXUS",
+      "placement": 1,
+      "placement_points_awarded": 15,
+      "team_kills_this_match": 1,
+      "total_match_points": 16
     }
   ],
   "kill_events": [
@@ -299,6 +329,17 @@
       "killed_player_name": "Kiran",
       "killed_team_name": "Storm Riders",
       "timestamp": "2026-07-11T08:57:37.476Z"
+    },
+    {
+      "id": "mrg9wy370q1ur",
+      "match_id": "mrg9wy0sm5822",
+      "tournament_id": "mrg9wxuwwxwfd",
+      "killer_player_id": "mrg9wxwy6r5ca",
+      "killer_name": "Player1",
+      "killer_team_name": "NEXUS",
+      "killed_player_name": "EnemyX",
+      "killed_team_name": "ENEMY",
+      "timestamp": "2026-07-11T11:20:45.715Z"
     }
   ],
   "elimination_events": [
@@ -310,12 +351,21 @@
       "eliminated_player_name": "Anil",
       "eliminated_team_name": "Storm Riders",
       "timestamp": "2026-07-11T08:57:37.571Z"
+    },
+    {
+      "id": "mrg9wy41g99wp",
+      "match_id": "mrg9wy0sm5822",
+      "tournament_id": "mrg9wxuwwxwfd",
+      "eliminated_player_id": "mrg9wxwy6r5ca",
+      "eliminated_player_name": "Player1",
+      "eliminated_team_name": "NEXUS",
+      "timestamp": "2026-07-11T11:20:45.745Z"
     }
   ],
   "overlay_state": {
     "id": "singleton",
-    "tournament_id": "mrg4qon481wtb",
-    "current_screen": "champions",
+    "tournament_id": "mrg9wxuwwxwfd",
+    "current_screen": "pre_match_map",
     "mvp_player_id": "mrg4qsud3do5c",
     "mvp_player_name": "Ravi",
     "mvp_team_name": "Alpha Squad",
@@ -323,14 +373,14 @@
     "champion_team_id": "mrg4qsudd8x5l",
     "champion_team_name": "Alpha Squad",
     "champion_total_points": 17,
-    "last_updated_at": "2026-07-11T08:57:46.846Z"
+    "last_updated_at": "2026-07-11T11:20:46.040Z"
   },
   "design": {
-    "accentColor": "#f97316",
+    "accentColor": "#FF6B00",
     "accentColor2": "#ef4444",
     "bgColor": "#0a0a0f",
     "textColor": "#ffffff",
-    "tournamentName": "BOOYAH CUP",
+    "tournamentName": "TEST CUP",
     "tournamentSubtitle": "GRAND FINALS",
     "gameLabel": "GAME",
     "logoUrl": "",
