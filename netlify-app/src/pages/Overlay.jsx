@@ -1,4 +1,126 @@
 import React, { useEffect, useState, useMemo } from 'react';
+
+import { MAP_IMAGES } from '@/lib/maps';
+
+function GamingBackground({ mapName, accent = '#f97316', accent2 = '#00d4ff' }) {
+  const mapImg = MAP_IMAGES[mapName] || null;
+  
+  return (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
+      {/* Base: deep dark */}
+      <div style={{ position: 'absolute', inset: 0, background: '#060912' }} />
+      
+      {/* Map image — blurred, darkened, used as atmospheric backdrop */}
+      {mapImg && (
+        <div style={{
+          position: 'absolute', inset: 0,
+          backgroundImage: `url(${mapImg})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.12,
+          filter: 'blur(8px) saturate(0.6)',
+        }} />
+      )}
+      
+      {/* Carbon fiber texture overlay */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: `
+          repeating-linear-gradient(45deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 6px),
+          repeating-linear-gradient(-45deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 6px)
+        `,
+      }} />
+      
+      {/* Hex grid pattern */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: `
+          linear-gradient(${accent}08 1px, transparent 1px),
+          linear-gradient(90deg, ${accent}08 1px, transparent 1px)
+        `,
+        backgroundSize: '80px 80px',
+      }} />
+      
+      {/* Diagonal scan lines — subtle */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: `repeating-linear-gradient(
+          -45deg,
+          transparent,
+          transparent 3px,
+          rgba(255,255,255,0.008) 3px,
+          rgba(255,255,255,0.008) 4px
+        )`,
+      }} />
+      
+      {/* Radial center glow — primary accent */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: `radial-gradient(ellipse 1400px 900px at 50% 40%, ${accent}22, transparent 70%)`,
+      }} />
+      
+      {/* Secondary accent glow — opposite corner */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: `radial-gradient(ellipse 600px 600px at 85% 80%, ${accent2}15, transparent 60%)`,
+      }} />
+      
+      {/* Top edge LED strip */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
+        background: `linear-gradient(90deg, transparent, ${accent}, ${accent2}, ${accent}, transparent)`,
+      }} />
+      
+      {/* Bottom edge LED strip */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
+        background: `linear-gradient(90deg, transparent, ${accent}88, transparent)`,
+      }} />
+      
+      {/* Left edge glow */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, bottom: 0, width: '1px',
+        background: `linear-gradient(180deg, transparent, ${accent}66, transparent)`,
+      }} />
+      
+      {/* Right edge glow */}
+      <div style={{
+        position: 'absolute', top: 0, right: 0, bottom: 0, width: '1px',
+        background: `linear-gradient(180deg, transparent, ${accent2}66, transparent)`,
+      }} />
+      
+      {/* Dark vignette — keeps corners very dark */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'radial-gradient(ellipse 120% 120% at 50% 50%, transparent 30%, rgba(4,5,14,0.85) 100%)',
+      }} />
+      
+      {/* Floating particles — CSS animation via keyframes in style tag */}
+      {[...Array(12)].map((_, i) => (
+        <div key={i} style={{
+          position: 'absolute',
+          width: i % 3 === 0 ? '3px' : '2px',
+          height: i % 3 === 0 ? '3px' : '2px',
+          borderRadius: '50%',
+          background: i % 2 === 0 ? accent : accent2,
+          left: `${8 + i * 8}%`,
+          top: `${10 + (i * 17) % 80}%`,
+          opacity: 0.4,
+          animation: `floatParticle ${3 + (i % 3)}s ease-in-out infinite alternate`,
+          animationDelay: `${i * 0.4}s`,
+        }} />
+      ))}
+      
+      <style>{`
+        @keyframes floatParticle {
+          from { transform: translateY(0px) translateX(0px); opacity: 0.2; }
+          to   { transform: translateY(-20px) translateX(8px); opacity: 0.6; }
+        }
+      `}</style>
+    </div>
+  );
+}
+
 import { AnimatePresence, motion } from 'framer-motion';
 import { useOverlayData } from '@/lib/overlayApi';
 import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award, XCircle } from 'lucide-react';
@@ -609,12 +731,15 @@ function KillFeedScreen({ killFeed = [], design }) {
    5. PRE_MATCH_MAP (SOLID BG)
 ────────────────────────────────────────────────── */
 function PreMatchMap({ match, teams = [], design }) {
-  const mapName = match?.mapName || 'BERMUDA';
+  const mapName = match?.map_name || match?.mapName || 'Bermuda';
   const matchNum = match?.matchNumber || 'MATCH 01';
+  const primary = tok.acc(design);
+  const secondary = tok.acc2(design);
+  const mapImg = MAP_IMAGES[mapName];
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <GridBg design={design} />
+      <GamingBackground mapName={mapName} accent={primary} accent2={secondary} />
 
       {/* Main Container */}
       <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
@@ -679,71 +804,50 @@ function PreMatchMap({ match, teams = [], design }) {
                 <div style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#ffffff' }}>{teams.length || 12} TEAMS</div>
               </div>
               <div style={{ borderLeft: '3px solid #00D4FF', paddingLeft: 12 }}>
-                <div style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>TOTAL LOBBY PLAYERS</div>
-                <div style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#00D4FF' }}>48 SURVIVORS</div>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>BATTLEGROUND</div>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#ffffff', textTransform: 'uppercase' }}>{mapName}</div>
               </div>
             </div>
           </div>
 
-          {/* Right Visual Frame */}
-          <div style={{ flex: 1, height: '100%', minHeight: 380, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <FFPanel style={{ width: '100%', height: '100%', minHeight: 380, padding: 6, background: 'rgba(0,0,0,0.4)' }}>
+          {/* Right Side: Map Image with Frame */}
+          <div style={{ flex: 1, position: 'relative', height: '100%', minHeight: 480, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            {mapImg && (
               <div style={{
-                position: 'relative',
-                width: '100%',
-                height: '100%',
-                background: 'rgba(10,14,30,0.9)',
-                borderRadius: 4,
+                position: 'absolute', right: 60, top: '50%', 
+                transform: 'translateY(-50%)',
+                width: 520, height: 520,
+                borderRadius: 16,
                 overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
+                border: '1px solid ' + primary + '40',
+                boxShadow: '0 0 60px ' + primary + '30, 0 0 120px ' + primary + '15, inset 0 0 60px rgba(0,0,0,0.5)',
               }}>
-                {/* Styled Grid Graphics inside frame */}
+                <img src={mapImg} alt={mapName} style={{ width: '100%', height: '100%', objectFit: 'cover', filter: 'saturate(1.2) contrast(1.05)' }} />
+                {/* Overlay gradient on map image */}
                 <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backgroundImage: `radial-gradient(#FF6B00 1px, transparent 1px)`,
-                  backgroundSize: '24px 24px',
-                  opacity: 0.15
+                  position: 'absolute', inset: 0,
+                  background: 'linear-gradient(135deg, ' + primary + '20, transparent 50%, ' + primary + '10)',
                 }} />
-                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
-                  <MapPin size={48} style={{ color: '#FF6B00' }} />
-                  <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff', letterSpacing: '0.2em' }}>BATTLEGROUND ASSIGNED</span>
-                  <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: '#00D4FF', letterSpacing: '0.1em' }}>ENVIRONMENT: EXTREME TOXICITY</span>
-                </div>
+                {/* Corner brackets */}
+                {[['top-0 left-0','border-t-2 border-l-2'],['top-0 right-0','border-t-2 border-r-2'],
+                  ['bottom-0 left-0','border-b-2 border-l-2'],['bottom-0 right-0','border-b-2 border-r-2']
+                ].map(([pos, border], i) => (
+                  <div key={i} className={'absolute ' + pos + ' w-8 h-8 ' + border} style={{ borderColor: primary }} />
+                ))}
               </div>
-            </FFPanel>
+            )}
           </div>
         </div>
 
-        {/* Bottom Team Logos Ribbon */}
-        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20, display: 'flex', alignItems: 'center', gap: 20 }}>
-          <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: '#FF6B00', letterSpacing: '0.2em' }}>CONTENDING LOBBY</span>
-          <div style={{ display: 'flex', gap: 12, overflow: 'hidden', flex: 1 }}>
-            {teams.slice(0, 10).map((t, idx) => (
-              <div key={t.id || idx} style={{
-                display: 'flex',
-                alignItems: 'center',
-                gap: 6,
-                background: 'rgba(255,255,255,0.03)',
-                border: '1px solid rgba(255,255,255,0.06)',
-                padding: '4px 10px',
-                borderRadius: 4
-              }}>
-                {t.logo ? (
-                  <img src={t.logo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
-                ) : (
-                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: t.color || '#FF6B00', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 7, fontWeight: 900, color: '#000' }}>
-                    {(t.name || 'T').substring(0, 2).toUpperCase()}
-                  </div>
-                )}
-                <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: '#ffffff' }}>{t.name || 'TEAM'}</span>
-              </div>
-            ))}
-          </div>
+        {/* Bottom Bar info */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 16 }}>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.15em' }}>
+            OFFICIAL BROADCAST OVERLAY SYSTEM
+          </span>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: '#FF6B00', fontWeight: 900, letterSpacing: '0.15em' }}>
+            LIVE DEPLOYMENT PREPARATION
+          </span>
         </div>
-
       </div>
     </div>
   );
@@ -1101,7 +1205,10 @@ function CastersScreen({ design }) {
    9. UPCOMING_MAP (SOLID BG)
 ────────────────────────────────────────────────── */
 function UpcomingMap({ match, design }) {
-  const mapName = match?.mapName || 'KALAHARI';
+  const mapName = match?.map_name || match?.mapName || 'Kalahari';
+  const primary = tok.acc(design);
+  const secondary = tok.acc2(design);
+  const mapImg = MAP_IMAGES[mapName];
   
   // Timer State for 5:00 countdown
   const [seconds, setSeconds] = useState(300);
@@ -1116,12 +1223,12 @@ function UpcomingMap({ match, design }) {
   const formatTime = (totalSec) => {
     const mins = Math.floor(totalSec / 60);
     const secs = totalSec % 60;
-    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
+    return mins.toString().padStart(2, '0') + ':' + secs.toString().padStart(2, '0');
   };
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <GridBg design={design} />
+      <GamingBackground mapName={mapName} accent={primary} accent2={secondary} />
 
       <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         
@@ -1151,67 +1258,62 @@ function UpcomingMap({ match, design }) {
             }}>
               {mapName}
             </h1>
-            
-            {/* Live Timer Visual */}
-            <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 40 }}>
+
+            {/* Timer Counter */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 14, marginTop: 32 }}>
               <div style={{
-                background: 'rgba(255,107,0,0.15)',
-                border: '1px solid rgba(255,107,0,0.4)',
-                padding: '16px 32px',
-                borderRadius: 6,
-                display: 'flex',
+                background: 'rgba(255,107,0,0.1)',
+                border: '1px solid rgba(255,107,0,0.3)',
+                padding: '12px 24px',
+                borderRadius: 8,
+                display: 'inline-flex',
                 flexDirection: 'column'
               }}>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: '#FF6B00', letterSpacing: '0.2em', fontWeight: 900, marginBottom: 4 }}>MATCH STARTS IN</span>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 44, fontWeight: 950, color: '#ffffff', letterSpacing: '0.05em' }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 8, color: '#FF6B00', fontWeight: 800, letterSpacing: '0.2em' }}>ESTIMATED START</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 32, fontWeight: 900, color: '#ffffff', marginTop: 4, letterSpacing: '0.05em' }}>
                   {formatTime(seconds)}
                 </span>
               </div>
-              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>COUNTDOWN CLOCK ACTIVE</span>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 8, color: 'rgba(255,255,255,0.3)' }}>DO NOT REFRESH DIRECT STREAM VIEW</span>
+              <div style={{ maxWidth: 220 }}>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 10, color: '#ffffff', fontWeight: 700, letterSpacing: '0.05em' }}>WARM-UP COUNTDOWN</div>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 8, color: 'rgba(255,255,255,0.4)', marginTop: 4, lineHeight: 1.4 }}>
+                  All players must connect to custom lobby. Live feed streams once counter hits zero.
+                </div>
               </div>
             </div>
           </div>
 
-          {/* Right Map Image Card representation */}
-          <div style={{ flex: 1, height: '100%', minHeight: 340, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-            <FFPanel style={{ width: '100%', height: '100%', minHeight: 340, padding: 6, background: 'rgba(0,0,0,0.4)' }}>
-              <div style={{
-                position: 'relative',
-                width: '100%',
-                height: '100%',
-                background: 'rgba(10,14,30,0.9)',
-                borderRadius: 4,
-                overflow: 'hidden',
-                display: 'flex',
-                alignItems: 'center',
-                justifyContent: 'center'
-              }}>
-                <div style={{
-                  position: 'absolute',
-                  inset: 0,
-                  backgroundImage: `linear-gradient(45deg, rgba(255,107,0,0.04) 25%, transparent 25%, transparent 75%, rgba(255,107,0,0.04) 75%), linear-gradient(45deg, rgba(255,107,0,0.04) 25%, transparent 25%, transparent 75%, rgba(255,107,0,0.04) 75%)`,
-                  backgroundSize: '40px 40px',
-                  backgroundPosition: '0 0, 20px 20px'
-                }} />
-                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
-                  <Zap size={44} style={{ color: '#00D4FF', animation: 'bounce 2s infinite' }} />
-                  <span style={{ fontFamily: 'Orbitron', fontSize: 13, fontWeight: 900, color: '#ffffff', letterSpacing: '0.1em' }}>TACTICAL ARENA PREPARED</span>
-                  <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: '#FF6B00' }}>4 SQUAD SURVIVAL CONTEST</span>
-                </div>
-              </div>
-            </FFPanel>
+          {/* Right Side: Centered map image card with dramatic reveal */}
+          <div style={{ flex: 1, display: 'flex', justifyContent: 'center' }}>
+            {mapImg && (
+              <motion.div 
+                initial={{ scale: 0.8, opacity: 0 }} 
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ delay: 0.4, type: 'spring', stiffness: 60 }}
+                style={{
+                  width: 480, height: 480,
+                  borderRadius: 20,
+                  overflow: 'hidden',
+                  border: '2px solid ' + primary + '60',
+                  boxShadow: '0 0 80px ' + primary + '40, 0 40px 80px rgba(0,0,0,0.8)',
+                  margin: '40px auto 0',
+                }}
+              >
+                <img src={mapImg} alt={mapName} style={{ width: '100%', height: '100%', objectFit: 'cover' }} />
+              </motion.div>
+            )}
           </div>
-
         </div>
 
         {/* Footer */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
-          <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: 'rgba(255,255,255,0.4)' }}>GARENA ESPORTS GRAND FINAL 2026</span>
-          <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: '#00D4FF', fontWeight: 700 }}>MATCH #2 STAGE PREPARATION</span>
+        <div style={{ display: 'flex', justifyContent: 'space-between', borderTop: '1px solid rgba(255,255,255,0.08)', paddingTop: 16 }}>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.15em' }}>
+            {tok.name(design)}
+          </span>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: '#00D4FF', fontWeight: 900, letterSpacing: '0.15em' }}>
+            {tok.sub(design)}
+          </span>
         </div>
-
       </div>
     </div>
   );

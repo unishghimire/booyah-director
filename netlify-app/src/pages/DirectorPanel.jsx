@@ -1,3 +1,4 @@
+import { MAP_IMAGES, MAPS } from '@/lib/maps';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
@@ -596,17 +597,23 @@ export default function DirectorPanel() {
                       Select Next Map
                     </p>
                     <div className="flex gap-2 flex-wrap">
-                      {['Bermuda', 'Kalahari', 'Purgatory', 'Nexterra'].map((mapName) => (
-                        <button
-                          key={mapName}
-                          onClick={() => setMapSelect(mapName)}
-                          className={`px-5 py-2.5 rounded-md font-orbitron text-[11px] font-black tracking-wider transition-all border ${
-                            mapSelect === mapName
-                              ? 'bg-[#FF6B00] border-[#FF6B00] text-black shadow-[0_0_12px_rgba(255,107,0,0.3)]'
-                              : 'bg-[#13131f] border-white/5 text-gray-400 hover:text-white'
+                      {MAPS.map(m => (
+                        <button 
+                          key={m}
+                          onClick={() => setMapSelect(m)}
+                          className={`flex items-center gap-2 px-3 py-2 rounded-lg border transition-all text-[11px] font-orbitron ${
+                            mapSelect === m 
+                              ? 'border-[#FF6B00]/60 bg-[#FF6B00]/15 text-[#FF6B00]' 
+                              : 'border-white/10 bg-white/5 text-gray-400 hover:border-white/20'
                           }`}
                         >
-                          {mapName.toUpperCase()}
+                          <img 
+                            src={MAP_IMAGES[m]} 
+                            alt={m} 
+                            style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover' }}
+                            onError={e => e.target.style.display='none'}
+                          />
+                          {m}
                         </button>
                       ))}
                     </div>
