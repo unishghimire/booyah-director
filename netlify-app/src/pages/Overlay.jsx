@@ -14,6 +14,116 @@ function GamingBackground({ mapName, accent = '#f97316', accent2 = '#00d4ff' }) 
       {mapImg && (
         <div style={{
           position: 'absolute', inset: 0,
+          backgroundImage: 'url(' + mapImg + ')',
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          opacity: 0.12,
+          filter: 'blur(8px) saturate(0.6)',
+        }} />
+      )}
+      
+      {/* Carbon fiber texture overlay */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'repeating-linear-gradient(45deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 6px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.012) 0px, rgba(255,255,255,0.012) 1px, transparent 1px, transparent 6px)',
+      }} />
+      
+      {/* Hex grid pattern */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'linear-gradient(' + accent + '08 1px, transparent 1px), linear-gradient(90deg, ' + accent + '08 1px, transparent 1px)',
+        backgroundSize: '80px 80px',
+      }} />
+      
+      {/* Diagonal scan lines — subtle */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        backgroundImage: 'repeating-linear-gradient(-45deg, transparent, transparent 3px, rgba(255,255,255,0.008) 3px, rgba(255,255,255,0.008) 4px)',
+      }} />
+      
+      {/* Radial center glow — primary accent */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'radial-gradient(ellipse 1400px 900px at 50% 40%, ' + accent + '22, transparent 70%)',
+      }} />
+      
+      {/* Secondary accent glow — opposite corner */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'radial-gradient(ellipse 600px 600px at 85% 80%, ' + accent2 + '15, transparent 60%)',
+      }} />
+      
+      {/* Top edge LED strip */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, right: 0, height: '2px',
+        background: 'linear-gradient(90deg, transparent, ' + accent + ', ' + accent2 + ', ' + accent + ', transparent)',
+      }} />
+      
+      {/* Bottom edge LED strip */}
+      <div style={{
+        position: 'absolute', bottom: 0, left: 0, right: 0, height: '1px',
+        background: 'linear-gradient(90deg, transparent, ' + accent + '88, transparent)',
+      }} />
+      
+      {/* Left edge glow */}
+      <div style={{
+        position: 'absolute', top: 0, left: 0, bottom: 0, width: '1px',
+        background: 'linear-gradient(180deg, transparent, ' + accent + '66, transparent)',
+      }} />
+      
+      {/* Right edge glow */}
+      <div style={{
+        position: 'absolute', top: 0, right: 0, bottom: 0, width: '1px',
+        background: 'linear-gradient(180deg, transparent, ' + accent2 + '66, transparent)',
+      }} />
+      
+      {/* Dark vignette — keeps corners very dark */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'radial-gradient(ellipse 120% 120% at 50% 50%, transparent 30%, rgba(4,5,14,0.85) 100%)',
+      }} />
+      
+      {/* Floating particles — CSS animation via keyframes in style tag */}
+      {[...Array(12)].map((_, i) => (
+        <div key={i} style={{
+          position: 'absolute',
+          width: i % 3 === 0 ? '3px' : '2px',
+          height: i % 3 === 0 ? '3px' : '2px',
+          borderRadius: '50%',
+          background: i % 2 === 0 ? accent : accent2,
+          left: (8 + i * 8) + '%',
+          top: (10 + (i * 17) % 80) + '%',
+          opacity: 0.4,
+          animation: 'floatParticle ' + (3 + (i % 3)) + 's ease-in-out infinite alternate',
+          animationDelay: (i * 0.4) + 's',
+        }} />
+      ))}
+      
+      <style>{'
+        @keyframes floatParticle {
+          from { transform: translateY(0px) translateX(0px); opacity: 0.2; }
+          to   { transform: translateY(-20px) translateX(8px); opacity: 0.6; }
+        }
+      '}</style>
+    </div>
+  );
+}
+
+
+import { MAP_IMAGES } from '@/lib/maps';
+
+function GamingBackground({ mapName, accent = '#f97316', accent2 = '#00d4ff' }) {
+  const mapImg = MAP_IMAGES[mapName] || null;
+  
+  return (
+    <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
+      {/* Base: deep dark */}
+      <div style={{ position: 'absolute', inset: 0, background: '#060912' }} />
+      
+      {/* Map image — blurred, darkened, used as atmospheric backdrop */}
+      {mapImg && (
+        <div style={{
+          position: 'absolute', inset: 0,
           backgroundImage: `url(${mapImg})`,
           backgroundSize: 'cover',
           backgroundPosition: 'center',
@@ -829,8 +939,8 @@ function PreMatchMap({ match, teams = [], design }) {
                   background: 'linear-gradient(135deg, ' + primary + '20, transparent 50%, ' + primary + '10)',
                 }} />
                 {/* Corner brackets */}
-                {[['top-0 left-0','border-t-2 border-l-2'],['top-0 right-0','border-t-2 border-r-2'],
-                  ['bottom-0 left-0','border-b-2 border-l-2'],['bottom-0 right-0','border-b-2 border-r-2']
+                {[['top-0 left-0', 'border-t-2 border-l-2'], ['top-0 right-0', 'border-t-2 border-r-2'],
+                  ['bottom-0 left-0', 'border-b-2 border-l-2'], ['bottom-0 right-0', 'border-b-2 border-r-2']
                 ].map(([pos, border], i) => (
                   <div key={i} className={'absolute ' + pos + ' w-8 h-8 ' + border} style={{ borderColor: primary }} />
                 ))}
@@ -852,7 +962,6 @@ function PreMatchMap({ match, teams = [], design }) {
     </div>
   );
 }
-
 /* ──────────────────────────────────────────────────
    6. TODAYS_MATCHES (SOLID BG)
 ────────────────────────────────────────────────── */
@@ -868,7 +977,7 @@ function TodaysMatches({ matches = [], design }) {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <GridBg design={design} />
+      <GamingBackground accent={tok.acc(design)} accent2={tok.acc2(design)} />
 
       <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         
@@ -984,7 +1093,7 @@ function TeamsToday({ teams = [], design }) {
   const displayTeams = useMemo(() => {
     if (teams.length > 0) return teams.slice(0, 12);
     return Array.from({ length: 12 }, (_, i) => ({
-      name: `TEAM ALPHA ${i + 1}`,
+      name: 'TEAM ALPHA ' + (i + 1),
       color: '#FF6B00',
       logo: null
     }));
@@ -992,7 +1101,7 @@ function TeamsToday({ teams = [], design }) {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <GridBg design={design} />
+      <GamingBackground accent={tok.acc(design)} accent2={tok.acc2(design)} />
 
       <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justify_content: 'space-between' }}>
         
@@ -1090,7 +1199,7 @@ function TeamsToday({ teams = [], design }) {
 function CastersScreen({ design }) {
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <GridBg design={design} />
+      <GamingBackground accent={tok.acc(design)} accent2={tok.acc2(design)} />
 
       <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         
@@ -1318,7 +1427,6 @@ function UpcomingMap({ match, design }) {
     </div>
   );
 }
-
 /* ──────────────────────────────────────────────────
    10. ELIMINATION_ALERT (SOLID BG / FLASH)
 ────────────────────────────────────────────────── */
@@ -1337,7 +1445,8 @@ function EliminationAlert({ eliminations = [], design }) {
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      background: '#060915'
+    }}>
+      <GamingBackground accent="#ef4444" accent2={tok.acc2(design)} />
     }}>
       {/* Red Radial Alert Glow */}
       <div style={{
@@ -1422,7 +1531,7 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
 
   return (
     <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
-      <GridBg design={design} />
+      <GamingBackground accent={tok.acc(design)} accent2={tok.acc2(design)} />
 
       <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         
@@ -1575,7 +1684,8 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
       flexDirection: 'column',
       justifyContent: 'center',
       alignItems: 'center',
-      background: '#060915'
+    }}>
+      <GamingBackground accent={tok.acc(design)} accent2={tok.acc2(design)} />
     }}>
       {/* Fallback CSS Confetti Style Tags */}
       <style>{`
@@ -1766,7 +1876,7 @@ export default function Overlay() {
       className="relative overflow-hidden w-[1920px] h-[1080px] origin-top-left"
       style={{
         transform: `scale(${scale})`,
-        background: isTransparent ? 'transparent' : '#060915',
+        background: isTransparent ? 'transparent' : 'transparent',
         width: 1920,
         height: 1080
       }}
