@@ -410,23 +410,43 @@ exports.handler = async (event) => {
       if (!clientEmail || !privateKey) return err(500, 'Google Sheets credentials not configured. Add GOOGLE_CLIENT_EMAIL and GOOGLE_PRIVATE_KEY to Netlify env vars.');
 
       try {
-        const { google } = require('googleapis');
-        const auth = new google.auth.GoogleAuth({
-          credentials: { client_email: clientEmail, private_key: privateKey },
-          scopes: ['https://www.googleapis.com/auth/spreadsheets.readonly'],
+        // Pure-fetch Google Sheets access via service account JWT (no googleapis SDK)
+        const crypto = require('crypto');
+        const now = Math.floor(Date.now() / 1000);
+        const jwtHeader = Buffer.from(JSON.stringify({ alg: 'RS256', typ: 'JWT' })).toString('base64url');
+        const jwtPayload = Buffer.from(JSON.stringify({
+          iss: clientEmail, scope: 'https://www.googleapis.com/auth/spreadsheets.readonly',
+          aud: 'https://oauth2.googleapis.com/token', iat: now, exp: now + 3600,
+        })).toString('base64url');
+        const toSign = `${jwtHeader}.${jwtPayload}`;
+        const signature = crypto.createSign('RSA-SHA256').update(toSign).sign(privateKey, 'base64url');
+        const jwt = `${toSign}.${signature}`;
+
+        const tokenRes = await fetch('https://oauth2.googleapis.com/token', {
+          method: 'POST', headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}`,
         });
-        const sheets = google.sheets({ version: 'v4', auth });
+        const { access_token } = await tokenRes.json();
+        if (!access_token) return err(500, 'Failed to get Google access token');
+
+        async function getSheetRange(range) {
+          const r = await fetch(
+            `https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}`,
+            { headers: { Authorization: `Bearer ${access_token}` } }
+          );
+          return r.ok ? (await r.json()).values || [] : [];
+        }
 
         let teamsData = [], playersData = [];
         try {
-          const r = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range: 'Teams!A:C' });
-          teamsData = (r.data.values || []).slice(1).filter(row => row[0]).map(row => ({
+          const rows = await getSheetRange('Teams!A:C');
+          teamsData = rows.slice(1).filter(row => row[0]).map(row => ({
             team_name: row[0]?.trim(), logo_url: row[1]?.trim() || '', color: row[2]?.trim() || '',
           }));
         } catch (_) {}
         try {
-          const r = await sheets.spreadsheets.values.get({ spreadsheetId: sheetId, range: 'Players!A:C' });
-          playersData = (r.data.values || []).slice(1).filter(row => row[0] && row[1]).map(row => ({
+          const rows = await getSheetRange('Players!A:C');
+          playersData = rows.slice(1).filter(row => row[0] && row[1]).map(row => ({
             player_name: row[0]?.trim(), team_name: row[1]?.trim(), role: row[2]?.trim() || 'Player',
           }));
         } catch (_) {}

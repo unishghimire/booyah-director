@@ -1,52 +1,57 @@
 /**
- * _db.js — Smart storage layer
- * 
+ * _db.js — Smart storage layer (zero native dependencies)
+ *
  * Priority:
- *   1. Firebase Realtime DB (if FIREBASE_DATABASE_URL env var is set)
- *   2. /tmp JSON file (Netlify serverless fallback — ephemeral but works without Firebase)
- * 
- * This ensures the app ALWAYS works, even before Firebase is configured.
+ *   1. Firebase Realtime DB via REST API (no SDK — pure HTTP fetch)
+ *   2. /tmp JSON file fallback (works on Netlify without any env vars)
+ *
+ * Required env vars for Firebase (optional — falls back to /tmp if missing):
+ *   FIREBASE_DATABASE_URL   e.g. https://your-project-default-rtdb.firebaseio.com
+ *   FIREBASE_DATABASE_SECRET  (Database secret from Firebase console > Project Settings > Service Accounts > Database secrets)
  */
 
 const fs   = require('fs');
 const path = require('path');
 
+// Use built-in fetch (Node 18+) or fall back to https
 const USE_FIREBASE = !!(
   process.env.FIREBASE_DATABASE_URL &&
-  process.env.FIREBASE_PROJECT_ID   &&
-  process.env.FIREBASE_CLIENT_EMAIL &&
-  process.env.FIREBASE_PRIVATE_KEY
+  process.env.FIREBASE_DATABASE_SECRET
 );
 
-// ─── Firebase path ────────────────────────────────────────────────────────────
-let _fbApp = null;
-function getFirebaseDb() {
-  if (_fbApp) return _fbApp;
-  const admin = require('firebase-admin');
-  if (!admin.apps.length) {
-    admin.initializeApp({
-      credential: admin.credential.cert({
-        projectId:   process.env.FIREBASE_PROJECT_ID,
-        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-        privateKey:  process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
-      }),
-      databaseURL: process.env.FIREBASE_DATABASE_URL,
-    });
-  }
-  _fbApp = admin.database();
-  return _fbApp;
+// ─── Firebase REST helpers ────────────────────────────────────────────────────
+function fbUrl(suffix) {
+  const base = process.env.FIREBASE_DATABASE_URL.replace(/\/$/, '');
+  const secret = process.env.FIREBASE_DATABASE_SECRET;
+  return `${base}${suffix}?auth=${secret}`;
+}
+
+async function fbGet() {
+  const res = await fetch(fbUrl('/booyah.json'));
+  if (!res.ok) throw new Error(`Firebase GET failed: ${res.status}`);
+  return await res.json();
+}
+
+async function fbSet(data) {
+  const res = await fetch(fbUrl('/booyah.json'), {
+    method: 'PUT',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify(data),
+  });
+  if (!res.ok) throw new Error(`Firebase PUT failed: ${res.status}`);
 }
 
 // ─── JSON file path (Netlify /tmp fallback) ───────────────────────────────────
-const IS_SERVERLESS = process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const IS_SERVERLESS = !!(process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME);
 const DATA_DIR = IS_SERVERLESS ? '/tmp' : path.join(process.cwd(), 'data');
 const DB_FILE  = path.join(DATA_DIR, 'booyah.json');
 
-// ─── Shared helpers ───────────────────────────────────────────────────────────
+// ─── ID generator ─────────────────────────────────────────────────────────────
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
 
+// ─── Default DB shape ─────────────────────────────────────────────────────────
 function getDefaultDb() {
   return {
     tournaments: [],
@@ -72,35 +77,36 @@ function getDefaultDb() {
   };
 }
 
-// ─── Load ──────────────────────────────────────────────────────────────────────
+// ─── Load ─────────────────────────────────────────────────────────────────────
 async function loadDb() {
   if (USE_FIREBASE) {
     try {
-      const snap = await getFirebaseDb().ref('booyah').once('value');
-      return snap.val() || getDefaultDb();
+      const data = await fbGet();
+      if (data && typeof data === 'object') return data;
     } catch (e) {
-      console.error('[_db] Firebase read failed, falling back to /tmp:', e.message);
-      // Fall through to file fallback
+      console.error('[_db] Firebase read failed, using /tmp fallback:', e.message);
     }
   }
   // File fallback
   try {
     if (fs.existsSync(DB_FILE)) {
-      return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+      const raw = fs.readFileSync(DB_FILE, 'utf8');
+      return JSON.parse(raw);
     }
-  } catch (e) { /* corrupted — reset */ }
+  } catch (e) {
+    console.error('[_db] File read failed, using default DB:', e.message);
+  }
   return getDefaultDb();
 }
 
-// ─── Save ──────────────────────────────────────────────────────────────────────
+// ─── Save ─────────────────────────────────────────────────────────────────────
 async function saveDb(db) {
   if (USE_FIREBASE) {
     try {
-      await getFirebaseDb().ref('booyah').set(db);
+      await fbSet(db);
       return;
     } catch (e) {
       console.error('[_db] Firebase write failed, falling back to /tmp:', e.message);
-      // Fall through to file fallback
     }
   }
   // File fallback
