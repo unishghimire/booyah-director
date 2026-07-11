@@ -1,8 +1,10 @@
 const fs = require('fs');
 const path = require('path');
 
-// On Netlify, /tmp is writable. Locally use ./data/
-const DATA_DIR = process.env.NETLIFY ? '/tmp' : path.join(process.cwd(), 'data');
+// Netlify (and all serverless): only /tmp is writable at runtime
+// Locally: use a ./data/ folder relative to repo root
+const IS_SERVERLESS = process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const DATA_DIR = IS_SERVERLESS ? '/tmp' : path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'booyah.json');
 
 function genId() {
@@ -39,12 +41,14 @@ function loadDb() {
     if (fs.existsSync(DB_FILE)) {
       return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
     }
-  } catch (e) { /* corrupted, reset */ }
+  } catch (e) { /* corrupted or missing — reset */ }
   return getDefaultDb();
 }
 
 function saveDb(db) {
-  if (!fs.existsSync(DATA_DIR)) {
+  // /tmp always exists on serverless — no mkdir needed
+  // Locally, create ./data/ if it doesn't exist
+  if (!IS_SERVERLESS && !fs.existsSync(DATA_DIR)) {
     fs.mkdirSync(DATA_DIR, { recursive: true });
   }
   fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
