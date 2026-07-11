@@ -1,0 +1,270 @@
+{
+  "tournaments": [
+    {
+      "id": "mrg4qon481wtb",
+      "name": "Booyah Cup 2026",
+      "total_matches": 6,
+      "points_per_kill": 1,
+      "placement_points_config": "{\"1\":15,\"2\":12,\"3\":10,\"4\":8,\"5\":6,\"6\":4,\"7\":2,\"8\":1,\"9\":1,\"10\":1,\"11\":1,\"12\":1}",
+      "current_match_number": 1,
+      "status": "completed",
+      "created_at": "2026-07-11T08:55:55.456Z"
+    }
+  ],
+  "teams": [
+    {
+      "id": "mrg4qsudd8x5l",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Alpha Squad",
+      "logo_url": null,
+      "total_tournament_points": 17,
+      "total_tournament_kills": 2,
+      "created_at": "2026-07-11T08:56:00.901Z"
+    },
+    {
+      "id": "mrg4qsvjiqjol",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Storm Riders",
+      "logo_url": null,
+      "total_tournament_points": 10,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.943Z"
+    },
+    {
+      "id": "mrg4qswofbt0d",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Dragon Force",
+      "logo_url": null,
+      "total_tournament_points": 13,
+      "total_tournament_kills": 1,
+      "created_at": "2026-07-11T08:56:00.984Z"
+    }
+  ],
+  "players": [
+    {
+      "id": "mrg4qsud3do5c",
+      "team_id": "mrg4qsudd8x5l",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Ravi",
+      "is_alive": true,
+      "current_match_kills": 2,
+      "total_tournament_kills": 2,
+      "created_at": "2026-07-11T08:56:00.901Z"
+    },
+    {
+      "id": "mrg4qsudbkezp",
+      "team_id": "mrg4qsudd8x5l",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Suman",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.901Z"
+    },
+    {
+      "id": "mrg4qsud4amev",
+      "team_id": "mrg4qsudd8x5l",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Bikash",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.901Z"
+    },
+    {
+      "id": "mrg4qsudgnxzs",
+      "team_id": "mrg4qsudd8x5l",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Hari",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.901Z"
+    },
+    {
+      "id": "mrg4qsvjjmv24",
+      "team_id": "mrg4qsvjiqjol",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Anil",
+      "is_alive": false,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.943Z"
+    },
+    {
+      "id": "mrg4qsvj0s16l",
+      "team_id": "mrg4qsvjiqjol",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Roshan",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.943Z"
+    },
+    {
+      "id": "mrg4qsvjgd3yb",
+      "team_id": "mrg4qsvjiqjol",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Kiran",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.943Z"
+    },
+    {
+      "id": "mrg4qsvjxn3et",
+      "team_id": "mrg4qsvjiqjol",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Deepak",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.943Z"
+    },
+    {
+      "id": "mrg4qswonhg6u",
+      "team_id": "mrg4qswofbt0d",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Suraj",
+      "is_alive": true,
+      "current_match_kills": 1,
+      "total_tournament_kills": 1,
+      "created_at": "2026-07-11T08:56:00.984Z"
+    },
+    {
+      "id": "mrg4qswox2ihf",
+      "team_id": "mrg4qswofbt0d",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Niroj",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.984Z"
+    },
+    {
+      "id": "mrg4qswogy49g",
+      "team_id": "mrg4qswofbt0d",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Pawan",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.984Z"
+    },
+    {
+      "id": "mrg4qswovapcs",
+      "team_id": "mrg4qswofbt0d",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Sagar",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T08:56:00.984Z"
+    }
+  ],
+  "matches": [
+    {
+      "id": "mrg4sh1itbx2r",
+      "tournament_id": "mrg4qon481wtb",
+      "match_number": 1,
+      "state": "live",
+      "map_name": "Bermuda",
+      "started_at": "2026-07-11T08:57:18.918Z",
+      "ended_at": null
+    }
+  ],
+  "match_standings": [
+    {
+      "id": "mrg4svi1b91wq",
+      "match_id": "mrg4sh1itbx2r",
+      "tournament_id": "mrg4qon481wtb",
+      "team_id": "mrg4qsudd8x5l",
+      "team_name": "Alpha Squad",
+      "placement": 1,
+      "placement_points_awarded": 15,
+      "team_kills_this_match": 2,
+      "total_match_points": 17
+    },
+    {
+      "id": "mrg4svkfhni2f",
+      "match_id": "mrg4sh1itbx2r",
+      "tournament_id": "mrg4qon481wtb",
+      "team_id": "mrg4qswofbt0d",
+      "team_name": "Dragon Force",
+      "placement": 2,
+      "placement_points_awarded": 12,
+      "team_kills_this_match": 1,
+      "total_match_points": 13
+    },
+    {
+      "id": "mrg4svn22i7pi",
+      "match_id": "mrg4sh1itbx2r",
+      "tournament_id": "mrg4qon481wtb",
+      "team_id": "mrg4qsvjiqjol",
+      "team_name": "Storm Riders",
+      "placement": 3,
+      "placement_points_awarded": 10,
+      "team_kills_this_match": 0,
+      "total_match_points": 10
+    }
+  ],
+  "kill_events": [
+    {
+      "id": "mrg4sv7nop4hl",
+      "match_id": "mrg4sh1itbx2r",
+      "tournament_id": "mrg4qon481wtb",
+      "killer_player_id": "mrg4qsud3do5c",
+      "killer_name": "Ravi",
+      "killer_team_name": "Alpha Squad",
+      "killed_player_name": "Anil",
+      "killed_team_name": "Storm Riders",
+      "timestamp": "2026-07-11T08:57:37.283Z"
+    },
+    {
+      "id": "mrg4svaas8b0w",
+      "match_id": "mrg4sh1itbx2r",
+      "tournament_id": "mrg4qon481wtb",
+      "killer_player_id": "mrg4qsud3do5c",
+      "killer_name": "Ravi",
+      "killer_team_name": "Alpha Squad",
+      "killed_player_name": "Suraj",
+      "killed_team_name": "Dragon Force",
+      "timestamp": "2026-07-11T08:57:37.378Z"
+    },
+    {
+      "id": "mrg4svd0cxcn9",
+      "match_id": "mrg4sh1itbx2r",
+      "tournament_id": "mrg4qon481wtb",
+      "killer_player_id": "mrg4qswonhg6u",
+      "killer_name": "Suraj",
+      "killer_team_name": "Dragon Force",
+      "killed_player_name": "Kiran",
+      "killed_team_name": "Storm Riders",
+      "timestamp": "2026-07-11T08:57:37.476Z"
+    }
+  ],
+  "elimination_events": [
+    {
+      "id": "mrg4svfnbq63u",
+      "match_id": "mrg4sh1itbx2r",
+      "tournament_id": "mrg4qon481wtb",
+      "eliminated_player_id": "mrg4qsvjjmv24",
+      "eliminated_player_name": "Anil",
+      "eliminated_team_name": "Storm Riders",
+      "timestamp": "2026-07-11T08:57:37.571Z"
+    }
+  ],
+  "overlay_state": {
+    "id": "singleton",
+    "tournament_id": "mrg4qon481wtb",
+    "current_screen": "champions",
+    "mvp_player_id": "mrg4qsud3do5c",
+    "mvp_player_name": "Ravi",
+    "mvp_team_name": "Alpha Squad",
+    "mvp_kills": 2,
+    "champion_team_id": "mrg4qsudd8x5l",
+    "champion_team_name": "Alpha Squad",
+    "champion_total_points": 17,
+    "last_updated_at": "2026-07-11T08:57:46.846Z"
+  }
+}
