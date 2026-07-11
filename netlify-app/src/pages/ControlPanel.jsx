@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useOverlayData } from '@/lib/overlayApi';
 import TournamentSetup from '@/components/control/TournamentSetup';
@@ -10,7 +10,8 @@ import ScreenSwitcher from '@/components/control/ScreenSwitcher';
 import MVPCard from '@/components/control/MVPCard';
 import ChampionsCard from '@/components/control/ChampionsCard';
 import KillFeedLog from '@/components/control/KillFeedLog';
-import { Monitor, Copy } from 'lucide-react';
+import DesignStudio from '@/components/control/DesignStudio';
+import { Monitor, Copy, Paintbrush, Tv } from 'lucide-react';
 
 function OBSUrlBox() {
   const url = `${window.location.origin}/overlay`;
@@ -41,8 +42,14 @@ function OBSUrlBox() {
   );
 }
 
+const RIGHT_TABS = [
+  { key: 'screens', label: 'Screens', icon: Tv },
+  { key: 'design', label: 'Design', icon: Paintbrush },
+];
+
 export default function ControlPanel() {
   const { data, loading, refresh } = useOverlayData(true);
+  const [rightTab, setRightTab] = useState('screens');
 
   if (loading || !data) {
     return (
@@ -56,14 +63,14 @@ export default function ControlPanel() {
 
   return (
     <div className="flex h-full">
-      {/* Left sidebar */}
-      <aside className="flex w-80 flex-shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-[#0d0d14] p-3">
+      {/* ── Left sidebar: Tournament & Teams ── */}
+      <aside className="flex w-80 flex-shrink-0 flex-col overflow-y-auto border-r border-white/10 bg-[#0d0d14] p-3 gap-3">
         {!tournament ? (
           <TournamentSetup onCreated={refresh} />
         ) : (
           <>
-            <div className="mb-3 rounded-lg border border-orange-500/20 bg-orange-500/5 p-3">
-              <p className="text-[10px] uppercase tracking-wider text-gray-500">Tournament</p>
+            <div className="rounded-lg border border-orange-500/20 bg-orange-500/5 p-3">
+              <p className="text-[10px] uppercase tracking-wider text-gray-500">Active Tournament</p>
               <p className="font-orbitron text-sm font-bold text-white">{tournament.name}</p>
               <p className="mt-0.5 text-xs text-gray-500">
                 Match {tournament.current_match_number || 0}/{tournament.total_matches} · {tournament.points_per_kill}pt/kill
@@ -74,7 +81,7 @@ export default function ControlPanel() {
         )}
       </aside>
 
-      {/* Main content */}
+      {/* ── Main: Match Controls + Kills + Standings ── */}
       <main className="flex-1 overflow-y-auto p-4">
         <div className="mx-auto max-w-5xl space-y-4">
           <MatchControls tournament={tournament} currentMatch={current_match} onAction={refresh} />
@@ -83,13 +90,37 @@ export default function ControlPanel() {
         </div>
       </main>
 
-      {/* Right panel */}
-      <aside className="flex w-80 flex-shrink-0 flex-col overflow-y-auto border-l border-white/10 bg-[#0d0d14] p-3">
-        <ScreenSwitcher currentScreen={overlay_state?.current_screen} onAction={refresh} />
-        <MVPCard tournament={tournament} currentMatch={current_match} overlayState={overlay_state} onAction={refresh} />
-        <ChampionsCard tournament={tournament} teams={teams} onAction={refresh} />
-        <KillFeedLog killFeed={kill_feed} />
-        <OBSUrlBox />
+      {/* ── Right panel: Screens OR Design Studio ── */}
+      <aside className="flex w-80 flex-shrink-0 flex-col overflow-y-auto border-l border-white/10 bg-[#0d0d14] p-3 gap-3">
+        {/* Tab switcher */}
+        <div className="flex rounded-lg border border-white/10 bg-black/30 p-1 gap-1">
+          {RIGHT_TABS.map(({ key, label, icon: Icon }) => (
+            <button
+              key={key}
+              onClick={() => setRightTab(key)}
+              className={`flex flex-1 items-center justify-center gap-1.5 rounded-md py-1.5 text-[11px] font-bold transition ${
+                rightTab === key
+                  ? 'bg-orange-500 text-black'
+                  : 'text-gray-400 hover:text-white'
+              }`}
+            >
+              <Icon className="h-3 w-3" />
+              {label}
+            </button>
+          ))}
+        </div>
+
+        {rightTab === 'screens' ? (
+          <>
+            <ScreenSwitcher currentScreen={overlay_state?.current_screen} onAction={refresh} />
+            <MVPCard tournament={tournament} currentMatch={current_match} overlayState={overlay_state} onAction={refresh} />
+            <ChampionsCard tournament={tournament} teams={teams} onAction={refresh} />
+            <KillFeedLog killFeed={kill_feed} />
+            <OBSUrlBox />
+          </>
+        ) : (
+          <DesignStudio onAction={refresh} />
+        )}
       </aside>
     </div>
   );

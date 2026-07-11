@@ -1,7 +1,5 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
 
-// In production (Netlify), redirects handle /api/* → /.netlify/functions/api/*
-// In dev (vite proxy), /api/* → localhost:9999/.netlify/functions/api/*
 const BASE_URL = '/api';
 
 async function callFunction(name, payload = {}, method = 'POST') {
@@ -13,7 +11,6 @@ async function callFunction(name, payload = {}, method = 'POST') {
   const url = method === 'GET' && Object.keys(payload).length
     ? `${BASE_URL}/${name}?${new URLSearchParams(payload)}`
     : `${BASE_URL}/${name}`;
-
   const response = await fetch(url, options);
   let data = {};
   try { data = await response.json(); } catch (e) {}
@@ -35,6 +32,8 @@ export const overlayApi = {
   setChampionAndShowScreen: (data) => callFunction('setChampionAndShowScreen', data),
   switchOverlayScreen: (data) => callFunction('switchOverlayScreen', data),
   declareChampions: (data) => callFunction('declareChampions', data),
+  saveDesign: (data) => callFunction('saveDesign', data),
+  getDesign: () => callFunction('getDesign', {}, 'GET'),
 };
 
 export function useOverlayData(enabled = true) {
@@ -45,13 +44,8 @@ export function useOverlayData(enabled = true) {
   const refresh = useCallback(async () => {
     try {
       const result = await overlayApi.getOverlayData();
-      if (mountedRef.current) {
-        setData(result);
-        setLoading(false);
-      }
-    } catch (err) {
-      // silent poll fail
-    }
+      if (mountedRef.current) { setData(result); setLoading(false); }
+    } catch (err) {}
   }, []);
 
   useEffect(() => {

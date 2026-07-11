@@ -7,31 +7,37 @@ const corsHeaders = {
   'Content-Type': 'application/json'
 };
 
-function ok(data) {
-  return { statusCode: 200, headers: corsHeaders, body: JSON.stringify(data) };
-}
+function ok(data) { return { statusCode: 200, headers: corsHeaders, body: JSON.stringify(data) }; }
+function err(code, msg) { return { statusCode: code, headers: corsHeaders, body: JSON.stringify({ error: msg }) }; }
 
-function err(code, msg) {
-  return { statusCode: code, headers: corsHeaders, body: JSON.stringify({ error: msg }) };
-}
+const DEFAULT_DESIGN = {
+  accentColor: '#f97316',
+  accentColor2: '#ef4444',
+  bgColor: '#0a0a0f',
+  textColor: '#ffffff',
+  tournamentName: 'BOOYAH CUP',
+  tournamentSubtitle: 'GRAND FINALS',
+  gameLabel: 'GAME',
+  logoUrl: '',
+  overlayStyle: 'default',   // 'default' | 'ff_classic'
+  fontStyle: 'orbitron',     // 'orbitron' | 'rajdhani' | 'impact'
+};
 
 exports.handler = async (event) => {
-  if (event.httpMethod === 'OPTIONS') {
-    return { statusCode: 200, headers: corsHeaders, body: '' };
-  }
+  if (event.httpMethod === 'OPTIONS') return { statusCode: 200, headers: corsHeaders, body: '' };
 
-  // Extract route: /.netlify/functions/api/getOverlayData  →  getOverlayData
   const pathParts = event.path.replace('/.netlify/functions/api', '').replace('/api', '').split('/').filter(Boolean);
   const route = pathParts[0] || '';
   const body = event.body ? JSON.parse(event.body) : {};
 
   try {
     const db = loadDb();
+    if (!db.design) db.design = { ...DEFAULT_DESIGN };
 
     // ── GET OVERLAY DATA ──────────────────────────────────────────
     if (route === 'getOverlayData') {
       const tournament = db.tournaments.find(t => t.status === 'active') || db.tournaments[db.tournaments.length - 1] || null;
-      if (!tournament) return ok({ tournament: null, overlay_state: db.overlay_state, teams: [], players: [], current_match: null, kill_feed: [], eliminations: [], standings: [] });
+      if (!tournament) return ok({ tournament: null, overlay_state: db.overlay_state, design: db.design, teams: [], players: [], current_match: null, kill_feed: [], eliminations: [], standings: [] });
       const tid = tournament.id;
       const teams = db.teams.filter(t => t.tournament_id === tid).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
       const players = db.players.filter(p => p.tournament_id === tid);
@@ -39,11 +45,24 @@ exports.handler = async (event) => {
       const currentMatch = matches[0] || null;
       let killFeed = [], eliminations = [], standings = [];
       if (currentMatch) {
-        killFeed = db.kill_events.filter(k => k.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 10);
+        killFeed = db.kill_events.filter(k => k.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 15);
         eliminations = db.elimination_events.filter(e => e.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
         standings = db.match_standings.filter(s => s.match_id === currentMatch.id);
       }
-      return ok({ tournament, overlay_state: db.overlay_state, teams, players, current_match: currentMatch, kill_feed: killFeed, eliminations, standings });
+      return ok({ tournament, overlay_state: db.overlay_state, design: db.design, teams, players, current_match: currentMatch, kill_feed: killFeed, eliminations, standings });
+    }
+
+    // ── SAVE DESIGN ───────────────────────────────────────────────
+    if (route === 'saveDesign') {
+      db.design = { ...DEFAULT_DESIGN, ...db.design, ...body };
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      saveDb(db);
+      return ok({ success: true, design: db.design });
+    }
+
+    // ── GET DESIGN ────────────────────────────────────────────────
+    if (route === 'getDesign') {
+      return ok({ design: db.design || DEFAULT_DESIGN });
     }
 
     // ── INITIALIZE TOURNAMENT ─────────────────────────────────────
@@ -65,7 +84,7 @@ exports.handler = async (event) => {
       const { tournament_id, team_name, player_names } = body;
       if (!tournament_id || !team_name) return err(400, 'tournament_id and team_name required');
       if (db.teams.filter(t => t.tournament_id === tournament_id).length >= 12) return err(400, 'Maximum 12 teams allowed');
-      const team = { id: genId(), tournament_id, name: team_name, logo_url: null, total_tournament_points: 0, total_tournament_kills: 0, created_at: new Date().toISOString() };
+      const team = { id: genId(), tournament_id, name: team_name, logo_url: body.logo_url || null, total_tournament_points: 0, total_tournament_kills: 0, created_at: new Date().toISOString() };
       db.teams.push(team);
       const createdPlayers = (player_names || []).filter(n => n?.trim()).slice(0, 4).map(name => {
         const p = { id: genId(), team_id: team.id, tournament_id, name: name.trim(), is_alive: true, current_match_kills: 0, total_tournament_kills: 0, created_at: new Date().toISOString() };
@@ -103,7 +122,7 @@ exports.handler = async (event) => {
       if (mIdx === -1) return err(404, 'Match not found');
       db.matches[mIdx].state = state;
       if (state === 'ended') db.matches[mIdx].ended_at = new Date().toISOString();
-      if (state === 'live') { db.overlay_state.current_screen = 'scoreboard'; db.overlay_state.last_updated_at = new Date().toISOString(); }
+      if (state === 'live') { db.overlay_state.current_screen = 'ff_scoreboard'; db.overlay_state.last_updated_at = new Date().toISOString(); }
       saveDb(db);
       return ok({ success: true });
     }
@@ -232,7 +251,6 @@ exports.handler = async (event) => {
     }
 
     return err(404, `Unknown route: ${route}`);
-
   } catch (e) {
     return err(500, e.message);
   }
