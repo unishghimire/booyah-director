@@ -112,156 +112,257 @@ function SetupBlank() {
 /* ──────────────────────────────────────────────────
    2. FF_SCOREBOARD (TRANSPARENT OVERLAY - RIGHT SIDE)
 ────────────────────────────────────────────────── */
-function FFBoard({ teams = [], currentMatch, design }) {
-  // Sort teams by points descending
-  const sortedTeams = useMemo(() => {
-    return [...teams].sort((a, b) => {
-      const aPts = (a.kills || 0) + (a.placementPoints || 0) + (a.booyahPoints || 0);
-      const bPts = (b.kills || 0) + (b.placementPoints || 0) + (b.booyahPoints || 0);
-      return bPts - aPts;
-    }).slice(0, 12);
-  }, [teams]);
+function FFBoard({ teams = [], players = [], currentMatch, design }) {
+
+  // Build enriched team rows with real live data
+  const rows = useMemo(() => {
+    return [...teams]
+      .map(team => {
+        const teamPlayers = players.filter(p => p.team_id === team.id);
+        const totalPlayers = teamPlayers.length || 4;
+        const alivePlayers = teamPlayers.filter(p => p.is_alive).length;
+        const kills = team.total_tournament_kills || 0;
+        const pts   = team.total_tournament_points || 0;
+        return { ...team, totalPlayers, alivePlayers, kills, pts };
+      })
+      .sort((a, b) => b.pts - a.pts || b.kills - a.kills)
+      .slice(0, 12);
+  }, [teams, players]);
+
+  const primary = '#FF6B00';
+  const mapName = currentMatch?.map_name || currentMatch?.mapName || 'Bermuda';
 
   return (
-    <div style={{ position: 'absolute', right: 30, top: '50%', transform: 'translateY(-50%)', width: 440, background: 'transparent' }}>
-      <FFPanel style={{ width: 440 }}>
-        <FFPanelHeader design={design} center="FF OFFICIAL BOARD" />
-        
-        {/* Table Headers */}
+    <div style={{
+      position: 'absolute',
+      top: 60,
+      right: 28,
+      width: 310,
+      background: 'transparent',
+      fontFamily: 'Orbitron, sans-serif',
+    }}>
+
+      {/* ── POINTS TABLE HEADER ─────────────────── */}
+      <div style={{
+        background: primary,
+        padding: '7px 12px',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'space-between',
+      }}>
+        <span style={{ fontSize: 13, fontWeight: 900, color: '#fff', letterSpacing: '0.12em', textTransform: 'uppercase' }}>
+          POINTS TABLE
+        </span>
+        {currentMatch && (
+          <span style={{ fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.8)', letterSpacing: '0.1em' }}>
+            MATCH {currentMatch.match_number || 1}
+          </span>
+        )}
+      </div>
+
+      {/* ── COLUMN HEADERS ─────────────────────── */}
+      <div style={{
+        display: 'flex',
+        alignItems: 'center',
+        height: 22,
+        background: 'rgba(20,8,4,0.97)',
+        borderBottom: '1px solid rgba(255,107,0,0.25)',
+        padding: '0 8px',
+        fontSize: 8,
+        fontWeight: 800,
+        color: 'rgba(255,255,255,0.45)',
+        letterSpacing: '0.12em',
+      }}>
+        <div style={{ width: 18, textAlign: 'center' }}>#</div>
+        <div style={{ width: 26 }} />{/* logo */}
+        <div style={{ flex: 1 }}>TEAM</div>
+        <div style={{ width: 48, textAlign: 'center' }}>ALIVE</div>
+        <div style={{ width: 34, textAlign: 'center' }}>KILL</div>
+        <div style={{ width: 36, textAlign: 'right', paddingRight: 4 }}>TOTAL</div>
+      </div>
+
+      {/* ── TEAM ROWS ──────────────────────────── */}
+      <div style={{ display: 'flex', flexDirection: 'column' }}>
+        {rows.map((team, idx) => {
+          const rank = idx + 1;
+          const isTop1 = rank === 1;
+          const rowBg = isTop1
+            ? 'rgba(180,60,0,0.55)'
+            : idx % 2 === 0
+              ? 'rgba(14,6,2,0.96)'
+              : 'rgba(22,10,4,0.96)';
+
+          return (
+            <div key={team.id || idx} style={{
+              display: 'flex',
+              alignItems: 'center',
+              height: 30,
+              background: rowBg,
+              borderBottom: '1px solid rgba(255,107,0,0.1)',
+              borderLeft: isTop1 ? `3px solid ${primary}` : '3px solid transparent',
+              padding: '0 8px',
+              transition: 'background 0.3s',
+            }}>
+
+              {/* Rank */}
+              <div style={{
+                width: 18,
+                textAlign: 'center',
+                fontSize: 11,
+                fontWeight: 900,
+                color: isTop1 ? primary : 'rgba(255,255,255,0.5)',
+              }}>
+                {rank}
+              </div>
+
+              {/* Logo */}
+              <div style={{ width: 26, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                {team.logo_url ? (
+                  <img src={team.logo_url} alt="" style={{ width: 18, height: 18, objectFit: 'contain' }} />
+                ) : (
+                  <div style={{
+                    width: 20, height: 20, borderRadius: 3,
+                    background: isTop1 ? 'rgba(255,107,0,0.3)' : 'rgba(255,255,255,0.08)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    fontSize: 7, fontWeight: 900, color: isTop1 ? primary : 'rgba(255,255,255,0.6)',
+                    border: `1px solid ${isTop1 ? 'rgba(255,107,0,0.5)' : 'rgba(255,255,255,0.1)'}`,
+                  }}>
+                    {(team.name || 'T').substring(0, 2).toUpperCase()}
+                  </div>
+                )}
+              </div>
+
+              {/* Team Name */}
+              <div style={{
+                flex: 1,
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                fontSize: 10, fontWeight: 700,
+                color: isTop1 ? '#fff' : 'rgba(255,255,255,0.85)',
+                letterSpacing: '0.04em',
+              }}>
+                {team.name || 'TEAM'}
+              </div>
+
+              {/* Alive dots */}
+              <div style={{ width: 48, display: 'flex', gap: 3, justifyContent: 'center', alignItems: 'center' }}>
+                {Array.from({ length: team.totalPlayers || 4 }).map((_, i) => {
+                  const alive = i < team.alivePlayers;
+                  return (
+                    <div key={i} style={{
+                      width: 8, height: 8, borderRadius: '50%',
+                      background: alive ? '#00e676' : 'rgba(255,255,255,0.12)',
+                      boxShadow: alive ? '0 0 4px #00e676' : 'none',
+                      transition: 'all 0.3s',
+                    }} />
+                  );
+                })}
+              </div>
+
+              {/* Kills */}
+              <div style={{
+                width: 34, textAlign: 'center',
+                fontSize: 12, fontWeight: 900,
+                color: team.kills > 0 ? primary : 'rgba(255,255,255,0.35)',
+              }}>
+                {team.kills}
+              </div>
+
+              {/* Total Points */}
+              <div style={{
+                width: 36, textAlign: 'right', paddingRight: 4,
+                fontSize: 12, fontWeight: 900,
+                color: isTop1 ? primary : 'rgba(255,255,255,0.9)',
+              }}>
+                {team.pts}
+              </div>
+
+            </div>
+          );
+        })}
+
+        {rows.length === 0 && (
+          <div style={{ padding: '16px 0', textAlign: 'center', color: 'rgba(255,255,255,0.25)', fontSize: 9, letterSpacing: '0.15em' }}>
+            AWAITING TEAM DATA
+          </div>
+        )}
+      </div>
+
+      {/* ── MAP ROTATION STRIP ─────────────────── */}
+      <div style={{
+        background: 'rgba(10,4,2,0.97)',
+        borderTop: '1px solid rgba(255,107,0,0.3)',
+        display: 'flex',
+        alignItems: 'stretch',
+        minHeight: 38,
+        overflow: 'hidden',
+      }}>
+        {/* MAP ROTATION label */}
         <div style={{
+          background: primary,
+          padding: '0 10px',
           display: 'flex',
           alignItems: 'center',
-          height: 26,
-          background: 'rgba(0,0,0,0.3)',
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          padding: '0 10px',
-          fontSize: 8,
-          fontWeight: 800,
-          color: 'rgba(255,255,255,0.4)',
-          fontFamily: 'Orbitron',
-          letterSpacing: '0.1em'
+          justifyContent: 'center',
+          flexShrink: 0,
+          minWidth: 72,
         }}>
-          <div style={{ width: 30, textAlign: 'center' }}>RK</div>
-          <div style={{ width: 28 }} />
-          <div style={{ flex: 1, paddingLeft: 6 }}>TEAM</div>
-          <div style={{ width: 36, textAlign: 'center' }}>KLS</div>
-          <div style={{ width: 36, textAlign: 'center' }}>BYH</div>
-          <div style={{ width: 46, textAlign: 'center' }}>PTS</div>
-          <div style={{ width: 32, textAlign: 'center' }}>ST</div>
+          <span style={{ fontSize: 7, fontWeight: 900, color: '#fff', letterSpacing: '0.08em', textAlign: 'center', lineHeight: 1.3 }}>
+            MAP<br/>ROTATION
+          </span>
         </div>
 
-        {/* Rows */}
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          {sortedTeams.map((team, idx) => {
-            const rank = idx + 1;
-            const kills = team.kills || 0;
-            const booyahs = team.booyahs || 0;
-            const totalPoints = kills + (team.placementPoints || 0) + (team.booyahPoints || 0);
-            const isEliminated = team.eliminated || false;
-
-            let rowBg = 'rgba(0,0,0,0.1)';
-            let leftBorder = '3px solid transparent';
-            
-            if (rank === 1) {
-              rowBg = 'rgba(255,184,0,0.06)';
-              leftBorder = '3px solid #FFB800';
-            } else if (rank === 2) {
-              rowBg = 'rgba(148,163,184,0.04)';
-              leftBorder = '3px solid rgba(148,163,184,0.8)';
-            } else if (rank === 3) {
-              rowBg = 'rgba(180,83,9,0.04)';
-              leftBorder = '3px solid rgba(180,83,9,0.8)';
-            }
-
+        {/* Match slots */}
+        <div style={{ display: 'flex', alignItems: 'center', flex: 1, padding: '0 6px', gap: 4, overflowX: 'hidden' }}>
+          {['Bermuda','Purgatory','Kalahari','Bermuda','Purgatory','Kalahari'].map((map, i) => {
+            const matchNum = i + 1;
+            const isCurrent = currentMatch && currentMatch.match_number === matchNum;
+            const isCompleted = currentMatch && currentMatch.match_number > matchNum;
             return (
-              <div key={team.id || idx} style={{
+              <div key={i} style={{
                 display: 'flex',
+                flexDirection: 'column',
                 alignItems: 'center',
-                height: 30,
-                background: rowBg,
-                borderBottom: '1px solid rgba(255,255,255,0.04)',
-                borderLeft: leftBorder,
-                padding: '0 10px',
-                opacity: isEliminated ? 0.4 : 1,
-                transition: 'all 0.3s'
+                padding: '3px 5px',
+                borderRadius: 3,
+                background: isCurrent ? 'rgba(255,107,0,0.2)' : 'transparent',
+                border: isCurrent ? `1px solid rgba(255,107,0,0.6)` : '1px solid transparent',
+                minWidth: 36,
+                position: 'relative',
               }}>
-                {/* Rank */}
-                <div style={{ width: 30, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: rank <= 3 ? '#FFB800' : '#ffffff' }}>
-                  {rank}
-                </div>
-                
-                {/* Logo */}
-                <div style={{ width: 28, display: 'flex', justifyContent: 'center' }}>
-                  {team.logo ? (
-                    <img src={team.logo} alt="" style={{ width: 20, height: 20, objectFit: 'contain' }} />
-                  ) : (
-                    <div style={{ width: 20, height: 20, borderRadius: '50%', background: team.color || '#FF6B00', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 900, color: '#000' }}>
-                      {(team.name || 'T').substring(0, 2).toUpperCase()}
-                    </div>
-                  )}
-                </div>
-
-                {/* Team Name */}
-                <div style={{ flex: 1, paddingLeft: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: '#ffffff' }}>
-                  {team.name || 'UNKNOWN TEAM'}
-                </div>
-
-                {/* Kills */}
-                <div style={{ width: 36, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, fontWeight: 600, color: kills > 0 ? '#FF6B00' : 'rgba(255,255,255,0.4)' }}>
-                  {kills}
-                </div>
-
-                {/* Booyah */}
-                <div style={{ width: 36, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, fontWeight: 600, color: booyahs > 0 ? '#00D4FF' : 'rgba(255,255,255,0.4)' }}>
-                  {booyahs}
-                </div>
-
-                {/* Total Points */}
-                <div style={{ width: 46, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: '#ffffff' }}>
-                  {totalPoints}
-                </div>
-
-                {/* Status/Alive Bar Indicator (4 tiny micro segments) */}
-                <div style={{ width: 32, display: 'flex', gap: 2, justifyContent: 'center' }}>
-                  {[1, 2, 3, 4].map((p) => {
-                    const isAlive = !isEliminated && (!team.playersCount || p <= (team.alivePlayersCount ?? 4));
-                    return (
-                      <div key={p} style={{
-                        width: 3,
-                        height: 12,
-                        background: isAlive ? (team.color || '#FF6B00') : 'rgba(255,255,255,0.1)',
-                        borderRadius: 1
-                      }} />
-                    );
-                  })}
-                </div>
+                {/* MT# */}
+                <span style={{ fontSize: 7, fontWeight: 700, color: isCurrent ? primary : 'rgba(255,255,255,0.35)', letterSpacing: '0.06em' }}>
+                  MT{matchNum}
+                </span>
+                {/* LIVE badge */}
+                {isCurrent && (
+                  <span style={{
+                    position: 'absolute', top: -6, left: '50%', transform: 'translateX(-50%)',
+                    background: '#e53935', color: '#fff', fontSize: 6, fontWeight: 900,
+                    padding: '1px 4px', borderRadius: 2, letterSpacing: '0.05em',
+                  }}>
+                    LIVE
+                  </span>
+                )}
+                {/* Checkmark if completed */}
+                {isCompleted && (
+                  <span style={{ fontSize: 7, color: '#00e676', position: 'absolute', top: -5, left: '50%', transform: 'translateX(-50%)' }}>✓</span>
+                )}
+                {/* Map name */}
+                <span style={{
+                  fontSize: 7, fontWeight: 700,
+                  color: isCurrent ? '#fff' : 'rgba(255,255,255,0.45)',
+                  letterSpacing: '0.03em',
+                  marginTop: 1,
+                  whiteSpace: 'nowrap',
+                }}>
+                  {map}
+                </span>
               </div>
             );
           })}
         </div>
+      </div>
 
-        {/* Bottom LIVE POINTS strip */}
-        <div style={{
-          height: 32,
-          background: 'rgba(255,107,0,0.1)',
-          borderTop: '1px solid rgba(255,107,0,0.3)',
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'space-between',
-          padding: '0 12px',
-          fontFamily: 'Orbitron',
-          fontSize: 8,
-          fontWeight: 800
-        }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF6B00', animation: 'pulse 1.5s infinite' }} />
-            <span style={{ color: '#FF6B00', letterSpacing: '0.1em' }}>LIVE POINTS</span>
-          </div>
-          <span style={{ color: '#00D4FF', letterSpacing: '0.1em' }}>
-            {currentMatch?.mapName || 'BERMUDA'}
-          </span>
-        </div>
-      </FFPanel>
     </div>
   );
 }
@@ -1533,7 +1634,7 @@ export default function Overlay() {
       case 'pre_match_map':
         return <PreMatchMap match={currentMatch} teams={teams} design={design} />;
       case 'ff_scoreboard':
-        return <FFBoard teams={teams} currentMatch={currentMatch} design={design} />;
+        return <FFBoard teams={teams} players={players} currentMatch={currentMatch} design={design} />;
       case 'scoreboard':
         return <FullStandings teams={teams} design={design} />;
       case 'kill_feed':
