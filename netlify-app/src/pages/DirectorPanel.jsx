@@ -74,7 +74,7 @@ export default function DirectorPanel() {
     const nextNum = (tournament?.current_match_number || 0) + 1;
     setBusy('start_match');
     try {
-      await overlayApi.startNextMatch({ tournament_id: state.tournament?.id, map_name: mapSelect });
+      await overlayApi.startNextMatch({ tournament_id: tournament?.id, map_name: mapSelect });
       toast.success(`Match #${nextNum} on ${mapSelect} Started!`);
     } catch (err) {
       toast.error(err.message);
@@ -633,7 +633,7 @@ export default function DirectorPanel() {
 
                     <div className="flex items-center gap-2">
                       {['pre_match', 'live', 'ended'].map((status) => {
-                        const isCurrent = currentMatch?.status === status;
+                        const isCurrent = currentMatch?.state === status;
                         return (
                           <button
                             key={status}
@@ -668,7 +668,10 @@ export default function DirectorPanel() {
                 </div>
 
                 <div className="overflow-x-auto">
-                  <table className="w-full text-left border-collapse">
+                  {sortedTeams.length === 0 ? (
+                    <div className='py-16 text-center text-gray-600 font-orbitron text-xs'>NO TEAMS REGISTERED YET</div>
+                  ) : (
+                    <table className="w-full text-left border-collapse">
                     <thead>
                       <tr className="border-b border-white/5 text-gray-400 font-orbitron text-[9px] font-black tracking-widest bg-black/20">
                         <th className="py-3 px-4">#</th>
@@ -720,6 +723,7 @@ export default function DirectorPanel() {
                       })}
                     </tbody>
                   </table>
+                  )}
                 </div>
               </div>
             )}

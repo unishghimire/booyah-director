@@ -226,7 +226,7 @@ function FFPanelHeader({ design, center }) {
    1. SETUP_BLANK (TRANSPARENT SCREEN)
 ────────────────────────────────────────────────── */
 function SetupBlank() {
-  return <div style={{ width: '100%', height: '100%', background: 'transparent' }} />;
+  return <div style={{ width: '100%', height: '100%', background: '#000' }} />;
 }
 
 /* ──────────────────────────────────────────────────
@@ -1724,7 +1724,7 @@ export default function Overlay() {
   const screen = overlayState?.current_screen || 'setup_blank';
 
   // Transparent screens list
-  const isTransparent = ['setup_blank', 'ff_scoreboard', 'scoreboard', 'kill_feed'].includes(screen);
+  const isTransparent = ['ff_scoreboard', 'scoreboard', 'kill_feed', 'elimination_alert'].includes(screen);
 
   const renderScreen = () => {
     switch (screen) {
@@ -1762,7 +1762,7 @@ export default function Overlay() {
       className="relative overflow-hidden w-[1920px] h-[1080px] origin-top-left"
       style={{
         transform: `scale(${scale})`,
-        background: isTransparent ? 'transparent' : 'transparent',
+        background: isTransparent ? 'transparent' : '#060915',
         width: 1920,
         height: 1080
       }}

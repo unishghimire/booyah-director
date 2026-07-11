@@ -72,7 +72,7 @@ export default function DataInputer() {
     if (!newPlayerName) return toast.error('Player name is required');
     setPlayerAdding(true);
     try {
-      await overlayApi.addPlayer({ name: newPlayerName, team_id: playerTeamId });
+      await overlayApi.addPlayer({ name: newPlayerName, team_id: playerTeamId, tournament_id: tournament?.id });
       toast.success(`Player "${newPlayerName}" added!`);
       setNewPlayerName('');
       refresh();
@@ -224,6 +224,16 @@ export default function DataInputer() {
                     className="w-full rounded-xl border border-white/5 bg-[#0f0f1a] py-3.5 pl-11 pr-4 text-xs font-semibold text-white outline-none focus:border-[#00D4FF]/40 focus:bg-[#13131f] transition-all"
                   />
                 </div>
+
+                {!currentMatch && (
+                  <div className='rounded-xl border border-yellow-500/20 bg-yellow-500/5 p-4 flex items-center gap-3'>
+                    <AlertTriangle className='h-5 w-5 text-yellow-400 flex-shrink-0' />
+                    <div>
+                      <p className='font-orbitron text-xs font-black text-yellow-400'>NO ACTIVE MATCH</p>
+                      <p className='text-[10px] text-gray-500 mt-0.5'>Start a match in the Director Panel before logging kills or eliminations.</p>
+                    </div>
+                  </div>
+                )}
 
                 {/* Team cards grid */}
                 <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
@@ -439,7 +449,7 @@ export default function DataInputer() {
                             </span>
                           </div>
                           <span className="text-[9px] font-mono text-gray-600">
-                            {new Date(k.created_at || Date.now()).toLocaleTimeString()}
+                            {new Date(k.timestamp || k.created_at || Date.now()).toLocaleTimeString()}
                           </span>
                         </div>
                       ))
@@ -477,7 +487,7 @@ export default function DataInputer() {
                             </span>
                           </div>
                           <span className="text-[9px] font-mono text-gray-600">
-                            {new Date(e.created_at || Date.now()).toLocaleTimeString()}
+                            {new Date(e.timestamp || e.created_at || Date.now()).toLocaleTimeString()}
                           </span>
                         </div>
                       ))

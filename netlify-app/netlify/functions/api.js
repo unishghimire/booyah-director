@@ -110,7 +110,7 @@ exports.handler = async (event) => {
       const currentMatch = matches[0] || null;
       let killFeed = [], eliminations = [], standings = [];
       if (currentMatch) {
-        killFeed = db.kill_events.filter(k => k.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 15);
+        killFeed = db.kill_events.filter(k => k.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 15).map(k => ({ ...k, killed_name: k.killed_player_name || k.killed_name || 'Opponent' }));
         eliminations = db.elimination_events.filter(e => e.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
         standings = db.match_standings.filter(s => s.match_id === currentMatch.id);
       }
