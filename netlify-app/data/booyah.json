@@ -19,6 +19,36 @@
       "current_match_number": 1,
       "status": "active",
       "created_at": "2026-07-11T11:20:45.416Z"
+    },
+    {
+      "id": "mrga145e93zle",
+      "name": "TEST",
+      "total_matches": 3,
+      "points_per_kill": 1,
+      "placement_points_config": "{\"1\":15,\"2\":12,\"3\":10,\"4\":8,\"5\":6,\"6\":4,\"7\":2,\"8\":1,\"9\":1,\"10\":1,\"11\":1,\"12\":1}",
+      "current_match_number": 0,
+      "status": "setup",
+      "created_at": "2026-07-11T11:24:00.194Z"
+    },
+    {
+      "id": "mrga1f3l3wu03",
+      "name": "TEST",
+      "total_matches": 3,
+      "points_per_kill": 1,
+      "placement_points_config": "{\"1\":15,\"2\":12,\"3\":10,\"4\":8,\"5\":6,\"6\":4,\"7\":2,\"8\":1,\"9\":1,\"10\":1,\"11\":1,\"12\":1}",
+      "current_match_number": 0,
+      "status": "setup",
+      "created_at": "2026-07-11T11:24:14.385Z"
+    },
+    {
+      "id": "mrga2ezhrrqjg",
+      "name": "TEST CUP",
+      "total_matches": 6,
+      "points_per_kill": 1,
+      "placement_points_config": "{\"1\":15,\"2\":12,\"3\":10,\"4\":8,\"5\":6,\"6\":4,\"7\":2,\"8\":1,\"9\":1,\"10\":1,\"11\":1,\"12\":1}",
+      "current_match_number": 1,
+      "status": "completed",
+      "created_at": "2026-07-11T11:25:00.893Z"
     }
   ],
   "teams": [
@@ -66,6 +96,24 @@
       "total_tournament_points": 0,
       "total_tournament_kills": 0,
       "created_at": "2026-07-11T10:12:05.101Z"
+    },
+    {
+      "id": "mrga146sguhdi",
+      "tournament_id": "mrga145e93zle",
+      "name": "NEXUS",
+      "logo_url": null,
+      "total_tournament_points": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T11:24:00.244Z"
+    },
+    {
+      "id": "mrga1f509f1z8",
+      "tournament_id": "mrga1f3l3wu03",
+      "name": "NEXUS",
+      "logo_url": null,
+      "total_tournament_points": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T11:24:14.436Z"
     }
   ],
   "players": [
@@ -248,6 +296,15 @@
       "map_name": "Bermuda",
       "started_at": "2026-07-11T11:20:45.628Z",
       "ended_at": null
+    },
+    {
+      "id": "mrga2f4noqaah",
+      "tournament_id": "mrga2ezhrrqjg",
+      "match_number": 1,
+      "state": "pre_match",
+      "map_name": "Bermuda",
+      "started_at": "2026-07-11T11:25:01.079Z",
+      "ended_at": null
     }
   ],
   "match_standings": [
@@ -364,23 +421,23 @@
   ],
   "overlay_state": {
     "id": "singleton",
-    "tournament_id": "mrg9wxuwwxwfd",
-    "current_screen": "pre_match_map",
-    "mvp_player_id": "mrg4qsud3do5c",
-    "mvp_player_name": "Ravi",
-    "mvp_team_name": "Alpha Squad",
-    "mvp_kills": 2,
-    "champion_team_id": "mrg4qsudd8x5l",
-    "champion_team_name": "Alpha Squad",
-    "champion_total_points": 17,
-    "last_updated_at": "2026-07-11T11:20:46.040Z"
+    "tournament_id": "mrga2ezhrrqjg",
+    "current_screen": "teams_today",
+    "mvp_player_id": "p1",
+    "mvp_player_name": "P1",
+    "mvp_team_name": "NEXUS",
+    "mvp_kills": 5,
+    "champion_team_id": "mrga2f14ky3wi",
+    "champion_team_name": "NEXUS",
+    "champion_total_points": 25,
+    "last_updated_at": "2026-07-11T11:25:01.654Z"
   },
   "design": {
     "accentColor": "#FF6B00",
     "accentColor2": "#ef4444",
     "bgColor": "#0a0a0f",
     "textColor": "#ffffff",
-    "tournamentName": "TEST CUP",
+    "tournamentName": "BOOYAH CUP",
     "tournamentSubtitle": "GRAND FINALS",
     "gameLabel": "GAME",
     "logoUrl": "",
