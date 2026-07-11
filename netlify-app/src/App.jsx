@@ -5,6 +5,7 @@ import ScrollToTop from '@/components/ScrollToTop';
 import DirectorPanel from './pages/DirectorPanel';
 import DataInputer from './pages/DataInputer';
 import Overlay from './pages/Overlay';
+import PinGate from './components/PinGate';
 import { Clapperboard, Keyboard, Monitor, ExternalLink, Zap } from 'lucide-react';
 
 const queryClient = new QueryClient();
@@ -14,15 +15,15 @@ function NavBar() {
   if (loc.pathname === '/overlay') return null;
 
   const tabs = [
-    { to: '/director', label: 'DIRECTOR', icon: Clapperboard, desc: 'Scene & overlay command center' },
-    { to: '/inputer',  label: 'DATA INPUTER', icon: Keyboard, desc: 'Live kills, elims & game events' },
+    { to: '/director', label: 'DIRECTOR',     icon: Clapperboard, desc: 'Scene & overlay command center' },
+    { to: '/inputer',  label: 'DATA INPUTER', icon: Keyboard,     desc: 'Live kills, elims & game events' },
   ];
   const active = (to) => loc.pathname === to || (loc.pathname === '/' && to === '/director');
 
   return (
-    <nav className="flex items-center gap-0 border-b border-white/10 bg-[#08080f] px-0">
+    <nav className="flex items-center gap-0 border-b border-white/10 bg-[#08080f] px-0 flex-shrink-0">
       {/* Brand */}
-      <div className="flex items-center gap-2.5 border-r border-white/10 px-5 py-3.5">
+      <div className="flex items-center gap-2.5 border-r border-white/10 px-5 py-3">
         <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-orange-700">
           <Zap className="h-4 w-4 text-black" />
         </div>
@@ -35,10 +36,8 @@ function NavBar() {
       {/* Role tabs */}
       {tabs.map(({ to, label, icon: Icon, desc }) => (
         <Link key={to} to={to}
-          className={`group flex items-center gap-3 border-r border-white/10 px-6 py-3.5 transition-all ${
-            active(to)
-              ? 'bg-orange-500/10 border-b-2 border-b-orange-500'
-              : 'hover:bg-white/5'
+          className={`group flex items-center gap-3 border-r border-white/10 px-6 py-3 transition-all ${
+            active(to) ? 'bg-orange-500/10 border-b-2 border-b-orange-500' : 'hover:bg-white/5'
           }`}>
           <Icon className={`h-4 w-4 ${active(to) ? 'text-orange-400' : 'text-gray-500'}`} />
           <div>
@@ -68,13 +67,21 @@ export default function App() {
         <ScrollToTop />
         <div className="flex h-screen flex-col bg-[#0a0a0f] text-white overflow-hidden">
           <NavBar />
-          <div className="flex-1 overflow-hidden">
+          <div className="flex-1 overflow-hidden min-h-0">
             <Routes>
-              <Route path="/"              element={<DirectorPanel />} />
-              <Route path="/director"      element={<DirectorPanel />} />
-              <Route path="/inputer"       element={<DataInputer />} />
-              <Route path="/control-panel" element={<DirectorPanel />} />
-              <Route path="/overlay"       element={<Overlay />} />
+              <Route path="/" element={
+                <PinGate role="director"><DirectorPanel /></PinGate>
+              } />
+              <Route path="/director" element={
+                <PinGate role="director"><DirectorPanel /></PinGate>
+              } />
+              <Route path="/inputer" element={
+                <PinGate role="inputer"><DataInputer /></PinGate>
+              } />
+              <Route path="/control-panel" element={
+                <PinGate role="director"><DirectorPanel /></PinGate>
+              } />
+              <Route path="/overlay" element={<Overlay />} />
             </Routes>
           </div>
         </div>
@@ -82,7 +89,7 @@ export default function App() {
       <Toaster position="top-right" toastOptions={{
         style: { background: '#16161f', color: '#fff', border: '1px solid rgba(249,115,22,0.3)', fontSize: '12px', fontFamily: 'Rajdhani, sans-serif', fontWeight: '600' },
         success: { iconTheme: { primary: '#f97316', secondary: '#000' } },
-        error: { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
+        error:   { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
       }} />
     </QueryClientProvider>
   );
