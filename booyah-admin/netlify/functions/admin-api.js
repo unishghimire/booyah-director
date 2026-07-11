@@ -17,7 +17,7 @@ function err(code, msg)  { return { statusCode: code, headers: corsHeaders, body
 
 // ─── Firebase DB helpers (pure fetch, no SDK) ─────────────────────────────
 function dbUrl(path) {
-  const base = process.env.FIREBASE_DATABASE_URL?.replace(/\/$/, '');
+  const base = (process.env.FIREBASE_DATABASE_URL || 'https://nexoverlays-default-rtdb.firebaseio.com').replace(/\/$/, '');
   const secret = process.env.FIREBASE_DATABASE_SECRET;
   return `${base}${path}.json?auth=${secret}`;
 }
@@ -40,13 +40,13 @@ async function dbDelete(path) {
 async function verifyAdminToken(authHeader) {
   if (!authHeader?.startsWith('Bearer ')) return null;
   const token = authHeader.slice(7);
-  const projectId = process.env.FIREBASE_PROJECT_ID;
+  const projectId = process.env.FIREBASE_PROJECT_ID || 'nexoverlays';
   if (!projectId) return { uid: 'dev', email: 'admin@dev.local', isAdmin: true }; // dev fallback
   
   try {
     // Use Firebase REST to verify token
     const r = await fetch(
-      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${process.env.FIREBASE_WEB_API_KEY}`,
+      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${process.env.FIREBASE_WEB_API_KEY || 'AIzaSyBekqzqZv_iWvgAn9UCnpBGIw2675wr1gc'}`,
       { method: 'POST', headers: {'Content-Type':'application/json'}, body: JSON.stringify({ idToken: token }) }
     );
     if (!r.ok) return null;
