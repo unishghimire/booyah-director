@@ -38,6 +38,24 @@
       "total_tournament_points": 13,
       "total_tournament_kills": 1,
       "created_at": "2026-07-11T08:56:00.984Z"
+    },
+    {
+      "id": "mrg79qymchys7",
+      "tournament_id": "FAKE",
+      "name": "TEST",
+      "logo_url": null,
+      "total_tournament_points": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T10:06:44.158Z"
+    },
+    {
+      "id": "mrg7gmlpvkpv2",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Test Team",
+      "logo_url": null,
+      "total_tournament_points": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T10:12:05.101Z"
     }
   ],
   "players": [
@@ -160,6 +178,46 @@
       "current_match_kills": 0,
       "total_tournament_kills": 0,
       "created_at": "2026-07-11T08:56:00.984Z"
+    },
+    {
+      "id": "mrg7gmlpaekji",
+      "team_id": "mrg7gmlpvkpv2",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Player A",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T10:12:05.101Z"
+    },
+    {
+      "id": "mrg7gmlp2aa1t",
+      "team_id": "mrg7gmlpvkpv2",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Player B",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T10:12:05.101Z"
+    },
+    {
+      "id": "mrg7gmlph2dra",
+      "team_id": "mrg7gmlpvkpv2",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Player C",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T10:12:05.101Z"
+    },
+    {
+      "id": "mrg7gmlp3o7o5",
+      "team_id": "mrg7gmlpvkpv2",
+      "tournament_id": "mrg4qon481wtb",
+      "name": "Player D",
+      "is_alive": true,
+      "current_match_kills": 0,
+      "total_tournament_kills": 0,
+      "created_at": "2026-07-11T10:12:05.101Z"
     }
   ],
   "matches": [
@@ -266,5 +324,17 @@
     "champion_team_name": "Alpha Squad",
     "champion_total_points": 17,
     "last_updated_at": "2026-07-11T08:57:46.846Z"
+  },
+  "design": {
+    "accentColor": "#f97316",
+    "accentColor2": "#ef4444",
+    "bgColor": "#0a0a0f",
+    "textColor": "#ffffff",
+    "tournamentName": "BOOYAH CUP",
+    "tournamentSubtitle": "GRAND FINALS",
+    "gameLabel": "GAME",
+    "logoUrl": "",
+    "overlayStyle": "default",
+    "fontStyle": "orbitron"
   }
 }

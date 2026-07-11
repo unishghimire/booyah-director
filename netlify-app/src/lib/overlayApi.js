@@ -14,47 +14,61 @@ async function callFunction(name, payload = {}, method = 'POST') {
   const response = await fetch(url, options);
   let data = {};
   try { data = await response.json(); } catch (e) {}
-  if (!response.ok) throw new Error(data.error || data.message || `${name} failed`);
+  if (!response.ok) throw new Error(data.error || data.message || `${name} failed (${response.status})`);
   return data;
 }
 
 export const overlayApi = {
-  getOverlayData: () => callFunction('getOverlayData', {}, 'GET'),
-  initializeTournament: (data) => callFunction('initializeTournament', data),
-  addTeam: (data) => callFunction('addTeam', data),
-  startNextMatch: (data) => callFunction('startNextMatch', data),
-  updateMatchState: (data) => callFunction('updateMatchState', data),
-  addKill: (data) => callFunction('addKill', data),
-  eliminatePlayer: (data) => callFunction('eliminatePlayer', data),
-  setTeamPlacement: (data) => callFunction('setTeamPlacement', data),
-  calculateMVP: (data) => callFunction('calculateMVP', data),
-  setMVPAndShowScreen: (data) => callFunction('setMVPAndShowScreen', data),
-  setChampionAndShowScreen: (data) => callFunction('setChampionAndShowScreen', data),
-  switchOverlayScreen: (data) => callFunction('switchOverlayScreen', data),
-  declareChampions: (data) => callFunction('declareChampions', data),
-  saveDesign: (data) => callFunction('saveDesign', data),
-  getDesign: () => callFunction('getDesign', {}, 'GET'),
+  getOverlayData:         ()     => callFunction('getOverlayData', {}, 'GET'),
+  initializeTournament:   (d)    => callFunction('initializeTournament', d),
+  addTeam:                (d)    => callFunction('addTeam', d),
+  deleteTeam:             (d)    => callFunction('deleteTeam', d),
+  startNextMatch:         (d)    => callFunction('startNextMatch', d),
+  updateMatchState:       (d)    => callFunction('updateMatchState', d),
+  addKill:                (d)    => callFunction('addKill', d),
+  eliminatePlayer:        (d)    => callFunction('eliminatePlayer', d),
+  revivePlayer:           (d)    => callFunction('revivePlayer', d),
+  setTeamPlacement:       (d)    => callFunction('setTeamPlacement', d),
+  calculateMVP:           (d)    => callFunction('calculateMVP', d),
+  setMVPAndShowScreen:    (d)    => callFunction('setMVPAndShowScreen', d),
+  setChampionAndShowScreen:(d)   => callFunction('setChampionAndShowScreen', d),
+  switchOverlayScreen:    (d)    => callFunction('switchOverlayScreen', d),
+  declareChampions:       (d)    => callFunction('declareChampions', d),
+  saveDesign:             (d)    => callFunction('saveDesign', d),
+  getDesign:              ()     => callFunction('getDesign', {}, 'GET'),
+  resetMatch:             (d)    => callFunction('resetMatch', d),
 };
 
 export function useOverlayData(enabled = true) {
-  const [data, setData] = useState(null);
+  const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
-  const mountedRef = useRef(true);
+  const [error, setError]     = useState(null);
+  const mountedRef            = useRef(true);
 
   const refresh = useCallback(async () => {
     try {
       const result = await overlayApi.getOverlayData();
-      if (mountedRef.current) { setData(result); setLoading(false); }
-    } catch (err) {}
+      if (mountedRef.current) {
+        setData(result);
+        setLoading(false);
+        setError(null);
+      }
+    } catch (err) {
+      if (mountedRef.current) {
+        // On first load error, still set loading=false so UI renders
+        setLoading(false);
+        setError(err.message);
+      }
+    }
   }, []);
 
   useEffect(() => {
     mountedRef.current = true;
-    if (!enabled) return;
+    if (!enabled) { setLoading(false); return; }
     refresh();
-    const interval = setInterval(refresh, 500);
+    const interval = setInterval(refresh, 1000);
     return () => { mountedRef.current = false; clearInterval(interval); };
   }, [enabled, refresh]);
 
-  return { data, loading, refresh };
+  return { data, loading, error, refresh };
 }

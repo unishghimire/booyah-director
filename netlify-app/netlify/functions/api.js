@@ -250,6 +250,57 @@ exports.handler = async (event) => {
       return ok({ success: true, rankings: teams.map((t, i) => ({ rank: i + 1, team: t.name, total_points: t.total_tournament_points, total_kills: t.total_tournament_kills })) });
     }
 
+    // ── DELETE TEAM ───────────────────────────────────────────────
+    if (route === 'deleteTeam') {
+      const { team_id } = body;
+      if (!team_id) return err(400, 'team_id required');
+      db.teams = db.teams.filter(t => t.id !== team_id);
+      db.players = db.players.filter(p => p.team_id !== team_id);
+      saveDb(db);
+      return ok({ success: true });
+    }
+
+    // ── REVIVE PLAYER ─────────────────────────────────────────────
+    if (route === 'revivePlayer') {
+      const { player_id } = body;
+      if (!player_id) return err(400, 'player_id required');
+      const pIdx = db.players.findIndex(p => p.id === player_id);
+      if (pIdx === -1) return err(404, 'Player not found');
+      db.players[pIdx].is_alive = true;
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      saveDb(db);
+      return ok({ success: true, player: db.players[pIdx] });
+    }
+
+    // ── RESET MATCH ───────────────────────────────────────────────
+    if (route === 'resetMatch') {
+      const { match_id, tournament_id } = body;
+      if (match_id) {
+        db.kill_events = db.kill_events.filter(k => k.match_id !== match_id);
+        db.elimination_events = db.elimination_events.filter(e => e.match_id !== match_id);
+        db.match_standings = db.match_standings.filter(s => s.match_id !== match_id);
+        const mIdx = db.matches.findIndex(m => m.id === match_id);
+        if (mIdx !== -1) db.matches[mIdx].state = 'pre_match';
+      }
+      if (tournament_id) {
+        db.players = db.players.map(p => p.tournament_id === tournament_id ? { ...p, is_alive: true, current_match_kills: 0 } : p);
+      }
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      saveDb(db);
+      return ok({ success: true });
+    }
+
+    // ── UPDATE TOURNAMENT ─────────────────────────────────────────
+    if (route === 'updateTournament') {
+      const { tournament_id, ...updates } = body;
+      const tIdx = db.tournaments.findIndex(t => t.id === tournament_id);
+      if (tIdx === -1) return err(404, 'Tournament not found');
+      db.tournaments[tIdx] = { ...db.tournaments[tIdx], ...updates };
+      saveDb(db);
+      return ok({ success: true, tournament: db.tournaments[tIdx] });
+    }
+
+
     return err(404, `Unknown route: ${route}`);
   } catch (e) {
     return err(500, e.message);
