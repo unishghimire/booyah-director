@@ -41,6 +41,8 @@ export const overlayApi = {
   getDesign:                ()  => callFunction('getDesign', {}, 'GET'),
   resetMatch:               (d) => callFunction('resetMatch', d),
   updateTournament:         (d) => callFunction('updateTournament', d),
+  importFromSheet:          (d) => callFunction('importFromSheet', d),
+  resetDatabase:            ()  => callFunction('resetDatabase'),
 };
 
 /**

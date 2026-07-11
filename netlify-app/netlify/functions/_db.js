@@ -1,12 +1,23 @@
-const fs = require('fs');
-const path = require('path');
+const admin = require('firebase-admin');
 
-// Netlify (and all serverless): only /tmp is writable at runtime.
-// BUT since /tmp data is ephemeral and can disappear between serverless container invocations,
-// we must make sure we try our best to load/save correctly, and that we handle missing directories.
-const IS_SERVERLESS = process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
-const DATA_DIR = IS_SERVERLESS ? '/tmp' : path.join(process.cwd(), 'data');
-const DB_FILE = path.join(DATA_DIR, 'booyah.json');
+// Initialize Firebase Admin only once (serverless cold-start safety)
+if (!admin.apps.length) {
+  const projectId   = process.env.FIREBASE_PROJECT_ID;
+  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
+  const privateKey  = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+  const databaseURL = process.env.FIREBASE_DATABASE_URL;
+
+  if (projectId && clientEmail && privateKey && databaseURL) {
+    admin.initializeApp({
+      credential: admin.credential.cert({ projectId, clientEmail, privateKey }),
+      databaseURL,
+    });
+  } else {
+    // Local dev fallback — use in-memory store so the app still boots without Firebase creds
+    console.warn('[_db] Firebase env vars not set — using in-memory store (data will not persist across restarts)');
+    admin.initializeApp({ projectId: 'local-dev' });
+  }
+}
 
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
@@ -32,28 +43,37 @@ function getDefaultDb() {
       champion_team_id: null,
       champion_team_name: null,
       champion_total_points: 0,
-      last_updated_at: new Date().toISOString()
-    }
+      last_updated_at: new Date().toISOString(),
+    },
   };
 }
 
-function loadDb() {
+// In-memory fallback for local dev without Firebase
+let _memDb = null;
+
+async function loadDb() {
+  if (!process.env.FIREBASE_DATABASE_URL) {
+    if (!_memDb) _memDb = getDefaultDb();
+    return JSON.parse(JSON.stringify(_memDb));
+  }
   try {
-    if (fs.existsSync(DB_FILE)) {
-      return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
-    }
-  } catch (e) { /* corrupted or missing — reset */ }
-  return getDefaultDb();
+    const snap = await admin.database().ref('booyah').once('value');
+    return snap.val() || getDefaultDb();
+  } catch (e) {
+    console.error('[_db] Firebase read error:', e.message);
+    return getDefaultDb();
+  }
 }
 
-function saveDb(db) {
+async function saveDb(db) {
+  if (!process.env.FIREBASE_DATABASE_URL) {
+    _memDb = JSON.parse(JSON.stringify(db));
+    return;
+  }
   try {
-    if (!fs.existsSync(DATA_DIR)) {
-      fs.mkdirSync(DATA_DIR, { recursive: true });
-    }
-    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+    await admin.database().ref('booyah').set(db);
   } catch (e) {
-    console.error('Failed to save DB:', e);
+    console.error('[_db] Firebase write error:', e.message);
   }
 }
 

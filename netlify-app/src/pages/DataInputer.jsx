@@ -1,4 +1,5 @@
 import React, { useState, useMemo } from 'react';
+import SheetImport from '@/components/control/SheetImport';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
 import {
@@ -251,6 +252,11 @@ export default function DataInputer() {
             {/* TEAMS TAB */}
             {activeTab === 'teams' && (
               <div className="grid grid-cols-12 gap-6">
+                {/* Google Sheets Import */}
+                <div className="col-span-12 mb-2">
+                  <SheetImport tournamentId={tournament?.id} onImported={refresh} />
+                </div>
+
                 {/* Add Team form */}
                 <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
                   <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
