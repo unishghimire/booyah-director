@@ -1,0 +1,61 @@
+import React, { useState, useEffect } from 'react';
+import { Users, CreditCard, TrendingUp, Tag, Activity, Crown, Zap } from 'lucide-react';
+import StatCard from '../components/StatCard';
+import { auth } from '../firebase';
+
+async function adminFetch(route, opts = {}) {
+  const token = await auth.currentUser?.getIdToken();
+  const r = await fetch(`/api/${route}`, {
+    ...opts,
+    headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}`, ...opts.headers },
+  });
+  const data = await r.json();
+  if (!r.ok) throw new Error(data.error);
+  return data;
+}
+
+export { adminFetch };
+
+export default function Dashboard() {
+  const [stats, setStats] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    adminFetch('stats').then(d => { setStats(d); setLoading(false); }).catch(() => setLoading(false));
+  }, []);
+
+  return (
+    <div>
+      <div className="mb-6">
+        <h1 className="font-orbitron text-lg font-black text-white tracking-wider">DASHBOARD</h1>
+        <p className="font-orbitron text-[9px] text-gray-500 mt-1">REAL-TIME PLATFORM OVERVIEW</p>
+      </div>
+      {loading ? (
+        <div className="flex items-center justify-center h-40">
+          <div className="h-8 w-8 rounded-full border-4 border-[#FF6B00]/20 border-t-[#FF6B00] animate-spin" />
+        </div>
+      ) : (
+        <div className="grid grid-cols-2 xl:grid-cols-4 gap-4 mb-6">
+          <StatCard title="TOTAL USERS"    value={stats?.totalUsers}   icon={Users}      accent="#00D4FF" />
+          <StatCard title="ACTIVE SUBS"    value={stats?.activeUsers}  icon={Crown}      accent="#FF6B00" />
+          <StatCard title="TOTAL REVENUE"  value={`NPR ${stats?.totalRevenue?.toLocaleString() ?? 0}`} icon={TrendingUp} accent="#22c55e" />
+          <StatCard title="PROMO CODES"    value={stats?.promoCodes}   icon={Tag}        accent="#a855f7" />
+        </div>
+      )}
+      {stats?.planBreakdown && (
+        <div className="rounded-xl border border-white/5 bg-[#0a0e1a] p-5">
+          <h2 className="font-orbitron text-[10px] font-black text-gray-400 tracking-widest mb-4">PLAN BREAKDOWN</h2>
+          <div className="grid grid-cols-3 gap-3">
+            {[['WEEKLY', 'weekly', '#FF6B00'], ['MONTHLY', 'monthly', '#00D4FF'], ['YEARLY', 'yearly', '#22c55e']].map(([label, key, color]) => (
+              <div key={key} className="rounded-lg border border-white/5 bg-black/20 p-4 text-center">
+                <p className="font-orbitron text-[8px] text-gray-500 tracking-widest mb-2">{label}</p>
+                <p className="font-orbitron text-2xl font-black" style={{ color }}>{stats.planBreakdown[key]}</p>
+                <p className="font-orbitron text-[8px] text-gray-600 mt-1">NPR {key === 'weekly' ? 299 : key === 'monthly' ? 599 : 2999}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
