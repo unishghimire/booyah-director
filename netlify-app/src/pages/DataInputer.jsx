@@ -1,20 +1,10 @@
-/**
- * DATA INPUTER PANEL
- * Role: Live game operator — adds teams/players, logs kills,
- * eliminations, placements. Everything that happens in the game.
- *
- * Tabs:
- *  1. LIVE INPUT  — per-player kill/elim buttons organised by team
- *  2. TEAMS       — add / manage teams & players
- *  3. EVENT LOG   — live kill + elimination feed
- */
 import React, { useState, useMemo } from 'react';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
 import {
   Crosshair, Users, Clock, RefreshCw, Search, Plus,
   ChevronDown, AlertTriangle, XCircle, Heart, Skull,
-  Shield, Trash2, RotateCcw, CheckCircle2
+  Shield, Trash2, RotateCcw, CheckCircle2, MapPin
 } from 'lucide-react';
 
 /* ─── Team colour palette ─── */
@@ -24,574 +14,788 @@ const COLORS = [
   '#8b5cf6','#14b8a6','#f59e0b','#6366f1',
 ];
 
-/* ════════════════════════════════════════
-   PLAYER CARD — Kill + Elim buttons
-════════════════════════════════════════ */
-function PlayerCard({ player, teamColor, currentMatch, onAction }) {
-  const [busy, setBusy] = useState(null);
-  const alive = player.is_alive;
-  const kills = player.current_match_kills || 0;
-
-  const addKill = async () => {
-    if (!currentMatch?.id) return toast.error('Start a match first (Director panel → Match Control)');
-    setBusy('kill');
-    try {
-      const r = await overlayApi.addKill({ player_id: player.id, match_id: currentMatch.id, killed_player_name: '', killed_team_name: '' });
-      toast.success(`+1 kill — ${player.name} now has ${r.player.current_match_kills} kills`);
-      onAction?.();
-    } catch (e) { toast.error(e.message); } finally { setBusy(null); }
-  };
-
-  const eliminate = async () => {
-    if (!currentMatch?.id) return toast.error('Start a match first');
-    setBusy('elim');
-    try {
-      await overlayApi.eliminatePlayer({ player_id: player.id, match_id: currentMatch.id });
-      toast(`${player.name} eliminated`, { icon: '💀' });
-      onAction?.();
-    } catch (e) { toast.error(e.message); } finally { setBusy(null); }
-  };
-
-  const revive = async () => {
-    setBusy('revive');
-    try {
-      await overlayApi.revivePlayer({ player_id: player.id });
-      toast.success(`${player.name} revived`);
-      onAction?.();
-    } catch (e) { toast.error(e.message); } finally { setBusy(null); }
-  };
-
-  return (
-    <div className={`rounded-xl border p-3 transition-all ${alive ? 'border-white/10 bg-[#13131e]' : 'border-red-900/20 bg-red-950/10 opacity-60'}`}>
-      {/* Header */}
-      <div className="mb-2 flex items-center gap-2">
-        <div className="flex h-7 w-7 flex-shrink-0 items-center justify-center rounded-full font-orbitron text-[9px] font-black"
-          style={{ background: alive ? teamColor + '33' : '#1a1a1a', color: alive ? teamColor : '#555' }}>
-          {player.name.slice(0, 2).toUpperCase()}
-        </div>
-        <div className="flex-1 min-w-0">
-          <p className={`text-xs font-black truncate ${alive ? 'text-white' : 'text-gray-600 line-through'}`}>{player.name}</p>
-        </div>
-        {/* Kill counter */}
-        <div className="flex items-center gap-1 rounded-lg border border-white/10 bg-black/30 px-2 py-0.5">
-          <Skull className="h-2.5 w-2.5 text-orange-400" />
-          <span className="font-orbitron text-xs font-black text-orange-400">{kills}</span>
-        </div>
-        {/* Status dot */}
-        {alive
-          ? <Heart className="h-3 w-3 flex-shrink-0 text-green-400" />
-          : <XCircle className="h-3 w-3 flex-shrink-0 text-red-600" />
-        }
-      </div>
-
-      {/* Buttons */}
-      {alive ? (
-        <div className="flex gap-1.5">
-          <button onClick={addKill} disabled={!!busy}
-            className="flex flex-1 items-center justify-center gap-1.5 rounded-lg py-2 text-xs font-black text-black transition-all active:scale-95 disabled:opacity-40"
-            style={{ background: busy === 'kill' ? teamColor + 'aa' : teamColor }}>
-            {busy === 'kill'
-              ? <div className="h-3 w-3 animate-spin rounded-full border border-black border-t-transparent" />
-              : <><Crosshair className="h-3 w-3" />+KILL</>
-            }
-          </button>
-          <button onClick={eliminate} disabled={!!busy}
-            className="flex items-center justify-center gap-1 rounded-lg border border-red-700 bg-red-900/30 px-2.5 py-2 text-xs font-black text-red-400 hover:bg-red-700 hover:text-white disabled:opacity-40 transition-all active:scale-95">
-            {busy === 'elim' ? '…' : <><XCircle className="h-3 w-3" />ELIM</>}
-          </button>
-        </div>
-      ) : (
-        <button onClick={revive} disabled={!!busy}
-          className="flex w-full items-center justify-center gap-2 rounded-lg border border-white/10 py-2 text-[10px] font-bold text-gray-500 hover:border-green-500/30 hover:text-green-400 disabled:opacity-40 transition-all">
-          {busy === 'revive' ? '…' : <><RotateCcw className="h-3 w-3" />REVIVE</>}
-        </button>
-      )}
-    </div>
-  );
-}
-
-/* ════════════════════════════════════════
-   TEAM CARD — groups all players
-════════════════════════════════════════ */
-function TeamCard({ team, allPlayers, currentMatch, tournament, onAction, colorIndex }) {
-  const [placement, setPlacement] = useState('');
-  const [busy, setBusy]           = useState(false);
-  const [confirmDel, setConfirmDel] = useState(false);
-  const color      = COLORS[colorIndex % COLORS.length];
-  const teamPlayers = allPlayers.filter(p => p.team_id === team.id);
-  const alive       = teamPlayers.filter(p => p.is_alive).length;
-  const totalPts    = team.total_tournament_points || 0;
-  const totalKills  = team.total_tournament_kills  || 0;
-
-  const setPlace = async () => {
-    if (!placement)           return toast.error('Select a placement first');
-    if (!currentMatch?.id)    return toast.error('No active match');
-    setBusy(true);
-    try {
-      const r = await overlayApi.setTeamPlacement({ team_id: team.id, match_id: currentMatch.id, placement: Number(placement), tournament_id: tournament.id });
-      toast.success(`${team.name}: #${placement} placement (+${r.placement_points ?? '?'} pts)`);
-      setPlacement('');
-      onAction?.();
-    } catch (e) { toast.error(e.message); } finally { setBusy(false); }
-  };
-
-  const deleteTeam = async () => {
-    setBusy(true);
-    try {
-      await overlayApi.deleteTeam({ team_id: team.id });
-      toast.success(`${team.name} removed`);
-      onAction?.();
-    } catch (e) { toast.error(e.message); } finally { setBusy(false); setConfirmDel(false); }
-  };
-
-  return (
-    <div className="rounded-2xl border overflow-hidden" style={{ borderColor: color + '33', background: '#0f0f1a' }}>
-      {/* Team header */}
-      <div className="flex items-center gap-3 px-4 py-3" style={{ background: color + '12', borderBottom: `1px solid ${color}22` }}>
-        {team.logo_url
-          ? <img src={team.logo_url} alt="" className="h-9 w-9 flex-shrink-0 rounded-full object-cover border-2" style={{ borderColor: color + '66' }} onError={e => e.target.style.display = 'none'} />
-          : <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 font-orbitron text-[10px] font-black" style={{ borderColor: color + '55', background: color + '22', color }}>{team.name.slice(0, 2).toUpperCase()}</div>
-        }
-        <div className="flex-1 min-w-0">
-          <p className="font-orbitron text-sm font-black text-white truncate">{team.name}</p>
-          <div className="flex items-center gap-3 mt-0.5">
-            <span className="text-[10px] text-gray-500">{alive}/{teamPlayers.length} alive</span>
-            <span className="text-[10px] font-bold" style={{ color }}>{totalKills} kills</span>
-            <span className="text-[10px] font-black text-orange-400">{totalPts} pts</span>
-          </div>
-        </div>
-        {/* Alive tally */}
-        <div className="flex gap-0.5 flex-shrink-0">
-          {Array.from({ length: teamPlayers.length || 4 }).map((_, i) => (
-            <div key={i} className="rounded-sm" style={{ width: 5, height: i < alive ? 14 : 7, background: i < alive ? color : '#374151', marginTop: i < alive ? 0 : 4 }} />
-          ))}
-        </div>
-        {/* Delete */}
-        {!confirmDel
-          ? <button onClick={() => setConfirmDel(true)} className="ml-2 flex-shrink-0 rounded-lg p-1.5 text-gray-600 hover:text-red-400 hover:bg-red-900/20 transition-all"><Trash2 className="h-3.5 w-3.5" /></button>
-          : <div className="ml-2 flex gap-1">
-              <button onClick={deleteTeam} disabled={busy} className="rounded-lg bg-red-600 px-2 py-1 text-[10px] font-black text-white hover:bg-red-500">DEL</button>
-              <button onClick={() => setConfirmDel(false)} className="rounded-lg border border-white/10 px-2 py-1 text-[10px] font-bold text-gray-400">NO</button>
-            </div>
-        }
-      </div>
-
-      {/* Players grid */}
-      <div className="grid grid-cols-2 gap-2 p-3">
-        {teamPlayers.length === 0
-          ? <p className="col-span-2 py-3 text-center text-[10px] text-gray-600">No players added</p>
-          : teamPlayers.map(p => <PlayerCard key={p.id} player={p} teamColor={color} currentMatch={currentMatch} onAction={onAction} />)
-        }
-      </div>
-
-      {/* Placement row */}
-      <div className="flex items-center gap-2 border-t border-white/5 bg-black/20 px-3 py-2">
-        <Shield className="h-3.5 w-3.5 flex-shrink-0 text-gray-600" />
-        <span className="text-[10px] font-bold text-gray-600 flex-shrink-0">PLACEMENT:</span>
-        <div className="relative flex-1">
-          <select value={placement} onChange={e => setPlacement(e.target.value)}
-            className="w-full appearance-none rounded-lg border border-white/10 bg-black/40 px-3 py-1.5 text-xs font-bold text-white outline-none focus:border-orange-500/40">
-            <option value="">— rank —</option>
-            {Array.from({ length: 12 }, (_, i) => i + 1).map(n => <option key={n} value={n}>#{n}</option>)}
-          </select>
-          <ChevronDown className="pointer-events-none absolute right-2 top-1/2 h-3 w-3 -translate-y-1/2 text-gray-500" />
-        </div>
-        <button onClick={setPlace} disabled={busy || !placement}
-          className="flex-shrink-0 rounded-lg bg-orange-500 px-3 py-1.5 text-xs font-black text-black hover:bg-orange-400 disabled:opacity-40 transition-all">
-          {busy ? '…' : 'SET'}
-        </button>
-      </div>
-    </div>
-  );
-}
-
-/* ════════════════════════════════════════
-   ADD TEAM FORM
-════════════════════════════════════════ */
-function AddTeamForm({ tournament, onAdded }) {
-  const [open, setOpen]               = useState(false);
-  const [teamName, setTeamName]       = useState('');
-  const [logoUrl, setLogoUrl]         = useState('');
-  const [playerNames, setPlayerNames] = useState(['', '', '', '']);
-  const [busy, setBusy]               = useState(false);
-
-  const updatePlayer = (i, val) => {
-    const arr = [...playerNames];
-    arr[i] = val;
-    setPlayerNames(arr);
-  };
-
-  const submit = async (e) => {
-    e.preventDefault();
-    if (!teamName.trim())  return toast.error('Team name is required');
-    if (!tournament?.id)   return toast.error('No active tournament — go to Director → Setup tab to create one first');
-    setBusy(true);
-    try {
-      const r = await overlayApi.addTeam({
-        tournament_id: tournament.id,
-        team_name:     teamName.trim(),
-        logo_url:      logoUrl.trim() || null,
-        player_names:  playerNames.filter(p => p.trim()),
-      });
-      toast.success(`✅ ${teamName} added with ${r.players?.length || 0} players!`);
-      setTeamName(''); setLogoUrl(''); setPlayerNames(['', '', '', '']); setOpen(false);
-      onAdded?.();
-    } catch (e) { toast.error(e.message); } finally { setBusy(false); }
-  };
-
-  if (!tournament) {
-    return (
-      <div className="flex items-center gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 px-4 py-3">
-        <AlertTriangle className="h-4 w-4 flex-shrink-0 text-yellow-400" />
-        <p className="text-sm font-bold text-yellow-300">
-          No tournament yet — go to the <span className="text-orange-400">Director</span> panel → Setup tab to create a tournament first.
-        </p>
-      </div>
-    );
-  }
-
-  return (
-    <div className="rounded-2xl border border-white/10 bg-[#0f0f1a] overflow-hidden">
-      {/* Toggle */}
-      <button onClick={() => setOpen(o => !o)}
-        className="flex w-full items-center gap-3 px-5 py-4 text-left hover:bg-white/5 transition-all">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-green-500/40 bg-green-500/10">
-          <Plus className="h-4 w-4 text-green-400" />
-        </div>
-        <div>
-          <p className="font-orbitron text-sm font-black text-white">ADD NEW TEAM</p>
-          <p className="text-[10px] text-gray-600">{tournament.name} · up to 12 teams</p>
-        </div>
-        <ChevronDown className={`ml-auto h-4 w-4 text-gray-500 transition-transform ${open ? 'rotate-180' : ''}`} />
-      </button>
-
-      {open && (
-        <form onSubmit={submit} className="border-t border-white/10 p-5 space-y-4">
-          {/* Team name + logo */}
-          <div className="grid grid-cols-2 gap-3">
-            <div>
-              <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-500">Team Name *</label>
-              <input value={teamName} onChange={e => setTeamName(e.target.value)}
-                placeholder="e.g. BTR Zuxxy" autoFocus
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/50 transition-colors" />
-            </div>
-            <div>
-              <label className="mb-1.5 block text-[10px] font-black uppercase tracking-wider text-gray-500">Team Logo URL</label>
-              <input value={logoUrl} onChange={e => setLogoUrl(e.target.value)}
-                placeholder="https://img.png (optional)"
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/50 transition-colors" />
-            </div>
-          </div>
-
-          {/* Logo preview */}
-          {logoUrl.trim() && (
-            <div className="flex items-center gap-2">
-              <img src={logoUrl} alt="preview" className="h-10 w-10 rounded-full object-cover border border-white/20" onError={e => e.target.style.display='none'} />
-              <span className="text-[10px] text-gray-500">Logo preview</span>
-            </div>
-          )}
-
-          {/* Players */}
-          <div>
-            <label className="mb-2 block text-[10px] font-black uppercase tracking-wider text-gray-500">Players (up to 4)</label>
-            <div className="grid grid-cols-2 gap-2">
-              {playerNames.map((p, i) => (
-                <input key={i} value={p} onChange={e => updatePlayer(i, e.target.value)}
-                  placeholder={`Player ${i + 1} name`}
-                  className="rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-blue-500/50 transition-colors" />
-              ))}
-            </div>
-          </div>
-
-          {/* Actions */}
-          <div className="flex gap-3 pt-1">
-            <button type="button" onClick={() => setOpen(false)}
-              className="flex-1 rounded-xl border border-white/10 py-2.5 text-sm font-bold text-gray-400 hover:text-white transition-all">
-              Cancel
-            </button>
-            <button type="submit" disabled={busy}
-              className="flex-1 rounded-xl bg-green-600 py-2.5 text-sm font-black text-white hover:bg-green-500 disabled:opacity-40 transition-all">
-              {busy ? 'Adding…' : '+ Add Team'}
-            </button>
-          </div>
-        </form>
-      )}
-    </div>
-  );
-}
-
-/* ════════════════════════════════════════
-   MATCH STATUS BAR
-════════════════════════════════════════ */
-function MatchStatusBar({ tournament, currentMatch, teams, players }) {
-  if (!tournament) {
-    return (
-      <div className="flex items-center gap-3 rounded-xl border border-yellow-500/20 bg-yellow-500/5 px-4 py-3">
-        <AlertTriangle className="h-4 w-4 text-yellow-400" />
-        <p className="text-sm font-bold text-yellow-300">No tournament — create one in Director panel first</p>
-      </div>
-    );
-  }
-
-  const matchState  = currentMatch?.state || 'idle';
-  const aliveTeams  = (teams  || []).filter(t => (players || []).filter(p => p.team_id === t.id).some(p => p.is_alive)).length;
-  const totalAlive  = (players || []).filter(p => p.is_alive).length;
-  const stateColors = { live:'#ef4444', pre_match:'#3b82f6', ended:'#6b7280', idle:'#4b5563' };
-  const stateLabels = { live:'● LIVE', pre_match:'◐ PRE-MATCH', ended:'■ ENDED', idle:'○ IDLE' };
-
-  return (
-    <div className="flex items-center overflow-hidden rounded-xl border border-white/10 bg-[#0f0f1a]">
-      {[
-        { label:'TOURNAMENT', value: tournament.name, wide: true },
-        { label:'MATCH #',    value: currentMatch?.match_number || '—', accent: true },
-        { label:'MAP',        value: currentMatch?.map_name || '—' },
-        { label:'TEAMS ALIVE',value: `${aliveTeams} / ${(teams||[]).length}` },
-        { label:'PLAYERS',    value: `${totalAlive} alive` },
-      ].map(({ label, value, accent, wide }) => (
-        <div key={label} className={`flex flex-col border-r border-white/10 px-4 py-3 ${wide ? 'flex-1' : 'min-w-[100px]'}`}>
-          <p className="text-[9px] font-black uppercase tracking-widest text-gray-600">{label}</p>
-          <p className={`font-orbitron text-sm font-black truncate ${accent ? 'text-orange-400' : 'text-white'}`}>{value}</p>
-        </div>
-      ))}
-      <div className="flex flex-col px-4 py-3">
-        <p className="text-[9px] font-black uppercase tracking-widest text-gray-600">STATUS</p>
-        <p className="font-orbitron text-sm font-black" style={{ color: stateColors[matchState] || '#6b7280' }}>
-          {stateLabels[matchState] || 'IDLE'}
-        </p>
-      </div>
-    </div>
-  );
-}
-
-/* ════════════════════════════════════════
-   EVENT FEED
-════════════════════════════════════════ */
-function EventFeed({ killFeed, eliminations }) {
-  const kills = useMemo(() => [...(killFeed || [])].sort((a,b) => new Date(b.timestamp)-new Date(a.timestamp)).slice(0,15), [killFeed]);
-  const elims = useMemo(() => [...(eliminations || [])].sort((a,b) => new Date(b.timestamp)-new Date(a.timestamp)).slice(0,8), [eliminations]);
-  const fmt   = ts => { try { return new Date(ts).toLocaleTimeString([], { hour:'2-digit', minute:'2-digit', second:'2-digit' }); } catch { return ''; } };
-
-  return (
-    <div className="grid grid-cols-2 gap-4">
-      {/* Kill feed */}
-      <div className="rounded-2xl border border-white/10 bg-[#0f0f1a] overflow-hidden">
-        <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-          <Crosshair className="h-4 w-4 text-orange-400" />
-          <h3 className="font-orbitron text-xs font-black text-white">KILL LOG</h3>
-          <span className="ml-auto rounded-full bg-orange-500 px-2 py-0.5 text-[9px] font-black text-black">{kills.length}</span>
-        </div>
-        <div className="max-h-96 overflow-y-auto p-3 space-y-1">
-          {kills.length === 0 && <p className="py-6 text-center text-xs text-gray-600">No kills recorded yet</p>}
-          {kills.map((k, i) => (
-            <div key={k.id || i} className="flex items-center gap-2 rounded-lg bg-white/5 px-3 py-2">
-              <span className="flex-shrink-0 font-mono text-[9px] text-gray-600">{fmt(k.timestamp)}</span>
-              <span className="font-bold text-xs text-orange-400 truncate">{k.killer_name}</span>
-              <Skull className="h-3 w-3 flex-shrink-0 text-gray-600" />
-              <span className="text-xs text-red-400 truncate">{k.killed_player_name || '—'}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-
-      {/* Elimination feed */}
-      <div className="rounded-2xl border border-white/10 bg-[#0f0f1a] overflow-hidden">
-        <div className="flex items-center gap-2 border-b border-white/10 px-4 py-3">
-          <XCircle className="h-4 w-4 text-red-400" />
-          <h3 className="font-orbitron text-xs font-black text-white">ELIMINATION LOG</h3>
-          <span className="ml-auto rounded-full bg-red-600 px-2 py-0.5 text-[9px] font-black text-white">{elims.length}</span>
-        </div>
-        <div className="max-h-96 overflow-y-auto p-3 space-y-1">
-          {elims.length === 0 && <p className="py-6 text-center text-xs text-gray-600">No eliminations recorded</p>}
-          {elims.map((e, i) => (
-            <div key={e.id || i} className="flex items-center gap-2 rounded-lg border border-red-900/20 bg-red-950/20 px-3 py-2">
-              <XCircle className="h-3 w-3 flex-shrink-0 text-red-500" />
-              <span className="font-bold text-xs text-red-400 truncate flex-1">{e.eliminated_player_name}</span>
-              <span className="flex-shrink-0 text-[9px] text-gray-600 truncate">{e.eliminated_team_name}</span>
-              <span className="flex-shrink-0 font-mono text-[9px] text-gray-700">{fmt(e.timestamp)}</span>
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ════════════════════════════════════════
-   MAIN EXPORT
-════════════════════════════════════════ */
-const TABS = [
-  { key: 'live',   label: 'Live Input',    icon: Crosshair },
-  { key: 'teams',  label: 'Teams',         icon: Users },
-  { key: 'events', label: 'Event Log',     icon: Clock },
-];
-
 export default function DataInputer() {
-  const { data, loading, error, refresh } = useOverlayData(true);
-  const [tab, setTab]     = useState('live');
-  const [search, setSearch] = useState('');
+  const { data, loading, refresh } = useOverlayData(true);
+  const [activeTab, setActiveTab] = useState('live');
+  const [searchQuery, setSearchQuery] = useState('');
+  const [refreshing, setRefreshing] = useState(false);
 
-  /* Never get stuck on loading — show error UI instead */
-  if (loading) {
-    return (
-      <div className="flex h-full items-center justify-center">
-        <div className="text-center">
-          <div className="mx-auto mb-4 h-8 w-8 animate-spin rounded-full border-2 border-orange-500 border-t-transparent" />
-          <p className="font-orbitron text-sm text-gray-500">Loading Data Inputer…</p>
-        </div>
-      </div>
-    );
-  }
+  // Add Team state
+  const [newTeamName, setNewTeamName] = useState('');
+  const [newTeamLogo, setNewTeamLogo] = useState('');
+  const [teamAdding, setTeamAdding] = useState(false);
 
-  if (error && !data) {
-    return (
-      <div className="flex h-full items-center justify-center p-8">
-        <div className="text-center">
-          <AlertTriangle className="mx-auto mb-3 h-10 w-10 text-red-400" />
-          <p className="font-orbitron text-sm text-white mb-2">API Connection Error</p>
-          <p className="text-xs text-gray-500 mb-4">{error}</p>
-          <button onClick={refresh} className="rounded-xl bg-orange-500 px-6 py-2.5 text-sm font-black text-black hover:bg-orange-400">
-            Retry
-          </button>
-        </div>
-      </div>
-    );
-  }
+  // Add Player state
+  const [playerTeamId, setPlayerTeamId] = useState('');
+  const [newPlayerName, setNewPlayerName] = useState('');
+  const [playerAdding, setPlayerAdding] = useState(false);
 
-  const { tournament, teams, players, current_match, kill_feed, eliminations } = data || {};
+  // General busy state
+  const [busyState, setBusyState] = useState(null);
 
+  const state = data?.overlayState || {};
+  const currentMatch = data?.currentMatch;
+  const tournament = data?.tournament;
+  const teams = data?.teams || [];
+  const players = data?.players || [];
+  const killFeed = data?.killFeed || [];
+  const eliminations = data?.eliminations || [];
+
+  const handleRefresh = async () => {
+    setRefreshing(true);
+    await refresh();
+    setRefreshing(false);
+    toast.success('Live database synchronized!');
+  };
+
+  const handleAddTeam = async (e) => {
+    e.preventDefault();
+    if (!newTeamName) return toast.error('Team name is required');
+    setTeamAdding(true);
+    try {
+      await overlayApi.addTeam({ name: newTeamName, logo_url: newTeamLogo || '' });
+      toast.success(`Team "${newTeamName}" added successfully!`);
+      setNewTeamName('');
+      setNewTeamLogo('');
+      refresh();
+    } catch (err) {
+      toast.error(err.message || 'Error adding team');
+    } finally {
+      setTeamAdding(false);
+    }
+  };
+
+  const handleAddPlayer = async (e) => {
+    e.preventDefault();
+    if (!playerTeamId) return toast.error('Please select a team');
+    if (!newPlayerName) return toast.error('Player name is required');
+    setPlayerAdding(true);
+    try {
+      await overlayApi.addPlayer({ name: newPlayerName, team_id: playerTeamId });
+      toast.success(`Player "${newPlayerName}" added!`);
+      setNewPlayerName('');
+      refresh();
+    } catch (err) {
+      toast.error(err.message || 'Error adding player');
+    } finally {
+      setPlayerAdding(false);
+    }
+  };
+
+  // Filtered teams based on search query
   const filteredTeams = useMemo(() => {
-    const all = teams || [];
-    if (!search.trim()) return all;
-    const q = search.toLowerCase();
-    return all.filter(t =>
-      t.name.toLowerCase().includes(q) ||
-      (players || []).filter(p => p.team_id === t.id).some(p => p.name.toLowerCase().includes(q))
-    );
-  }, [teams, players, search]);
+    if (!searchQuery) return teams;
+    const query = searchQuery.toLowerCase();
+    return teams.filter((team) => {
+      const matchTeam = team.name.toLowerCase().includes(query);
+      const teamPlayers = players.filter((p) => p.team_id === team.id);
+      const matchPlayer = teamPlayers.some((p) =>
+        p.name.toLowerCase().includes(query)
+      );
+      return matchTeam || matchPlayer;
+    });
+  }, [teams, players, searchQuery]);
+
+  // Alive states count
+  const totalAlivePlayers = players.filter((p) => p.is_alive).length;
+  const totalAliveTeams = useMemo(() => {
+    return teams.filter((team) => {
+      const teamPlayers = players.filter((p) => p.team_id === team.id);
+      return teamPlayers.length > 0 && teamPlayers.some((p) => p.is_alive);
+    }).length;
+  }, [teams, players]);
 
   return (
-    <div className="flex h-full flex-col overflow-hidden">
-      {/* Status bar */}
-      <div className="flex-shrink-0 border-b border-white/10 bg-[#0c0c14] px-5 py-3">
-        <MatchStatusBar tournament={tournament} currentMatch={current_match} teams={teams} players={players} />
-      </div>
-
-      {/* Tab bar */}
-      <div className="flex-shrink-0 flex items-center border-b border-white/10 bg-[#0c0c14] px-5">
-        <div className="flex gap-0">
-          {TABS.map(({ key, label, icon: Icon }) => (
-            <button key={key} onClick={() => setTab(key)}
-              className={`flex items-center gap-2 border-b-2 px-5 py-3 text-[11px] font-black uppercase tracking-wider transition-all ${
-                tab === key ? 'border-orange-500 text-orange-400' : 'border-transparent text-gray-600 hover:text-gray-300'
-              }`}>
-              <Icon className="h-3.5 w-3.5" />{label}
-            </button>
-          ))}
+    <div className="flex h-full flex-col bg-[#09090f] text-white">
+      {/* ─────────────────────────────────────────
+         STATUS BAR — 52px
+      ───────────────────────────────────────── */}
+      <div className="relative flex h-[52px] items-center justify-between border-b border-[rgba(0,212,255,0.2)] bg-[#0c0c18] px-5 flex-shrink-0">
+        <div className="flex items-center gap-3">
+          <div className="h-5 w-[4px] bg-[#00D4FF]" />
+          <div className="leading-none flex items-center gap-2">
+            <span className="font-orbitron text-xs font-black uppercase text-white">
+              {tournament?.name || 'CHAMPIONSHIP TOUR'}
+            </span>
+            <span className="text-gray-500 font-bold text-xs">//</span>
+            <span className="font-orbitron text-[10px] font-bold text-[#00D4FF] tracking-wider uppercase">
+              {currentMatch ? `MATCH #${currentMatch.match_number}` : 'NO ACTIVE MATCH'}
+            </span>
+            {currentMatch?.map && (
+              <>
+                <span className="text-gray-500 font-bold text-xs">//</span>
+                <span className="font-orbitron text-[10px] font-bold text-white tracking-wider uppercase">
+                  {currentMatch.map}
+                </span>
+              </>
+            )}
+          </div>
         </div>
-        <button onClick={refresh} className="ml-auto flex items-center gap-1.5 rounded-lg px-3 py-2 text-[10px] text-gray-600 hover:text-gray-300 transition-all">
-          <RefreshCw className="h-3 w-3" /> Refresh
+
+        {/* Center: Live statistics pill */}
+        <div className="flex items-center gap-4 bg-[#09090f] border border-[rgba(0,212,255,0.3)] rounded-full px-4 py-1">
+          <div className="flex items-center gap-1.5">
+            <Users className="h-3.5 w-3.5 text-[#00D4FF]" />
+            <span className="font-orbitron text-[10px] font-black text-white">
+              TEAMS ALIVE: <span className="text-[#00D4FF] font-mono">{totalAliveTeams}/{teams.length}</span>
+            </span>
+          </div>
+          <div className="h-3 w-[1px] bg-white/10" />
+          <div className="flex items-center gap-1.5">
+            <Skull className="h-3.5 w-3.5 text-orange-400" />
+            <span className="font-orbitron text-[10px] font-black text-white">
+              PLAYERS ALIVE: <span className="text-orange-400 font-mono">{totalAlivePlayers}/{players.length}</span>
+            </span>
+          </div>
+        </div>
+
+        {/* Right Action */}
+        <button
+          onClick={handleRefresh}
+          disabled={refreshing}
+          className="flex h-8 w-8 items-center justify-center rounded border border-white/10 bg-[#13131f] text-gray-400 hover:text-white transition-all"
+        >
+          <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin text-[#00D4FF]' : ''}`} />
         </button>
+
+        {/* Bottom strip gradient line */}
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-[#00D4FF] via-transparent to-[#FF6B00]" />
       </div>
 
-      {/* Content */}
-      <div className="flex-1 overflow-y-auto bg-[#09090f] p-5">
+      {/* ─────────────────────────────────────────
+         TAB BAR — 44px
+      ───────────────────────────────────────── */}
+      <nav className="flex h-11 border-b border-white/5 bg-[#0c0c18] flex-shrink-0">
+        {[
+          { id: 'live', label: 'LIVE INPUT', icon: Crosshair },
+          { id: 'teams', label: 'TEAMS / PLAYERS', icon: Users },
+          { id: 'events', label: 'EVENT LOG', icon: Clock },
+        ].map((t) => {
+          const isActive = activeTab === t.id;
+          const Icon = t.icon;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setActiveTab(t.id)}
+              className="flex items-center gap-2 px-6 font-orbitron text-[11px] font-black tracking-[0.15em] transition-all relative border-r border-white/5"
+              style={
+                isActive
+                  ? {
+                      color: '#00D4FF',
+                      background: 'rgba(0,212,255,0.05)',
+                    }
+                  : { color: 'rgba(255,255,255,0.4)' }
+              }
+            >
+              <Icon className="h-4 w-4" />
+              {t.label}
+              {isActive && (
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#00D4FF]" />
+              )}
+            </button>
+          );
+        })}
+      </nav>
 
-        {/* ── LIVE INPUT ── */}
-        {tab === 'live' && (
+      {/* ─────────────────────────────────────────
+         CONTENT — flex-1
+      ───────────────────────────────────────── */}
+      <main className="flex-1 overflow-y-auto p-6 min-h-0">
+        {loading && (
+          <div className="flex h-40 items-center justify-center">
+            <RefreshCw className="h-8 w-8 animate-spin text-[#00D4FF]" />
+          </div>
+        )}
+
+        {!loading && (
           <>
-            {!current_match && (
-              <div className="mb-4 flex items-center gap-3 rounded-xl border border-blue-500/20 bg-blue-500/5 px-4 py-3">
-                <CheckCircle2 className="h-4 w-4 flex-shrink-0 text-blue-400" />
-                <p className="text-sm text-blue-300">
-                  <strong>Tip:</strong> Go to <span className="text-orange-400 font-bold">Director → Match Control</span> to start a match before logging kills.
-                </p>
+            {/* LIVE INPUT TAB */}
+            {activeTab === 'live' && (
+              <div className="space-y-6">
+                {/* Search bar */}
+                <div className="relative">
+                  <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                  <input
+                    type="text"
+                    placeholder="Search team or player..."
+                    value={searchQuery}
+                    onChange={(e) => setSearchQuery(e.target.value)}
+                    className="w-full rounded-xl border border-white/5 bg-[#0f0f1a] py-3.5 pl-11 pr-4 text-xs font-semibold text-white outline-none focus:border-[#00D4FF]/40 focus:bg-[#13131f] transition-all"
+                  />
+                </div>
+
+                {/* Team cards grid */}
+                <div className="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+                  {filteredTeams.map((team, idx) => {
+                    const teamColor = COLORS[idx % COLORS.length];
+                    const teamPlayers = players.filter((p) => p.team_id === team.id);
+                    const aliveCount = teamPlayers.filter((p) => p.is_alive).length;
+
+                    return (
+                      <TeamInputCard
+                        key={team.id}
+                        team={team}
+                        players={teamPlayers}
+                        aliveCount={aliveCount}
+                        teamColor={teamColor}
+                        currentMatch={currentMatch}
+                        tournament={tournament}
+                        onAction={refresh}
+                      />
+                    );
+                  })}
+                </div>
               </div>
             )}
-            {/* Search */}
-            <div className="relative mb-4">
-              <Search className="absolute left-4 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-600" />
-              <input value={search} onChange={e => setSearch(e.target.value)}
-                placeholder="Search team or player name…"
-                className="w-full rounded-xl border border-white/10 bg-[#0f0f1a] py-3 pl-10 pr-4 text-sm text-white placeholder-gray-600 outline-none focus:border-orange-500/30" />
-            </div>
 
-            {filteredTeams.length === 0 ? (
-              <div className="flex flex-col items-center justify-center gap-4 py-16">
-                <Users className="h-12 w-12 text-gray-700" />
-                <p className="font-orbitron text-sm text-gray-600">
-                  {(teams || []).length === 0 ? 'No teams yet — go to Teams tab to add some' : `No results for "${search}"`}
-                </p>
+            {/* TEAMS TAB */}
+            {activeTab === 'teams' && (
+              <div className="grid grid-cols-12 gap-6">
+                {/* Add Team form */}
+                <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
+                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
+                    <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-white mb-4">
+                      ADD NEW TEAM
+                    </h3>
+                    <form onSubmit={handleAddTeam} className="space-y-4">
+                      <div>
+                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-gray-500 uppercase mb-2">
+                          Team Name *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={newTeamName}
+                          onChange={(e) => setNewTeamName(e.target.value)}
+                          placeholder="e.g. TEAM LIQUID"
+                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
+                        />
+                      </div>
+                      <div>
+                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-gray-500 uppercase mb-2">
+                          Logo URL
+                        </label>
+                        <input
+                          type="url"
+                          value={newTeamLogo}
+                          onChange={(e) => setNewTeamLogo(e.target.value)}
+                          placeholder="https://example.com/logo.png"
+                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={teamAdding}
+                        className="w-full rounded-lg bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(255,107,0,0.2)] transition-all disabled:opacity-50"
+                      >
+                        {teamAdding ? 'ADDING TEAM...' : 'CREATE TEAM'}
+                      </button>
+                    </form>
+                  </div>
+
+                  {/* Add Player form */}
+                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
+                    <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-white mb-4">
+                      ADD PLAYER TO TEAM
+                    </h3>
+                    <form onSubmit={handleAddPlayer} className="space-y-4">
+                      <div>
+                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-gray-500 uppercase mb-2">
+                          Select Team *
+                        </label>
+                        <select
+                          required
+                          value={playerTeamId}
+                          onChange={(e) => setPlayerTeamId(e.target.value)}
+                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
+                        >
+                          <option value="">— select team —</option>
+                          {teams.map((t) => (
+                            <option key={t.id} value={t.id}>
+                              {t.name}
+                            </option>
+                          ))}
+                        </select>
+                      </div>
+                      <div>
+                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-gray-500 uppercase mb-2">
+                          Player Name *
+                        </label>
+                        <input
+                          type="text"
+                          required
+                          value={newPlayerName}
+                          onChange={(e) => setNewPlayerName(e.target.value)}
+                          placeholder="e.g. TSUNAMI"
+                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
+                        />
+                      </div>
+                      <button
+                        type="submit"
+                        disabled={playerAdding}
+                        className="w-full rounded-lg bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(255,107,0,0.2)] transition-all disabled:opacity-50"
+                      >
+                        {playerAdding ? 'ADDING PLAYER...' : 'ADD PLAYER'}
+                      </button>
+                    </form>
+                  </div>
+                </div>
+
+                {/* Team roster view */}
+                <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
+                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
+                    <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-white mb-4">
+                      TEAMS LIST & ROSTERS
+                    </h3>
+                    <div className="space-y-4">
+                      {teams.map((t, idx) => {
+                        const teamColor = COLORS[idx % COLORS.length];
+                        const teamPlayers = players.filter((p) => p.team_id === t.id);
+
+                        return (
+                          <div
+                            key={t.id}
+                            className="rounded-lg border border-white/5 bg-black/20 p-4 flex items-center justify-between"
+                          >
+                            <div className="flex items-center gap-3">
+                              {t.logo_url ? (
+                                <img
+                                  src={t.logo_url}
+                                  alt=""
+                                  className="h-10 w-10 rounded-full object-cover border-2"
+                                  style={{ borderColor: teamColor }}
+                                />
+                              ) : (
+                                <div
+                                  className="h-10 w-10 rounded-full border-2 flex items-center justify-center font-orbitron text-[10px] font-black"
+                                  style={{ borderColor: teamColor, color: teamColor }}
+                                >
+                                  {t.name.slice(0, 2).toUpperCase()}
+                                </div>
+                              )}
+                              <div>
+                                <p className="font-orbitron text-xs font-black text-white">
+                                  {t.name}
+                                </p>
+                                <p className="text-[10px] text-gray-500 font-bold mt-0.5">
+                                  {teamPlayers.length} players registered
+                                </p>
+                              </div>
+                            </div>
+                            <div className="flex gap-1.5 flex-wrap max-w-xs">
+                              {teamPlayers.map((p) => (
+                                <span
+                                  key={p.id}
+                                  className="inline-block rounded-md bg-white/[0.04] px-2.5 py-1 text-[9px] font-bold text-gray-400 border border-white/5"
+                                >
+                                  {p.name}
+                                </span>
+                              ))}
+                            </div>
+                          </div>
+                        );
+                      })}
+                    </div>
+                  </div>
+                </div>
               </div>
-            ) : (
-              <div className="grid grid-cols-1 gap-4 lg:grid-cols-2 xl:grid-cols-3">
-                {filteredTeams.map(team => (
-                  <TeamCard
-                    key={team.id}
-                    team={team}
-                    allPlayers={players || []}
-                    currentMatch={current_match}
-                    tournament={tournament}
-                    onAction={refresh}
-                    colorIndex={(teams || []).findIndex(t => t.id === team.id)}
-                  />
-                ))}
+            )}
+
+            {/* EVENT LOG TAB */}
+            {activeTab === 'events' && (
+              <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                {/* KILL LOG */}
+                <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
+                  <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
+                    <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-[#FF6B00]">
+                      KILL LOG
+                    </h3>
+                    <Crosshair className="h-4 w-4 text-[#FF6B00]" />
+                  </div>
+                  <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                    {killFeed.length === 0 ? (
+                      <p className="text-center text-[11px] text-gray-600 py-6">
+                        No kills logged in this match yet
+                      </p>
+                    ) : (
+                      killFeed.map((k, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between bg-white/[0.02] border border-white/5 p-3 rounded-lg text-xs"
+                        >
+                          <div className="flex items-center gap-2">
+                            <span className="font-orbitron font-bold text-[#FF6B00]">
+                              {k.killer_name}
+                            </span>
+                            <span className="text-gray-500 font-medium">killed</span>
+                            <span className="font-orbitron font-bold text-gray-400">
+                              {k.killed_name || 'Opponent'}
+                            </span>
+                          </div>
+                          <span className="text-[9px] font-mono text-gray-600">
+                            {new Date(k.created_at || Date.now()).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
+
+                {/* ELIMINATION LOG */}
+                <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
+                  <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
+                    <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-[#ef4444]">
+                      ELIMINATION LOG
+                    </h3>
+                    <Skull className="h-4 w-4 text-[#ef4444]" />
+                  </div>
+                  <div className="space-y-2 max-h-[500px] overflow-y-auto">
+                    {eliminations.length === 0 ? (
+                      <p className="text-center text-[11px] text-gray-600 py-6">
+                        No eliminations logged in this match yet
+                      </p>
+                    ) : (
+                      eliminations.map((e, idx) => (
+                        <div
+                          key={idx}
+                          className="flex items-center justify-between bg-red-950/5 border border-red-900/10 p-3 rounded-lg text-xs"
+                        >
+                          <div className="flex items-center gap-2">
+                            <Skull className="h-3.5 w-3.5 text-[#ef4444]" />
+                            <span className="font-orbitron font-bold text-white">
+                              {e.player_name}
+                            </span>
+                            <span className="text-gray-600 font-bold">//</span>
+                            <span className="font-orbitron text-[10px] font-black text-gray-500">
+                              ELIMINATED
+                            </span>
+                          </div>
+                          <span className="text-[9px] font-mono text-gray-600">
+                            {new Date(e.created_at || Date.now()).toLocaleTimeString()}
+                          </span>
+                        </div>
+                      ))
+                    )}
+                  </div>
+                </div>
               </div>
             )}
           </>
         )}
+      </main>
+    </div>
+  );
+}
 
-        {/* ── TEAMS MANAGEMENT ── */}
-        {tab === 'teams' && (
-          <div className="max-w-3xl space-y-4">
-            <AddTeamForm tournament={tournament} onAdded={refresh} />
-            <div className="space-y-3">
-              {(teams || []).length === 0 ? (
-                <div className="flex flex-col items-center justify-center gap-3 rounded-2xl border border-dashed border-white/10 py-14">
-                  <Users className="h-10 w-10 text-gray-700" />
-                  <p className="font-orbitron text-sm text-gray-600">No teams yet — add the first team above</p>
-                </div>
-              ) : (
-                (teams || []).map((team, i) => {
-                  const tp    = (players || []).filter(p => p.team_id === team.id);
-                  const color = COLORS[i % COLORS.length];
-                  return (
-                    <div key={team.id} className="rounded-2xl border bg-[#0f0f1a] p-4" style={{ borderColor: color + '33' }}>
-                      <div className="flex items-center gap-3">
-                        {team.logo_url
-                          ? <img src={team.logo_url} alt="" className="h-10 w-10 rounded-full object-cover" onError={e=>e.target.style.display='none'} />
-                          : <div className="flex h-10 w-10 items-center justify-center rounded-full border-2 font-orbitron text-xs font-black" style={{ borderColor: color + '55', background: color + '22', color }}>{team.name.slice(0,2)}</div>
-                        }
-                        <div>
-                          <p className="font-orbitron text-sm font-black text-white">{team.name}</p>
-                          <p className="text-xs text-gray-500">{tp.length} players · {team.total_tournament_kills||0} kills · {team.total_tournament_points||0} pts</p>
-                        </div>
-                      </div>
-                      {tp.length > 0 && (
-                        <div className="mt-3 flex flex-wrap gap-2">
-                          {tp.map(p => (
-                            <span key={p.id} className={`flex items-center gap-1.5 rounded-full border px-2.5 py-1 text-[11px] font-bold ${p.is_alive ? 'border-green-500/30 bg-green-500/10 text-green-400' : 'border-red-700/20 bg-red-950/20 text-red-600'}`}>
-                              {p.is_alive ? <Heart className="h-2.5 w-2.5" /> : <XCircle className="h-2.5 w-2.5" />}
-                              {p.name}
-                              {(p.current_match_kills||0) > 0 && <span className="text-orange-400">({p.current_match_kills}💀)</span>}
-                            </span>
-                          ))}
-                        </div>
-                      )}
-                    </div>
-                  );
-                })
-              )}
-            </div>
+/* ─────────────────────────────────────────
+   TEAM INPUT CARD COMPONENT
+───────────────────────────────────────── */
+function TeamInputCard({
+  team,
+  players,
+  aliveCount,
+  teamColor,
+  currentMatch,
+  tournament,
+  onAction,
+}) {
+  const [placement, setPlacement] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [showConfirmDelete, setShowConfirmDelete] = useState(false);
+
+  const handleSetPlacement = async () => {
+    if (!placement) return toast.error('Select placement rank');
+    if (!currentMatch?.id) return toast.error('Start a match first');
+    setBusy(true);
+    try {
+      const r = await overlayApi.setTeamPlacement({
+        team_id: team.id,
+        match_id: currentMatch.id,
+        placement: Number(placement),
+        tournament_id: tournament?.id,
+      });
+      toast.success(
+        `${team.name}: Placement #${placement} (+${r.placement_points || 0} pts)`
+      );
+      setPlacement('');
+      onAction();
+    } catch (err) {
+      toast.error(err.message || 'Error setting placement');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const handleDeleteTeam = async () => {
+    setBusy(true);
+    try {
+      await overlayApi.deleteTeam({ team_id: team.id });
+      toast.success(`Team "${team.name}" has been removed.`);
+      onAction();
+    } catch (err) {
+      toast.error(err.message || 'Error deleting team');
+    } finally {
+      setBusy(false);
+      setShowConfirmDelete(false);
+    }
+  };
+
+  return (
+    <div
+      className="rounded-xl border overflow-hidden flex flex-col justify-between"
+      style={{
+        borderTop: `2px solid ${teamColor}`,
+        borderLeft: `1px solid rgba(255, 255, 255, 0.05)`,
+        borderRight: `1px solid rgba(255, 255, 255, 0.05)`,
+        borderBottom: `1px solid rgba(255, 255, 255, 0.05)`,
+        background: '#0f0f1a',
+      }}
+    >
+      {/* Header */}
+      <div
+        className="flex items-center gap-3 px-4 py-3"
+        style={{
+          background: 'rgba(255, 255, 255, 0.01)',
+          borderBottom: '1px solid rgba(255, 255, 255, 0.04)',
+        }}
+      >
+        {team.logo_url ? (
+          <img
+            src={team.logo_url}
+            alt=""
+            className="h-9 w-9 flex-shrink-0 rounded-full object-cover border-2"
+            style={{ borderColor: teamColor }}
+          />
+        ) : (
+          <div
+            className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-full border-2 font-orbitron text-[10px] font-black"
+            style={{ borderColor: teamColor, background: `${teamColor}1a`, color: teamColor }}
+          >
+            {team.name.slice(0, 2).toUpperCase()}
           </div>
         )}
 
-        {/* ── EVENT LOG ── */}
-        {tab === 'events' && (
-          <div className="max-w-5xl">
-            <EventFeed killFeed={kill_feed} eliminations={eliminations} />
+        <div className="flex-1 min-w-0">
+          <p className="font-orbitron text-sm font-black text-white truncate">
+            {team.name}
+          </p>
+          <div className="flex items-center gap-2 mt-0.5">
+            <span className="text-[10px] font-bold" style={{ color: teamColor }}>
+              KILLS: {team.total_tournament_kills || 0}
+            </span>
+            <span className="text-[10px] text-gray-500 font-bold">//</span>
+            <span className="text-[10px] font-black text-orange-400">
+              PTS: {team.total_tournament_points || 0}
+            </span>
+          </div>
+        </div>
+
+        {/* Alive vertical tally bars */}
+        <div className="flex gap-0.5 flex-shrink-0 ml-1">
+          {Array.from({ length: Math.max(players.length, 4) }).map((_, i) => (
+            <div
+              key={i}
+              className="rounded-sm"
+              style={{
+                width: 3,
+                height: 14,
+                background: i < aliveCount ? teamColor : 'rgba(255, 255, 255, 0.1)',
+              }}
+            />
+          ))}
+        </div>
+
+        {/* Delete button */}
+        {!showConfirmDelete ? (
+          <button
+            onClick={() => setShowConfirmDelete(true)}
+            className="ml-2 flex-shrink-0 rounded p-1 text-gray-600 hover:text-red-400 hover:bg-red-950/20 transition-all"
+          >
+            <Trash2 className="h-3.5 w-3.5" />
+          </button>
+        ) : (
+          <div className="ml-2 flex gap-1">
+            <button
+              onClick={handleDeleteTeam}
+              className="rounded bg-red-600 px-1.5 py-0.5 text-[8px] font-black text-white"
+            >
+              YES
+            </button>
+            <button
+              onClick={() => setShowConfirmDelete(false)}
+              className="rounded border border-white/10 px-1.5 py-0.5 text-[8px] font-bold text-gray-400"
+            >
+              NO
+            </button>
           </div>
         )}
       </div>
+
+      {/* Players list */}
+      <div className="grid grid-cols-2 gap-2 p-3">
+        {players.length === 0 ? (
+          <p className="col-span-2 py-3 text-center text-[10px] text-gray-600 font-medium">
+            No players registered
+          </p>
+        ) : (
+          players.map((p) => (
+            <PlayerInputCard
+              key={p.id}
+              player={p}
+              teamColor={teamColor}
+              currentMatch={currentMatch}
+              onAction={onAction}
+            />
+          ))
+        )}
+      </div>
+
+      {/* Placement row (bottom) */}
+      <div className="flex items-center gap-2 border-t border-white/[0.04] bg-black/20 px-3 py-2">
+        <Shield className="h-3.5 w-3.5 flex-shrink-0 text-gray-500" />
+        <span className="text-[9px] font-orbitron font-black text-gray-500 flex-shrink-0">
+          PLACEMENT
+        </span>
+        <select
+          value={placement}
+          onChange={(e) => setPlacement(e.target.value)}
+          className="flex-1 rounded border border-white/10 bg-[#13131f] px-2 py-1 text-[11px] font-semibold text-white outline-none focus:border-[#00D4FF]/40"
+        >
+          <option value="">— rank —</option>
+          {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
+            <option key={n} value={n}>
+              #{n}
+            </option>
+          ))}
+        </select>
+        <button
+          onClick={handleSetPlacement}
+          disabled={busy || !placement}
+          className="rounded px-3 py-1 font-orbitron text-[10px] font-black text-black tracking-wider transition-all"
+          style={{ background: teamColor }}
+        >
+          SET
+        </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─────────────────────────────────────────
+   PLAYER INPUT CARD COMPONENT
+───────────────────────────────────────── */
+function PlayerInputCard({ player, teamColor, currentMatch, onAction }) {
+  const [busy, setBusy] = useState(null);
+  const alive = player.is_alive;
+  const kills = player.current_match_kills || 0;
+
+  const handleKill = async () => {
+    if (!currentMatch?.id) {
+      return toast.error('Start a match first in Director Panel');
+    }
+    setBusy('kill');
+    try {
+      const r = await overlayApi.addKill({
+        player_id: player.id,
+        match_id: currentMatch.id,
+        killed_player_name: '',
+        killed_team_name: '',
+      });
+      toast.success(`+1 Kill for ${player.name}! (${r.player.current_match_kills || 0} total)`);
+      onAction();
+    } catch (err) {
+      toast.error(err.message || 'Error adding kill');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleEliminate = async () => {
+    if (!currentMatch?.id) return toast.error('No active match');
+    setBusy('elim');
+    try {
+      await overlayApi.eliminatePlayer({
+        player_id: player.id,
+        match_id: currentMatch.id,
+      });
+      toast(`Player "${player.name}" has been eliminated.`, { icon: '💀' });
+      onAction();
+    } catch (err) {
+      toast.error(err.message || 'Error eliminating player');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  const handleRevive = async () => {
+    setBusy('revive');
+    try {
+      await overlayApi.revivePlayer({ player_id: player.id });
+      toast.success(`Player "${player.name}" revived!`);
+      onAction();
+    } catch (err) {
+      toast.error(err.message || 'Error reviving player');
+    } finally {
+      setBusy(null);
+    }
+  };
+
+  return (
+    <div
+      className="rounded-lg border p-2.5 transition-all flex flex-col justify-between"
+      style={{
+        borderColor: alive ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 68, 68, 0.1)',
+        background: alive ? 'rgba(255, 255, 255, 0.02)' : 'rgba(239, 68, 68, 0.02)',
+        opacity: alive ? 1 : 0.6,
+      }}
+    >
+      <div className="flex items-center justify-between gap-1.5 mb-2">
+        <div className="flex items-center gap-1.5 min-w-0">
+          {alive ? (
+            <span className="h-1.5 w-1.5 rounded-full bg-[#10b981] flex-shrink-0" />
+          ) : (
+            <span className="h-1.5 w-1.5 rounded-full bg-[#ef4444] flex-shrink-0" />
+          )}
+          <span
+            className={`font-orbitron text-[10px] font-black truncate ${
+              alive ? 'text-white' : 'text-gray-500 line-through'
+            }`}
+          >
+            {player.name}
+          </span>
+        </div>
+        <span className="rounded bg-[#FF6B00]/10 border border-[#FF6B00]/20 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#FF6B00] tabular-nums">
+          {kills} K
+        </span>
+      </div>
+
+      {alive ? (
+        <div className="flex gap-1">
+          <button
+            onClick={handleKill}
+            disabled={busy !== null}
+            className="flex-1 rounded py-1 font-orbitron text-[9px] font-black text-black hover:brightness-110 active:scale-95 transition-all"
+            style={{ background: teamColor }}
+          >
+            {busy === 'kill' ? '...' : '+KILL'}
+          </button>
+          <button
+            onClick={handleEliminate}
+            disabled={busy !== null}
+            className="rounded border border-red-500/30 hover:bg-red-500/10 px-2 py-1 font-orbitron text-[9px] font-black text-[#ef4444] active:scale-95 transition-all"
+          >
+            {busy === 'elim' ? '...' : 'ELIM'}
+          </button>
+        </div>
+      ) : (
+        <button
+          onClick={handleRevive}
+          disabled={busy !== null}
+          className="w-full rounded border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] py-1 font-orbitron text-[9px] font-black text-gray-400 active:scale-95 transition-all"
+        >
+          {busy === 'revive' ? '...' : 'REVIVE'}
+        </button>
+      )}
     </div>
   );
 }

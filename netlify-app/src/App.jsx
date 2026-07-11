@@ -6,58 +6,91 @@ import DirectorPanel from './pages/DirectorPanel';
 import DataInputer from './pages/DataInputer';
 import Overlay from './pages/Overlay';
 import PinGate from './components/PinGate';
+import { useOverlayData } from '@/lib/overlayApi';
 import { Clapperboard, Keyboard, Monitor, ExternalLink, Zap } from 'lucide-react';
 
 const queryClient = new QueryClient();
 
-function NavBar() {
+function NavBarContent() {
   const loc = useLocation();
+  const { data } = useOverlayData(true);
+
   if (loc.pathname === '/overlay') return null;
 
+  const currentScreenName = data?.overlayState?.current_screen 
+    ? data.overlayState.current_screen.replace(/_/g, ' ').toUpperCase()
+    : 'BLANK';
+
   const tabs = [
-    { to: '/director', label: 'DIRECTOR',     icon: Clapperboard, desc: 'Scene & overlay command center' },
-    { to: '/inputer',  label: 'DATA INPUTER', icon: Keyboard,     desc: 'Live kills, elims & game events' },
+    { to: '/director', label: 'DIRECTOR', icon: Clapperboard, activeBg: 'rgba(255,107,0,0.15)', activeColor: '#FF6B00' },
+    { to: '/inputer',  label: 'DATA INPUTER', icon: Keyboard, activeBg: 'rgba(0,212,255,0.15)', activeColor: '#00D4FF' },
   ];
+
   const active = (to) => loc.pathname === to || (loc.pathname === '/' && to === '/director');
 
   return (
-    <nav className="flex items-center gap-0 border-b border-white/10 bg-[#08080f] px-0 flex-shrink-0">
-      {/* Brand */}
-      <div className="flex items-center gap-2.5 border-r border-white/10 px-5 py-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-gradient-to-br from-orange-500 to-orange-700">
-          <Zap className="h-4 w-4 text-black" />
+    <nav className="relative flex items-center justify-between border-b border-white/10 bg-[#060912] px-4 py-2 flex-shrink-0">
+      {/* Left: Brand */}
+      <div className="flex items-center gap-2.5">
+        <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-[#FF6B00] to-[#FF8C00]">
+          <Zap className="h-4.5 w-4.5 text-black stroke-[2.5]" />
         </div>
         <div className="leading-none">
-          <p className="font-orbitron text-xs font-black tracking-widest text-orange-500">BOOYAH</p>
-          <p className="font-orbitron text-[9px] font-bold tracking-widest text-gray-500">DIRECTOR</p>
+          <p className="font-orbitron text-xs font-black tracking-widest text-[#FF6B00]">BOOYAH</p>
+          <p className="font-orbitron text-[9px] font-bold tracking-widest text-white">DIRECTOR</p>
         </div>
       </div>
 
-      {/* Role tabs */}
-      {tabs.map(({ to, label, icon: Icon, desc }) => (
-        <Link key={to} to={to}
-          className={`group flex items-center gap-3 border-r border-white/10 px-6 py-3 transition-all ${
-            active(to) ? 'bg-orange-500/10 border-b-2 border-b-orange-500' : 'hover:bg-white/5'
-          }`}>
-          <Icon className={`h-4 w-4 ${active(to) ? 'text-orange-400' : 'text-gray-500'}`} />
-          <div>
-            <p className={`font-orbitron text-[11px] font-black tracking-wider ${active(to) ? 'text-orange-400' : 'text-gray-400'}`}>{label}</p>
-            <p className="text-[9px] text-gray-600 group-hover:text-gray-500">{desc}</p>
-          </div>
-          {active(to) && <div className="ml-1 h-1.5 w-1.5 rounded-full bg-orange-500 animate-pulse" />}
-        </Link>
-      ))}
+      {/* Center: Role tabs */}
+      <div className="flex items-center gap-2 bg-black/40 p-1 rounded-lg border border-white/5">
+        {tabs.map(({ to, label, icon: Icon, activeBg, activeColor }) => {
+          const isActive = active(to);
+          return (
+            <Link
+              key={to}
+              to={to}
+              className="flex items-center gap-2 px-4 py-1.5 rounded-[6px] transition-all"
+              style={isActive ? { background: activeBg, color: activeColor } : { color: 'rgba(255,255,255,0.4)' }}
+            >
+              <Icon className="h-4 w-4" style={{ color: isActive ? activeColor : 'rgba(255,255,255,0.4)' }} />
+              <span className="font-orbitron text-[11px] font-black tracking-wider">{label}</span>
+            </Link>
+          );
+        })}
+      </div>
 
-      <div className="ml-auto px-4">
-        <a href="/overlay" target="_blank" rel="noopener noreferrer"
-          className="flex items-center gap-2 rounded-lg border border-white/10 px-3 py-2 text-[11px] font-bold text-gray-500 hover:border-orange-500/40 hover:text-orange-400 transition-all">
+      {/* Right: Status Pill & OBS Link */}
+      <div className="flex items-center gap-3">
+        <div className="flex items-center gap-2 rounded-full border border-[rgba(255,107,0,0.4)] bg-[#09090f] px-3 py-1">
+          <span className="relative flex h-2 w-2">
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#FF6B00] opacity-75"></span>
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#FF6B00]"></span>
+          </span>
+          <span className="font-orbitron text-[9px] font-black text-[#FF6B00] tracking-wider">
+            LIVE: {currentScreenName}
+          </span>
+        </div>
+
+        <a
+          href="/overlay"
+          target="_blank"
+          rel="noopener noreferrer"
+          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-[#0f0f1a] px-3 py-1.5 text-[10px] font-orbitron font-black text-[rgba(255,255,255,0.6)] hover:border-[#FF6B00]/40 hover:text-white transition-all"
+        >
           <Monitor className="h-3.5 w-3.5" />
-          OBS Overlay
+          OBS SOURCE
           <ExternalLink className="h-3 w-3" />
         </a>
       </div>
+
+      {/* Bottom gradient strip */}
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-[#FF6B00] via-transparent to-[#00D4FF]" />
     </nav>
   );
+}
+
+function NavBar() {
+  return <NavBarContent />;
 }
 
 export default function App() {
@@ -65,7 +98,7 @@ export default function App() {
     <QueryClientProvider client={queryClient}>
       <Router>
         <ScrollToTop />
-        <div className="flex h-screen flex-col bg-[#0a0a0f] text-white overflow-hidden">
+        <div className="flex h-screen flex-col bg-[#09090f] text-white overflow-hidden">
           <NavBar />
           <div className="flex-1 overflow-hidden min-h-0">
             <Routes>
@@ -87,7 +120,7 @@ export default function App() {
         </div>
       </Router>
       <Toaster position="top-right" toastOptions={{
-        style: { background: '#16161f', color: '#fff', border: '1px solid rgba(249,115,22,0.3)', fontSize: '12px', fontFamily: 'Rajdhani, sans-serif', fontWeight: '600' },
+        style: { background: '#16161f', color: '#fff', border: '1px solid rgba(249,115,22,0.3)', fontSize: '12px', fontFamily: 'Orbitron, sans-serif', fontWeight: '600' },
         success: { iconTheme: { primary: '#f97316', secondary: '#000' } },
         error:   { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
       }} />
