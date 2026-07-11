@@ -1335,7 +1335,6 @@ function EliminationAlert({ eliminations = [], design }) {
       alignItems: 'center',
     }}>
       <GamingBackground accent="#ef4444" accent2={tok.acc2(design)} />
-    }}>
       {/* Red Radial Alert Glow */}
       <div style={{
         position: 'absolute',
@@ -1574,7 +1573,6 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
       alignItems: 'center',
     }}>
       <GamingBackground accent={tok.acc(design)} accent2={tok.acc2(design)} />
-    }}>
       {/* Fallback CSS Confetti Style Tags */}
       <style>{`
         @keyframes confettiFall {

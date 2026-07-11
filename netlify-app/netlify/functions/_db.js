@@ -1,24 +1,48 @@
-const admin = require('firebase-admin');
+/**
+ * _db.js — Smart storage layer
+ * 
+ * Priority:
+ *   1. Firebase Realtime DB (if FIREBASE_DATABASE_URL env var is set)
+ *   2. /tmp JSON file (Netlify serverless fallback — ephemeral but works without Firebase)
+ * 
+ * This ensures the app ALWAYS works, even before Firebase is configured.
+ */
 
-// Initialize Firebase Admin only once (serverless cold-start safety)
-if (!admin.apps.length) {
-  const projectId   = process.env.FIREBASE_PROJECT_ID;
-  const clientEmail = process.env.FIREBASE_CLIENT_EMAIL;
-  const privateKey  = process.env.FIREBASE_PRIVATE_KEY?.replace(/\\n/g, '\n');
-  const databaseURL = process.env.FIREBASE_DATABASE_URL;
+const fs   = require('fs');
+const path = require('path');
 
-  if (projectId && clientEmail && privateKey && databaseURL) {
+const USE_FIREBASE = !!(
+  process.env.FIREBASE_DATABASE_URL &&
+  process.env.FIREBASE_PROJECT_ID   &&
+  process.env.FIREBASE_CLIENT_EMAIL &&
+  process.env.FIREBASE_PRIVATE_KEY
+);
+
+// ─── Firebase path ────────────────────────────────────────────────────────────
+let _fbApp = null;
+function getFirebaseDb() {
+  if (_fbApp) return _fbApp;
+  const admin = require('firebase-admin');
+  if (!admin.apps.length) {
     admin.initializeApp({
-      credential: admin.credential.cert({ projectId, clientEmail, privateKey }),
-      databaseURL,
+      credential: admin.credential.cert({
+        projectId:   process.env.FIREBASE_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
+        privateKey:  process.env.FIREBASE_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      }),
+      databaseURL: process.env.FIREBASE_DATABASE_URL,
     });
-  } else {
-    // Local dev fallback — use in-memory store so the app still boots without Firebase creds
-    console.warn('[_db] Firebase env vars not set — using in-memory store (data will not persist across restarts)');
-    admin.initializeApp({ projectId: 'local-dev' });
   }
+  _fbApp = admin.database();
+  return _fbApp;
 }
 
+// ─── JSON file path (Netlify /tmp fallback) ───────────────────────────────────
+const IS_SERVERLESS = process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
+const DATA_DIR = IS_SERVERLESS ? '/tmp' : path.join(process.cwd(), 'data');
+const DB_FILE  = path.join(DATA_DIR, 'booyah.json');
+
+// ─── Shared helpers ───────────────────────────────────────────────────────────
 function genId() {
   return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
 }
@@ -48,32 +72,43 @@ function getDefaultDb() {
   };
 }
 
-// In-memory fallback for local dev without Firebase
-let _memDb = null;
-
+// ─── Load ──────────────────────────────────────────────────────────────────────
 async function loadDb() {
-  if (!process.env.FIREBASE_DATABASE_URL) {
-    if (!_memDb) _memDb = getDefaultDb();
-    return JSON.parse(JSON.stringify(_memDb));
+  if (USE_FIREBASE) {
+    try {
+      const snap = await getFirebaseDb().ref('booyah').once('value');
+      return snap.val() || getDefaultDb();
+    } catch (e) {
+      console.error('[_db] Firebase read failed, falling back to /tmp:', e.message);
+      // Fall through to file fallback
+    }
   }
+  // File fallback
   try {
-    const snap = await admin.database().ref('booyah').once('value');
-    return snap.val() || getDefaultDb();
-  } catch (e) {
-    console.error('[_db] Firebase read error:', e.message);
-    return getDefaultDb();
-  }
+    if (fs.existsSync(DB_FILE)) {
+      return JSON.parse(fs.readFileSync(DB_FILE, 'utf8'));
+    }
+  } catch (e) { /* corrupted — reset */ }
+  return getDefaultDb();
 }
 
+// ─── Save ──────────────────────────────────────────────────────────────────────
 async function saveDb(db) {
-  if (!process.env.FIREBASE_DATABASE_URL) {
-    _memDb = JSON.parse(JSON.stringify(db));
-    return;
+  if (USE_FIREBASE) {
+    try {
+      await getFirebaseDb().ref('booyah').set(db);
+      return;
+    } catch (e) {
+      console.error('[_db] Firebase write failed, falling back to /tmp:', e.message);
+      // Fall through to file fallback
+    }
   }
+  // File fallback
   try {
-    await admin.database().ref('booyah').set(db);
+    if (!fs.existsSync(DATA_DIR)) fs.mkdirSync(DATA_DIR, { recursive: true });
+    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
   } catch (e) {
-    console.error('[_db] Firebase write error:', e.message);
+    console.error('[_db] File write failed:', e.message);
   }
 }
 
