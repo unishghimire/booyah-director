@@ -1,17 +1,17 @@
 import React, { useEffect, useState, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { useOverlayData } from '@/lib/overlayApi';
-import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award } from 'lucide-react';
+import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award, XCircle } from 'lucide-react';
 
 /* ── Design tokens helper ── */
 const tok = {
-  acc:  x => x?.accentColor  || '#f97316',
-  acc2: x => x?.accentColor2 || '#00d4ff',
+  acc:  x => x?.accentColor  || '#FF6B00',
+  acc2: x => x?.accentColor2 || '#00D4FF',
   bg:   x => x?.bgColor      || '#060915',
   txt:  x => x?.textColor    || '#ffffff',
-  name: x => x?.tournamentName    || 'BOOYAH CUP',
+  name: x => x?.tournamentName    || 'FF GLOBAL CHAMPIONSHIP',
   sub:  x => x?.tournamentSubtitle || 'GRAND FINALS',
-  game: x => x?.gameLabel    || 'GAME',
+  game: x => x?.gameLabel    || 'MATCH',
   font: x => {
     const f = x?.fontStyle || 'orbitron';
     if (f === 'rajdhani') return 'Rajdhani, sans-serif';
@@ -20,688 +20,626 @@ const tok = {
   },
 };
 
-const carbonFiberBg = `repeating-linear-gradient(45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 4px), repeating-linear-gradient(-45deg, rgba(255,255,255,0.015) 0px, rgba(255,255,255,0.015) 1px, transparent 1px, transparent 4px), #060915`;
-
-/* ── Garena-style Header Bar (For Solid BG Screens) ── */
-function FFHeader({ design, title, right }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
+/* ── FF Global Grid Background ── */
+function GridBg({ design }) {
   return (
-    <div className="relative flex h-14 w-full items-center justify-between px-6"
-      style={{ 
-        background: 'rgba(0,0,0,0.6)', 
-        borderBottom: `1px solid ${primary}4d` 
-      }}>
-      {/* Left logo / Garena G */}
-      <div className="flex items-center gap-3">
-        <div className="flex h-8 w-8 items-center justify-center rounded-full border border-orange-500/30" style={{ background: `radial-gradient(circle, ${primary}33 0%, transparent 100%)` }}>
-          <span className="font-orbitron text-base font-black text-white" style={{ color: primary }}>G</span>
-        </div>
-        <div className="flex flex-col">
-          <span className="font-orbitron text-[11px] font-black tracking-[0.2em] text-white">GARENA ESPORTS</span>
-          <span className="font-orbitron text-[8px] font-bold tracking-[0.1em] text-gray-400">OFFICIAL PARTNER</span>
-        </div>
-      </div>
-      {/* Center title */}
-      <div className="flex items-center gap-4">
-        <div className="h-[1px] w-16" style={{ background: `linear-gradient(to right, transparent, ${primary})` }} />
-        <span className="font-orbitron text-base font-black tracking-[0.3em] text-white uppercase">{title || tok.name(design)}</span>
-        <div className="h-[1px] w-16" style={{ background: `linear-gradient(to left, transparent, ${cyan})` }} />
-      </div>
-      {/* Right side banner */}
-      <div className="flex flex-col items-end">
-        <span className="font-orbitron text-xs font-black tracking-[0.2em]" style={{ color: primary }}>
-          {right || tok.sub(design)}
-        </span>
-      </div>
-      {/* Orange LED strip on very bottom */}
-      <div className="absolute bottom-0 left-0 h-[1px] w-full" style={{ background: `linear-gradient(90deg, ${primary}, transparent, ${primary})` }} />
+    <>
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundImage: `linear-gradient(rgba(255,107,0,0.06) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px)`,
+        backgroundSize: '80px 80px',
+        zIndex: 0
+      }} />
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: `radial-gradient(ellipse 1400px 700px at 50% 50%, rgba(255,107,0,0.08), transparent)`,
+        zIndex: 0
+      }} />
+    </>
+  );
+}
+
+/* ── FF Reusable Panel Component ── */
+function FFPanel({ children, style, className }) {
+  return (
+    <div style={{
+      background: 'rgba(6,9,21,0.93)',
+      backdropFilter: 'blur(16px) saturate(180%)',
+      borderTop: '2px solid #FF6B00',
+      borderLeft: '2px solid #FF6B00',
+      borderBottom: '2px solid #00D4FF',
+      borderRight: '2px solid #00D4FF',
+      borderRadius: 6,
+      boxShadow: '0 0 40px rgba(255,107,0,0.12), 0 0 80px rgba(0,0,0,0.6), inset 0 1px 0 rgba(255,107,0,0.2)',
+      position: 'relative',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+      ...style
+    }} className={className}>
+      {/* Corner accent marks — orange diagonal slashes */}
+      <div style={{ position:'absolute', top:0, left:0, width:12, height:12, borderTop:'3px solid #FF6B00', borderLeft:'3px solid #FF6B00', borderRadius:'2px 0 0 0', zIndex: 10 }} />
+      <div style={{ position:'absolute', top:0, right:0, width:12, height:12, borderTop:'3px solid #00D4FF', borderRight:'3px solid #00D4FF', borderRadius:'0 2px 0 0', zIndex: 10 }} />
+      <div style={{ position:'absolute', bottom:0, left:0, width:12, height:12, borderBottom:'3px solid #00D4FF', borderLeft:'3px solid #00D4FF', borderRadius:'0 0 0 2px', zIndex: 10 }} />
+      <div style={{ position:'absolute', bottom:0, right:0, width:12, height:12, borderBottom:'3px solid #FF6B00', borderRight:'3px solid #FF6B00', borderRadius:'0 0 2px 0', zIndex: 10 }} />
+      {children}
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════
-   1. SETUP BLANK SCREEN (Pure transparent backdrop)
-══════════════════════════════════════════════════ */
+/* ── FF Panel Header Component ── */
+function FFPanelHeader({ design, center }) {
+  return (
+    <div style={{
+      height: 36,
+      background: 'rgba(0,0,0,0.5)',
+      borderBottom: '1px solid rgba(255,107,0,0.3)',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'space-between',
+      padding: '0 12px',
+      flexShrink: 0,
+      zIndex: 2
+    }}>
+      {/* Left: Garena logo */}
+      <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+        <div style={{ width:20, height:20, borderRadius:'50%', background:'rgba(255,107,0,0.2)', border:'1px solid rgba(255,107,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <span style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:900, color:'#FF6B00', lineHeight: 1 }}>G</span>
+        </div>
+        <span style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'rgba(255,255,255,0.5)', letterSpacing:'0.2em' }}>GARENA</span>
+      </div>
+      {/* Center */}
+      <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:900, color:'rgba(255,255,255,0.7)', letterSpacing:'0.3em', textTransform:'uppercase' }}>
+        {center || 'FF OFFICIAL'}
+      </span>
+      {/* Right: tournament name */}
+      <span style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em', textTransform:'uppercase' }}>
+        {tok.name(design)}
+      </span>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────
+   1. SETUP_BLANK (TRANSPARENT SCREEN)
+────────────────────────────────────────────────── */
 function SetupBlank() {
-  return <div className="h-full w-full" style={{ background: 'transparent' }} />;
+  return <div style={{ width: '100%', height: '100%', background: 'transparent' }} />;
 }
 
-/* ══════════════════════════════════════════════════
-   2. FF BOARD / SCOREBOARD (Transparent OBS Overlay)
-══════════════════════════════════════════════════ */
-function FFBoard({ teams, players, currentMatch, design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
-  const matchNum = currentMatch?.match_number || 1;
-
-  const rows = useMemo(() => {
-    return [...(teams || [])]
-      .sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0))
-      .slice(0, 12)
-      .map((team, i) => {
-        const teamPlayers = (players || []).filter(p => p.team_id === team.id);
-        const aliveCount = teamPlayers.filter(p => p.is_alive).length;
-        const totalCount = teamPlayers.length || 4;
-        return {
-          team,
-          rank: i + 1,
-          alive: aliveCount,
-          total: totalCount,
-          kills: team.total_tournament_kills || 0,
-          booyah: team.booyahs_count || 0,
-          pts: team.total_tournament_points || 0,
-          isOut: aliveCount === 0 && teamPlayers.length > 0,
-        };
-      });
-  }, [teams, players]);
+/* ──────────────────────────────────────────────────
+   2. FF_SCOREBOARD (TRANSPARENT OVERLAY - RIGHT SIDE)
+────────────────────────────────────────────────── */
+function FFBoard({ teams = [], currentMatch, design }) {
+  // Sort teams by points descending
+  const sortedTeams = useMemo(() => {
+    return [...teams].sort((a, b) => {
+      const aPts = (a.kills || 0) + (a.placementPoints || 0) + (a.booyahPoints || 0);
+      const bPts = (b.kills || 0) + (b.placementPoints || 0) + (b.booyahPoints || 0);
+      return bPts - aPts;
+    }).slice(0, 12);
+  }, [teams]);
 
   return (
-    <div className="absolute right-6 top-1/2 w-[420px] -translate-y-1/2 flex flex-col overflow-hidden rounded-lg"
-      style={{ 
-        background: 'rgba(5, 8, 20, 0.92)', 
-        backdropFilter: 'blur(16px)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: `0 0 60px rgba(249,115,22,0.08), 0 24px 48px rgba(0,0,0,0.6), inset 0 1px 0 rgba(249,115,22,0.3)`
-      }}>
-      
-      {/* Top LED accent line */}
-      <div className="h-[2px] w-full" style={{ background: `linear-gradient(90deg, ${primary}, ${cyan})` }} />
-
-      {/* Header bar */}
-      <div className="flex items-center justify-between px-4 py-2 border-b border-white/5">
-        <div className="flex items-center gap-2">
-          {design?.logoUrl ? (
-            <img src={design.logoUrl} alt="" className="h-4 object-contain" />
-          ) : (
-            <div className="flex h-4 w-4 items-center justify-center rounded-full bg-orange-500/20">
-              <Zap className="h-2.5 w-2.5" style={{ color: primary }} />
-            </div>
-          )}
-          <span className="font-orbitron text-[9px] font-black tracking-[0.3em] text-white">
-            {tok.name(design).toUpperCase()}
-          </span>
-        </div>
-        <span className="font-orbitron text-[9px] font-bold uppercase tracking-[0.2em]" style={{ color: primary }}>
-          GAME {matchNum}
-        </span>
-      </div>
-
-      {/* Column Titles */}
-      <div className="grid grid-cols-[30px_35px_1fr_40px_40px_50px_40px] items-center px-4 py-1 text-[10px] font-black tracking-[0.15em] text-white/35 uppercase border-b border-white/5 bg-black/20">
-        <div>#</div>
-        <div>LOGO</div>
-        <div>TEAM</div>
-        <div className="text-right">K</div>
-        <div className="text-right">BP</div>
-        <div className="text-right">PTS</div>
-        <div className="text-center">HP</div>
-      </div>
-
-      {/* Rows */}
-      <div className="flex flex-col">
-        {rows.map((row, idx) => {
-          const isTop3 = row.rank <= 3;
-          const leftBarColor = row.rank === 1 ? '#fbbf24' : row.rank === 2 ? '#94a3b8' : row.rank === 3 ? '#b45309' : null;
-          
-          return (
-            <motion.div 
-              key={row.team.id}
-              initial={{ opacity: 0, x: 20 }}
-              animate={{ opacity: row.isOut ? 0.45 : 1, x: 0 }}
-              transition={{ delay: idx * 0.03 }}
-              className="grid grid-cols-[30px_35px_1fr_40px_40px_50px_40px] items-center px-4 h-7 border-b border-white/5 relative"
-              style={{
-                background: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.015)',
-                borderLeft: leftBarColor ? `3px solid ${leftBarColor}` : 'none',
-                boxShadow: row.rank === 1 ? `inset 2px 0 0 ${primary}` : undefined
-              }}
-            >
-              {/* Rank */}
-              <div className="font-orbitron text-xs font-bold text-white/80">{row.rank}</div>
-              
-              {/* Team Logo / Initials */}
-              <div>
-                {row.team.logo_url ? (
-                  <img src={row.team.logo_url} alt="" className="h-[18px] w-[18px] rounded-full object-cover" />
-                ) : (
-                  <div className="flex h-[18px] w-[18px] items-center justify-center rounded-full text-[9px] font-black text-white" style={{ background: primary }}>
-                    {row.team.name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
-              </div>
-
-              {/* Team Name */}
-              <div className="font-orbitron text-xs font-black truncate uppercase text-white tracking-wide">
-                {row.team.name}
-              </div>
-
-              {/* Kills */}
-              <div className="font-mono text-xs text-right font-bold" style={{ color: row.kills > 0 ? primary : 'rgba(255,255,255,0.6)' }}>
-                {row.kills}
-              </div>
-
-              {/* Booyah / Placement points */}
-              <div className="font-mono text-xs text-right font-bold" style={{ color: cyan }}>
-                {row.booyah}
-              </div>
-
-              {/* Total points */}
-              <div className="font-orbitron text-xs text-right font-black text-white">
-                {row.pts}
-              </div>
-
-              {/* Status / Health bars */}
-              <div className="flex justify-center gap-[2px]">
-                {[...Array(4)].map((_, bIdx) => {
-                  const active = bIdx < row.alive;
-                  return (
-                    <div 
-                      key={bIdx} 
-                      className="w-[3px] rounded-sm transition-all"
-                      style={{ 
-                        height: active ? 14 : 7,
-                        background: active ? primary : 'rgba(255,255,255,0.1)'
-                      }} 
-                    />
-                  );
-                })}
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-
-      {/* Footer strip */}
-      <div className="flex items-center justify-center h-6 bg-black/40 border-t border-white/5">
-        <span className="font-orbitron text-[8px] font-black tracking-[0.2em] flex items-center gap-1.5" style={{ color: primary }}>
-          <span className="h-1.5 w-1.5 rounded-full bg-red-500 animate-ping" />
-          ● LIVE
-          <span className="text-white/60">|</span>
-          <span className="text-white uppercase">{(currentMatch?.map_name || 'Bermuda')}</span>
-        </span>
-      </div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════
-   3. SCOREBOARD / OVERALL STANDINGS (Transparent OBS Overlay)
-══════════════════════════════════════════════════ */
-function FullStandings({ teams, players, design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
-
-  const rows = useMemo(() => {
-    return [...(teams || [])]
-      .sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0))
-      .map((team, i) => {
-        const teamPlayers = (players || []).filter(p => p.team_id === team.id);
-        const alive = teamPlayers.filter(p => p.is_alive).length;
-        return {
-          team,
-          rank: i + 1,
-          kills: team.total_tournament_kills || 0,
-          booyahs: team.booyahs_count || 0,
-          points: team.total_tournament_points || 0,
-          isOut: alive === 0 && teamPlayers.length > 0,
-        };
-      });
-  }, [teams, players]);
-
-  return (
-    <div className="absolute left-1/2 top-1/2 -translate-x-1/2 -translate-y-1/2 w-[820px] max-h-[680px] flex flex-col overflow-hidden rounded-xl"
-      style={{ 
-        background: 'rgba(5, 8, 20, 0.92)', 
-        backdropFilter: 'blur(20px) saturate(180%)',
-        border: '1px solid rgba(255,255,255,0.08)',
-        boxShadow: `0 0 80px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.1)`
-      }}>
-      
-      {/* Top gradient line */}
-      <div className="h-[3px] w-full" style={{ background: `linear-gradient(90deg, ${primary}, ${cyan}, ${primary})` }} />
-
-      {/* Header */}
-      <div className="flex items-center justify-between px-6 py-4 border-b border-white/5 bg-black/20">
-        <div className="flex items-center gap-3">
-          <Award className="h-6 w-6 text-yellow-500" />
-          <div className="flex flex-col">
-            <span className="font-orbitron text-lg font-black tracking-[0.2em] text-white">OVERALL STANDINGS</span>
-            <span className="font-orbitron text-[10px] tracking-[0.15em] text-white/40 uppercase">TOURNAMENT LEADERS</span>
-          </div>
-        </div>
-        <span className="font-orbitron text-xs font-bold tracking-[0.15em] text-white/60">
-          {tok.name(design).toUpperCase()}
-        </span>
-      </div>
-
-      {/* Columns Header */}
-      <div className="grid grid-cols-[50px_60px_1fr_100px_100px_120px] items-center px-6 py-2 text-xs font-black tracking-[0.15em] text-white/35 uppercase border-b border-white/5 bg-black/40">
-        <div>RANK</div>
-        <div>LOGO</div>
-        <div>TEAM</div>
-        <div className="text-right">KILLS</div>
-        <div className="text-right">BOOYAH</div>
-        <div className="text-right">TOTAL PTS</div>
-      </div>
-
-      {/* Rows Container */}
-      <div className="flex flex-col overflow-y-auto" style={{ maxHeight: 460 }}>
-        {rows.map((row, idx) => {
-          const isTop3 = row.rank <= 3;
-          const metalColor = row.rank === 1 ? '#fbbf24' : row.rank === 2 ? '#94a3b8' : row.rank === 3 ? '#b45309' : null;
-
-          return (
-            <motion.div
-              key={row.team.id}
-              initial={{ opacity: 0, y: 10 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: idx * 0.04 }}
-              className="grid grid-cols-[50px_60px_1fr_100px_100px_120px] items-center px-6 h-8 border-b border-white/5 relative"
-              style={{
-                background: idx % 2 === 0 ? 'transparent' : 'rgba(255, 255, 255, 0.015)',
-                borderLeft: metalColor ? `4px solid ${metalColor}` : 'none',
-                boxShadow: row.rank === 1 ? `inset 0 0 20px rgba(251,191,36,0.05)` : undefined
-              }}
-            >
-              {/* Rank */}
-              <div className="font-orbitron text-sm font-black text-white/80">{row.rank}</div>
-
-              {/* Logo */}
-              <div>
-                {row.team.logo_url ? (
-                  <img src={row.team.logo_url} alt="" className="h-6 w-6 rounded-full object-cover border border-white/10" />
-                ) : (
-                  <div className="flex h-6 w-6 items-center justify-center rounded-full text-xs font-black text-white" style={{ background: primary }}>
-                    {row.team.name.slice(0, 2).toUpperCase()}
-                  </div>
-                )}
-              </div>
-
-              {/* Team Name */}
-              <div className="font-orbitron text-sm font-black text-white uppercase tracking-wider">
-                {row.team.name}
-              </div>
-
-              {/* Kills */}
-              <div className="font-mono text-sm text-right font-bold text-white/80">{row.kills}</div>
-
-              {/* Booyahs */}
-              <div className="font-mono text-sm text-right font-bold" style={{ color: cyan }}>{row.booyahs}</div>
-
-              {/* Total points */}
-              <div className="font-orbitron text-sm text-right font-black text-white" style={{ color: isTop3 ? metalColor : '#ffffff' }}>
-                {row.points}
-              </div>
-            </motion.div>
-          );
-        })}
-      </div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════
-   4. KILL FEED (Transparent OBS Overlay)
-══════════════════════════════════════════════════ */
-function KillFeedScreen({ killFeed, design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
-
-  return (
-    <div className="absolute left-6 bottom-20 w-[340px] flex flex-col gap-2 pointer-events-none">
-      <AnimatePresence initial={false}>
-        {(killFeed || []).slice(0, 5).map((kill, i) => {
-          const ageOpacity = 1 - (i * 0.12);
-          return (
-            <motion.div
-              key={kill.id}
-              initial={{ opacity: 0, x: -50 }}
-              animate={{ opacity: ageOpacity, x: 0 }}
-              exit={{ opacity: 0, x: -50 }}
-              transition={{ type: 'spring', stiffness: 120, damping: 14 }}
-              className="flex items-center justify-between h-9 px-3 rounded-md border border-white/5 relative overflow-hidden"
-              style={{
-                background: 'rgba(6, 9, 21, 0.85)',
-                backdropFilter: 'blur(12px)',
-                boxShadow: `0 4px 12px rgba(0,0,0,0.4)`
-              }}
-            >
-              {/* Left design glow border */}
-              <div className="absolute left-0 top-0 bottom-0 w-[3px]" style={{ background: `linear-gradient(to bottom, ${primary}, ${cyan})` }} />
-
-              {/* Killer Info */}
-              <div className="font-orbitron text-xs font-black truncate max-w-[120px] uppercase" style={{ color: primary }}>
-                {kill.killer_name}
-              </div>
-
-              {/* Weapon icon / Crosshair */}
-              <div className="flex items-center gap-1 opacity-60">
-                <Skull className="h-3.5 w-3.5 text-white/40" />
-                <span className="font-mono text-[9px] text-white/40">🎯</span>
-              </div>
-
-              {/* Victim Info */}
-              <div className="font-orbitron text-xs italic font-bold truncate max-w-[120px] uppercase text-white/50">
-                {kill.killed_player_name}
-              </div>
-            </motion.div>
-          );
-        })}
-      </AnimatePresence>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════
-   5. PRE MATCH MAP (Solid BG)
-══════════════════════════════════════════════════ */
-function PreMatchMap({ match, teams, design }) {
-  const mapName  = (match?.map_name || 'BERMUDA').toUpperCase();
-  const matchNum = match?.match_number || 1;
-  const primary  = tok.acc(design);
-  const cyan     = tok.acc2(design);
-
-  return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
-      {/* Background Grids and Glows */}
-      <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 50% 40%, ${primary}18, transparent)` }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse at 50% 50%, transparent 40%, rgba(0,0,0,0.7) 100%)` }} />
-
-      <FFHeader design={design} title="PRE-MATCH BRIEF" right={`${tok.game(design)} ${matchNum}`} />
-
-      {/* Center Hero Panel */}
-      <div className="flex flex-1 flex-col items-center justify-center relative">
-        <motion.p 
-          initial={{ opacity: 0, y: -20 }} 
-          animate={{ opacity: 1, y: 0 }}
-          className="font-orbitron text-[13px] font-black uppercase tracking-[0.5em]"
-          style={{ color: cyan }}>
-          UPCOMING MAP
-        </motion.p>
+    <div style={{ position: 'absolute', right: 30, top: '50%', transform: 'translateY(-50%)', width: 440, background: 'transparent' }}>
+      <FFPanel style={{ width: 440 }}>
+        <FFPanelHeader design={design} center="FF OFFICIAL BOARD" />
         
-        <span className="font-orbitron text-xs font-black tracking-[0.3em] text-white/30 uppercase mt-1">
-          {tok.game(design)} {matchNum}
-        </span>
-
-        <motion.div 
-          initial={{ scaleX: 0 }} 
-          animate={{ scaleX: 1 }} 
-          className="h-[1px] w-[300px] my-4"
-          style={{ background: `linear-gradient(to right, transparent, ${primary}, transparent)` }}
-        />
-
-        <motion.h1 
-          initial={{ opacity: 0, scale: 0.7 }} 
-          animate={{ opacity: 1, scale: 1 }} 
-          transition={{ type: 'spring', stiffness: 80, damping: 15 }}
-          className="font-orbitron font-black leading-none text-white tracking-widest"
-          style={{ 
-            fontSize: 160, 
-            textShadow: `0 0 80px ${primary}cc, 0 0 160px ${primary}33`,
-            WebkitTextStroke: `1px rgba(249,115,22,0.5)`
-          }}>
-          {mapName}
-        </motion.h1>
-
-        <p className="font-orbitron text-[11px] tracking-[0.4em] text-white/40 uppercase mt-4">
-          BATTLE ROYALE MODE
-        </p>
-      </div>
-
-      {/* Bottom Participation strip */}
-      <div className="h-24 w-full bg-black/70 border-t border-white/10 px-8 flex items-center justify-between">
-        <div className="flex flex-col">
-          <span className="font-orbitron text-xs font-black tracking-[0.2em]" style={{ color: primary }}>PARTICIPANTS</span>
-          <span className="font-orbitron text-[10px] text-white/40 tracking-[0.1em] uppercase">{(teams || []).length} TEAMS COMPETING</span>
+        {/* Table Headers */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          height: 26,
+          background: 'rgba(0,0,0,0.3)',
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          padding: '0 10px',
+          fontSize: 8,
+          fontWeight: 800,
+          color: 'rgba(255,255,255,0.4)',
+          fontFamily: 'Orbitron',
+          letterSpacing: '0.1em'
+        }}>
+          <div style={{ width: 30, textAlign: 'center' }}>RK</div>
+          <div style={{ width: 28 }} />
+          <div style={{ flex: 1, paddingLeft: 6 }}>TEAM</div>
+          <div style={{ width: 36, textAlign: 'center' }}>KLS</div>
+          <div style={{ width: 36, textAlign: 'center' }}>BYH</div>
+          <div style={{ width: 46, textAlign: 'center' }}>PTS</div>
+          <div style={{ width: 32, textAlign: 'center' }}>ST</div>
         </div>
-        <div className="flex items-center gap-2">
-          {(teams || []).slice(0, 12).map((team, idx) => (
-            <div key={team.id} className="relative group">
-              {team.logo_url ? (
-                <img src={team.logo_url} alt="" className="h-10 w-10 rounded-full object-cover border border-white/20 hover:scale-110 transition-transform" />
-              ) : (
-                <div className="flex h-10 w-10 items-center justify-center rounded-full text-[10px] font-black text-white border border-white/20" style={{ background: primary }}>
-                  {team.name.slice(0, 2).toUpperCase()}
-                </div>
-              )}
-            </div>
-          ))}
-        </div>
-      </div>
-    </div>
-  );
-}
 
-/* ══════════════════════════════════════════════════
-   6. TODAYS MATCHES (Solid BG)
-══════════════════════════════════════════════════ */
-function TodaysMatches({ matches, design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
+        {/* Rows */}
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          {sortedTeams.map((team, idx) => {
+            const rank = idx + 1;
+            const kills = team.kills || 0;
+            const booyahs = team.booyahs || 0;
+            const totalPoints = kills + (team.placementPoints || 0) + (team.booyahPoints || 0);
+            const isEliminated = team.eliminated || false;
 
-  return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
-      {/* Visual Depth Background */}
-      <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 50% 40%, ${cyan}15, transparent)` }} />
-
-      <FFHeader design={design} title="TODAYS SCHEDULE" right="BROADCAST RUN" />
-
-      {/* Center Match Cards Grid */}
-      <div className="flex-1 flex items-center justify-center px-12">
-        <div className="grid grid-cols-3 gap-6 w-full max-w-[1100px]">
-          {(matches || []).slice(0, 3).map((match, idx) => {
-            const isLive = match.state === 'live';
-            const isCompleted = match.state === 'ended';
-            const statusColor = isLive ? '#ef4444' : isCompleted ? '#10b981' : '#6b7280';
+            let rowBg = 'rgba(0,0,0,0.1)';
+            let leftBorder = '3px solid transparent';
+            
+            if (rank === 1) {
+              rowBg = 'rgba(255,184,0,0.06)';
+              leftBorder = '3px solid #FFB800';
+            } else if (rank === 2) {
+              rowBg = 'rgba(148,163,184,0.04)';
+              leftBorder = '3px solid rgba(148,163,184,0.8)';
+            } else if (rank === 3) {
+              rowBg = 'rgba(180,83,9,0.04)';
+              leftBorder = '3px solid rgba(180,83,9,0.8)';
+            }
 
             return (
-              <motion.div
-                key={idx}
-                initial={{ opacity: 0, y: 30 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: idx * 0.1 }}
-                className="rounded-xl border border-white/10 overflow-hidden relative"
-                style={{
-                  background: 'rgba(255, 255, 255, 0.03)',
-                  boxShadow: `0 10px 30px rgba(0,0,0,0.5)`
-                }}
-              >
-                {/* Accent top line based on state */}
-                <div className="h-[3px] w-full" style={{ background: statusColor }} />
-
-                <div className="p-6 flex flex-col justify-between h-56">
-                  {/* Card top */}
-                  <div className="flex justify-between items-center">
-                    <span className="font-orbitron text-xs font-black text-white/50 tracking-[0.1em]">
-                      MATCH 0{match.match_number}
-                    </span>
-                    {/* Status badge */}
-                    <div className="flex items-center gap-1.5 px-2 py-0.5 rounded-full border border-white/5 bg-black/40">
-                      {isLive && <span className="h-2 w-2 rounded-full bg-red-500 animate-ping" />}
-                      <span className="font-orbitron text-[9px] font-black uppercase tracking-wider" style={{ color: statusColor }}>
-                        {match.state}
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Card center (Map Name) */}
-                  <div className="my-4">
-                    <h2 className="font-orbitron text-3xl font-black text-white uppercase tracking-wider leading-none">
-                      {match.map_name}
-                    </h2>
-                    <span className="font-orbitron text-[10px] text-white/30 tracking-[0.2em] uppercase block mt-1">
-                      BATTLE ROYALE
-                    </span>
-                  </div>
-
-                  {/* Card footer */}
-                  <div className="border-t border-white/5 pt-3 flex justify-between items-center">
-                    <span className="font-orbitron text-[10px] text-white/40 tracking-[0.1em]">COMPETING TEAMS</span>
-                    <span className="font-orbitron text-xs font-bold text-white">12 TEAMS</span>
-                  </div>
+              <div key={team.id || idx} style={{
+                display: 'flex',
+                alignItems: 'center',
+                height: 30,
+                background: rowBg,
+                borderBottom: '1px solid rgba(255,255,255,0.04)',
+                borderLeft: leftBorder,
+                padding: '0 10px',
+                opacity: isEliminated ? 0.4 : 1,
+                transition: 'all 0.3s'
+              }}>
+                {/* Rank */}
+                <div style={{ width: 30, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: rank <= 3 ? '#FFB800' : '#ffffff' }}>
+                  {rank}
                 </div>
-              </motion.div>
-            );
-          })}
-        </div>
-      </div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════
-   7. TEAMS TODAY (Solid BG)
-══════════════════════════════════════════════════ */
-function TeamsToday({ teams, design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
-
-  return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
-      <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 50% 50%, ${cyan}12, transparent)` }} />
-
-      <FFHeader design={design} title="MEET THE TEAMS" right="TOURNAMENT LINEUP" />
-
-      {/* Main Title Center */}
-      <div className="flex flex-col items-center mt-8">
-        <h1 className="font-orbitron text-4xl font-black uppercase tracking-[0.2em] bg-clip-text text-transparent bg-gradient-to-r from-orange-500 to-cyan-400">
-          CONTESTANTS
-        </h1>
-        <p className="font-orbitron text-[10px] tracking-[0.3em] text-white/40 uppercase mt-1">
-          {tok.name(design)} | {tok.sub(design)}
-        </p>
-      </div>
-
-      {/* Grid Layout */}
-      <div className="flex-1 flex items-center justify-center px-12 pb-10">
-        <div className="grid grid-cols-4 gap-6 w-full max-w-[1000px]">
-          {(teams || []).slice(0, 12).map((team, idx) => {
-            const teamColor = idx % 2 === 0 ? primary : cyan;
-            return (
-              <motion.div
-                key={team.id}
-                initial={{ opacity: 0, scale: 0.8 }}
-                animate={{ opacity: 1, scale: 1 }}
-                transition={{ type: 'spring', stiffness: 90, damping: 14, delay: idx * 0.05 }}
-                className="flex flex-col items-center justify-center p-4 rounded-xl border border-white/5 relative overflow-hidden h-36 bg-black/40"
-              >
-                {/* Logo circle with teamColor glow ring */}
-                <div 
-                  className="relative flex h-16 w-16 items-center justify-center rounded-full transition-transform"
-                  style={{
-                    boxShadow: `0 0 0 2px ${teamColor}, 0 0 20px ${teamColor}55`
-                  }}
-                >
-                  {team.logo_url ? (
-                    <img src={team.logo_url} alt="" className="h-full w-full rounded-full object-cover" />
+                
+                {/* Logo */}
+                <div style={{ width: 28, display: 'flex', justifyContent: 'center' }}>
+                  {team.logo ? (
+                    <img src={team.logo} alt="" style={{ width: 20, height: 20, objectFit: 'contain' }} />
                   ) : (
-                    <div className="flex h-full w-full items-center justify-center rounded-full text-base font-black text-white" style={{ background: teamColor }}>
-                      {team.name.slice(0, 2).toUpperCase()}
+                    <div style={{ width: 20, height: 20, borderRadius: '50%', background: team.color || '#FF6B00', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 8, fontWeight: 900, color: '#000' }}>
+                      {(team.name || 'T').substring(0, 2).toUpperCase()}
                     </div>
                   )}
                 </div>
 
-                {/* Team label */}
-                <span className="font-orbitron text-xs font-black tracking-[0.2em] text-white uppercase text-center mt-4 truncate w-full">
-                  {team.name}
-                </span>
-              </motion.div>
+                {/* Team Name */}
+                <div style={{ flex: 1, paddingLeft: 6, overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: '#ffffff' }}>
+                  {team.name || 'UNKNOWN TEAM'}
+                </div>
+
+                {/* Kills */}
+                <div style={{ width: 36, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, fontWeight: 600, color: kills > 0 ? '#FF6B00' : 'rgba(255,255,255,0.4)' }}>
+                  {kills}
+                </div>
+
+                {/* Booyah */}
+                <div style={{ width: 36, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, fontWeight: 600, color: booyahs > 0 ? '#00D4FF' : 'rgba(255,255,255,0.4)' }}>
+                  {booyahs}
+                </div>
+
+                {/* Total Points */}
+                <div style={{ width: 46, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: '#ffffff' }}>
+                  {totalPoints}
+                </div>
+
+                {/* Status/Alive Bar Indicator (4 tiny micro segments) */}
+                <div style={{ width: 32, display: 'flex', gap: 2, justifyContent: 'center' }}>
+                  {[1, 2, 3, 4].map((p) => {
+                    const isAlive = !isEliminated && (!team.playersCount || p <= (team.alivePlayersCount ?? 4));
+                    return (
+                      <div key={p} style={{
+                        width: 3,
+                        height: 12,
+                        background: isAlive ? (team.color || '#FF6B00') : 'rgba(255,255,255,0.1)',
+                        borderRadius: 1
+                      }} />
+                    );
+                  })}
+                </div>
+              </div>
             );
           })}
         </div>
-      </div>
+
+        {/* Bottom LIVE POINTS strip */}
+        <div style={{
+          height: 32,
+          background: 'rgba(255,107,0,0.1)',
+          borderTop: '1px solid rgba(255,107,0,0.3)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 12px',
+          fontFamily: 'Orbitron',
+          fontSize: 8,
+          fontWeight: 800
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+            <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF6B00', animation: 'pulse 1.5s infinite' }} />
+            <span style={{ color: '#FF6B00', letterSpacing: '0.1em' }}>LIVE POINTS</span>
+          </div>
+          <span style={{ color: '#00D4FF', letterSpacing: '0.1em' }}>
+            {currentMatch?.mapName || 'BERMUDA'}
+          </span>
+        </div>
+      </FFPanel>
     </div>
   );
 }
 
-/* ══════════════════════════════════════════════════
-   8. CASTERS (Solid BG)
-══════════════════════════════════════════════════ */
-function CastersScreen({ design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
+/* ──────────────────────────────────────────────────
+   3. SCOREBOARD / FULL STANDINGS (TRANSPARENT OVERLAY - CENTERED)
+────────────────────────────────────────────────── */
+function FullStandings({ teams = [], design }) {
+  const sortedTeams = useMemo(() => {
+    return [...teams].sort((a, b) => {
+      const aPts = (a.kills || 0) + (a.placementPoints || 0) + (a.booyahPoints || 0);
+      const bPts = (b.kills || 0) + (b.placementPoints || 0) + (b.booyahPoints || 0);
+      return bPts - aPts;
+    });
+  }, [teams]);
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
-      <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 20% 50%, ${primary}15, transparent)` }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 80% 50%, ${cyan}15, transparent)` }} />
+    <div style={{ position: 'absolute', left: '50%', top: '50%', transform: 'translate(-50%,-50%)', width: 840, background: 'transparent' }}>
+      <FFPanel style={{ width: 840 }}>
+        <FFPanelHeader design={design} center="OVERALL TOURNAMENT STANDINGS" />
 
-      <FFHeader design={design} title="CASTER TALENT" right="ANALYSIS DESK" />
+        {/* Table Headers */}
+        <div style={{
+          display: 'flex',
+          alignItems: 'center',
+          height: 32,
+          background: 'rgba(0,0,0,0.4)',
+          borderBottom: '2px solid rgba(255,107,0,0.3)',
+          padding: '0 16px',
+          fontSize: 9,
+          fontWeight: 900,
+          color: 'rgba(255,255,255,0.6)',
+          fontFamily: 'Orbitron',
+          letterSpacing: '0.15em'
+        }}>
+          <div style={{ width: 40, textAlign: 'center' }}>RANK</div>
+          <div style={{ width: 32 }} />
+          <div style={{ flex: 1, paddingLeft: 12 }}>TEAM NAME</div>
+          <div style={{ width: 70, textAlign: 'center' }}>MATCHES</div>
+          <div style={{ width: 70, textAlign: 'center' }}>KILLS</div>
+          <div style={{ width: 70, textAlign: 'center' }}>BOOYAH</div>
+          <div style={{ width: 80, textAlign: 'center' }}>PLACE PTS</div>
+          <div style={{ width: 90, textAlign: 'center', color: '#00D4FF' }}>TOTAL PTS</div>
+        </div>
 
-      {/* Main split display */}
-      <div className="flex-1 flex items-center justify-center px-12 gap-12">
+        {/* Rows */}
+        <div style={{ display: 'flex', flexDirection: 'column', maxHeight: 520, overflowY: 'auto' }}>
+          {sortedTeams.map((team, idx) => {
+            const rank = idx + 1;
+            const kills = team.kills || 0;
+            const booyahs = team.booyahs || 0;
+            const placementPts = team.placementPoints || 0;
+            const totalPoints = kills + placementPts + (team.booyahPoints || 0);
+
+            let rowBg = idx % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'rgba(0,0,0,0.15)';
+            let rankColor = '#ffffff';
+            let leftBorder = '3px solid transparent';
+
+            if (rank === 1) {
+              rowBg = 'rgba(255,184,0,0.08)';
+              rankColor = '#FFB800';
+              leftBorder = '3px solid #FFB800';
+            } else if (rank === 2) {
+              rowBg = 'rgba(148,163,184,0.06)';
+              rankColor = '#E2E8F0';
+              leftBorder = '3px solid #94A3B8';
+            } else if (rank === 3) {
+              rowBg = 'rgba(180,83,9,0.06)';
+              rankColor = '#F59E0B';
+              leftBorder = '3px solid #B45309';
+            }
+
+            return (
+              <div key={team.id || idx} style={{
+                display: 'flex',
+                alignItems: 'center',
+                height: 38,
+                background: rowBg,
+                borderBottom: '1px solid rgba(255,255,255,0.03)',
+                borderLeft: leftBorder,
+                padding: '0 16px',
+                transition: 'all 0.2s'
+              }}>
+                {/* Rank */}
+                <div style={{ width: 40, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 13, fontWeight: 900, color: rankColor }}>
+                  #{rank}
+                </div>
+
+                {/* Logo */}
+                <div style={{ width: 32, display: 'flex', justifyContent: 'center' }}>
+                  {team.logo ? (
+                    <img src={team.logo} alt="" style={{ width: 24, height: 24, objectFit: 'contain' }} />
+                  ) : (
+                    <div style={{ width: 24, height: 24, borderRadius: '50%', background: team.color || '#FF6B00', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 10, fontWeight: 900, color: '#000' }}>
+                      {(team.name || 'T').substring(0, 2).toUpperCase()}
+                    </div>
+                  )}
+                </div>
+
+                {/* Name */}
+                <div style={{ flex: 1, paddingLeft: 12, fontFamily: 'Orbitron', fontSize: 12, fontWeight: 700, color: '#ffffff' }}>
+                  {team.name || 'UNKNOWN TEAM'}
+                </div>
+
+                {/* Matches */}
+                <div style={{ width: 70, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
+                  {team.matchesPlayed || 5}
+                </div>
+
+                {/* Kills */}
+                <div style={{ width: 70, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, color: '#FF6B00', fontWeight: 600 }}>
+                  {kills}
+                </div>
+
+                {/* Booyah */}
+                <div style={{ width: 70, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, color: '#00D4FF', fontWeight: 600 }}>
+                  {booyahs}
+                </div>
+
+                {/* Placement Points */}
+                <div style={{ width: 80, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
+                  {placementPts}
+                </div>
+
+                {/* Total Points */}
+                <div style={{ width: 90, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff' }}>
+                  {totalPoints}
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </FFPanel>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────
+   4. KILL_FEED (TRANSPARENT OVERLAY - BOTTOM-LEFT)
+────────────────────────────────────────────────── */
+function KillFeedScreen({ killFeed = [], design }) {
+  // Take last 5 kills
+  const activeKills = useMemo(() => {
+    return [...killFeed].slice(-5).reverse();
+  }, [killFeed]);
+
+  return (
+    <div style={{ position: 'absolute', left: 30, bottom: 60, width: 340, background: 'transparent' }}>
+      <FFPanel style={{ width: 340 }}>
+        <FFPanelHeader design={design} center="BATTLE FEED" />
+        <div style={{ display: 'flex', flexDirection: 'column', padding: '6px 0' }}>
+          <AnimatePresence initial={false}>
+            {activeKills.map((kill, idx) => (
+              <motion.div
+                key={kill.id || idx}
+                initial={{ x: -40, opacity: 0 }}
+                animate={{ x: 0, opacity: 1 }}
+                exit={{ x: -40, opacity: 0 }}
+                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
+                style={{
+                  display: 'flex',
+                  alignItems: 'center',
+                  height: 34,
+                  padding: '0 12px',
+                  borderBottom: '1px solid rgba(255,255,255,0.03)',
+                  background: 'rgba(0,0,0,0.1)'
+                }}
+              >
+                {/* Orange crosshair arrow */}
+                <span style={{ color: '#FF6B00', marginRight: 8, fontSize: 12, fontWeight: 900 }}>▸</span>
+                
+                {/* Killer */}
+                <span style={{
+                  fontFamily: 'Orbitron',
+                  fontSize: 11,
+                  fontWeight: 800,
+                  color: '#FF6B00',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: 110
+                }}>
+                  {kill.killer || 'KILLER'}
+                </span>
+
+                {/* Bullet/Skull icon */}
+                <span style={{ margin: '0 8px', color: 'rgba(255,255,255,0.3)', display: 'flex', alignItems: 'center' }}>
+                  <Skull size={11} style={{ color: '#00D4FF' }} />
+                </span>
+
+                {/* Victim */}
+                <span style={{
+                  fontFamily: 'Orbitron',
+                  fontSize: 11,
+                  fontWeight: 700,
+                  color: 'rgba(255,255,255,0.8)',
+                  overflow: 'hidden',
+                  textOverflow: 'ellipsis',
+                  whiteSpace: 'nowrap',
+                  maxWidth: 110
+                }}>
+                  {kill.victim || 'VICTIM'}
+                </span>
+
+                {/* Weapon Badge */}
+                <span style={{
+                  marginLeft: 'auto',
+                  background: 'rgba(255,107,0,0.15)',
+                  border: '1px solid rgba(255,107,0,0.3)',
+                  borderRadius: 3,
+                  padding: '1px 5px',
+                  fontFamily: 'Orbitron',
+                  fontSize: 8,
+                  fontWeight: 800,
+                  color: '#FF6B00',
+                  textTransform: 'uppercase'
+                }}>
+                  {kill.weapon || 'M1887'}
+                </span>
+              </motion.div>
+            ))}
+          </AnimatePresence>
+          {activeKills.length === 0 && (
+            <div style={{
+              height: 50,
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center',
+              fontFamily: 'Orbitron',
+              fontSize: 9,
+              color: 'rgba(255,255,255,0.3)',
+              letterSpacing: '0.1em'
+            }}>
+              AWAITING COMBAT ENGAGEMENT...
+            </div>
+          )}
+        </div>
+      </FFPanel>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────
+   5. PRE_MATCH_MAP (SOLID BG)
+────────────────────────────────────────────────── */
+function PreMatchMap({ match, teams = [], design }) {
+  const mapName = match?.mapName || 'BERMUDA';
+  const matchNum = match?.matchNumber || 'MATCH 01';
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <GridBg design={design} />
+
+      {/* Main Container */}
+      <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         
-        {/* Caster 1 camera box */}
-        <div className="w-[480px] h-[300px] border border-white/5 relative bg-black/40 rounded overflow-hidden">
-          {/* HUD Brackets */}
-          <div className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2" style={{ borderColor: primary }} />
-          <div className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2" style={{ borderColor: primary }} />
-          <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2" style={{ borderColor: primary }} />
-          <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2" style={{ borderColor: primary }} />
-
-          {/* Top Camera HUD bar inside frame */}
-          <div className="absolute top-2 left-3 right-3 flex justify-between items-center">
-            <span className="font-orbitron text-[9px] font-black text-red-500 animate-pulse">● REC</span>
-            <span className="font-orbitron text-[9px] text-white/30">CAM 01</span>
-          </div>
-
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Video className="h-10 w-10 text-white/10" />
-          </div>
-
-          {/* Bottom name strip */}
-          <div className="absolute bottom-0 left-0 right-0 h-14 bg-black/90 border-t border-white/10 flex items-center justify-between px-4">
-            <div className="flex flex-col">
-              <span className="font-orbitron text-sm font-black text-white uppercase tracking-wider">CASTER ONE</span>
-              <span className="font-orbitron text-[10px] uppercase tracking-wider" style={{ color: primary }}>@CASTER_HANDLE</span>
+        {/* Top Header Row */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 10 }}>
+            <div style={{ width: 32, height: 32, borderRadius: '50%', background: 'rgba(255,107,0,0.2)', border: '1px solid #FF6B00', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#FF6B00' }}>G</span>
             </div>
-            <span className="font-orbitron text-[10px] text-white/50 tracking-widest border border-white/15 px-2 py-0.5 rounded uppercase">LEAD HOST</span>
+            <div>
+              <div style={{ fontFamily: 'Orbitron', fontSize: 16, fontWeight: 900, color: '#ffffff', letterSpacing: '0.1em' }}>
+                {tok.name(design)}
+              </div>
+              <div style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.2em' }}>
+                {tok.sub(design)}
+              </div>
+            </div>
+          </div>
+          <div style={{
+            background: 'rgba(255,107,0,0.1)',
+            border: '1px solid rgba(255,107,0,0.4)',
+            padding: '4px 16px',
+            borderRadius: 4,
+            fontFamily: 'Orbitron',
+            fontSize: 12,
+            fontWeight: 900,
+            color: '#FF6B00'
+          }}>
+            {matchNum}
           </div>
         </div>
 
-        {/* VS Divider center */}
-        <div className="flex flex-col items-center">
-          <div className="h-20 w-[1px]" style={{ background: `linear-gradient(to bottom, transparent, ${primary})` }} />
-          <div className="relative flex items-center justify-center my-2 h-14 w-14 border border-white/20 rotate-45">
-            <span className="font-orbitron text-xl font-black -rotate-45 text-white">VS</span>
+        {/* Center Split View */}
+        <div style={{ display: 'flex', gap: 40, alignItems: 'center', flex: 1, margin: '40px 0' }}>
+          {/* Left Text Detail */}
+          <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#00D4FF', letterSpacing: '0.4em', marginBottom: 10 }}>
+              NEXT MAP SELECTION
+            </span>
+            <motion.h1 
+              initial={{ scale: 0.8, opacity: 0 }}
+              animate={{ scale: 1, opacity: 1 }}
+              transition={{ type: 'spring', stiffness: 120 }}
+              style={{
+                fontFamily: 'Orbitron',
+                fontSize: 100,
+                fontWeight: 950,
+                color: '#ffffff',
+                lineHeight: 0.9,
+                margin: 0,
+                textShadow: '0 0 30px rgba(255,107,0,0.4)',
+                letterSpacing: '0.02em',
+                textTransform: 'uppercase'
+              }}
+            >
+              {mapName}
+            </motion.h1>
+            <div style={{ display: 'flex', gap: 24, marginTop: 30 }}>
+              <div style={{ borderLeft: '3px solid #FF6B00', paddingLeft: 12 }}>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>TEAMS REMAINING</div>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#ffffff' }}>{teams.length || 12} TEAMS</div>
+              </div>
+              <div style={{ borderLeft: '3px solid #00D4FF', paddingLeft: 12 }}>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>TOTAL LOBBY PLAYERS</div>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#00D4FF' }}>48 SURVIVORS</div>
+              </div>
+            </div>
           </div>
-          <div className="h-20 w-[1px]" style={{ background: `linear-gradient(to top, transparent, ${cyan})` }} />
+
+          {/* Right Visual Frame */}
+          <div style={{ flex: 1, height: '100%', minHeight: 380, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FFPanel style={{ width: '100%', height: '100%', minHeight: 380, padding: 6, background: 'rgba(0,0,0,0.4)' }}>
+              <div style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                background: 'rgba(10,14,30,0.9)',
+                borderRadius: 4,
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                {/* Styled Grid Graphics inside frame */}
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundImage: `radial-gradient(#FF6B00 1px, transparent 1px)`,
+                  backgroundSize: '24px 24px',
+                  opacity: 0.15
+                }} />
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                  <MapPin size={48} style={{ color: '#FF6B00' }} />
+                  <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff', letterSpacing: '0.2em' }}>BATTLEGROUND ASSIGNED</span>
+                  <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: '#00D4FF', letterSpacing: '0.1em' }}>ENVIRONMENT: EXTREME TOXICITY</span>
+                </div>
+              </div>
+            </FFPanel>
+          </div>
         </div>
 
-        {/* Caster 2 camera box */}
-        <div className="w-[480px] h-[300px] border border-white/5 relative bg-black/40 rounded overflow-hidden">
-          {/* HUD Brackets */}
-          <div className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2" style={{ borderColor: cyan }} />
-          <div className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2" style={{ borderColor: cyan }} />
-          <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2" style={{ borderColor: cyan }} />
-          <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2" style={{ borderColor: cyan }} />
-
-          {/* Top Camera HUD bar inside frame */}
-          <div className="absolute top-2 left-3 right-3 flex justify-between items-center">
-            <span className="font-orbitron text-[9px] font-black text-red-500 animate-pulse">● REC</span>
-            <span className="font-orbitron text-[9px] text-white/30">CAM 02</span>
-          </div>
-
-          <div className="absolute inset-0 flex items-center justify-center">
-            <Video className="h-10 w-10 text-white/10" />
-          </div>
-
-          {/* Bottom name strip */}
-          <div className="absolute bottom-0 left-0 right-0 h-14 bg-black/90 border-t border-white/10 flex items-center justify-between px-4">
-            <div className="flex flex-col">
-              <span className="font-orbitron text-sm font-black text-white uppercase tracking-wider">CASTER TWO</span>
-              <span className="font-orbitron text-[10px] uppercase tracking-wider" style={{ color: cyan }}>@CASTER_HANDLE</span>
-            </div>
-            <span className="font-orbitron text-[10px] text-white/50 tracking-widest border border-white/15 px-2 py-0.5 rounded uppercase">CO-ANALYST</span>
+        {/* Bottom Team Logos Ribbon */}
+        <div style={{ borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20, display: 'flex', alignItems: 'center', gap: 20 }}>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: '#FF6B00', letterSpacing: '0.2em' }}>CONTENDING LOBBY</span>
+          <div style={{ display: 'flex', gap: 12, overflow: 'hidden', flex: 1 }}>
+            {teams.slice(0, 10).map((t, idx) => (
+              <div key={t.id || idx} style={{
+                display: 'flex',
+                alignItems: 'center',
+                gap: 6,
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.06)',
+                padding: '4px 10px',
+                borderRadius: 4
+              }}>
+                {t.logo ? (
+                  <img src={t.logo} alt="" style={{ width: 14, height: 14, objectFit: 'contain' }} />
+                ) : (
+                  <div style={{ width: 14, height: 14, borderRadius: '50%', background: t.color || '#FF6B00', display: 'flex', alignItems: 'center', justifyContent: 'center', fontSize: 7, fontWeight: 900, color: '#000' }}>
+                    {(t.name || 'T').substring(0, 2).toUpperCase()}
+                  </div>
+                )}
+                <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: '#ffffff' }}>{t.name || 'TEAM'}</span>
+              </div>
+            ))}
           </div>
         </div>
 
@@ -710,191 +648,467 @@ function CastersScreen({ design }) {
   );
 }
 
-/* ══════════════════════════════════════════════════
-   9. UPCOMING MAP (Solid BG)
-══════════════════════════════════════════════════ */
-function UpcomingMap({ match, design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
-  const mapName = (match?.map_name || 'BERMUDA').toUpperCase();
+/* ──────────────────────────────────────────────────
+   6. TODAYS_MATCHES (SOLID BG)
+────────────────────────────────────────────────── */
+function TodaysMatches({ matches = [], design }) {
+  // Mock standard schedule matches if none supplied
+  const items = matches.length > 0 ? matches : [
+    { matchNumber: 'MATCH 01', mapName: 'BERMUDA', time: '16:00', status: 'COMPLETED' },
+    { matchNumber: 'MATCH 02', mapName: 'KALAHARE', time: '16:45', status: 'LIVE' },
+    { matchNumber: 'MATCH 03', mapName: 'PURGATORY', time: '17:30', status: 'UPCOMING' },
+    { matchNumber: 'MATCH 04', mapName: 'ALPINE', time: '18:15', status: 'UPCOMING' },
+    { matchNumber: 'MATCH 05', mapName: 'NEXTERRA', time: '19:00', status: 'UPCOMING' }
+  ];
 
-  const [timeLeft, setTimeLeft] = useState(300);
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <GridBg design={design} />
+
+      <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 950, color: '#ffffff', letterSpacing: '0.1em' }}>
+              TODAY'S MATCH SCHEDULE
+            </div>
+            <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.2em' }}>
+              GRAND CHAMPIONSHIP STREAM GRID
+            </div>
+          </div>
+          <Calendar style={{ color: '#FF6B00' }} size={28} />
+        </div>
+
+        {/* Row of Cards */}
+        <div style={{ display: 'flex', gap: 16, width: '100%', justifyContent: 'center', margin: '40px 0' }}>
+          {items.map((m, idx) => {
+            const isLive = m.status === 'LIVE';
+            const isCompleted = m.status === 'COMPLETED';
+
+            return (
+              <FFPanel key={idx} style={{
+                width: 280,
+                height: 380,
+                background: isLive ? 'rgba(255,107,0,0.06)' : 'rgba(6,9,21,0.9)',
+                borderColor: isLive ? '#FF6B00' : 'rgba(255,255,255,0.08)'
+              }}>
+                <div style={{
+                  position: 'relative',
+                  width: '100%',
+                  height: '100%',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                  padding: 20
+                }}>
+                  {/* Top: Match Num + Status */}
+                  <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                    <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.4)' }}>
+                      {m.matchNumber || `MATCH 0${idx + 1}`}
+                    </span>
+                    <span style={{
+                      fontFamily: 'Orbitron',
+                      fontSize: 8,
+                      fontWeight: 900,
+                      padding: '2px 8px',
+                      borderRadius: 3,
+                      background: isLive ? '#FF6B00' : isCompleted ? 'rgba(255,255,255,0.1)' : 'rgba(0,212,255,0.1)',
+                      color: isLive ? '#000000' : isCompleted ? 'rgba(255,255,255,0.6)' : '#00D4FF'
+                    }}>
+                      {m.status || 'UPCOMING'}
+                    </span>
+                  </div>
+
+                  {/* Mid: Map Info */}
+                  <div style={{ textAlign: 'center', margin: '40px 0' }}>
+                    <MapPin size={32} style={{ color: isLive ? '#FF6B00' : '#00D4FF', margin: '0 auto 12px auto' }} />
+                    <h3 style={{ fontFamily: 'Orbitron', fontSize: 22, fontWeight: 900, color: '#ffffff', margin: 0, textTransform: 'uppercase' }}>
+                      {m.mapName || 'BERMUDA'}
+                    </h3>
+                    <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>
+                      ROUND {idx + 1}
+                    </span>
+                  </div>
+
+                  {/* Bottom: Match Time */}
+                  <div style={{
+                    borderTop: '1px solid rgba(255,255,255,0.06)',
+                    paddingTop: 16,
+                    display: 'flex',
+                    justifyContent: 'space-between',
+                    alignItems: 'center'
+                  }}>
+                    <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.5)' }}>EST START</span>
+                    <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: isLive ? '#FF6B00' : '#ffffff' }}>
+                      {m.time || '18:00'}
+                    </span>
+                  </div>
+                </div>
+              </FFPanel>
+            );
+          })}
+        </div>
+
+        {/* Footer info banner */}
+        <div style={{
+          background: 'rgba(0,0,0,0.4)',
+          border: '1px solid rgba(255,255,255,0.04)',
+          padding: '12px 24px',
+          borderRadius: 6,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          fontFamily: 'Orbitron',
+          fontSize: 9
+        }}>
+          <span style={{ color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>STREAM EVENT: ALL TIMINGS LISTED IN YOUR LOCAL ZONE</span>
+          <span style={{ color: '#00D4FF', fontWeight: 700 }}>GARENA OFFICIAL FEED</span>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────
+   7. TEAMS_TODAY (SOLID BG)
+────────────────────────────────────────────────── */
+function TeamsToday({ teams = [], design }) {
+  // Pad with placeholders if no teams found
+  const displayTeams = useMemo(() => {
+    if (teams.length > 0) return teams.slice(0, 12);
+    return Array.from({ length: 12 }, (_, i) => ({
+      name: `TEAM ALPHA ${i + 1}`,
+      color: '#FF6B00',
+      logo: null
+    }));
+  }, [teams]);
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <GridBg design={design} />
+
+      <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justify_content: 'space-between' }}>
+        
+        {/* Header Title */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: '#00D4FF', letterSpacing: '0.3em' }}>FF CHAMPIONSHIPS</span>
+            <div style={{ fontFamily: 'Orbitron', fontSize: 26, fontWeight: 950, color: '#ffffff', letterSpacing: '0.1em', marginTop: 4 }}>
+              MEET THE TEAMS CONTENDING TODAY
+            </div>
+          </div>
+          <Users style={{ color: '#FF6B00' }} size={28} />
+        </div>
+
+        {/* Teams Grid */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: 'repeat(6, 1fr)',
+          gap: 16,
+          margin: '30px 0'
+        }}>
+          {displayTeams.map((team, idx) => (
+            <FFPanel key={idx} style={{ height: 160, padding: 4 }}>
+              <div style={{
+                width: '100%',
+                height: '100%',
+                background: 'rgba(10,14,30,0.8)',
+                borderRadius: 4,
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                padding: 10,
+                textAlign: 'center'
+              }}>
+                {/* Team Glow Ring */}
+                <div style={{
+                  width: 56,
+                  height: 56,
+                  borderRadius: '50%',
+                  border: `2px solid ${team.color || '#FF6B00'}`,
+                  boxShadow: `0 0 15px ${team.color || '#FF6B00'}55`,
+                  display: 'flex',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 10,
+                  background: 'rgba(0,0,0,0.4)'
+                }}>
+                  {team.logo ? (
+                    <img src={team.logo} alt="" style={{ width: 36, height: 36, objectFit: 'contain' }} />
+                  ) : (
+                    <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff' }}>
+                      {(team.name || 'T').substring(0, 2).toUpperCase()}
+                    </span>
+                  )}
+                </div>
+
+                <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 900, color: '#ffffff', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', width: '100%' }}>
+                  {team.name || 'TEAM'}
+                </span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 8, color: '#00D4FF', letterSpacing: '0.1em', marginTop: 2 }}>
+                  QUALIFIED
+                </span>
+              </div>
+            </FFPanel>
+          ))}
+        </div>
+
+        {/* Bottom Bar */}
+        <div style={{
+          height: 36,
+          background: 'rgba(255,107,0,0.1)',
+          border: '1px solid rgba(255,107,0,0.3)',
+          borderRadius: 6,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          gap: 10,
+          fontFamily: 'Orbitron',
+          fontSize: 10,
+          color: '#ffffff'
+        }}>
+          <span style={{ width: 6, height: 6, borderRadius: '50%', background: '#FF6B00' }} />
+          <span>LOBBY READY STATUS: <strong style={{ color: '#00D4FF' }}>ACTIVE CONTENDERS IN LOBBY</strong></span>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────
+   8. CASTERS (SOLID BG)
+────────────────────────────────────────────────── */
+function CastersScreen({ design }) {
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <GridBg design={design} />
+
+      <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        
+        {/* Header Title */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 950, color: '#ffffff', letterSpacing: '0.1em' }}>
+              OFFICIAL BROADCAST DESK
+            </div>
+            <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.2em' }}>
+              MATCH COMMENTARY & SHOUTCAST
+            </div>
+          </div>
+          <Video style={{ color: '#FF6B00' }} size={28} />
+        </div>
+
+        {/* Caster Split Screen Area */}
+        <div style={{ display: 'flex', gap: 30, alignItems: 'center', justifyContent: 'center', flex: 1, margin: '20px 0' }}>
+          
+          {/* Caster 1 Webcam Frame */}
+          <div style={{ flex: 1, height: 380, display: 'flex', flexDirection: 'column' }}>
+            <FFPanel style={{ flex: 1, background: 'rgba(0,0,0,0.6)' }}>
+              <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.3em' }}>CAM 01 // FEED ACTIVE</span>
+                
+                {/* Red Record indicator */}
+                <div style={{ position: 'absolute', top: 12, left: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#FF2020', animation: 'pulse 1s infinite' }} />
+                  <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#FF2020' }}>REC</span>
+                </div>
+              </div>
+            </FFPanel>
+            {/* Caster 1 Handle Label */}
+            <div style={{
+              background: '#060915',
+              borderLeft: '4px solid #FF6B00',
+              borderRight: '1px solid rgba(255,255,255,0.08)',
+              borderBottom: '1px solid rgba(255,255,255,0.08)',
+              padding: '10px 16px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: 10
+            }}>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff' }}>OMNIPEAK</span>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: '#FF6B00', letterSpacing: '0.1em' }}>ANALYST</span>
+            </div>
+          </div>
+
+          {/* VS Center Marker */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+            <div style={{ width: 1, height: 80, background: 'linear-gradient(transparent, #FF6B00, transparent)' }} />
+            <div style={{
+              width: 46,
+              height: 46,
+              borderRadius: '50%',
+              background: 'rgba(6,9,21,0.9)',
+              border: '2px solid #FF6B00',
+              boxShadow: '0 0 15px rgba(255,107,0,0.3)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'center'
+            }}>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: '#FF6B00' }}>VS</span>
+            </div>
+            <div style={{ width: 1, height: 80, background: 'linear-gradient(transparent, #00D4FF, transparent)' }} />
+          </div>
+
+          {/* Caster 2 Webcam Frame */}
+          <div style={{ flex: 1, height: 380, display: 'flex', flexDirection: 'column' }}>
+            <FFPanel style={{ flex: 1, background: 'rgba(0,0,0,0.6)' }}>
+              <div style={{ position: 'relative', width: '100%', height: '100%', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.3em' }}>CAM 02 // FEED ACTIVE</span>
+                
+                {/* Red Record indicator */}
+                <div style={{ position: 'absolute', top: 12, left: 12, display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <span style={{ width: 8, height: 8, borderRadius: '50%', background: '#FF2020', animation: 'pulse 1s infinite' }} />
+                  <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#FF2020' }}>REC</span>
+                </div>
+              </div>
+            </FFPanel>
+            {/* Caster 2 Handle Label */}
+            <div style={{
+              background: '#060915',
+              borderLeft: '4px solid #00D4FF',
+              borderRight: '1px solid rgba(255,255,255,0.08)',
+              borderBottom: '1px solid rgba(255,255,255,0.08)',
+              padding: '10px 16px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginTop: 10
+            }}>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#ffffff' }}>THE SHRE</span>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.1em' }}>SHOUTCASTER</span>
+            </div>
+          </div>
+
+        </div>
+
+        {/* Garena footer line */}
+        <div style={{ textAlign: 'center', fontFamily: 'Orbitron', fontSize: 8, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.3em' }}>
+          GARENA FREE FIRE ESPORTS NETWORK — LIVE PRE-MATCH TALK
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────
+   9. UPCOMING_MAP (SOLID BG)
+────────────────────────────────────────────────── */
+function UpcomingMap({ match, design }) {
+  const mapName = match?.mapName || 'KALAHARI';
+  
+  // Timer State for 5:00 countdown
+  const [seconds, setSeconds] = useState(300);
 
   useEffect(() => {
     const timer = setInterval(() => {
-      setTimeLeft(prev => (prev > 0 ? prev - 1 : 300));
+      setSeconds(prev => (prev > 0 ? prev - 1 : 0));
     }, 1000);
     return () => clearInterval(timer);
   }, []);
 
-  const formatTime = (sec) => {
-    const m = Math.floor(sec / 60).toString().padStart(2, '0');
-    const s = (sec % 60).toString().padStart(2, '0');
-    return `${m}:${s}`;
+  const formatTime = (totalSec) => {
+    const mins = Math.floor(totalSec / 60);
+    const secs = totalSec % 60;
+    return `${mins.toString().padStart(2, '0')}:${secs.toString().padStart(2, '0')}`;
   };
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
-      <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <GridBg design={design} />
 
-      <FFHeader design={design} title="COUNTDOWN TO BATTLE" right="LOADING LOBBY" />
-
-      {/* Main split content */}
-      <div className="flex-1 flex items-center justify-between px-16">
+      <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
         
-        {/* Left info box */}
-        <div className="flex flex-col max-w-[50%]">
-          <span className="font-orbitron text-[12px] font-black tracking-[0.5em]" style={{ color: cyan }}>NEXT MATCH</span>
-          <h1 className="font-orbitron text-7xl font-black text-white tracking-widest leading-none mt-2 drop-shadow-lg">
-            {mapName}
-          </h1>
-          <span className="font-orbitron text-xs font-bold tracking-[0.3em] text-white/40 uppercase mt-1">BATTLE ROYALE LOBBY</span>
-          
-          <div className="mt-8">
-            <span className="font-orbitron text-[10px] text-white/40 tracking-[0.1em]">MATCH STARTS IN</span>
-            <div className="font-orbitron text-7xl font-black mt-1 animate-pulse" style={{ color: primary, textShadow: `0 0 30px ${primary}88` }}>
-              {formatTime(timeLeft)}
-            </div>
-          </div>
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: '#FF6B00', letterSpacing: '0.3em' }}>UPCOMING DEPLOYMENT</span>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 8, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>STATUS: LOBBY LOCKDOWN</span>
         </div>
 
-        {/* Right Watermark style map block */}
-        <div className="w-[420px] h-[280px] border border-white/5 relative bg-black/40 rounded flex items-center justify-center overflow-hidden">
-          {/* Brackets */}
-          <div className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2" style={{ borderColor: primary }} />
-          <div className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2" style={{ borderColor: primary }} />
-          <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2" style={{ borderColor: primary }} />
-          <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2" style={{ borderColor: primary }} />
+        {/* Center Split Grid */}
+        <div style={{ display: 'flex', gap: 40, alignItems: 'center', flex: 1, margin: '40px 0' }}>
           
-          <div className="absolute inset-0 opacity-10 flex flex-wrap gap-2 p-4 text-[24px] font-black pointer-events-none font-orbitron text-white">
-            {Array(12).fill(mapName)}
-          </div>
-          <span className="font-orbitron text-5xl font-black tracking-widest text-white/20 uppercase">
-            {mapName}
-          </span>
-        </div>
-
-      </div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════
-   10. ELIMINATION ALERT (Full Screen Alert overlay style)
-══════════════════════════════════════════════════ */
-function EliminationAlert({ eliminations, design }) {
-  const primary = tok.acc(design);
-  const latestElim = eliminations?.[0];
-
-  if (!latestElim) return <div className="h-full w-full" style={{ background: 'transparent' }} />;
-
-  return (
-    <div className="absolute inset-0 flex items-center justify-center pointer-events-none"
-      style={{
-        background: `radial-gradient(circle, rgba(239, 68, 68, 0.35) 0%, transparent 70%)`
-      }}
-    >
-      <motion.div
-        initial={{ opacity: 0, scale: 0.5 }}
-        animate={{ opacity: 1, scale: 1 }}
-        exit={{ opacity: 0 }}
-        className="flex flex-col items-center justify-center"
-      >
-        <Skull className="h-16 w-16 text-red-500 mb-2 animate-bounce" />
-        
-        <h1 className="font-orbitron text-6xl font-black tracking-[0.3em] text-white"
-          style={{ textShadow: `0 0 40px #ef4444` }}
-        >
-          ELIMINATED
-        </h1>
-
-        <span className="font-orbitron text-2xl font-black mt-2" style={{ color: primary }}>
-          {latestElim.eliminated_player_name}
-        </span>
-
-        <span className="font-orbitron text-xs tracking-[0.1em] text-white/40 uppercase mt-1">
-          {latestElim.eliminated_team_name}
-        </span>
-      </motion.div>
-    </div>
-  );
-}
-
-/* ══════════════════════════════════════════════════
-   11. MVP (Solid BG)
-══════════════════════════════════════════════════ */
-function MVPScreen({ players, teams, design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
-
-  // Pick top player in tournament kills
-  const topPlayer = useMemo(() => {
-    return [...(players || [])].sort((a, b) => (b.total_tournament_kills || 0) - (a.total_tournament_kills || 0))[0] || null;
-  }, [players]);
-
-  const topTeam = useMemo(() => {
-    if (!topPlayer) return null;
-    return (teams || []).find(t => t.id === topPlayer.team_id) || null;
-  }, [topPlayer, teams]);
-
-  return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
-      <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 1200px 800px at 50% 50%, ${primary}15, transparent)` }} />
-
-      <FFHeader design={design} title="MATCH MVP" right="PERFORMANCE REVIEW" />
-
-      {/* Main content display split */}
-      <div className="flex-1 flex items-center justify-center gap-16 px-16">
-        
-        {/* Left Side: Avatar Display */}
-        <div className="w-[340px] h-[400px] border border-white/5 relative bg-black/40 rounded flex items-center justify-center overflow-hidden">
-          <div className="absolute left-0 top-0 h-4 w-4 border-l-2 border-t-2" style={{ borderColor: primary }} />
-          <div className="absolute right-0 top-0 h-4 w-4 border-r-2 border-t-2" style={{ borderColor: primary }} />
-          <div className="absolute bottom-0 left-0 h-4 w-4 border-b-2 border-l-2" style={{ borderColor: primary }} />
-          <div className="absolute bottom-0 right-0 h-4 w-4 border-b-2 border-r-2" style={{ borderColor: primary }} />
-
-          <div className="absolute inset-0 opacity-5 flex items-center justify-center text-[180px] font-black select-none pointer-events-none font-orbitron text-white">
-            MVP
-          </div>
-
-          <div className="flex flex-col items-center">
-            <Award className="h-20 w-20 text-yellow-500 mb-4" />
-            <span className="font-orbitron text-2xl font-black text-white uppercase tracking-wider">
-              {topPlayer?.name || 'PLAYER_ONE'}
+          {/* Left Text Detail */}
+          <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column' }}>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 13, fontWeight: 900, color: '#00D4FF', letterSpacing: '0.4em', marginBottom: 12 }}>
+              UPCOMING ARENA
             </span>
-            <span className="font-orbitron text-sm uppercase tracking-widest mt-1" style={{ color: primary }}>
-              {topTeam?.name || 'TEAM ALPHA'}
-            </span>
+            <h1 style={{
+              fontFamily: 'Orbitron',
+              fontSize: 84,
+              fontWeight: 950,
+              color: '#ffffff',
+              lineHeight: 0.9,
+              margin: 0,
+              letterSpacing: '0.02em',
+              textTransform: 'uppercase'
+            }}>
+              {mapName}
+            </h1>
+            
+            {/* Live Timer Visual */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 20, marginTop: 40 }}>
+              <div style={{
+                background: 'rgba(255,107,0,0.15)',
+                border: '1px solid rgba(255,107,0,0.4)',
+                padding: '16px 32px',
+                borderRadius: 6,
+                display: 'flex',
+                flexDirection: 'column'
+              }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: '#FF6B00', letterSpacing: '0.2em', fontWeight: 900, marginBottom: 4 }}>MATCH STARTS IN</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 44, fontWeight: 950, color: '#ffffff', letterSpacing: '0.05em' }}>
+                  {formatTime(seconds)}
+                </span>
+              </div>
+              <div style={{ display: 'flex', flexDirection: 'column', gap: 4 }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.6)' }}>COUNTDOWN CLOCK ACTIVE</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 8, color: 'rgba(255,255,255,0.3)' }}>DO NOT REFRESH DIRECT STREAM VIEW</span>
+              </div>
+            </div>
           </div>
+
+          {/* Right Map Image Card representation */}
+          <div style={{ flex: 1, height: '100%', minHeight: 340, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FFPanel style={{ width: '100%', height: '100%', minHeight: 340, padding: 6, background: 'rgba(0,0,0,0.4)' }}>
+              <div style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                background: 'rgba(10,14,30,0.9)',
+                borderRadius: 4,
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundImage: `linear-gradient(45deg, rgba(255,107,0,0.04) 25%, transparent 25%, transparent 75%, rgba(255,107,0,0.04) 75%), linear-gradient(45deg, rgba(255,107,0,0.04) 25%, transparent 25%, transparent 75%, rgba(255,107,0,0.04) 75%)`,
+                  backgroundSize: '40px 40px',
+                  backgroundPosition: '0 0, 20px 20px'
+                }} />
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 10 }}>
+                  <Zap size={44} style={{ color: '#00D4FF', animation: 'bounce 2s infinite' }} />
+                  <span style={{ fontFamily: 'Orbitron', fontSize: 13, fontWeight: 900, color: '#ffffff', letterSpacing: '0.1em' }}>TACTICAL ARENA PREPARED</span>
+                  <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: '#FF6B00' }}>4 SQUAD SURVIVAL CONTEST</span>
+                </div>
+              </div>
+            </FFPanel>
+          </div>
+
         </div>
 
-        {/* Right Side: Performance stats */}
-        <div className="flex flex-col max-w-[50%]">
-          <span className="font-orbitron text-[12px] font-black tracking-[0.4em]" style={{ color: cyan }}>TOURNAMENT STANDOUT</span>
-          <h1 className="font-orbitron text-8xl font-black text-white tracking-wider leading-none mt-2">
-            MVP
-          </h1>
-          
-          <div className="h-[2px] w-[300px] my-6" style={{ background: `linear-gradient(90deg, ${primary}, transparent)` }} />
-
-          {/* Stats grid */}
-          <div className="grid grid-cols-3 gap-4">
-            <div className="bg-black/40 border border-white/5 rounded p-4 flex flex-col justify-between w-32 h-24">
-              <span className="font-orbitron text-[10px] text-white/40 tracking-wider">TOTAL KILLS</span>
-              <span className="font-orbitron text-3xl font-black text-white">{topPlayer?.total_tournament_kills || 0}</span>
-            </div>
-            <div className="bg-black/40 border border-white/5 rounded p-4 flex flex-col justify-between w-32 h-24">
-              <span className="font-orbitron text-[10px] text-white/40 tracking-wider">MATCH KILLS</span>
-              <span className="font-orbitron text-3xl font-black text-white">{topPlayer?.current_match_kills || 0}</span>
-            </div>
-            <div className="bg-black/40 border border-white/5 rounded p-4 flex flex-col justify-between w-32 h-24">
-              <span className="font-orbitron text-[10px] text-white/40 tracking-wider">SURVIVAL</span>
-              <span className="font-orbitron text-3xl font-black" style={{ color: cyan }}>ALIVE</span>
-            </div>
-          </div>
+        {/* Footer */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: 'rgba(255,255,255,0.4)' }}>GARENA ESPORTS GRAND FINAL 2026</span>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: '#00D4FF', fontWeight: 700 }}>MATCH #2 STAGE PREPARATION</span>
         </div>
 
       </div>
@@ -902,128 +1116,390 @@ function MVPScreen({ players, teams, design }) {
   );
 }
 
-/* ══════════════════════════════════════════════════
-   12. CHAMPIONS / BOOYAH (Solid BG)
-══════════════════════════════════════════════════ */
-function ChampionsScreen({ teams, design }) {
-  const primary = tok.acc(design);
-  const cyan    = tok.acc2(design);
-
-  // Top ranking team
-  const championTeam = useMemo(() => {
-    return [...(teams || [])].sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0))[0] || null;
-  }, [teams]);
+/* ──────────────────────────────────────────────────
+   10. ELIMINATION_ALERT (SOLID BG / FLASH)
+────────────────────────────────────────────────── */
+function EliminationAlert({ eliminations = [], design }) {
+  const latestElim = eliminations[eliminations.length - 1];
+  const teamName = latestElim?.teamName || 'TEAM TITANS';
+  const reason = latestElim?.reason || 'WIPED OUT';
 
   return (
-    <div className="relative flex h-full w-full flex-col overflow-hidden" style={{ background: carbonFiberBg }}>
-      {/* Golden volumetric glows */}
-      <div className="absolute inset-0" style={{ background: `radial-gradient(ellipse 800px 600px at 50% 40%, rgba(251,191,36,0.2), transparent)` }} />
-      <div className="absolute inset-0 opacity-10"
-        style={{ backgroundImage: `linear-gradient(${primary}12 1px, transparent 1px), linear-gradient(90deg, ${primary}12 1px, transparent 1px)`, backgroundSize: '80px 80px' }} />
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      background: '#060915'
+    }}>
+      {/* Red Radial Alert Glow */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle, rgba(255,32,32,0.18) 0%, transparent 70%)',
+        zIndex: 0
+      }} />
 
-      {/* Confetti Particle System */}
-      <div className="absolute inset-0 pointer-events-none overflow-hidden">
-        {[...Array(30)].map((_, i) => {
-          const delay = Math.random() * 4;
-          const duration = 2 + Math.random() * 2;
-          const colors = ['#f97316', '#00d4ff', '#fbbf24', '#ffffff'];
-          const randomColor = colors[Math.floor(Math.random() * colors.length)];
-          const width = 2 + Math.random() * 4;
-          const height = 4 + Math.random() * 6;
-
-          return (
-            <div
-              key={i}
-              className="absolute bg-white rounded-sm"
-              style={{
-                left: `${Math.random() * 100}%`,
-                top: `-20px`,
-                width: width,
-                height: height,
-                background: randomColor,
-                opacity: 0.8,
-                animation: `confetti-fall ${duration}s linear infinite`,
-                animationDelay: `${delay}s`
-              }}
-            />
-          );
-        })}
-      </div>
-
-      <FFHeader design={design} title="VICTORY CEREMONY" right="FINAL STANDINGS" />
-
-      {/* Hero center presentation */}
-      <div className="flex-1 flex flex-col items-center justify-center relative">
+      <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: 800 }}>
+        
+        {/* Animated Skull / Crosshair Icon with shaking motion effect */}
         <motion.div
-          initial={{ opacity: 0, y: -80 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ type: 'spring', stiffness: 80, damping: 15 }}
-          className="mb-2"
+          animate={{ scale: [1, 1.1, 1], rotate: [0, -3, 3, -3, 0] }}
+          transition={{ repeat: Infinity, duration: 1.5 }}
+          style={{ marginBottom: 30 }}
         >
-          <Crown className="h-16 w-16 text-yellow-500" />
+          <XCircle size={90} style={{ color: '#FF2020', filter: 'drop-shadow(0 0 20px rgba(255,32,32,0.6))' }} />
         </motion.div>
 
-        <motion.h1
-          initial={{ opacity: 0, scale: 0.5 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ type: 'spring', stiffness: 90, damping: 14 }}
-          className="font-orbitron font-black text-9xl tracking-widest leading-none text-white uppercase"
-          style={{
-            textShadow: `0 0 60px #f97316cc, 0 0 120px #fbbf2455`,
-            WebkitTextStroke: `1px rgba(251,191,36,0.4)`
-          }}
-        >
-          BOOYAH!
-        </motion.h1>
-
-        <span className="font-orbitron text-lg font-black tracking-[0.6em] text-cyan-400 uppercase mt-4">
-          CHAMPIONS
+        {/* Main Alert Sub-label */}
+        <span style={{
+          fontFamily: 'Orbitron',
+          fontSize: 14,
+          fontWeight: 900,
+          color: '#FF2020',
+          letterSpacing: '0.6em',
+          textTransform: 'uppercase',
+          marginBottom: 12
+        }}>
+          SQUAD ELIMINATED
         </span>
 
-        {/* Winner display card */}
-        {championTeam && (
-          <motion.div
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.4 }}
-            className="mt-8 p-6 rounded-xl border border-yellow-500/30 w-[600px] flex items-center justify-between"
-            style={{
-              background: 'rgba(5, 8, 20, 0.92)',
-              backdropFilter: 'blur(16px)',
-              boxShadow: `0 0 40px rgba(251,191,36,0.15)`
-            }}
-          >
-            <div className="flex items-center gap-4">
-              {championTeam.logo_url ? (
-                <img src={championTeam.logo_url} alt="" className="h-14 w-14 rounded-full object-cover border border-white/20" />
-              ) : (
-                <div className="flex h-14 w-14 items-center justify-center rounded-full text-lg font-black text-white" style={{ background: primary }}>
-                  {championTeam.name.slice(0, 2).toUpperCase()}
-                </div>
-              )}
-              <div className="flex flex-col">
-                <span className="font-orbitron text-xl font-black text-white uppercase tracking-wide">
-                  {championTeam.name}
-                </span>
-                <span className="font-orbitron text-[10px] tracking-wider text-yellow-500 uppercase font-black">
-                  TOURNAMENT CHAMPION
-                </span>
-              </div>
-            </div>
+        {/* Team Name */}
+        <h1 style={{
+          fontFamily: 'Orbitron',
+          fontSize: 72,
+          fontWeight: 950,
+          color: '#ffffff',
+          lineHeight: 1,
+          margin: '0 0 16px 0',
+          letterSpacing: '0.02em',
+          textShadow: '0 0 30px rgba(255,32,32,0.4)',
+          textTransform: 'uppercase'
+        }}>
+          {teamName}
+        </h1>
 
-            {/* Performance numbers */}
-            <div className="grid grid-cols-2 gap-4 border-l border-white/10 pl-6">
-              <div className="flex flex-col">
-                <span className="font-orbitron text-[9px] text-white/40">TOTAL POINTS</span>
-                <span className="font-orbitron text-xl font-black text-white">{championTeam.total_tournament_points || 0}</span>
+        {/* Team Status Reason */}
+        <div style={{
+          background: 'rgba(255,32,32,0.12)',
+          border: '1px solid rgba(255,32,32,0.3)',
+          borderRadius: 4,
+          padding: '8px 24px',
+          fontFamily: 'Orbitron',
+          fontSize: 12,
+          fontWeight: 900,
+          color: '#FF2020',
+          letterSpacing: '0.2em'
+        }}>
+          {reason} // SQUAD DISMISSED
+        </div>
+
+        <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em', marginTop: 40 }}>
+          RANK ASSIGNED AT TIME OF TERMINATION
+        </span>
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────
+   11. MVP (SOLID BG)
+────────────────────────────────────────────────── */
+function MVPScreen({ players = [], teams = [], design }) {
+  // Extract MVP stats
+  const mvpPlayerName = 'VIPER_X';
+  const teamName = 'GODLIKE ESPORTS';
+  const kills = 12;
+  const damage = 2850;
+  const assists = 4;
+
+  return (
+    <div style={{ position: 'relative', width: '100%', height: '100%', overflow: 'hidden', display: 'flex', flexDirection: 'column' }}>
+      <GridBg design={design} />
+
+      <div style={{ position: 'relative', zIndex: 1, padding: 40, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
+        
+        {/* Header */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+          <div>
+            <div style={{ fontFamily: 'Orbitron', fontSize: 22, fontWeight: 950, color: '#ffffff', letterSpacing: '0.1em' }}>
+              MATCH MVP PERFORMA
+            </div>
+            <div style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.2em' }}>
+              MOST VALUABLE PLAYER PROFILE
+            </div>
+          </div>
+          <Award style={{ color: '#FF6B00' }} size={28} />
+        </div>
+
+        {/* Center Split Grid */}
+        <div style={{ display: 'flex', gap: 40, alignItems: 'center', flex: 1, margin: '30px 0' }}>
+          
+          {/* Left Player Avatar Silhouette Box */}
+          <div style={{ flex: 1, height: '100%', minHeight: 380, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <FFPanel style={{ width: '100%', height: '100%', minHeight: 380, padding: 6, background: 'rgba(0,0,0,0.5)' }}>
+              <div style={{
+                position: 'relative',
+                width: '100%',
+                height: '100%',
+                background: 'rgba(10,14,30,0.9)',
+                borderRadius: 4,
+                overflow: 'hidden',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center'
+              }}>
+                <div style={{
+                  position: 'absolute',
+                  inset: 0,
+                  backgroundImage: `radial-gradient(#FF6B00 1px, transparent 1px)`,
+                  backgroundSize: '24px 24px',
+                  opacity: 0.1
+                }} />
+                {/* Silhouette placeholder graphic */}
+                <div style={{ position: 'relative', zIndex: 1, display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 12 }}>
+                  <div style={{
+                    width: 110,
+                    height: 110,
+                    borderRadius: '50%',
+                    background: 'rgba(255,107,0,0.1)',
+                    border: '2px solid #FF6B00',
+                    display: 'flex',
+                    alignItems: 'center',
+                    justifyContent: 'center'
+                  }}>
+                    <Users size={48} style={{ color: '#FF6B00' }} />
+                  </div>
+                  <span style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: '#ffffff', letterSpacing: '0.2em' }}>PHOTO SECURE</span>
+                </div>
               </div>
-              <div className="flex flex-col">
-                <span className="font-orbitron text-[9px] text-white/40">TOTAL KILLS</span>
-                <span className="font-orbitron text-xl font-black text-white">{championTeam.total_tournament_kills || 0}</span>
+            </FFPanel>
+          </div>
+
+          {/* Right Stats Frame */}
+          <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 950, color: '#00D4FF', letterSpacing: '0.3em', marginBottom: 6 }}>
+              MATCH CHAMPION MVP
+            </span>
+            <h1 style={{
+              fontFamily: 'Orbitron',
+              fontSize: 64,
+              fontWeight: 950,
+              color: '#ffffff',
+              lineHeight: 0.9,
+              margin: '0 0 4px 0',
+              textShadow: '0 0 20px rgba(255,107,0,0.3)',
+              textTransform: 'uppercase'
+            }}>
+              {mvpPlayerName}
+            </h1>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 700, color: '#FF6B00', letterSpacing: '0.1em', marginBottom: 30 }}>
+              {teamName}
+            </span>
+
+            {/* Stat Cards Row */}
+            <div style={{ display: 'flex', gap: 12 }}>
+              <div style={{
+                flex: 1,
+                background: 'rgba(255,107,0,0.1)',
+                border: '1px solid rgba(255,107,0,0.3)',
+                padding: 16,
+                borderRadius: 6,
+                textAlign: 'center'
+              }}>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 9, color: '#FF6B00', letterSpacing: '0.1em', fontWeight: 900 }}>TOTAL KILLS</div>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 32, fontWeight: 950, color: '#ffffff', marginTop: 4 }}>{kills}</div>
+              </div>
+              <div style={{
+                flex: 1,
+                background: 'rgba(0,212,255,0.1)',
+                border: '1px solid rgba(0,212,255,0.3)',
+                padding: 16,
+                borderRadius: 6,
+                textAlign: 'center'
+              }}>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 9, color: '#00D4FF', letterSpacing: '0.1em', fontWeight: 900 }}>DAMAGE DEAL</div>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 32, fontWeight: 950, color: '#ffffff', marginTop: 4 }}>{damage}</div>
+              </div>
+              <div style={{
+                flex: 1,
+                background: 'rgba(255,255,255,0.03)',
+                border: '1px solid rgba(255,255,255,0.08)',
+                padding: 16,
+                borderRadius: 6,
+                textAlign: 'center'
+              }}>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 9, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em', fontWeight: 900 }}>ASSISTS</div>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 32, fontWeight: 950, color: '#ffffff', marginTop: 4 }}>{assists}</div>
               </div>
             </div>
-          </motion.div>
-        )}
+          </div>
+
+        </div>
+
+        {/* Footer */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderTop: '1px solid rgba(255,255,255,0.06)', paddingTop: 20 }}>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 8, color: 'rgba(255,255,255,0.3)' }}>LOBBY DATA INTEGRATION STATUS: SECURE</span>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 8, color: '#00D4FF', fontWeight: 700 }}>GARENA OFFICIAL DESIGN PACK</span>
+        </div>
+
+      </div>
+    </div>
+  );
+}
+
+/* ──────────────────────────────────────────────────
+   12. CHAMPIONS / BOOYAH (SOLID BG)
+────────────────────────────────────────────────── */
+function ChampionsScreen({ teams = [], design }) {
+  const winnerTeam = teams[0]?.name || 'GLORY ESPORTS';
+  
+  // Confetti array
+  const confettiParticles = Array.from({ length: 30 });
+
+  return (
+    <div style={{
+      position: 'relative',
+      width: '100%',
+      height: '100%',
+      overflow: 'hidden',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center',
+      background: '#060915'
+    }}>
+      {/* Fallback CSS Confetti Style Tags */}
+      <style>{`
+        @keyframes confettiFall {
+          0% { transform: translateY(-50px) rotate(0deg); opacity: 1; }
+          100% { transform: translateY(1100px) rotate(360deg); opacity: 0; }
+        }
+        @keyframes crownPulse {
+          0%, 100% { transform: scale(1); filter: drop-shadow(0 0 15px rgba(255,184,0,0.6)); }
+          50% { transform: scale(1.08); filter: drop-shadow(0 0 35px rgba(255,184,0,0.9)); }
+        }
+      `}</style>
+
+      {/* Gold Ambient Glow Background */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        background: 'radial-gradient(circle, rgba(255,184,0,0.12) 0%, transparent 75%)',
+        zIndex: 0
+      }} />
+
+      {/* Confetti Particles */}
+      {confettiParticles.map((_, i) => {
+        const left = Math.random() * 100;
+        const delay = Math.random() * 6;
+        const duration = 4 + Math.random() * 4;
+        const size = 6 + Math.random() * 10;
+        const color = ['#FFB800', '#FF6B00', '#00D4FF', '#ffffff'][Math.floor(Math.random() * 4)];
+        return (
+          <div key={i} style={{
+            position: 'absolute',
+            top: -20,
+            left: `${left}%`,
+            width: size,
+            height: size,
+            backgroundColor: color,
+            borderRadius: Math.random() > 0.5 ? '50%' : 2,
+            opacity: 0.8,
+            zIndex: 1,
+            animation: `confettiFall ${duration}s linear infinite`,
+            animationDelay: `${delay}s`
+          }} />
+        );
+      })}
+
+      {/* Main Champions Container */}
+      <div style={{ position: 'relative', zIndex: 2, display: 'flex', flexDirection: 'column', alignItems: 'center', textAlign: 'center', maxWidth: 900 }}>
+        
+        {/* Crown Icon */}
+        <div style={{
+          animation: 'crownPulse 2.5s infinite ease-in-out',
+          marginBottom: 16
+        }}>
+          <Crown size={72} style={{ color: '#FFB800' }} />
+        </div>
+
+        {/* Big Booyah Text */}
+        <h1 style={{
+          fontFamily: 'Orbitron',
+          fontSize: 104,
+          fontWeight: 950,
+          background: 'linear-gradient(135deg, #FFB800 0%, #FF6B00 100%)',
+          WebkitBackgroundClip: 'text',
+          WebkitTextFillColor: 'transparent',
+          lineHeight: 0.9,
+          margin: '0 0 16px 0',
+          letterSpacing: '0.04em',
+          filter: 'drop-shadow(0 0 30px rgba(255,107,0,0.35))'
+        }}>
+          BOOYAH!
+        </h1>
+
+        {/* Sub label */}
+        <span style={{
+          fontFamily: 'Orbitron',
+          fontSize: 12,
+          fontWeight: 900,
+          color: '#00D4FF',
+          letterSpacing: '0.5em',
+          textTransform: 'uppercase',
+          marginBottom: 24
+        }}>
+          TOURNAMENT CHAMPION DECLARED
+        </span>
+
+        {/* Winner Card Panel */}
+        <FFPanel style={{ width: 500, padding: 24, background: 'rgba(6,9,21,0.96)' }}>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 13, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>MATCH WINNER</span>
+            
+            <span style={{
+              fontFamily: 'Orbitron',
+              fontSize: 32,
+              fontWeight: 950,
+              color: '#ffffff',
+              marginTop: 10,
+              letterSpacing: '0.05em',
+              textTransform: 'uppercase'
+            }}>
+              {winnerTeam}
+            </span>
+
+            {/* Micro Stats inside Card */}
+            <div style={{
+              borderTop: '1px solid rgba(255,255,255,0.06)',
+              marginTop: 20,
+              paddingTop: 16,
+              width: '100%',
+              display: 'flex',
+              justifyContent: 'space-around',
+              fontFamily: 'Orbitron'
+            }}>
+              <div>
+                <div style={{ fontSize: 9, color: '#FF6B00', letterSpacing: '0.1em' }}>TOTAL KILLS</div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: '#ffffff', marginTop: 2 }}>24 KILLS</div>
+              </div>
+              <div style={{ width: 1, background: 'rgba(255,255,255,0.06)' }} />
+              <div>
+                <div style={{ fontSize: 9, color: '#00D4FF', letterSpacing: '0.1em' }}>MATCH POINT</div>
+                <div style={{ fontSize: 18, fontWeight: 900, color: '#ffffff', marginTop: 2 }}>+32 PTS</div>
+              </div>
+            </div>
+          </div>
+        </FFPanel>
+
+        <span style={{ fontFamily: 'Orbitron', fontSize: 9, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.15em', marginTop: 40 }}>
+          CONGRATULATIONS TO ALL TEAMS AND CONTENDERS
+        </span>
       </div>
     </div>
   );
@@ -1057,9 +1533,9 @@ export default function Overlay() {
       case 'pre_match_map':
         return <PreMatchMap match={currentMatch} teams={teams} design={design} />;
       case 'ff_scoreboard':
-        return <FFBoard teams={teams} players={players} currentMatch={currentMatch} design={design} />;
+        return <FFBoard teams={teams} currentMatch={currentMatch} design={design} />;
       case 'scoreboard':
-        return <FullStandings teams={teams} players={players} design={design} />;
+        return <FullStandings teams={teams} design={design} />;
       case 'kill_feed':
         return <KillFeedScreen killFeed={killFeed} design={design} />;
       case 'todays_matches':
