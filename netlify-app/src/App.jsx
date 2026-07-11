@@ -1,21 +1,25 @@
-import { BrowserRouter as Router, Routes, Route, Link, useLocation } from 'react-router-dom';
+import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
+import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import ScrollToTop from '@/components/ScrollToTop';
+import AuthPage from '@/pages/AuthPage';
+import PricingPage from '@/pages/PricingPage';
 import DirectorPanel from './pages/DirectorPanel';
 import DataInputer from './pages/DataInputer';
 import Overlay from './pages/Overlay';
 import PinGate from './components/PinGate';
 import { useOverlayData } from '@/lib/overlayApi';
-import { Clapperboard, Keyboard, Monitor, ExternalLink, Zap } from 'lucide-react';
+import { Clapperboard, Keyboard, Monitor, ExternalLink, Zap, LogOut } from 'lucide-react';
 
 const queryClient = new QueryClient();
 
 function NavBarContent() {
   const loc = useLocation();
   const { data } = useOverlayData(true);
+  const { user, logout } = useAuth();
 
-  if (loc.pathname === '/overlay') return null;
+  if (loc.pathname === '/overlay' || !user) return null;
 
   const currentScreenName = data?.overlayState?.current_screen 
     ? data.overlayState.current_screen.replace(/_/g, ' ').toUpperCase()
@@ -59,7 +63,7 @@ function NavBarContent() {
         })}
       </div>
 
-      {/* Right: Status Pill & OBS Link */}
+      {/* Right: Status Pill & OBS Link & Logout */}
       <div className="flex items-center gap-3">
         <div className="flex items-center gap-2 rounded-full border border-[rgba(255,107,0,0.4)] bg-[#09090f] px-3 py-1">
           <span className="relative flex h-2 w-2">
@@ -81,6 +85,13 @@ function NavBarContent() {
           OBS SOURCE
           <ExternalLink className="h-3 w-3" />
         </a>
+
+        <button 
+          onClick={logout}
+          className="flex items-center gap-1 text-[10px] font-orbitron text-gray-500 hover:text-red-400 transition-colors bg-[#0f0f1a] border border-white/10 px-3 py-1.5 rounded-lg font-black"
+        >
+          <LogOut className="w-3.5 h-3.5" /> LOGOUT
+        </button>
       </div>
 
       {/* Bottom gradient strip */}
@@ -93,31 +104,60 @@ function NavBar() {
   return <NavBarContent />;
 }
 
+function AppRoutes() {
+  const { user, subscription, loading } = useAuth();
+
+  if (loading) return (
+    <div className="flex h-screen items-center justify-center bg-[#060915]">
+      <div className="h-10 w-10 rounded-full border-4 border-[#FF6B00]/20 border-t-[#FF6B00] animate-spin" />
+    </div>
+  );
+
+  // Not logged in
+  if (!user) return (
+    <Routes>
+      <Route path="/overlay" element={<Overlay />} />
+      <Route path="*" element={<AuthPage />} />
+    </Routes>
+  );
+
+  // Check subscription active
+  const isSubscribed = subscription?.status === 'active' && subscription?.expiresAt > Date.now();
+
+  // No active subscription
+  if (!isSubscribed) return (
+    <Routes>
+      <Route path="/overlay" element={<Overlay />} />
+      <Route path="*" element={<PricingPage />} />
+    </Routes>
+  );
+
+  // Fully authenticated + subscribed
+  return (
+    <Routes>
+      <Route path="/" element={<Navigate to="/director" replace />} />
+      <Route path="/director" element={<PinGate role="director"><DirectorPanel /></PinGate>} />
+      <Route path="/inputer" element={<PinGate role="inputer"><DataInputer /></PinGate>} />
+      <Route path="/control-panel" element={<Navigate to="/director" replace />} />
+      <Route path="/overlay" element={<Overlay />} />
+      <Route path="*" element={<Navigate to="/director" replace />} />
+    </Routes>
+  );
+}
+
 export default function App() {
   return (
     <QueryClientProvider client={queryClient}>
       <Router>
-        <ScrollToTop />
-        <div className="flex h-screen flex-col bg-[#09090f] text-white overflow-hidden">
-          <NavBar />
-          <div className="flex-1 overflow-hidden min-h-0">
-            <Routes>
-              <Route path="/" element={
-                <PinGate role="director"><DirectorPanel /></PinGate>
-              } />
-              <Route path="/director" element={
-                <PinGate role="director"><DirectorPanel /></PinGate>
-              } />
-              <Route path="/inputer" element={
-                <PinGate role="inputer"><DataInputer /></PinGate>
-              } />
-              <Route path="/control-panel" element={
-                <PinGate role="director"><DirectorPanel /></PinGate>
-              } />
-              <Route path="/overlay" element={<Overlay />} />
-            </Routes>
+        <AuthProvider>
+          <ScrollToTop />
+          <div className="flex h-screen flex-col bg-[#09090f] text-white overflow-hidden">
+            <NavBar />
+            <div className="flex-1 overflow-hidden min-h-0">
+              <AppRoutes />
+            </div>
           </div>
-        </div>
+        </AuthProvider>
       </Router>
       <Toaster position="top-right" toastOptions={{
         style: { background: '#16161f', color: '#fff', border: '1px solid rgba(249,115,22,0.3)', fontSize: '12px', fontFamily: 'Orbitron, sans-serif', fontWeight: '600' },

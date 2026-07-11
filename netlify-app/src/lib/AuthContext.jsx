@@ -1,71 +1,45 @@
-import React, { createContext, useState, useContext, useEffect } from 'react';
-import { base44 } from '@/api/base44Client';
+import React, { createContext, useContext, useState, useEffect } from 'react';
+import { onAuthStateChanged, signOut } from 'firebase/auth';
+import { auth } from './firebase';
 
-const AuthContext = createContext();
+const AuthContext = createContext(null);
 
-export const AuthProvider = ({ children }) => {
-  const [user, setUser] = useState(null);
-  const [loading, setLoading] = useState(true);
+export function AuthProvider({ children }) {
+  const [user, setUser]               = useState(null);
+  const [subscription, setSubscription] = useState(null);
+  const [loading, setLoading]         = useState(true);
 
   useEffect(() => {
-    const fetchUser = async () => {
-      try {
-        const isAuth = await base44.auth.isAuthenticated();
-        if (isAuth) {
-          const me = await base44.auth.me();
-          setUser(me);
-        } else {
-          setUser(null);
+    const unsub = onAuthStateChanged(auth, async (fbUser) => {
+      setUser(fbUser);
+      if (fbUser) {
+        // Check subscription via backend
+        try {
+          const token = await fbUser.getIdToken();
+          const r = await fetch('/api/checkSubscription', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json', Authorization: `Bearer ${token}` },
+          });
+          const data = r.ok ? await r.json() : {};
+          setSubscription(data.subscription || null);
+        } catch (e) {
+          setSubscription(null);
         }
-      } catch (e) {
-        setUser(null);
-      } finally {
-        setLoading(false);
+      } else {
+        setSubscription(null);
       }
-    };
-    fetchUser();
+      setLoading(false);
+    });
+    return unsub;
   }, []);
 
-  const fetchUser = async () => {
-    try {
-      const isAuth = await base44.auth.isAuthenticated();
-      if (isAuth) {
-        const me = await base44.auth.me();
-        setUser(me);
-      } else {
-        setUser(null);
-      }
-    } catch (e) {
-      setUser(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const logout = async (redirectUrl) => {
-    await base44.auth.logout(redirectUrl);
-    setUser(null);
-  };
-
-  const redirectToLogin = (nextUrl) => {
-    base44.auth.redirectToLogin(nextUrl);
-  };
-
-  const updateUser = (data) => {
-    setUser((prev) => ({ ...prev, ...data }));
-  };
+  const logout = () => signOut(auth);
 
   return (
-    <AuthContext.Provider value={{ user, loading, fetchUser, logout, redirectToLogin, updateUser }}>
+    <AuthContext.Provider value={{ user, subscription, loading, logout }}>
       {children}
     </AuthContext.Provider>
   );
-};
+}
 
-export const useAuth = () => {
-  const context = useContext(AuthContext);
-  if (!context) {
-    throw new Error('useAuth must be used within an AuthProvider');
-  }
-  return context;
-};
+export const useAuth = () => useContext(AuthContext);
