@@ -230,6 +230,18 @@ exports.handler = async (event) => {
       return ok({ success: true });
     }
 
+
+    // ── BOOTSTRAP FIRST ADMIN (one-time setup, requires SUPER_ADMIN_SECRET) ──
+    if (route === 'bootstrap-admin' && event.httpMethod === 'POST') {
+      const { secret, uid, email } = body;
+      const superSecret = process.env.SUPER_ADMIN_SECRET;
+      if (!superSecret) return err(500, 'SUPER_ADMIN_SECRET env var not set');
+      if (secret !== superSecret) return err(403, 'Invalid secret');
+      if (!uid || !email) return err(400, 'uid and email required');
+      await dbSet(`/booyah_admin/admins/${uid}`, { uid, email, enabled: true, addedAt: Date.now() });
+      return ok({ success: true, message: `Admin ${email} bootstrapped. Remove SUPER_ADMIN_SECRET from env after use.` });
+    }
+
     return err(404, `Unknown admin route: ${route}`);
   } catch (e) {
     console.error('[admin-api]', e.message);
