@@ -1,8 +1,9 @@
 const fs = require('fs');
 const path = require('path');
 
-// Netlify (and all serverless): only /tmp is writable at runtime
-// Locally: use a ./data/ folder relative to repo root
+// Netlify (and all serverless): only /tmp is writable at runtime.
+// BUT since /tmp data is ephemeral and can disappear between serverless container invocations,
+// we must make sure we try our best to load/save correctly, and that we handle missing directories.
 const IS_SERVERLESS = process.env.NETLIFY || process.env.VERCEL || process.env.AWS_LAMBDA_FUNCTION_NAME;
 const DATA_DIR = IS_SERVERLESS ? '/tmp' : path.join(process.cwd(), 'data');
 const DB_FILE = path.join(DATA_DIR, 'booyah.json');
@@ -46,12 +47,14 @@ function loadDb() {
 }
 
 function saveDb(db) {
-  // /tmp always exists on serverless — no mkdir needed
-  // Locally, create ./data/ if it doesn't exist
-  if (!IS_SERVERLESS && !fs.existsSync(DATA_DIR)) {
-    fs.mkdirSync(DATA_DIR, { recursive: true });
+  try {
+    if (!fs.existsSync(DATA_DIR)) {
+      fs.mkdirSync(DATA_DIR, { recursive: true });
+    }
+    fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
+  } catch (e) {
+    console.error('Failed to save DB:', e);
   }
-  fs.writeFileSync(DB_FILE, JSON.stringify(db, null, 2));
 }
 
 module.exports = { loadDb, saveDb, genId };

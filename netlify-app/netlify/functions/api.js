@@ -28,19 +28,84 @@ exports.handler = async (event) => {
 
   const pathParts = event.path.replace('/.netlify/functions/api', '').replace('/api', '').split('/').filter(Boolean);
   const route = pathParts[0] || '';
-  const body = event.body ? JSON.parse(event.body) : {};
+  
+  let body = {};
+  if (event.body) {
+    try {
+      body = JSON.parse(event.body);
+    } catch (e) {
+      return err(400, 'Invalid JSON body');
+    }
+  }
 
   try {
     const db = loadDb();
     if (!db.design) db.design = { ...DEFAULT_DESIGN };
+    if (!db.tournaments) db.tournaments = [];
+    if (!db.teams) db.teams = [];
+    if (!db.players) db.players = [];
+    if (!db.matches) db.matches = [];
+    if (!db.match_standings) db.match_standings = [];
+    if (!db.kill_events) db.kill_events = [];
+    if (!db.elimination_events) db.elimination_events = [];
+    if (!db.overlay_state) {
+      db.overlay_state = {
+        id: 'singleton',
+        tournament_id: null,
+        current_screen: 'setup_blank',
+        mvp_player_id: null,
+        mvp_player_name: null,
+        mvp_team_name: null,
+        mvp_kills: 0,
+        champion_team_id: null,
+        champion_team_name: null,
+        champion_total_points: 0,
+        last_updated_at: new Date().toISOString()
+      };
+    }
 
     // ── GET OVERLAY DATA ──────────────────────────────────────────
     if (route === 'getOverlayData') {
       const tournament = db.tournaments.find(t => t.status === 'active') || db.tournaments[db.tournaments.length - 1] || null;
-      if (!tournament) return ok({ tournament: null, overlay_state: db.overlay_state, design: db.design, teams: [], players: [], current_match: null, kill_feed: [], eliminations: [], standings: [] });
+      if (!tournament) {
+        return ok({
+          tournament: null,
+          overlay_state: db.overlay_state,
+          design: db.design,
+          teams: [],
+          players: [],
+          current_match: null,
+          kill_feed: [],
+          eliminations: [],
+          standings: []
+        });
+      }
       const tid = tournament.id;
-      const teams = db.teams.filter(t => t.tournament_id === tid).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
-      const players = db.players.filter(p => p.tournament_id === tid);
+      const teams = db.teams.filter(t => t.tournament_id === tid).map(t => {
+        // Compute total_tournament_points dynamically from match_standings and kills to ensure data integrity
+        const standingsForTeam = db.match_standings.filter(s => s.tournament_id === tid && s.team_id === t.id);
+        const placementPoints = standingsForTeam.reduce((sum, s) => sum + (s.placement_points_awarded || 0), 0);
+        
+        // Sum player kills for total tournament kills
+        const teamPlayers = db.players.filter(p => p.team_id === t.id);
+        const totalKills = teamPlayers.reduce((sum, p) => sum + (p.total_tournament_kills || 0), 0);
+        
+        const pointsPerKill = tournament.points_per_kill || 1;
+        const totalPoints = placementPoints + (totalKills * pointsPerKill);
+
+        return {
+          ...t,
+          total_tournament_kills: totalKills,
+          total_tournament_points: totalPoints
+        };
+      }).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
+
+      // Map players and attach the 'is_alive' field dynamically (default to true if missing)
+      const players = db.players.filter(p => p.tournament_id === tid).map(p => ({
+        ...p,
+        is_alive: p.is_alive !== undefined ? p.is_alive : true
+      }));
+
       const matches = db.matches.filter(m => m.tournament_id === tid).sort((a, b) => (b.match_number || 0) - (a.match_number || 0));
       const currentMatch = matches[0] || null;
       let killFeed = [], eliminations = [], standings = [];
@@ -108,7 +173,6 @@ exports.handler = async (event) => {
       saveDb(db);
       return ok({ success: true, player });
     }
-
 
     // ── START NEXT MATCH ──────────────────────────────────────────
     if (route === 'startNextMatch') {
@@ -271,6 +335,7 @@ exports.handler = async (event) => {
       if (!team_id) return err(400, 'team_id required');
       db.teams = db.teams.filter(t => t.id !== team_id);
       db.players = db.players.filter(p => p.team_id !== team_id);
+      db.match_standings = db.match_standings.filter(s => s.team_id !== team_id);
       saveDb(db);
       return ok({ success: true });
     }
@@ -314,7 +379,6 @@ exports.handler = async (event) => {
       saveDb(db);
       return ok({ success: true, tournament: db.tournaments[tIdx] });
     }
-
 
     return err(404, `Unknown route: ${route}`);
   } catch (e) {
