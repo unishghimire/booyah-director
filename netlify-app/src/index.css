@@ -144,3 +144,20 @@
 .overlay-canvas::-webkit-scrollbar {
   display: none;
 }
+/* FF Championship scrollbar */
+* { scrollbar-width: thin; scrollbar-color: rgba(255,107,0,0.3) rgba(255,255,255,0.03); }
+*::-webkit-scrollbar { width: 4px; height: 4px; }
+*::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
+*::-webkit-scrollbar-thumb { background: rgba(255,107,0,0.4); border-radius: 2px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(255,107,0,0.7); }
+
+/* FF Championship selection */
+::selection { background: rgba(255,107,0,0.3); color: white; }
+
+/* Pulse animation */
+@keyframes ff-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
+.ff-pulse { animation: ff-pulse 2s ease-in-out infinite; }
+
+/* Glow text */
+@keyframes ff-glow { 0%,100% { text-shadow: 0 0 20px rgba(255,107,0,0.6); } 50% { text-shadow: 0 0 40px rgba(255,107,0,1), 0 0 80px rgba(255,107,0,0.4); } }
+.ff-glow-text { animation: ff-glow 3s ease-in-out infinite; }
