@@ -8,6 +8,7 @@ import PricingPage from '@/pages/PricingPage';
 import DirectorPanel from './pages/DirectorPanel';
 import DataInputer from './pages/DataInputer';
 import Overlay from './pages/Overlay';
+import OverlayLinks from './pages/OverlayLinks';
 import PinGate from './components/PinGate';
 import { useOverlayData } from '@/lib/overlayApi';
 import { Clapperboard, Keyboard, Monitor, ExternalLink, Zap, LogOut } from 'lucide-react';
@@ -27,6 +28,7 @@ function NavBarContent() {
 
   const tabs = [
     { to: '/director', label: 'DIRECTOR', icon: Clapperboard, activeBg: 'rgba(255,107,0,0.15)', activeColor: '#FF6B00' },
+    { to: '/overlay-links', label: 'OBS LINKS', icon: Monitor, activeBg: 'rgba(0,212,255,0.15)', activeColor: '#00D4FF' },
     { to: '/inputer',  label: 'DATA INPUTER', icon: Keyboard, activeBg: 'rgba(0,212,255,0.15)', activeColor: '#00D4FF' },
   ];
 
@@ -116,7 +118,8 @@ function AppRoutes() {
   // Not logged in
   if (!user) return (
     <Routes>
-      <Route path="/overlay" element={<Overlay />} />
+      <Route path="/overlay" element={<Navigate to="/overlay/blank" replace />} />
+      <Route path="/overlay/:screen" element={<Overlay />} />
       <Route path="*" element={<AuthPage />} />
     </Routes>
   );
@@ -127,7 +130,8 @@ function AppRoutes() {
   // No active subscription
   if (!isSubscribed) return (
     <Routes>
-      <Route path="/overlay" element={<Overlay />} />
+      <Route path="/overlay" element={<Navigate to="/overlay/blank" replace />} />
+      <Route path="/overlay/:screen" element={<Overlay />} />
       <Route path="*" element={<PricingPage />} />
     </Routes>
   );
@@ -139,7 +143,9 @@ function AppRoutes() {
       <Route path="/director" element={<PinGate role="director"><DirectorPanel /></PinGate>} />
       <Route path="/inputer" element={<PinGate role="inputer"><DataInputer /></PinGate>} />
       <Route path="/control-panel" element={<Navigate to="/director" replace />} />
-      <Route path="/overlay" element={<Overlay />} />
+      <Route path="/overlay" element={<Navigate to="/overlay/blank" replace />} />
+      <Route path="/overlay/:screen" element={<Overlay />} />
+      <Route path="/overlay-links" element={<PinGate role="director"><OverlayLinks /></PinGate>} />
       <Route path="*" element={<Navigate to="/director" replace />} />
     </Routes>
   );

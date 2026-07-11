@@ -5,6 +5,7 @@ import { useOverlayData, overlayApi } from '@/lib/overlayApi';
 import DesignStudio from '@/components/control/DesignStudio';
 import TournamentSetup from '@/components/control/TournamentSetup';
 import {
+  ExternalLink,
   Eye, Paintbrush, Settings2, Trophy, Star, Crown,
   Monitor, Copy, Radio, CheckCircle2, ChevronRight,
   Layers, Map, Crosshair, AlertTriangle, LayoutList,
@@ -15,20 +16,7 @@ import {
 /* ─────────────────────────────────────────
    SCREEN DEFINITIONS
 ───────────────────────────────────────── */
-const SCREENS = [
-  { key: 'setup_blank',        label: 'BLANK',         icon: Monitor,       color: '#ef4444', desc: 'Idle / black screen' },
-  { key: 'pre_match_map',      label: 'MAP INTRO',      icon: Map,           color: '#3b82f6', desc: 'Map name + team list' },
-  { key: 'ff_scoreboard',      label: 'FF BOARD',       icon: LayoutList,    color: '#FF6B00', desc: 'FF-style ranked table (LIVE)' },
-  { key: 'scoreboard',         label: 'STANDINGS',      icon: Trophy,        color: '#FFB800', desc: 'Full tournament standings' },
-  { key: 'kill_feed',          label: 'KILL FEED',      icon: Crosshair,     color: '#00D4FF', desc: 'Recent kill events list' },
-  { key: 'elimination_alert',  label: 'ELIM ALERT',     icon: AlertTriangle, color: '#ef4444', desc: 'Last elimination pop-up' },
-  { key: 'todays_matches',     label: 'TODAY\'S MATCHES',icon: Calendar,     color: '#06b6d4', desc: 'All matches of the day' },
-  { key: 'teams_today',        label: 'TEAMS TODAY',    icon: Users,         color: '#8b5cf6', desc: 'Competing teams roster' },
-  { key: 'casters',            label: 'CASTERS',        icon: Mic2,          color: '#10b981', desc: 'Caster / host info' },
-  { key: 'upcoming_map',       label: 'UPCOMING MAP',   icon: Flag,          color: '#0ea5e9', desc: 'Next map announcement' },
-  { key: 'mvp',                label: 'MVP',            icon: Star,          color: '#a855f7', desc: 'MVP of the match' },
-  { key: 'champions',          label: 'BOOYAH!',        icon: Crown,         color: '#FFB800', desc: 'Champions reveal' },
-];
+
 
 export default function DirectorPanel() {
   const { data, loading, refresh } = useOverlayData(true);
@@ -43,18 +31,6 @@ export default function DirectorPanel() {
   const tournament = data?.tournament;
   const teams = data?.teams || [];
   const players = data?.players || [];
-
-  const handleSwitchScreen = async (key) => {
-    setBusy(key);
-    try {
-      await overlayApi.switchOverlayScreen({ screen: key });
-      toast.success(`Screen switched to ${key.replace(/_/g, ' ').toUpperCase()}`);
-    } catch (err) {
-      toast.error(err.message || 'Error switching screen');
-    } finally {
-      setBusy(null);
-    }
-  };
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -293,260 +269,23 @@ export default function DirectorPanel() {
           <>
             {/* OVERLAY TAB */}
             {activeTab === 'overlay' && (
-              <div className="grid grid-cols-12 gap-6">
-                {/* Left Column (5/12) */}
-                <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
-                  {/* SCENE SWITCHER PANEL */}
-                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
-                    <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
-                      <div>
-                        <h2 className="font-orbitron text-xs font-black tracking-[0.25em] text-white">
-                          SCENE SWITCHER
-                        </h2>
-                        <p className="text-[10px] text-gray-500 font-medium mt-1">
-                          Click to go LIVE instantly
-                        </p>
-                      </div>
-                      <Monitor className="h-4 w-4 text-[#FF6B00]" />
-                    </div>
-
-                    <div className="grid grid-cols-3 gap-2.5">
-                      {SCREENS.map((s) => {
-                        const Icon = s.icon;
-                        const isActive = currentScreen === s.key;
-                        return (
-                          <button
-                            key={s.key}
-                            onClick={() => handleSwitchScreen(s.key)}
-                            disabled={busy !== null}
-                            className="group relative flex flex-col items-center justify-between rounded-lg border p-3 text-center transition-all min-h-[100px] bg-white/[0.02]"
-                            style={
-                              isActive
-                                ? {
-                                    borderColor: '#FF6B00',
-                                    background: 'rgba(255,107,0,0.15)',
-                                    boxShadow: '0 0 16px rgba(255,107,0,0.3)',
-                                  }
-                                : {
-                                    borderColor: 'rgba(255,255,255,0.07)',
-                                  }
-                            }
-                          >
-                            {/* ACTIVE badge top-right */}
-                            {isActive && (
-                              <span className="absolute right-1.5 top-1.5 flex items-center gap-1 bg-[#ef4444] px-1 py-0.5 rounded-[3px] scale-75 origin-top-right">
-                                <span className="h-1.5 w-1.5 rounded-full bg-white animate-pulse" />
-                                <span className="font-orbitron text-[8px] font-black text-white">LIVE</span>
-                              </span>
-                            )}
-
-                            <Icon
-                              className="h-5 w-5 mb-1"
-                              style={{ color: isActive ? '#FF6B00' : s.color }}
-                            />
-                            <div>
-                              <p className="font-orbitron text-[9px] font-black tracking-wider text-white">
-                                {s.label}
-                              </p>
-                              <p className="text-[8px] text-gray-500 mt-0.5 leading-tight truncate max-w-[85px]">
-                                {s.desc}
-                              </p>
-                            </div>
-                          </button>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* OBS SETUP BOX */}
-                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
-                    <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-[#FF6B00] mb-3">
-                      OBS BROWSER SOURCE
-                    </h3>
-                    <div className="flex items-center gap-2 rounded-lg bg-black/40 p-2.5 border border-white/5 mb-4">
-                      <span className="font-mono text-[10px] text-gray-400 truncate flex-1">
-                        {window.location.origin}/overlay
-                      </span>
-                      <button
-                        onClick={handleCopyOBS}
-                        className="flex h-7 w-7 items-center justify-center rounded bg-[#13131f] border border-white/10 hover:border-[#FF6B00]/40 text-white transition-all"
-                      >
-                        <Copy className="h-3.5 w-3.5 text-[#FF6B00]" />
-                      </button>
-                    </div>
-                    <ul className="space-y-1.5 text-[10px] text-gray-500 list-disc list-inside">
-                      <li>Set resolution to 1920x1080</li>
-                      <li>Check "Shutdown source when not visible"</li>
-                      <li>Check "Refresh browser when scene becomes active"</li>
-                    </ul>
-                  </div>
-                </div>
-
-                {/* Right Column (7/12) */}
-                <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
-                  {/* MVP CONTROL PANEL */}
-                  <div className="rounded-xl border border-[rgba(168,85,247,0.4)] bg-[#0f0f1a] p-5">
-                    <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
-                      <div>
-                        <h2 className="font-orbitron text-xs font-black tracking-[0.25em] text-purple-400">
-                          MVP CONTROL
-                        </h2>
-                        <p className="text-[10px] text-gray-500 font-medium mt-1">
-                          Manage & highlight match MVP live
-                        </p>
-                      </div>
-                      <Star className="h-4 w-4 text-purple-400 animate-pulse" />
-                    </div>
-
-                    {mvp ? (
-                      <div className="mb-4 flex items-center gap-4 rounded-xl border border-purple-500/30 bg-purple-500/10 p-4">
-                        <div className="flex h-12 w-12 flex-shrink-0 items-center justify-center rounded-full bg-purple-600 font-orbitron text-sm font-black text-white border border-purple-400">
-                          {(mvp.name || '??').slice(0, 2).toUpperCase()}
-                        </div>
-                        <div className="flex-1 min-w-0">
-                          <p className="font-orbitron text-sm font-black text-purple-300 truncate">
-                            {mvp.name}
-                          </p>
-                          <p className="text-[11px] text-gray-400 font-medium mt-0.5 truncate">
-                            {mvp.team}
-                          </p>
-                        </div>
-                        <div className="text-right">
-                          <p className="font-orbitron text-2xl font-black text-[#FF6B00] tabular-nums">
-                            {mvp.kills}
-                          </p>
-                          <p className="text-[9px] text-gray-500 uppercase tracking-wider font-bold">
-                            KILLS
-                          </p>
-                        </div>
-                      </div>
-                    ) : (
-                      <div className="mb-4 flex items-center justify-center rounded-xl border border-dashed border-white/10 py-8">
-                        <p className="text-xs text-gray-600 font-medium">
-                          No MVP calculated yet. Run calculation below!
-                        </p>
-                      </div>
-                    )}
-
-                    <div className="flex gap-2.5">
-                      <button
-                        onClick={calculateMVP}
-                        disabled={mvpBusy !== null}
-                        className="flex-1 rounded-lg border border-purple-500/30 bg-purple-600/10 py-3 font-orbitron text-[10px] font-black tracking-wider text-purple-300 hover:bg-purple-600/20 transition-all disabled:opacity-50"
-                      >
-                        {mvpBusy === 'calc' ? 'CALCULATING...' : '⟳ CALCULATE MVP'}
-                      </button>
-                      <button
-                        onClick={triggerMVPOverlay}
-                        disabled={mvpBusy !== null || !mvp?.player_id}
-                        className="flex-1 rounded-lg bg-purple-600 py-3 font-orbitron text-[10px] font-black tracking-wider text-white hover:bg-purple-500 transition-all disabled:opacity-50"
-                      >
-                        {mvpBusy === 'show' ? 'SENDING LIVE...' : 'SET LIVE MVP'}
-                      </button>
-                    </div>
-                  </div>
-
-                  {/* CHAMPIONS CONTROL PANEL */}
-                  <div className="rounded-xl border border-[rgba(255,184,0,0.4)] bg-[#0f0f1a] p-5">
-                    <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
-                      <div>
-                        <h2 className="font-orbitron text-xs font-black tracking-[0.25em] text-[#FFB800]">
-                          CHAMPIONS REVEAL
-                        </h2>
-                        <p className="text-[10px] text-gray-500 font-medium mt-1">
-                          Crown the ultimate championship team
-                        </p>
-                      </div>
-                      <Crown className="h-4 w-4 text-[#FFB800] animate-bounce" />
-                    </div>
-
-                    {/* Rankings list */}
-                    <div className="space-y-2 mb-5">
-                      {sortedTeams.slice(0, 3).map((team, idx) => {
-                        const medals = ['🥇', '🥈', '🥉'];
-                        return (
-                          <div
-                            key={team.id}
-                            className="flex items-center justify-between rounded-lg bg-white/[0.02] border border-white/5 p-3"
-                          >
-                            <div className="flex items-center gap-3">
-                              <span className="text-sm">{medals[idx]}</span>
-                              <div>
-                                <p className="font-orbitron text-[11px] font-black text-white">
-                                  {team.name}
-                                </p>
-                                <p className="text-[9px] text-gray-500 font-bold mt-0.5">
-                                  PTS: {team.total_tournament_points || 0} | KILLS:{' '}
-                                  {team.total_tournament_kills || 0}
-                                </p>
-                              </div>
-                            </div>
-                            <button
-                              onClick={() => revealChampions(team)}
-                              disabled={champBusy !== null}
-                              className="rounded bg-[#FFB800] hover:bg-[#FFA500] px-3.5 py-1.5 font-orbitron text-[9px] font-black text-black tracking-wider transition-all disabled:opacity-50"
-                            >
-                              {champBusy === team.id ? 'REVEALING...' : 'REVEAL'}
-                            </button>
-                          </div>
-                        );
-                      })}
-                    </div>
-
-                    <button
-                      onClick={declareTournamentFinished}
-                      disabled={champBusy !== null}
-                      className="w-full rounded-lg bg-gradient-to-r from-[#FFB800] to-[#FFA500] py-3.5 font-orbitron text-[11px] font-black tracking-widest text-black hover:brightness-115 transition-all disabled:opacity-50"
-                    >
-                      {champBusy === 'declare' ? 'DECLARING...' : 'DECLARE CHAMPIONS & END EVENT'}
-                    </button>
-                  </div>
-
-                  {/* EXPORT / DATA PANEL */}
-                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
-                    <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-white mb-4">
-                      EXPORT / DATA PANEL
-                    </h3>
-                    <div className="grid grid-cols-3 gap-4 mb-4">
-                      <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-center">
-                        <p className="font-orbitron text-xl font-black text-[#FF6B00] tabular-nums">
-                          {teams.length}
-                        </p>
-                        <p className="text-[9px] text-gray-500 font-bold mt-0.5">TEAMS</p>
-                      </div>
-                      <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-center">
-                        <p className="font-orbitron text-xl font-black text-[#00D4FF] tabular-nums">
-                          {players.length}
-                        </p>
-                        <p className="text-[9px] text-gray-500 font-bold mt-0.5">PLAYERS</p>
-                      </div>
-                      <div className="bg-black/30 p-3 rounded-lg border border-white/5 text-center">
-                        <p className="font-orbitron text-xl font-black text-[#FFB800] tabular-nums">
-                          {tournament?.current_match_number || 0}
-                        </p>
-                        <p className="text-[9px] text-gray-500 font-bold mt-0.5">MATCHES</p>
-                      </div>
-                    </div>
-                    <div className="flex gap-2.5">
-                      <button
-                        onClick={handleDownloadJSON}
-                        className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-[#13131f] py-2.5 font-orbitron text-[10px] font-black text-white hover:border-[#FF6B00]/40 transition-all"
-                      >
-                        <Download className="h-3.5 w-3.5 text-[#FF6B00]" />
-                        DOWNLOAD JSON
-                      </button>
-                      <button
-                        onClick={handleCopyToClipboard}
-                        className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-[#13131f] py-2.5 font-orbitron text-[10px] font-black text-white hover:border-[#FF6B00]/40 transition-all"
-                      >
-                        <Copy className="h-3.5 w-3.5 text-[#FF6B00]" />
-                        COPY TO CLIPBOARD
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
+  <div className="h-full flex items-center justify-center py-12">
+    <div className="text-center max-w-md bg-[#0f0f1a] border border-white/5 rounded-2xl p-8 shadow-2xl">
+      <Monitor className="w-12 h-12 text-[#00D4FF] mx-auto mb-4" />
+      <h2 className="font-orbitron text-lg font-black text-white mb-2">OVERLAY SOURCES</h2>
+      <p className="font-orbitron text-[10px] text-gray-500 mb-6 leading-relaxed">
+        Each overlay is now a dedicated URL. Add them directly to OBS as Browser Sources at 1920×1080.
+      </p>
+      <a
+        href="/overlay-links"
+        className="inline-flex items-center gap-2 px-6 py-3 rounded-xl font-orbitron text-[11px] font-black text-white tracking-wider"
+        style={{ background: 'linear-gradient(135deg, #00D4FF, #0099bb)' }}
+      >
+        <ExternalLink className="w-4 h-4" /> VIEW ALL OVERLAY LINKS
+      </a>
+    </div>
+  </div>
+)}
 
             {/* MATCH TAB */}
             {activeTab === 'match' && (

@@ -317,16 +317,6 @@ exports.handler = async (event) => {
       return ok({ success: true });
     }
 
-    // ── SWITCH OVERLAY SCREEN ─────────────────────────────────────
-    if (route === 'switchOverlayScreen') {
-      const { screen } = body;
-      if (!screen) return err(400, 'screen required');
-      db.overlay_state.current_screen = screen;
-      db.overlay_state.last_updated_at = new Date().toISOString();
-      await saveDb(db);
-      return ok({ success: true });
-    }
-
     // ── DECLARE CHAMPIONS ─────────────────────────────────────────
     if (route === 'declareChampions') {
       const { tournament_id } = body;

@@ -1,7 +1,8 @@
+import { useParams } from 'react-router-dom';
 import React, { useState, useEffect, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award, XCircle } from 'lucide-react';
-import { useOverlayData } from '@/lib/overlayApi';
+
 import { MAP_IMAGES } from '@/lib/maps';
 
 function GamingBackground({ mapName, accent = '#f97316', accent2 = '#00d4ff' }) {
@@ -1710,77 +1711,42 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
 /* ══════════════════════════════════════════════════
    MAIN OVERLAY APP CANVAS COMPONENT
 ══════════════════════════════════════════════════ */
-export default function Overlay() {
-  const { overlayState, design, teams, players, currentMatch, killFeed, eliminations } = useOverlayData();
-  const [scale, setScale] = useState(1);
-
+function useOverlayPoll() {
+  const [data, setData] = useState({});
   useEffect(() => {
-    const handleResize = () => {
-      setScale(window.innerWidth / 1920);
-    };
-    handleResize();
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
+    const fetch_ = () => fetch('/api/getOverlayData').then(r => r.json()).then(d => setData(d)).catch(() => {});
+    fetch_();
+    const id = setInterval(fetch_, 3000);
+    return () => clearInterval(id);
   }, []);
+  return data;
+}
 
-  const screen = overlayState?.current_screen || 'setup_blank';
+export default function Overlay() {
+  const { screen } = useParams();
+  const data = useOverlayPoll();
+  const { teams = [], players = [], killFeed = [], eliminations = [], currentMatch, overlayState, design } = data;
 
-  // Transparent screens list
-  const isTransparent = ['ff_scoreboard', 'scoreboard', 'kill_feed', 'elimination_alert'].includes(screen);
-
-  const renderScreen = () => {
-    switch (screen) {
-      case 'setup_blank':
-        return <SetupBlank />;
-      case 'pre_match_map':
-        return <PreMatchMap match={currentMatch} teams={teams} design={design} />;
-      case 'ff_scoreboard':
-        return <FFBoard teams={teams} players={players} currentMatch={currentMatch} design={design} />;
-      case 'scoreboard':
-        return <FullStandings teams={teams} design={design} />;
-      case 'kill_feed':
-        return <KillFeedScreen killFeed={killFeed} design={design} />;
-      case 'todays_matches':
-        return <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />;
-      case 'teams_today':
-        return <TeamsToday teams={teams} design={design} />;
-      case 'casters':
-        return <CastersScreen design={design} />;
-      case 'upcoming_map':
-        return <UpcomingMap match={currentMatch} design={design} />;
-      case 'elimination_alert':
-        return <EliminationAlert eliminations={eliminations} design={design} />;
-      case 'mvp':
-        return <MVPScreen players={players} teams={teams} design={design} overlayState={overlayState} />;
-      case 'champions':
-        return <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />;
-      default:
-        return <SetupBlank />;
-    }
+  const screens = {
+    blank:         <SetupBlank />,
+    scoreboard:    <FFBoard teams={teams} players={players} currentMatch={currentMatch} design={design} />,
+    standings:     <FullStandings teams={teams} design={design} />,
+    killfeed:      <KillFeedScreen killFeed={killFeed} design={design} />,
+    maplabel:      <PreMatchMap match={currentMatch} teams={teams} design={design} />,
+    'today-matches': <TodaysMatches matches={[]} design={design} />,
+    teams:         <TeamsToday teams={teams} design={design} />,
+    casters:       <CastersScreen design={design} />,
+    'upcoming-map':<UpcomingMap match={currentMatch} design={design} />,
+    'elim-alert':  <EliminationAlert eliminations={eliminations} design={design} />,
+    mvp:           <MVPScreen players={players} teams={teams} design={design} overlayState={overlayState} />,
+    champions:     <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
   };
 
+  const component = screens[screen] || <SetupBlank />;
+
   return (
-    <div 
-      className="relative overflow-hidden w-[1920px] h-[1080px] origin-top-left"
-      style={{
-        transform: `scale(${scale})`,
-        background: isTransparent ? 'transparent' : '#060915',
-        width: 1920,
-        height: 1080
-      }}
-    >
-      <AnimatePresence mode="wait">
-        <motion.div
-          key={screen}
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          transition={{ duration: 0.3 }}
-          className="h-full w-full relative"
-        >
-          {renderScreen()}
-        </motion.div>
-      </AnimatePresence>
+    <div style={{ width: 1920, height: 1080, position: 'relative', overflow: 'hidden', background: 'transparent' }}>
+      {component}
     </div>
   );
 }
