@@ -291,7 +291,6 @@ export default function DataInputer() {
                       <ImageUpload
                         value={newTeamLogo}
                         onChange={(url) => setNewTeamLogo(url)}
-                        folder="logos"
                         label="Team Logo"
                       />
                       <button

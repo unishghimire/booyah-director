@@ -210,7 +210,6 @@ export default function DesignStudio({ onAction }) {
           <ImageUpload
             value={design.logoUrl || ''}
             onChange={(url) => upd('logoUrl', url)}
-            folder="logos"
             label="Tournament Logo"
           />
         </div>

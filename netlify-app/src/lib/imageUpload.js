@@ -1,26 +1,60 @@
-import { ref, uploadBytes, getDownloadURL, deleteObject } from 'firebase/storage';
-import { auth, storage } from './firebase';
+/**
+ * imageUpload.js — ImgBB free image hosting
+ * 
+ * Free tier: unlimited uploads, permanent CDN URLs, no credit card
+ * API key: get yours free at https://api.imgbb.com/
+ * Set VITE_IMGBB_API_KEY in your Vercel environment variables.
+ *
+ * Returns a permanent CDN URL like:
+ *   https://i.ibb.co/xxxxx/filename.png
+ */
+
+const IMGBB_API_KEY = import.meta.env.VITE_IMGBB_API_KEY || '';
 
 /**
- * Upload an image file to Firebase Storage under the authenticated user's folder.
- * @param {File} file
- * @param {'logos'|'banners'} folder
- * @returns {Promise<{url: string, path: string}>}
+ * Upload an image file to ImgBB and return the CDN URL.
+ * @param {File} file        - The image file
+ * @param {string} [name]    - Optional custom display name
+ * @returns {Promise<{url: string, deleteUrl: string}>}
  */
-export async function uploadImage(file, folder = 'logos') {
-  const user = auth.currentUser;
-  if (!user) throw new Error('Must be signed in to upload images');
-  if (!file.type.startsWith('image/')) throw new Error('Only image files are allowed');
-  const maxSize = folder === 'banners' ? 5 * 1024 * 1024 : 2 * 1024 * 1024;
-  if (file.size > maxSize) throw new Error(`File too large. Max: ${maxSize / 1024 / 1024}MB`);
-  const ext  = file.name.split('.').pop().toLowerCase() || 'png';
-  const name = `${Date.now()}_${Math.random().toString(36).slice(2, 8)}.${ext}`;
-  const path = `users/${user.uid}/${folder}/${name}`;
-  const snap = await uploadBytes(ref(storage, path), file, { contentType: file.type });
-  const url  = await getDownloadURL(snap.ref);
-  return { url, path };
-}
+export async function uploadImage(file, name = null) {
+  if (!file) throw new Error('No file provided');
+  if (!file.type.startsWith('image/')) throw new Error('Only image files are allowed (PNG, JPG, WebP, GIF)');
 
-export async function deleteImage(path) {
-  try { await deleteObject(ref(storage, path)); } catch (e) { console.warn('deleteImage:', e.message); }
+  const maxSize = 32 * 1024 * 1024; // ImgBB free limit: 32MB
+  if (file.size > maxSize) throw new Error('File too large. ImgBB allows up to 32MB.');
+
+  if (!IMGBB_API_KEY) {
+    throw new Error('ImgBB API key not set. Add VITE_IMGBB_API_KEY to your Vercel environment variables. Get a free key at https://api.imgbb.com/');
+  }
+
+  // Convert file to base64
+  const base64 = await new Promise((resolve, reject) => {
+    const reader = new FileReader();
+    reader.onload  = () => resolve(reader.result.split(',')[1]); // strip data:image/...;base64,
+    reader.onerror = reject;
+    reader.readAsDataURL(file);
+  });
+
+  const form = new FormData();
+  form.append('key', IMGBB_API_KEY);
+  form.append('image', base64);
+  if (name) form.append('name', name);
+
+  const res = await fetch('https://api.imgbb.com/1/upload', {
+    method: 'POST',
+    body: form,
+  });
+
+  const data = await res.json();
+
+  if (!res.ok || !data.success) {
+    throw new Error(data?.error?.message || 'ImgBB upload failed');
+  }
+
+  return {
+    url:       data.data.url,         // permanent CDN URL
+    thumb:     data.data.thumb?.url,  // thumbnail URL
+    deleteUrl: data.data.delete_url,  // one-click delete link
+  };
 }

@@ -25,6 +25,7 @@ Paste these in Vercel → Project → Settings → Environment Variables → Pro
 
 | Variable | Value |
 |---|---|
+| `VITE_IMGBB_API_KEY` | `[get free key at https://api.imgbb.com/]` |
 | `OWNER_EMAILS` | `nex.unishghimire@gmail.com` |
 | `VITE_OWNER_EMAILS` | `nex.unishghimire@gmail.com` |
 | `ALLOWED_ORIGIN` | `*` |
@@ -42,11 +43,14 @@ Paste these in Vercel → Project → Settings → Environment Variables → Pro
 
 ---
 
-## 🔥 Firebase Console — Storage Rules
+## 🖼️ Image Hosting — ImgBB (Free, no credit card)
 
-Go to: Firebase Console → Storage → Rules → paste this → Publish
+1. Go to **https://api.imgbb.com/**
+2. Sign up free → My Account → API
+3. Copy your API key
+4. Add as `VITE_IMGBB_API_KEY` in Vercel → redeploy
 
-(See full content in /app/FIREBASE_STORAGE_RULES.txt)
+Images are stored on ImgBB's free CDN permanently. No Firebase Storage needed.
 
 ---
 
