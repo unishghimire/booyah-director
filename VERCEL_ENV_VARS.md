@@ -25,7 +25,7 @@ Paste these in Vercel → Project → Settings → Environment Variables → Pro
 
 | Variable | Value |
 |---|---|
-| `VITE_IMGBB_API_KEY` | `[get free key at https://api.imgbb.com/]` |
+| `VITE_IMGBB_API_KEY` | `ced24d28...914e` ← your key is saved, paste the full value from your Security settings |
 | `OWNER_EMAILS` | `nex.unishghimire@gmail.com` |
 | `VITE_OWNER_EMAILS` | `nex.unishghimire@gmail.com` |
 | `ALLOWED_ORIGIN` | `*` |
