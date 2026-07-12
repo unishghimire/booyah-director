@@ -64,7 +64,7 @@ function err(res, code, msg) {
 
 // ─── Firebase DB helpers ──────────────────────────────────────────────────
 function dbUrl(path) {
-  const base = (process.env.FIREBASE_DATABASE_URL || 'https://nexoverlays-default-rtdb.firebaseio.com').replace(/\/$/, '');
+  const base = (process.env.FIREBASE_DATABASE_URL || 'https://nexoverlays-default-rtdb.asia-southeast1.firebasedatabase.app').replace(/\/$/, '');
   const secret = process.env.FIREBASE_DATABASE_SECRET;
   if (!secret) return null;
   return `${base}${path}.json?auth=${secret}`;
