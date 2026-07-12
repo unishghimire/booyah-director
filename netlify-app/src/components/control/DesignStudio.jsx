@@ -21,6 +21,7 @@ import {
   Paintbrush, Check, Layers, Type, Eye, Mic2,
   Lock, RefreshCw, Save, RotateCcw
 } from 'lucide-react';
+import ImageUpload from '@/components/ImageUpload';
 
 /* ─── Colour presets matching official FF tournament palettes ─── */
 const PRESETS = [
@@ -206,15 +207,12 @@ export default function DesignStudio({ onAction }) {
             </div>
           ))}
 
-          <div>
-            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Tournament Logo URL</label>
-            <input value={design.logoUrl || ''} onChange={e => upd('logoUrl', e.target.value)} placeholder="https://your-logo.png"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/40 transition-colors" />
-            {design.logoUrl && (
-              <img src={design.logoUrl} alt="logo" className="mt-2 h-10 rounded-lg object-contain"
-                onError={e => e.target.style.display='none'} />
-            )}
-          </div>
+          <ImageUpload
+            value={design.logoUrl || ''}
+            onChange={(url) => upd('logoUrl', url)}
+            folder="logos"
+            label="Tournament Logo"
+          />
         </div>
       </Section>
 

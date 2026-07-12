@@ -1,3 +1,4 @@
+import ImageUpload from '@/components/ImageUpload';
 import React, { useState, useMemo } from 'react';
 import SheetImport from '@/components/control/SheetImport';
 import toast from 'react-hot-toast';
@@ -287,18 +288,12 @@ export default function DataInputer() {
                           className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
                         />
                       </div>
-                      <div>
-                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-gray-500 uppercase mb-2">
-                          Logo URL
-                        </label>
-                        <input
-                          type="url"
-                          value={newTeamLogo}
-                          onChange={(e) => setNewTeamLogo(e.target.value)}
-                          placeholder="https://example.com/logo.png"
-                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
-                        />
-                      </div>
+                      <ImageUpload
+                        value={newTeamLogo}
+                        onChange={(url) => setNewTeamLogo(url)}
+                        folder="logos"
+                        label="Team Logo"
+                      />
                       <button
                         type="submit"
                         disabled={teamAdding}
