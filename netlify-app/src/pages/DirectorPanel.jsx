@@ -5,6 +5,7 @@ import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
 import DesignStudio from '@/components/control/DesignStudio';
 import TournamentSetup from '@/components/control/TournamentSetup';
+import TournamentManager from '@/components/control/TournamentManager';
 import { useAuth } from '@/lib/AuthContext';
 import { OVERLAYS, CopyBtn } from './OverlayLinks';
 import {
@@ -727,7 +728,7 @@ export default function DirectorPanel() {
                   </div>
 
                   {/* Tournament setup form */}
-                  <TournamentSetup />
+                  <TournamentManager />
                 </div>
               </SectionBoundary>
             )}

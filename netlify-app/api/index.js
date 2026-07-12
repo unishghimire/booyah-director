@@ -348,7 +348,34 @@ module.exports = async (req, res) => {
 
     // ── LIST TOURNAMENTS ──────────────────────────────────────────────────
     if (route === 'listTournaments') {
-      const sorted = [...db.tournaments].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      const enriched = db.tournaments.map(t => {
+        const tid = t.id;
+        const tournamentTeams = db.teams.filter(team => team.tournament_id === tid);
+        const tournamentMatches = db.matches.filter(m => m.tournament_id === tid);
+        
+        // Calculate standings
+        const teamsWithPoints = tournamentTeams.map(team => {
+          const standingsForTeam = db.match_standings.filter(s => s.tournament_id === tid && s.team_id === team.id);
+          const placementPoints  = standingsForTeam.reduce((sum, s) => sum + (s.placement_points_awarded || 0), 0);
+          const teamPlayers      = db.players.filter(p => p.team_id === team.id);
+          const totalKills       = teamPlayers.reduce((sum, p) => sum + (p.total_tournament_kills || 0), 0);
+          const totalPoints      = placementPoints + (totalKills * (t.points_per_kill || 1));
+          return {
+            id: team.id,
+            name: team.name,
+            total_points: totalPoints
+          };
+        }).sort((a, b) => b.total_points - a.total_points);
+
+        return {
+          ...t,
+          team_count: tournamentTeams.length,
+          match_count: tournamentMatches.length,
+          standings: teamsWithPoints.slice(0, 3) // Top 3 teams
+        };
+      });
+
+      const sorted = enriched.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
       return ok({ tournaments: sorted });
     }
 
