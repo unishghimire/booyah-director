@@ -292,15 +292,23 @@ module.exports = async (req, res) => {
       try {
         const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${webApiKey}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ idToken: token }) });
         const d = await r.json(); const user = d.users?.[0]; if (!user) return err(401, 'Invalid token');
-        const dbUrl = (process.env.FIREBASE_DATABASE_URL || 'https://nexoverlays-default-rtdb.firebaseio.com').replace(/\/$/, '');
+        // Owner emails always get active subscription (set OWNER_EMAILS env var)
+        const ownerEmails = (process.env.OWNER_EMAILS || 'nex.unishghimire@gmail.com').split(',').map(e => e.trim().toLowerCase());
+        if (ownerEmails.includes(user.email?.toLowerCase())) {
+          return ok({ uid: user.localId, subscription: { plan:'yearly', status:'active', expiresAt: Date.now() + 315360000000 } });
+        }
+        // Check DB for regular users (graceful fail if DB not set up)
+        const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || 'https://nexoverlays-default-rtdb.firebaseio.com').replace(/\/$/, '');
         const secret = process.env.FIREBASE_DATABASE_SECRET;
         if (secret) {
-          const subR = await fetch(`${dbUrl}/booyah_admin/users/${user.localId}.json?auth=${secret}`);
-          const subData = subR.ok ? await subR.json() : null;
-          return ok({ uid: user.localId, subscription: subData?.subscription || null });
+          try {
+            const subR = await fetch(`${dbBaseUrl}/booyah_admin/users/${user.localId}.json?auth=${secret}`);
+            const subData = subR.ok ? await subR.json() : null;
+            return ok({ uid: user.localId, subscription: subData?.subscription || null });
+          } catch { return ok({ uid: user.localId, subscription: null }); }
         }
         return ok({ uid: user.localId, subscription: null });
-      } catch(e) { return err(500, e.message); }
+      } catch(e) { return ok({ uid: 'unknown', subscription: null }); }
     }
 
     // ── GOOGLE SHEETS IMPORT ──────────────────────────────────────────────
