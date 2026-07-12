@@ -1,10 +1,7 @@
-const { loadDb, saveDb, genId } = require('./_db');
-
-const CORS = {
-  'Access-Control-Allow-Origin': '*',
-  'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-  'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-};
+const { loadDb, saveDb, genId, getDefaultDb } = require('./_db');
+const { verifyToken } = require('./_auth');
+const { rateLimit } = require('./_ratelimit');
+const { sanitizeString, requireFields } = require('./_validate');
 
 const DEFAULT_DESIGN = {
   accentColor: '#FF6B00', accentColor2: '#00D4FF', bgColor: '#060915',
@@ -19,38 +16,70 @@ const DEFAULT_DESIGN = {
 };
 
 module.exports = async (req, res) => {
-  // CORS preflight
+  // CORS Configuration
+  const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
+  const CORS = {
+    'Access-Control-Allow-Origin': allowedOrigin,
+    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+  };
+
   Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
   if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // Route: /api/[route]
-  const route = (req.url || '').replace(/^\/api\/?/, '').split('?')[0].split('/')[0];
-  const body  = req.body || {};
+  // Rate Limiting
+  const ip = req.headers['x-nf-client-connection-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+  if (!rateLimit(ip)) {
+    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
+  }
+
+  // Parse Route and Query
+  const urlObj = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
+  const route = urlObj.pathname.replace(/^\/api\/?/, '').split('/')[0];
+  const query = Object.fromEntries(urlObj.searchParams.entries());
+  const body = req.body || {};
 
   const ok  = (data) => res.status(200).json(data);
   const err = (code, msg) => res.status(code).json({ error: msg });
 
-  try {
-    const db = await loadDb();
-    if (!db.design)              db.design = { ...DEFAULT_DESIGN };
-    if (!db.tournaments)         db.tournaments = [];
-    if (!db.teams)               db.teams = [];
-    if (!db.players)             db.players = [];
-    if (!db.matches)             db.matches = [];
-    if (!db.match_standings)     db.match_standings = [];
-    if (!db.kill_events)         db.kill_events = [];
-    if (!db.elimination_events)  db.elimination_events = [];
-    if (!db.overlay_state) {
-      db.overlay_state = {
-        id: 'singleton', tournament_id: null, current_screen: 'setup_blank',
-        mvp_player_id: null, mvp_player_name: null, mvp_team_name: null, mvp_kills: 0,
-        champion_team_id: null, champion_team_name: null, champion_total_points: 0,
-        last_updated_at: new Date().toISOString(),
-      };
+  // 1. PUBLIC ROUTE: getOverlayData
+  if (route === 'getOverlayData') {
+    const tokenParam = query.token;
+    const authHeader = req.headers.authorization || req.headers.Authorization || '';
+    let uid = null;
+
+    if (authHeader.startsWith('Bearer ')) {
+      const authUser = await verifyToken(authHeader);
+      if (authUser) uid = authUser.uid;
     }
 
-    // ── GET OVERLAY DATA ──────────────────────────────────────────────────
-    if (route === 'getOverlayData') {
+    // Fallback: If no Bearer token, we authenticate overlay view via shareToken
+    if (!uid && tokenParam) {
+      // Find which user owns this shareToken
+      // We look it up under /booyah_admin/share_tokens/{token}
+      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+      const secret = process.env.FIREBASE_DATABASE_SECRET;
+      if (dbBaseUrl && secret) {
+        try {
+          const rToken = await fetch(`${dbBaseUrl}/booyah_admin/share_tokens/${tokenParam}.json?auth=${secret}`);
+          if (rToken.ok) {
+            uid = await rToken.json(); // returns the uid string
+          }
+        } catch (e) {
+          console.error('[getOverlayData] Token fetch error:', e.message);
+        }
+      }
+    }
+
+    if (!uid) {
+      return ok({
+        tournament: null, overlay_state: { id: 'singleton', tournament_id: null, current_screen: 'setup_blank', last_updated_at: new Date().toISOString() },
+        design: DEFAULT_DESIGN, teams: [], players: [], current_match: null, kill_feed: [], eliminations: [], standings: []
+      });
+    }
+
+    try {
+      const db = await loadDb(uid);
       const tournament = db.tournaments.find(t => t.status === 'active') || db.tournaments[db.tournaments.length - 1] || null;
       if (!tournament) return ok({ tournament: null, overlay_state: db.overlay_state, design: db.design, teams: [], players: [], current_match: null, kill_feed: [], eliminations: [], standings: [] });
       const tid = tournament.id;
@@ -72,133 +101,399 @@ module.exports = async (req, res) => {
         standings    = db.match_standings.filter(s => s.match_id === currentMatch.id);
       }
       return ok({ tournament, overlay_state: db.overlay_state, design: db.design, teams, players, current_match: currentMatch, kill_feed: killFeed, eliminations, standings });
+    } catch (e) {
+      return err(500, 'Database load error');
+    }
+  }
+
+  // 2. PUBLIC ROUTE: registerUser (Firebase signup callback)
+  if (route === 'registerUser') {
+    const authHeader = req.headers.authorization || req.headers.Authorization || '';
+    const user = await verifyToken(authHeader);
+    if (!user) return err(401, 'Invalid or expired authentication token');
+
+    try {
+      // Just initialize database default structure
+      const db = await loadDb(user.uid);
+      await saveDb(user.uid, db);
+      return ok({ success: true, uid: user.uid, email: user.email });
+    } catch (e) {
+      return err(500, 'Failed to register user database');
+    }
+  }
+
+  // ─── AUTHENTICATION REQUIRED FOR ALL OTHER ROUTES ───
+  const authHeader = req.headers.authorization || req.headers.Authorization || '';
+  const user = await verifyToken(authHeader);
+  if (!user) return err(401, 'Unauthorized: Valid Bearer token required');
+
+  const { uid, isOwner } = user;
+
+  try {
+    const db = await loadDb(uid);
+    if (!db.design)              db.design = { ...DEFAULT_DESIGN };
+    if (!db.tournaments)         db.tournaments = [];
+    if (!db.teams)               db.teams = [];
+    if (!db.players)             db.players = [];
+    if (!db.matches)             db.matches = [];
+    if (!db.match_standings)     db.match_standings = [];
+    if (!db.kill_events)         db.kill_events = [];
+    if (!db.elimination_events)  db.elimination_events = [];
+    if (!db.overlay_state) {
+      db.overlay_state = {
+        id: 'singleton', tournament_id: null, current_screen: 'setup_blank',
+        mvp_player_id: null, mvp_player_name: null, mvp_team_name: null, mvp_kills: 0,
+        champion_team_id: null, champion_team_name: null, champion_total_points: 0,
+        last_updated_at: new Date().toISOString(),
+      };
+    }
+
+    // ── CHECK SUBSCRIPTION ───────────────────────────────────────────────
+    if (route === 'checkSubscription') {
+      if (isOwner) {
+        return ok({ uid, subscription: { plan: 'yearly', status: 'active', expiresAt: Date.now() + 315360000000 } });
+      }
+      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+      const secret = process.env.FIREBASE_DATABASE_SECRET;
+      if (secret && dbBaseUrl) {
+        try {
+          const subR = await fetch(`${dbBaseUrl}/booyah_admin/users/${uid}.json?auth=${secret}`);
+          const subData = subR.ok ? await subR.json() : null;
+          return ok({ uid, subscription: subData?.subscription || null });
+        } catch {
+          return ok({ uid, subscription: null });
+        }
+      }
+      return ok({ uid, subscription: null });
+    }
+
+    // ── GET SHARE TOKEN ──────────────────────────────────────────────────
+    if (route === 'getShareToken') {
+      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+      const secret = process.env.FIREBASE_DATABASE_SECRET;
+      if (!secret || !dbBaseUrl) return err(500, 'Database credentials missing');
+
+      try {
+        // Read current shareToken for this user
+        const r = await fetch(`${dbBaseUrl}/booyah_admin/users/${uid}/shareToken.json?auth=${secret}`);
+        let token = r.ok ? await r.json() : null;
+        if (!token) {
+          // Generate new token
+          token = genId() + genId();
+          // Write mapping token -> uid
+          await fetch(`${dbBaseUrl}/booyah_admin/share_tokens/${token}.json?auth=${secret}`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(uid)
+          });
+          // Write user -> token
+          await fetch(`${dbBaseUrl}/booyah_admin/users/${uid}/shareToken.json?auth=${secret}`, {
+            method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(token)
+          });
+        }
+        return ok({ shareToken: token });
+      } catch (e) {
+        return err(500, 'Failed to fetch or generate share token');
+      }
     }
 
     // ── SAVE / GET DESIGN ────────────────────────────────────────────────
-    if (route === 'saveDesign') { db.design = { ...DEFAULT_DESIGN, ...db.design, ...body }; db.overlay_state.last_updated_at = new Date().toISOString(); await saveDb(db); return ok({ success: true, design: db.design }); }
-    if (route === 'getDesign')  return ok({ design: db.design || DEFAULT_DESIGN });
+    if (route === 'saveDesign') {
+      const sanitizedCasters = (body.casters || []).map(c => ({
+        name: sanitizeString(c.name, 40),
+        role: sanitizeString(c.role, 40),
+        handle: sanitizeString(c.handle, 40)
+      }));
+
+      db.design = {
+        ...DEFAULT_DESIGN,
+        ...db.design,
+        ...body,
+        accentColor: sanitizeString(body.accentColor, 20),
+        accentColor2: sanitizeString(body.accentColor2, 20),
+        bgColor: sanitizeString(body.bgColor, 20),
+        textColor: sanitizeString(body.textColor, 20),
+        tournamentName: sanitizeString(body.tournamentName, 100),
+        tournamentSubtitle: sanitizeString(body.tournamentSubtitle, 100),
+        gameLabel: sanitizeString(body.gameLabel, 40),
+        logoUrl: sanitizeString(body.logoUrl, 300),
+        overlayStyle: sanitizeString(body.overlayStyle, 40),
+        fontStyle: sanitizeString(body.fontStyle, 40),
+        casters: sanitizedCasters,
+        organizerName: sanitizeString(body.organizerName, 100),
+        sponsorLogoUrl: sanitizeString(body.sponsorLogoUrl, 300)
+      };
+
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, design: db.design });
+    }
+
+    if (route === 'getDesign') return ok({ design: db.design || DEFAULT_DESIGN });
 
     // ── INITIALIZE TOURNAMENT ─────────────────────────────────────────────
     if (route === 'initializeTournament') {
-      const { name, total_matches, points_per_kill, placement_points_config } = body;
-      if (!name || !total_matches) return err(400, 'name and total_matches required');
-      const defaultConfig = { 1:15,2:12,3:10,4:8,5:6,6:4,7:2,8:1,9:1,10:1,11:1,12:1 };
-      const tournament = { id: genId(), name, total_matches: parseInt(total_matches), points_per_kill: points_per_kill || 1, placement_points_config: JSON.stringify(placement_points_config || defaultConfig), current_match_number: 0, status: 'setup', created_at: new Date().toISOString() };
+      const missing = requireFields(body, ['name', 'total_matches']);
+      if (missing) return err(400, missing);
+
+      const name = sanitizeString(body.name, 100);
+      const total_matches = parseInt(body.total_matches);
+      const points_per_kill = parseInt(body.points_per_kill) || 1;
+      const defaultConfig = { 1:15, 2:12, 3:10, 4:8, 5:6, 6:4, 7:2, 8:1, 9:1, 10:1, 11:1, 12:1 };
+
+      // Ensure shareToken exists on first init
+      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+      const secret = process.env.FIREBASE_DATABASE_SECRET;
+      if (secret && dbBaseUrl) {
+        try {
+          const r = await fetch(`${dbBaseUrl}/booyah_admin/users/${uid}/shareToken.json?auth=${secret}`);
+          let token = r.ok ? await r.json() : null;
+          if (!token) {
+            token = genId() + genId();
+            await fetch(`${dbBaseUrl}/booyah_admin/share_tokens/${token}.json?auth=${secret}`, {
+              method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(uid)
+            });
+            await fetch(`${dbBaseUrl}/booyah_admin/users/${uid}/shareToken.json?auth=${secret}`, {
+              method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(token)
+            });
+          }
+        } catch (_) {}
+      }
+
+      const tournament = {
+        id: genId(),
+        name,
+        total_matches,
+        points_per_kill,
+        placement_points_config: JSON.stringify(body.placement_points_config || defaultConfig),
+        current_match_number: 0,
+        status: 'setup',
+        created_at: new Date().toISOString()
+      };
+
       db.tournaments.push(tournament);
       db.overlay_state.tournament_id = tournament.id;
       db.overlay_state.current_screen = 'setup_blank';
       db.overlay_state.last_updated_at = new Date().toISOString();
-      await saveDb(db);
+      await saveDb(uid, db);
       return ok({ success: true, tournament });
     }
 
     // ── ADD TEAM ──────────────────────────────────────────────────────────
     if (route === 'addTeam') {
-      const { tournament_id, team_name, player_names } = body;
-      if (!tournament_id || !team_name) return err(400, 'tournament_id and team_name required');
-      if (db.teams.filter(t => t.tournament_id === tournament_id).length >= 12) return err(400, 'Maximum 12 teams allowed');
-      const team = { id: genId(), tournament_id, name: team_name, logo_url: body.logo_url || null, total_tournament_points: 0, total_tournament_kills: 0, created_at: new Date().toISOString() };
+      const missing = requireFields(body, ['tournament_id', 'team_name']);
+      if (missing) return err(400, missing);
+
+      if (db.teams.filter(t => t.tournament_id === body.tournament_id).length >= 12) {
+        return err(400, 'Maximum 12 teams allowed');
+      }
+
+      const team = {
+        id: genId(),
+        tournament_id: sanitizeString(body.tournament_id),
+        name: sanitizeString(body.team_name, 100),
+        logo_url: body.logo_url ? sanitizeString(body.logo_url, 300) : null,
+        total_tournament_points: 0,
+        total_tournament_kills: 0,
+        created_at: new Date().toISOString()
+      };
+
       db.teams.push(team);
-      const createdPlayers = (player_names || []).filter(n => n?.trim()).slice(0, 4).map(name => { const p = { id: genId(), team_id: team.id, tournament_id, name: name.trim(), is_alive: true, current_match_kills: 0, total_tournament_kills: 0, created_at: new Date().toISOString() }; db.players.push(p); return p; });
-      await saveDb(db);
+
+      const createdPlayers = (body.player_names || []).filter(n => n?.trim()).slice(0, 4).map(name => {
+        const p = {
+          id: genId(),
+          team_id: team.id,
+          tournament_id: team.tournament_id,
+          name: sanitizeString(name, 100),
+          is_alive: true,
+          current_match_kills: 0,
+          total_tournament_kills: 0,
+          created_at: new Date().toISOString()
+        };
+        db.players.push(p);
+        return p;
+      });
+
+      await saveDb(uid, db);
       return ok({ success: true, team, players: createdPlayers });
     }
 
     // ── ADD PLAYER ────────────────────────────────────────────────────────
     if (route === 'addPlayer') {
-      const { team_id, name } = body;
-      if (!team_id || !name) return err(400, 'team_id and name required');
-      const team = db.teams.find(t => t.id === team_id);
+      const missing = requireFields(body, ['team_id', 'name']);
+      if (missing) return err(400, missing);
+
+      const team = db.teams.find(t => t.id === body.team_id);
       if (!team) return err(404, 'Team not found');
-      if (db.players.filter(p => p.team_id === team_id).length >= 6) return err(400, 'Max 6 players per team');
-      const player = { id: genId(), team_id, tournament_id: team.tournament_id, name: name.trim(), is_alive: true, current_match_kills: 0, total_tournament_kills: 0, created_at: new Date().toISOString() };
+
+      if (db.players.filter(p => p.team_id === team.id).length >= 6) {
+        return err(400, 'Max 6 players per team');
+      }
+
+      const player = {
+        id: genId(),
+        team_id: team.id,
+        tournament_id: team.tournament_id,
+        name: sanitizeString(body.name, 100),
+        is_alive: true,
+        current_match_kills: 0,
+        total_tournament_kills: 0,
+        created_at: new Date().toISOString()
+      };
+
       db.players.push(player);
-      await saveDb(db);
+      await saveDb(uid, db);
       return ok({ success: true, player });
     }
 
     // ── START NEXT MATCH ──────────────────────────────────────────────────
     if (route === 'startNextMatch') {
-      const { tournament_id, map_name } = body;
-      if (!tournament_id) return err(400, 'tournament_id required');
-      const tIdx = db.tournaments.findIndex(t => t.id === tournament_id);
+      const missing = requireFields(body, ['tournament_id']);
+      if (missing) return err(400, missing);
+
+      const tIdx = db.tournaments.findIndex(t => t.id === body.tournament_id);
       if (tIdx === -1) return err(404, 'Tournament not found');
+
       const newMatchNumber = (db.tournaments[tIdx].current_match_number || 0) + 1;
       db.tournaments[tIdx].current_match_number = newMatchNumber;
       db.tournaments[tIdx].status = 'active';
-      const match = { id: genId(), tournament_id, match_number: newMatchNumber, state: 'pre_match', map_name: map_name || 'Bermuda', started_at: new Date().toISOString(), ended_at: null };
+
+      const match = {
+        id: genId(),
+        tournament_id: db.tournaments[tIdx].id,
+        match_number: newMatchNumber,
+        state: 'pre_match',
+        map_name: sanitizeString(body.map_name, 50) || 'Bermuda',
+        started_at: new Date().toISOString(),
+        ended_at: null
+      };
+
       db.matches.push(match);
-      db.players = db.players.map(p => p.tournament_id === tournament_id ? { ...p, is_alive: true, current_match_kills: 0 } : p);
+      db.players = db.players.map(p => p.tournament_id === match.tournament_id ? { ...p, is_alive: true, current_match_kills: 0 } : p);
       db.overlay_state.last_updated_at = new Date().toISOString();
-      await saveDb(db);
+      await saveDb(uid, db);
       return ok({ success: true, match, match_number: newMatchNumber });
     }
 
     // ── UPDATE MATCH STATE ────────────────────────────────────────────────
     if (route === 'updateMatchState') {
-      const { match_id, state } = body;
-      if (!match_id || !state) return err(400, 'match_id and state required');
-      const mIdx = db.matches.findIndex(m => m.id === match_id);
+      const missing = requireFields(body, ['match_id', 'state']);
+      if (missing) return err(400, missing);
+
+      const mIdx = db.matches.findIndex(m => m.id === body.match_id);
       if (mIdx === -1) return err(404, 'Match not found');
-      db.matches[mIdx].state = state;
-      if (state === 'ended') { db.matches[mIdx].ended_at = new Date().toISOString(); }
+
+      db.matches[mIdx].state = sanitizeString(body.state, 30);
+      if (db.matches[mIdx].state === 'ended') {
+        db.matches[mIdx].ended_at = new Date().toISOString();
+      }
+
       db.overlay_state.last_updated_at = new Date().toISOString();
-      await saveDb(db);
+      await saveDb(uid, db);
       return ok({ success: true, match: db.matches[mIdx] });
     }
 
     // ── ADD KILL ──────────────────────────────────────────────────────────
     if (route === 'addKill') {
-      const { match_id, tournament_id, killer_player_id, killer_name, killer_team_name, killed_player_name, killed_team_name } = body;
-      if (!match_id || !killer_player_id) return err(400, 'match_id and killer_player_id required');
-      const kill = { id: genId(), match_id, tournament_id, killer_player_id, killer_name: killer_name || 'Unknown', killer_team_name: killer_team_name || '', killed_player_name: killed_player_name || 'Opponent', killed_team_name: killed_team_name || '', timestamp: new Date().toISOString() };
+      const missing = requireFields(body, ['match_id', 'killer_player_id']);
+      if (missing) return err(400, missing);
+
+      const kill = {
+        id: genId(),
+        match_id: sanitizeString(body.match_id),
+        tournament_id: sanitizeString(body.tournament_id || ''),
+        killer_player_id: sanitizeString(body.killer_player_id),
+        killer_name: sanitizeString(body.killer_name, 100) || 'Unknown',
+        killer_team_name: sanitizeString(body.killer_team_name, 100) || '',
+        killed_player_name: sanitizeString(body.killed_player_name, 100) || 'Opponent',
+        killed_team_name: sanitizeString(body.killed_team_name, 100) || '',
+        timestamp: new Date().toISOString()
+      };
+
       db.kill_events.push(kill);
-      const pIdx = db.players.findIndex(p => p.id === killer_player_id);
-      if (pIdx !== -1) { db.players[pIdx].current_match_kills = (db.players[pIdx].current_match_kills || 0) + 1; db.players[pIdx].total_tournament_kills = (db.players[pIdx].total_tournament_kills || 0) + 1; }
+      const pIdx = db.players.findIndex(p => p.id === kill.killer_player_id);
+      if (pIdx !== -1) {
+        db.players[pIdx].current_match_kills = (db.players[pIdx].current_match_kills || 0) + 1;
+        db.players[pIdx].total_tournament_kills = (db.players[pIdx].total_tournament_kills || 0) + 1;
+      }
+
       db.overlay_state.last_updated_at = new Date().toISOString();
-      await saveDb(db);
+      await saveDb(uid, db);
       return ok({ success: true, kill });
     }
 
     // ── ELIMINATE PLAYER ──────────────────────────────────────────────────
     if (route === 'eliminatePlayer') {
-      const { match_id, tournament_id, player_id, player_name, team_name } = body;
-      if (!match_id || !player_id) return err(400, 'match_id and player_id required');
-      const elim = { id: genId(), match_id, tournament_id, eliminated_player_id: player_id, eliminated_player_name: player_name || 'Unknown', eliminated_team_name: team_name || '', timestamp: new Date().toISOString() };
+      const missing = requireFields(body, ['match_id', 'player_id']);
+      if (missing) return err(400, missing);
+
+      const elim = {
+        id: genId(),
+        match_id: sanitizeString(body.match_id),
+        tournament_id: sanitizeString(body.tournament_id || ''),
+        eliminated_player_id: sanitizeString(body.player_id),
+        eliminated_player_name: sanitizeString(body.player_name, 100) || 'Unknown',
+        eliminated_team_name: sanitizeString(body.team_name, 100) || '',
+        timestamp: new Date().toISOString()
+      };
+
       db.elimination_events.push(elim);
-      const pIdx = db.players.findIndex(p => p.id === player_id);
+      const pIdx = db.players.findIndex(p => p.id === elim.eliminated_player_id);
       if (pIdx !== -1) db.players[pIdx].is_alive = false;
+
       db.overlay_state.last_updated_at = new Date().toISOString();
-      await saveDb(db);
+      await saveDb(uid, db);
       return ok({ success: true, elimination: elim });
     }
 
     // ── SET TEAM PLACEMENT ────────────────────────────────────────────────
     if (route === 'setTeamPlacement') {
-      const { match_id, tournament_id, team_id, team_name, placement, placement_points_config } = body;
-      if (!match_id || !team_id || !placement) return err(400, 'match_id, team_id, and placement required');
-      const tournament = db.tournaments.find(t => t.id === tournament_id);
-      let config = { 1:15,2:12,3:10,4:8,5:6,6:4,7:2,8:1,9:1,10:1,11:1,12:1 };
-      try { if (tournament?.placement_points_config) config = JSON.parse(tournament.placement_points_config); if (placement_points_config) config = placement_points_config; } catch (_) {}
+      const missing = requireFields(body, ['match_id', 'team_id', 'placement']);
+      if (missing) return err(400, missing);
+
+      const tournament = db.tournaments.find(t => t.id === body.tournament_id);
+      let config = { 1:15, 2:12, 3:10, 4:8, 5:6, 6:4, 7:2, 8:1, 9:1, 10:1, 11:1, 12:1 };
+      try {
+        if (tournament?.placement_points_config) config = JSON.parse(tournament.placement_points_config);
+        if (body.placement_points_config) config = body.placement_points_config;
+      } catch (_) {}
+
+      const placement = parseInt(body.placement);
       const placementPts = config[placement] || 0;
-      const teamPlayers = db.players.filter(p => p.team_id === team_id);
+      const teamPlayers = db.players.filter(p => p.team_id === body.team_id);
       const teamKills   = teamPlayers.reduce((sum, p) => sum + (p.current_match_kills || 0), 0);
       const totalMatchPoints = placementPts + (teamKills * (tournament?.points_per_kill || 1));
-      const existing = db.match_standings.findIndex(s => s.match_id === match_id && s.team_id === team_id);
-      const standing = { id: existing !== -1 ? db.match_standings[existing].id : genId(), match_id, tournament_id, team_id, team_name: team_name || '', placement: parseInt(placement), placement_points_awarded: placementPts, team_kills_this_match: teamKills, total_match_points: totalMatchPoints };
-      if (existing !== -1) db.match_standings[existing] = standing; else db.match_standings.push(standing);
+
+      const existing = db.match_standings.findIndex(s => s.match_id === body.match_id && s.team_id === body.team_id);
+      const standing = {
+        id: existing !== -1 ? db.match_standings[existing].id : genId(),
+        match_id: sanitizeString(body.match_id),
+        tournament_id: sanitizeString(body.tournament_id || ''),
+        team_id: sanitizeString(body.team_id),
+        team_name: sanitizeString(body.team_name, 100) || '',
+        placement,
+        placement_points_awarded: placementPts,
+        team_kills_this_match: teamKills,
+        total_match_points: totalMatchPoints
+      };
+
+      if (existing !== -1) db.match_standings[existing] = standing;
+      else db.match_standings.push(standing);
+
       db.overlay_state.last_updated_at = new Date().toISOString();
-      await saveDb(db);
+      await saveDb(uid, db);
       return ok({ success: true, standing });
     }
 
     // ── CALCULATE MVP ─────────────────────────────────────────────────────
     if (route === 'calculateMVP') {
-      const { match_id } = body;
-      if (!match_id) return err(400, 'match_id required');
+      const missing = requireFields(body, ['match_id']);
+      if (missing) return err(400, missing);
+
       const killMap = {};
-      for (const evt of db.kill_events.filter(k => k.match_id === match_id)) {
-        if (!killMap[evt.killer_player_id]) killMap[evt.killer_player_id] = { name: evt.killer_name, team: evt.killer_team_name, kills: 0, player_id: evt.killer_player_id };
+      for (const evt of db.kill_events.filter(k => k.match_id === body.match_id)) {
+        if (!killMap[evt.killer_player_id]) {
+          killMap[evt.killer_player_id] = { name: evt.killer_name, team: evt.killer_team_name, kills: 0, player_id: evt.killer_player_id };
+        }
         killMap[evt.killer_player_id].kills++;
       }
       const sorted = Object.values(killMap).sort((a, b) => b.kills - a.kills);
@@ -208,107 +503,118 @@ module.exports = async (req, res) => {
       return ok({ mvp: top[0], tied: top.length > 1, tied_players: top, max_kills: maxKills });
     }
 
-    // ── SET MVP / CHAMPION ────────────────────────────────────────────────
+    // ── SET MVP AND SHOW SCREEN ───────────────────────────────────────────
     if (route === 'setMVPAndShowScreen') {
-      const { player_id, player_name, team_name, kills } = body;
-      db.overlay_state = { ...db.overlay_state, current_screen: 'mvp', mvp_player_id: player_id || '', mvp_player_name: player_name || '', mvp_team_name: team_name || '', mvp_kills: kills || 0, last_updated_at: new Date().toISOString() };
-      await saveDb(db);
+      db.overlay_state = {
+        ...db.overlay_state,
+        current_screen: 'mvp',
+        mvp_player_id: sanitizeString(body.player_id),
+        mvp_player_name: sanitizeString(body.player_name, 100) || '',
+        mvp_team_name: sanitizeString(body.team_name, 100) || '',
+        mvp_kills: parseInt(body.kills) || 0,
+        last_updated_at: new Date().toISOString()
+      };
+      await saveDb(uid, db);
       return ok({ success: true });
     }
+
+    // ── SET CHAMPION AND SHOW SCREEN ──────────────────────────────────────
     if (route === 'setChampionAndShowScreen') {
-      const { team_id, team_name, total_points } = body;
-      db.overlay_state = { ...db.overlay_state, current_screen: 'champions', champion_team_id: team_id || '', champion_team_name: team_name || '', champion_total_points: total_points || 0, last_updated_at: new Date().toISOString() };
-      await saveDb(db);
+      db.overlay_state = {
+        ...db.overlay_state,
+        current_screen: 'champions',
+        champion_team_id: sanitizeString(body.team_id),
+        champion_team_name: sanitizeString(body.team_name, 100) || '',
+        champion_total_points: parseInt(body.total_points) || 0,
+        last_updated_at: new Date().toISOString()
+      };
+      await saveDb(uid, db);
       return ok({ success: true });
     }
 
     // ── DECLARE CHAMPIONS ─────────────────────────────────────────────────
     if (route === 'declareChampions') {
-      const { tournament_id } = body;
-      if (!tournament_id) return err(400, 'tournament_id required');
-      const tIdx = db.tournaments.findIndex(t => t.id === tournament_id);
+      const missing = requireFields(body, ['tournament_id']);
+      if (missing) return err(400, missing);
+
+      const tIdx = db.tournaments.findIndex(t => t.id === body.tournament_id);
       if (tIdx !== -1) db.tournaments[tIdx].status = 'completed';
-      const teams = db.teams.filter(t => t.tournament_id === tournament_id).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
-      await saveDb(db);
+
+      const teams = db.teams.filter(t => t.tournament_id === body.tournament_id).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
+      await saveDb(uid, db);
       return ok({ success: true, rankings: teams.map((t, i) => ({ rank: i + 1, team: t.name, total_points: t.total_tournament_points, total_kills: t.total_tournament_kills })) });
     }
 
-    // ── DELETE TEAM / REVIVE PLAYER / RESET MATCH / UPDATE TOURNAMENT ────
+    // ── DELETE TEAM ───────────────────────────────────────────────────────
     if (route === 'deleteTeam') {
-      const { team_id } = body; if (!team_id) return err(400, 'team_id required');
-      db.teams = db.teams.filter(t => t.id !== team_id);
-      db.players = db.players.filter(p => p.team_id !== team_id);
-      db.match_standings = db.match_standings.filter(s => s.team_id !== team_id);
-      await saveDb(db); return ok({ success: true });
+      const missing = requireFields(body, ['team_id']);
+      if (missing) return err(400, missing);
+
+      db.teams = db.teams.filter(t => t.id !== body.team_id);
+      db.players = db.players.filter(p => p.team_id !== body.team_id);
+      db.match_standings = db.match_standings.filter(s => s.team_id !== body.team_id);
+      await saveDb(uid, db);
+      return ok({ success: true });
     }
+
+    // ── REVIVE PLAYER ─────────────────────────────────────────────────────
     if (route === 'revivePlayer') {
-      const { player_id } = body; if (!player_id) return err(400, 'player_id required');
-      const pIdx = db.players.findIndex(p => p.id === player_id);
+      const missing = requireFields(body, ['player_id']);
+      if (missing) return err(400, missing);
+
+      const pIdx = db.players.findIndex(p => p.id === body.player_id);
       if (pIdx === -1) return err(404, 'Player not found');
+
       db.players[pIdx].is_alive = true;
       db.overlay_state.last_updated_at = new Date().toISOString();
-      await saveDb(db); return ok({ success: true, player: db.players[pIdx] });
+      await saveDb(uid, db);
+      return ok({ success: true, player: db.players[pIdx] });
     }
+
+    // ── RESET MATCH ───────────────────────────────────────────────────────
     if (route === 'resetMatch') {
       const { match_id, tournament_id } = body;
-      if (match_id) { db.kill_events = db.kill_events.filter(k => k.match_id !== match_id); db.elimination_events = db.elimination_events.filter(e => e.match_id !== match_id); db.match_standings = db.match_standings.filter(s => s.match_id !== match_id); const mIdx = db.matches.findIndex(m => m.id === match_id); if (mIdx !== -1) db.matches[mIdx].state = 'pre_match'; }
-      if (tournament_id) db.players = db.players.map(p => p.tournament_id === tournament_id ? { ...p, is_alive: true, current_match_kills: 0 } : p);
+      if (match_id) {
+        db.kill_events = db.kill_events.filter(k => k.match_id !== match_id);
+        db.elimination_events = db.elimination_events.filter(e => e.match_id !== match_id);
+        db.match_standings = db.match_standings.filter(s => s.match_id !== match_id);
+        const mIdx = db.matches.findIndex(m => m.id === match_id);
+        if (mIdx !== -1) db.matches[mIdx].state = 'pre_match';
+      }
+      if (tournament_id) {
+        db.players = db.players.map(p => p.tournament_id === tournament_id ? { ...p, is_alive: true, current_match_kills: 0 } : p);
+      }
       db.overlay_state.last_updated_at = new Date().toISOString();
-      await saveDb(db); return ok({ success: true });
+      await saveDb(uid, db);
+      return ok({ success: true });
     }
+
+    // ── UPDATE TOURNAMENT ─────────────────────────────────────────────────
     if (route === 'updateTournament') {
-      const { tournament_id, ...updates } = body;
-      const tIdx = db.tournaments.findIndex(t => t.id === tournament_id);
+      const missing = requireFields(body, ['tournament_id']);
+      if (missing) return err(400, missing);
+
+      const tIdx = db.tournaments.findIndex(t => t.id === body.tournament_id);
       if (tIdx === -1) return err(404, 'Tournament not found');
+
+      const updates = {};
+      if (body.name) updates.name = sanitizeString(body.name, 100);
+      if (body.total_matches) updates.total_matches = parseInt(body.total_matches);
+      if (body.points_per_kill) updates.points_per_kill = parseInt(body.points_per_kill);
+      if (body.placement_points_config) updates.placement_points_config = JSON.stringify(body.placement_points_config);
+      if (body.status) updates.status = sanitizeString(body.status, 20);
+
       db.tournaments[tIdx] = { ...db.tournaments[tIdx], ...updates };
-      await saveDb(db); return ok({ success: true, tournament: db.tournaments[tIdx] });
+      await saveDb(uid, db);
+      return ok({ success: true, tournament: db.tournaments[tIdx] });
     }
 
-    // ── RESET DATABASE ────────────────────────────────────────────────────
+    // ── RESET DATABASE (OWNER ONLY) ───────────────────────────────────────
     if (route === 'resetDatabase') {
-      const fresh = { tournaments:[], teams:[], players:[], matches:[], match_standings:[], kill_events:[], elimination_events:[], overlay_state:{ id:'singleton', tournament_id:null, current_screen:'setup_blank', mvp_player_id:null, mvp_player_name:null, mvp_team_name:null, mvp_kills:0, champion_team_id:null, champion_team_name:null, champion_total_points:0, last_updated_at:new Date().toISOString() }, design: { ...DEFAULT_DESIGN } };
-      await saveDb(fresh); return ok({ success: true, message: 'Database reset successfully' });
-    }
-
-    // ── AUTH ROUTES ───────────────────────────────────────────────────────
-    if (route === 'registerUser') {
-      const authHeader = req.headers.authorization || req.headers.Authorization || '';
-      if (!authHeader.startsWith('Bearer ')) return err(401, 'No token');
-      const token = authHeader.slice(7);
-      const webApiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_WEB_API_KEY || 'AIzaSyBekqzqZv_iWvgAn9UCnpBGIw2675wr1gc';
-      try {
-        const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${webApiKey}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ idToken: token }) });
-        const d = await r.json(); const user = d.users?.[0]; if (!user) return err(401, 'Invalid token');
-        const existing = await loadDb();
-        return ok({ success: true, uid: user.localId, email: user.email });
-      } catch(e) { return err(500, e.message); }
-    }
-
-    if (route === 'checkSubscription') {
-      const authHeader = req.headers.authorization || req.headers.Authorization || '';
-      if (!authHeader.startsWith('Bearer ')) return err(401, 'No token');
-      const token = authHeader.slice(7);
-      const webApiKey = process.env.VITE_FIREBASE_API_KEY || process.env.FIREBASE_WEB_API_KEY || 'AIzaSyBekqzqZv_iWvgAn9UCnpBGIw2675wr1gc';
-      try {
-        const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${webApiKey}`, { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ idToken: token }) });
-        const d = await r.json(); const user = d.users?.[0]; if (!user) return err(401, 'Invalid token');
-        // Owner emails always get active subscription (set OWNER_EMAILS env var)
-        const ownerEmails = (process.env.OWNER_EMAILS || 'nex.unishghimire@gmail.com').split(',').map(e => e.trim().toLowerCase());
-        if (ownerEmails.includes(user.email?.toLowerCase())) {
-          return ok({ uid: user.localId, subscription: { plan:'yearly', status:'active', expiresAt: Date.now() + 315360000000 } });
-        }
-        // Check DB for regular users (graceful fail if DB not set up)
-        const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || 'https://nexoverlays-default-rtdb.firebaseio.com').replace(/\/$/, '');
-        const secret = process.env.FIREBASE_DATABASE_SECRET;
-        if (secret) {
-          try {
-            const subR = await fetch(`${dbBaseUrl}/booyah_admin/users/${user.localId}.json?auth=${secret}`);
-            const subData = subR.ok ? await subR.json() : null;
-            return ok({ uid: user.localId, subscription: subData?.subscription || null });
-          } catch { return ok({ uid: user.localId, subscription: null }); }
-        }
-        return ok({ uid: user.localId, subscription: null });
-      } catch(e) { return ok({ uid: 'unknown', subscription: null }); }
+      if (!isOwner) return err(403, 'Forbidden: Owner permission required');
+      const fresh = getDefaultDb();
+      await saveDb(uid, fresh);
+      return ok({ success: true, message: 'Database reset successfully' });
     }
 
     // ── GOOGLE SHEETS IMPORT ──────────────────────────────────────────────
@@ -340,13 +646,13 @@ module.exports = async (req, res) => {
         let teamsAdded = 0, playersAdded = 0;
         for (const t of teamsData) { if (!db.teams.find(x => x.name?.toLowerCase()===t.team_name.toLowerCase())) { db.teams.push({ id:genId(), tournament_id:tournament_id||db.tournaments[0]?.id, name:t.team_name, logo_url:t.logo_url, color:t.color, total_tournament_points:0, total_tournament_kills:0 }); teamsAdded++; } }
         for (const p of playersData) { const team = db.teams.find(t => t.name?.toLowerCase()===p.team_name.toLowerCase()); if (!team) continue; if (!db.players.find(x => x.name===p.player_name&&x.team_id===team.id)) { db.players.push({ id:genId(), team_id:team.id, tournament_id:tournament_id||db.tournaments[0]?.id, name:p.player_name, role:p.role, is_alive:true, total_tournament_kills:0, current_match_kills:0 }); playersAdded++; } }
-        await saveDb(db);
+        await saveDb(uid, db);
         return ok({ success:true, teams_added:teamsAdded, players_added:playersAdded });
       } catch(e) { return err(500, `Sheet import failed: ${e.message}`); }
     }
 
     return err(404, `Unknown route: ${route}`);
   } catch (e) {
-    return err(500, e.message);
+    return err(500, 'Internal Server Error');
   }
 };
