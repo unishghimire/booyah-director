@@ -94,6 +94,7 @@ export const overlayApi = {
   importFromSheet:          (d) => call('importFromSheet', d),
   resetDatabase:            ()  => call('resetDatabase'),
   getShareToken:            ()  => call('getShareToken', {}, 'GET'),
+  updateTeamLogo:           (d) => call('updateTeamLogo', d),
 };
 
 // ── Data normaliser ───────────────────────────────────────────────────────────

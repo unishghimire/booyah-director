@@ -559,6 +559,21 @@ module.exports = async (req, res) => {
       return ok({ success: true });
     }
 
+    // ── UPDATE TEAM LOGO ───────────────────────────────────────────────────
+    if (route === 'updateTeamLogo') {
+      const missing = requireFields(body, ['team_id', 'logo_url']);
+      if (missing) return err(400, missing);
+
+      const tIdx = db.teams.findIndex(t => t.id === body.team_id);
+      if (tIdx === -1) return err(404, 'Team not found');
+
+      db.teams[tIdx].logo_url = sanitizeString(body.logo_url, 400);
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, team: db.teams[tIdx] });
+    }
+
+
     // ── REVIVE PLAYER ─────────────────────────────────────────────────────
     if (route === 'revivePlayer') {
       const missing = requireFields(body, ['player_id']);

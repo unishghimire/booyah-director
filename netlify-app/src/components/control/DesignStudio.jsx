@@ -51,6 +51,7 @@ const DEFAULT_DESIGN = {
   bgColor:'#060915',     textColor:'#ffffff',
   tournamentName:'FF OFFICIAL', tournamentSubtitle:'GRAND FINALS',
   gameLabel:'MATCH', logoUrl:'', overlayStyle:'ff_classic', fontStyle:'orbitron',
+  sponsorLogoUrl:'',
   casters:[
     { name:'CASTER 1', handle:'@handle', role:'PLAY-BY-PLAY' },
     { name:'CASTER 2', handle:'@handle', role:'COLOR CASTER' },
@@ -210,7 +211,14 @@ export default function DesignStudio({ onAction }) {
           <ImageUpload
             value={design.logoUrl || ''}
             onChange={(url) => upd('logoUrl', url)}
-            label="Tournament Logo"
+            label="Tournament Logo (shows in scoreboard header & overlay screens)"
+            name="tournament-logo"
+          />
+          <ImageUpload
+            value={design.sponsorLogoUrl || ''}
+            onChange={(url) => upd('sponsorLogoUrl', url)}
+            label="Sponsor Logo (shows in casters screen)"
+            name="sponsor-logo"
           />
         </div>
       </Section>
@@ -232,6 +240,12 @@ export default function DesignStudio({ onAction }) {
                   placeholder="PLAY-BY-PLAY"
                   className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/30" />
               </div>
+              <ImageUpload
+                value={c.photo || ''}
+                onChange={(url) => updCaster(i, 'photo', url)}
+                label={`Caster ${i+1} Photo (shows in casters overlay)`}
+                name={`caster-${i+1}-photo`}
+              />
             </div>
           ))}
         </div>
