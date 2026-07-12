@@ -262,6 +262,7 @@ export default function DataInputer() {
                   })}
                 </div>
               </div>
+              </SectionBoundary>
             )}
 
             {/* TEAMS TAB */}
@@ -414,6 +415,7 @@ export default function DataInputer() {
                   </div>
                 </div>
               </div>
+              </SectionBoundary>
             )}
 
             {/* EVENT LOG TAB */}
@@ -495,6 +497,7 @@ export default function DataInputer() {
                   </div>
                 </div>
               </div>
+              </SectionBoundary>
             )}
           </>
         )}
