@@ -16,6 +16,8 @@ const DEFAULT_DESIGN = {
 };
 
 module.exports = async (req, res) => {
+  // GLOBAL_CATCH — ensures every error returns JSON, never crashes the function cold
+  try {
   // CORS Configuration
   const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
   const CORS = {
@@ -655,4 +657,3 @@ module.exports = async (req, res) => {
   } catch (e) {
     return err(500, 'Internal Server Error');
   }
-};

@@ -2,6 +2,7 @@ import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } f
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
+import { ErrorBoundary, PanelBoundary } from '@/components/ErrorBoundary';
 import ScrollToTop from '@/components/ScrollToTop';
 import AuthPage from '@/pages/AuthPage';
 import PricingPage from '@/pages/PricingPage';
@@ -27,7 +28,8 @@ function NavBarContent() {
 
   // Render Navbar only if subscribed OR owner (so authenticated and has access)
   const isOwner = user?.email && OWNER_EMAILS.includes(user.email.toLowerCase());
-  const isSubscribed = isOwner || (subscription?.status === 'active' && subscription?.expiresAt > Date.now());
+  const expiresAt = subscription?.expiresAt ? (typeof subscription.expiresAt === 'number' ? subscription.expiresAt : new Date(subscription.expiresAt).getTime()) : 0;
+  const isSubscribed = isOwner || (subscription?.status === 'active' && expiresAt > Date.now());
   if (!isSubscribed) return null;
 
   const currentScreenName = data?.overlayState?.current_screen 
@@ -140,7 +142,8 @@ function AppRoutes() {
 
   // Check subscription active (Owners always get active subscription status)
   const isOwner = user?.email && OWNER_EMAILS.includes(user.email.toLowerCase());
-  const isSubscribed = isOwner || (subscription?.status === 'active' && subscription?.expiresAt > Date.now());
+  const expiresAt = subscription?.expiresAt ? (typeof subscription.expiresAt === 'number' ? subscription.expiresAt : new Date(subscription.expiresAt).getTime()) : 0;
+  const isSubscribed = isOwner || (subscription?.status === 'active' && expiresAt > Date.now());
 
   // No active subscription
   if (!isSubscribed) {
@@ -157,12 +160,12 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/director" replace />} />
-      <Route path="/director" element={<PinGate role="director"><DirectorPanel /></PinGate>} />
-      <Route path="/inputer" element={<PinGate role="inputer"><DataInputer /></PinGate>} />
+      <Route path="/director" element={<PanelBoundary label="DIRECTOR"><DirectorPanel /></PanelBoundary>} />
+      <Route path="/inputer" element={<PanelBoundary label="DATA INPUTER"><DataInputer /></PanelBoundary>} />
       <Route path="/control-panel" element={<Navigate to="/director" replace />} />
       <Route path="/overlay" element={<Navigate to="/overlay/blank" replace />} />
       <Route path="/overlay/:screen" element={<Overlay />} />
-      <Route path="/overlay-links" element={<PinGate role="director"><OverlayLinks /></PinGate>} />
+      <Route path="/overlay-links" element={<PanelBoundary label="OBS LINKS"><OverlayLinks /></PanelBoundary>} />
       <Route path="*" element={<Navigate to="/director" replace />} />
     </Routes>
   );
