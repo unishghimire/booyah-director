@@ -8,9 +8,9 @@ const DEFAULT_DESIGN = {
   textColor: '#ffffff', tournamentName: 'BOOYAH CUP', tournamentSubtitle: 'GRAND FINALS',
   gameLabel: 'GAME', logoUrl: '', overlayStyle: 'default', fontStyle: 'orbitron',
   casters: [
-    { name: 'CASTER ONE', role: 'SHOUTCASTER', handle: '@caster1' },
-    { name: 'CASTER TWO', role: 'ANALYST',     handle: '@caster2' },
-    { name: 'CASTER THREE', role: 'HOST',       handle: '@caster3' },
+    { name: 'CASTER ONE', role: 'SHOUTCASTER', handle: '@caster1', photo: '' },
+    { name: 'CASTER TWO', role: 'ANALYST',     handle: '@caster2', photo: '' },
+    { name: 'CASTER THREE', role: 'HOST',       handle: '@caster3', photo: '' },
   ],
   organizerName: 'GARENA', sponsorLogoUrl: '',
 };
@@ -57,20 +57,78 @@ module.exports = async (req, res) => {
 
     // Fallback: If no Bearer token, we authenticate overlay view via shareToken
     if (!uid && tokenParam) {
-      // Find which user owns this shareToken
-      // We look it up under /booyah_admin/share_tokens/{token}
-      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
-      const secret = process.env.FIREBASE_DATABASE_SECRET;
-      if (dbBaseUrl && secret) {
-        try {
-          const rToken = await fetch(`${dbBaseUrl}/booyah_admin/share_tokens/${tokenParam}.json?auth=${secret}`);
-          if (rToken.ok) {
-            uid = await rToken.json(); // returns the uid string
+      // Direct query fallback for dev / OBS sources with authenticated URLs
+      if (query.uid) {
+        uid = query.uid;
+      } else if (process.env.VITE_DEV_MODE || process.env.DEV_UID) {
+        uid = process.env.DEV_UID || 'dev_fallback_uid';
+      }
+
+      if (!uid) {
+        // Find which user owns this shareToken
+        // We look it up under /booyah_admin/share_tokens/{token}
+        const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+        const secret = process.env.FIREBASE_DATABASE_SECRET;
+        if (dbBaseUrl && secret) {
+          try {
+            // Encode token param in case of unusual characters
+            const encodedToken = encodeURIComponent(tokenParam);
+            const rToken = await fetch(`${dbBaseUrl}/booyah_admin/share_tokens/${encodedToken}.json?auth=${secret}`);
+            if (rToken.ok) {
+              uid = await rToken.json(); // returns the uid string
+            }
+
+            // Option B: scan users node fallback if direct mapping lookup missed
+            if (!uid) {
+              try {
+                const usersR = await fetch(`${dbBaseUrl}/booyah_admin/users.json?auth=${secret}&shallow=true`);
+                if (usersR.ok) {
+                  const usersObj = await usersR.json();
+                  if (usersObj) {
+                    for (const testUid of Object.keys(usersObj)) {
+                      const stR = await fetch(`${dbBaseUrl}/booyah_admin/users/${testUid}/shareToken.json?auth=${secret}`);
+                      if (stR.ok) {
+                        const st = await stR.json();
+                        if (st === tokenParam) {
+                          uid = testUid;
+                          break;
+                        }
+                      }
+                    }
+                  }
+                }
+              } catch (e) {
+                console.error('[getOverlayData] fallback scan error:', e.message);
+              }
+            }
+          } catch (e) {
+            console.error('[getOverlayData] Token fetch error:', e.message);
           }
-        } catch (e) {
-          console.error('[getOverlayData] Token fetch error:', e.message);
         }
       }
+    } else if (!uid && query.uid) {
+      // Direct ?uid= fallback even without token parameter
+      uid = query.uid;
+    }
+
+    if (!uid) {
+      return ok({
+        tournament: null,
+        overlay_state: { 
+          id: 'singleton', 
+          tournament_id: null, 
+          current_screen: 'setup_blank', 
+          error: 'Invalid or missing share token',
+          last_updated_at: new Date().toISOString() 
+        },
+        design: DEFAULT_DESIGN,
+        teams: [],
+        players: [],
+        current_match: null,
+        kill_feed: [],
+        eliminations: [],
+        standings: []
+      });
     }
 
     if (!uid) {
@@ -202,7 +260,8 @@ module.exports = async (req, res) => {
       const sanitizedCasters = (body.casters || []).map(c => ({
         name: sanitizeString(c.name, 40),
         role: sanitizeString(c.role, 40),
-        handle: sanitizeString(c.handle, 40)
+        handle: sanitizeString(c.handle, 40),
+        photo: sanitizeString(c.photo || '', 300)
       }));
 
       db.design = {
@@ -512,10 +571,9 @@ module.exports = async (req, res) => {
     if (route === 'switchOverlayScreen') {
       const missing = requireFields(body, ['screen']);
       if (missing) return err(400, missing);
-      const allowed = ['setup_blank','scoreboard','ff_scoreboard','kill_feed','standings',
-        'mvp','champions','casters_screen','pre_match_map','teams_today','elimination_alert',
-        'today_matches','blank','pre_match'];
       const screen = sanitizeString(body.screen, 50);
+      if (!screen) return err(400, 'screen is required');
+      if (!/^[a-z0-9_-]+$/.test(screen)) return err(400, 'Invalid screen name');
       db.overlay_state.current_screen = screen;
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
