@@ -216,6 +216,7 @@ export default function DataInputer() {
           <>
             {/* LIVE INPUT TAB */}
             {activeTab === 'live' && (
+              <SectionBoundary label="LIVE INPUT">
               <div className="space-y-6">
                 {/* Search bar */}
                 <div className="relative">
@@ -265,6 +266,7 @@ export default function DataInputer() {
 
             {/* TEAMS TAB */}
             {activeTab === 'teams' && (
+              <SectionBoundary label="TEAMS">
               <div className="grid grid-cols-12 gap-6">
                 {/* Google Sheets Import */}
                 <div className="col-span-12 mb-2">
@@ -416,6 +418,7 @@ export default function DataInputer() {
 
             {/* EVENT LOG TAB */}
             {activeTab === 'events' && (
+              <SectionBoundary label="EVENT LOG">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* KILL LOG */}
                 <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">

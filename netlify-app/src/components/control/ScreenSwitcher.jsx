@@ -10,17 +10,17 @@ import toast from 'react-hot-toast';
 const SCREENS = [
   // ── Full-scene replacements (solid background) ──
   { key: 'setup_blank',       label: 'STANDBY',      icon: Monitor,      desc: 'Black hold screen',         group: 'scene' },
-  { key: 'pre_match_map',     label: 'MAP INTRO',     icon: Map,          desc: 'Map reveal + team list',    group: 'scene' },
-  { key: 'teams_today',       label: 'TEAMS TODAY',   icon: Users,        desc: 'All teams grid',            group: 'scene' },
-  { key: 'casters_screen',    label: 'CASTERS',       icon: Mic2,         desc: 'Caster introduction',       group: 'scene' },
+  { key: 'maplabel',          label: 'MAP INTRO',     icon: Map,          desc: 'Map reveal + team list',    group: 'scene' },
+  { key: 'teams',             label: 'TEAMS TODAY',   icon: Users,        desc: 'All teams grid',            group: 'scene' },
+  { key: 'casters',           label: 'CASTERS',       icon: Mic2,         desc: 'Caster introduction',       group: 'scene' },
   { key: 'mvp',               label: 'MVP',           icon: Star,         desc: 'MVP spotlight screen',      group: 'scene' },
   { key: 'champions',         label: 'BOOYAH!',       icon: Trophy,       desc: 'Champions reveal',          group: 'scene' },
   // ── Transparent overlays (layer over gameplay) ──
   { key: 'scoreboard',        label: 'SCOREBOARD',    icon: LayoutList,   desc: 'Live scoreboard overlay',   group: 'overlay' },
-  { key: 'ff_scoreboard',     label: 'FF STYLE',      icon: LayoutList,   desc: 'Free Fire style board',     group: 'overlay' },
+  { key: 'ff_scoreboard',     label: 'FF STYLE',      icon: LayoutList,   desc: 'Free Fire style board (same as Scoreboard)', group: 'overlay' },
   { key: 'standings',         label: 'STANDINGS',     icon: Trophy,       desc: 'Full tournament standings', group: 'overlay' },
   { key: 'kill_feed',         label: 'KILL FEED',     icon: Crosshair,    desc: 'Live kill events',          group: 'overlay' },
-  { key: 'elimination_alert', label: 'ELIM ALERT',    icon: AlertTriangle,desc: 'Last elimination popup',   group: 'overlay' },
+  { key: 'elim_alert',        label: 'ELIM ALERT',    icon: AlertTriangle,desc: 'Last elimination popup',   group: 'overlay' },
 ];
 
 const GROUP_LABELS = {

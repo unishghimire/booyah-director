@@ -272,6 +272,7 @@ export default function DirectorPanel() {
           <>
             {/* OVERLAY TAB */}
             {activeTab === 'overlay' && (
+              <SectionBoundary label="OVERLAY LINKS">
   <div className="h-full flex items-center justify-center py-12">
     <div className="text-center max-w-md bg-[#0f0f1a] border border-white/5 rounded-2xl p-8 shadow-2xl">
       <Monitor className="w-12 h-12 text-[#00D4FF] mx-auto mb-4" />
@@ -288,10 +289,12 @@ export default function DirectorPanel() {
       </a>
     </div>
   </div>
+              </SectionBoundary>
 )}
 
             {/* MATCH TAB */}
             {activeTab === 'match' && (
+              <SectionBoundary label="MATCH CONTROL">
               <div className="max-w-3xl mx-auto space-y-6">
                 <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-6">
                   <div className="mb-6 flex items-center gap-2 border-b border-white/5 pb-4">
@@ -395,10 +398,12 @@ export default function DirectorPanel() {
                   </div>
                 </div>
               </div>
+              </SectionBoundary>
             )}
 
             {/* STANDINGS TAB */}
             {activeTab === 'standings' && (
+              <SectionBoundary label="STANDINGS">
               <div className="rounded-xl border border-white/5 bg-[#0f0f1a] overflow-hidden">
                 <div className="p-5 border-b border-white/5 flex items-center justify-between">
                   <h2 className="font-orbitron text-xs font-black tracking-[0.25em] text-[#FFB800]">
@@ -468,6 +473,7 @@ export default function DirectorPanel() {
                   )}
                 </div>
               </div>
+              </SectionBoundary>
             )}
 
             {/* DESIGN TAB */}

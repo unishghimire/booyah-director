@@ -19,6 +19,7 @@ import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award, XCircle, Mic2, Shield, BarChart2 } from 'lucide-react';
 import { MAP_IMAGES } from '@/lib/maps';
+import { safeArray } from '@/components/ErrorBoundary';
 
 /* ══════════════════════════════════════════════════
    DATA POLLING — calls public overlay API with optional shareToken
@@ -253,9 +254,9 @@ function SetupBlank() {
 ══════════════════════════════════════════════════ */
 function FFBoard({ teams = [], players = [], currentMatch, design }) {
   const rows = useMemo(() => {
-    return [...teams]
+    return [...safeArray(teams)]
       .map(team => {
-        const tp = players.filter(p => p.team_id === team.id);
+        const tp = safeArray(players).filter(p => p.team_id === team.id);
         const alive = tp.filter(p => p.is_alive).length;
         return { ...team, alive, totalPlayers: tp.length || 4 };
       })
@@ -383,7 +384,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
    SCREEN 3: FULL STANDINGS (transparent, centered)
 ══════════════════════════════════════════════════ */
 function FullStandings({ teams = [], design }) {
-  const sorted = useMemo(() => [...teams].sort((a,b) => (b.total_tournament_points||0)-(a.total_tournament_points||0)||(b.total_tournament_kills||0)-(a.total_tournament_kills||0)), [teams]);
+  const sorted = useMemo(() => [...safeArray(teams)].sort((a,b) => (b.total_tournament_points||0)-(a.total_tournament_points||0)||(b.total_tournament_kills||0)-(a.total_tournament_kills||0)), [teams]);
   const rankColors = ['#FFB800','#C0C0C0','#CD7F32'];
 
   return (
@@ -431,7 +432,7 @@ function FullStandings({ teams = [], design }) {
    SCREEN 4: KILL FEED (transparent, bottom-left)
 ══════════════════════════════════════════════════ */
 function KillFeedScreen({ killFeed = [], design }) {
-  const activeKills = useMemo(() => [...killFeed].slice(-6).reverse(), [killFeed]);
+  const activeKills = useMemo(() => [...safeArray(killFeed)].slice(-6).reverse(), [killFeed]);
   const primary = tok.acc(design);
 
   return (
@@ -826,8 +827,8 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
   const mvpName   = overlayState?.mvp_player_name || overlayState?.mvpPlayerName || '—';
   const mvpTeam   = overlayState?.mvp_team_name   || overlayState?.mvpTeamName   || '—';
   const mvpKills  = overlayState?.mvp_kills        || overlayState?.mvpKills       || 0;
-  const mvpPlayer = players.find(p => p.name === mvpName);
-  const mvpTeamObj = teams.find(t => t.name === mvpTeam);
+  const mvpPlayer  = safeArray(players).find(p => p.name === mvpName) ?? null;
+  const mvpTeamObj = safeArray(teams).find(t => t.name === mvpTeam) ?? null;
 
   return (
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column' }}>
@@ -886,7 +887,7 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
 
   const winnerName   = overlayState?.champion_team_name   || teams[0]?.name || '—';
   const totalPoints  = overlayState?.champion_total_points || teams[0]?.total_tournament_points || 0;
-  const winnerTeamObj = teams.find(t=>t.name===winnerName) || teams[0];
+  const winnerTeamObj = safeArray(teams).find(t=>t.name===winnerName) || safeArray(teams)[0] || null;
   const totalKills   = winnerTeamObj?.total_tournament_kills || 0;
 
   return (
@@ -986,14 +987,20 @@ export default function Overlay() {
   const { data, error, ready } = useOverlayPoll(shareToken);
 
   const {
-    teams        = [],
-    players      = [],
-    killFeed     = [],
-    eliminations = [],
+    teams:        _teams        = [],
+    players:      _players      = [],
+    killFeed:     _killFeed     = [],
+    eliminations: _eliminations = [],
     currentMatch,
     overlayState,
     design,
-  } = data;
+  } = data || {};
+
+  // Always guarantee arrays — prevents .map() crashes if API returns null
+  const teams        = safeArray(_teams);
+  const players      = safeArray(_players);
+  const killFeed     = safeArray(_killFeed);
+  const eliminations = safeArray(_eliminations);
 
   if (!ready) return <div style={{ width:1920, height:1080, position:'relative', overflow:'hidden' }}><OverlayLoading /></div>;
 
@@ -1019,6 +1026,9 @@ export default function Overlay() {
     'elim-alert':    <EliminationAlert eliminations={eliminations} design={design} />,
     elim_alert:      <EliminationAlert eliminations={eliminations} design={design} />,
     elimination:     <EliminationAlert eliminations={eliminations} design={design} />,
+    elimination_alert: <EliminationAlert eliminations={eliminations} design={design} />,
+    pre_match_map:   <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
+    upcoming_map:    <UpcomingMap   match={currentMatch} design={design} />,
     mvp:             <MVPScreen     players={players} teams={teams} design={design} overlayState={overlayState} />,
     mvp_screen:      <MVPScreen     players={players} teams={teams} design={design} overlayState={overlayState} />,
     champions:       <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
