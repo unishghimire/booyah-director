@@ -15,12 +15,20 @@ import { Clapperboard, Keyboard, Monitor, ExternalLink, Zap, LogOut } from 'luci
 
 const queryClient = new QueryClient();
 
+const OWNER_EMAILS = (import.meta.env.VITE_OWNER_EMAILS || 'nex.unishghimire@gmail.com')
+  .split(',').map(e => e.trim().toLowerCase());
+
 function NavBarContent() {
   const loc = useLocation();
   const { data } = useOverlayData(true);
-  const { user, logout } = useAuth();
+  const { user, subscription, logout } = useAuth();
 
   if (loc.pathname === '/overlay' || !user) return null;
+
+  // Render Navbar only if subscribed OR owner (so authenticated and has access)
+  const isOwner = user?.email && OWNER_EMAILS.includes(user.email.toLowerCase());
+  const isSubscribed = isOwner || (subscription?.status === 'active' && subscription?.expiresAt > Date.now());
+  if (!isSubscribed) return null;
 
   const currentScreenName = data?.overlayState?.current_screen 
     ? data.overlayState.current_screen.replace(/_/g, ' ').toUpperCase()
@@ -115,26 +123,35 @@ function AppRoutes() {
     </div>
   );
 
-  // Not logged in
-  if (!user) return (
-    <Routes>
-      <Route path="/overlay" element={<Navigate to="/overlay/blank" replace />} />
-      <Route path="/overlay/:screen" element={<Overlay />} />
-      <Route path="*" element={<AuthPage />} />
-    </Routes>
-  );
+  // Overlay routes are PUBLIC (no auth or subscription required)
+  // Ensure we match '/overlay' and '/overlay/:screen'
+  const isOverlayRoute = window.location.pathname.startsWith('/overlay');
 
-  // Check subscription active
-  const isSubscribed = subscription?.status === 'active' && subscription?.expiresAt > Date.now();
+  // Not logged in
+  if (!user) {
+    return (
+      <Routes>
+        <Route path="/overlay" element={<Navigate to="/overlay/blank" replace />} />
+        <Route path="/overlay/:screen" element={<Overlay />} />
+        <Route path="*" element={<AuthPage />} />
+      </Routes>
+    );
+  }
+
+  // Check subscription active (Owners always get active subscription status)
+  const isOwner = user?.email && OWNER_EMAILS.includes(user.email.toLowerCase());
+  const isSubscribed = isOwner || (subscription?.status === 'active' && subscription?.expiresAt > Date.now());
 
   // No active subscription
-  if (!isSubscribed) return (
-    <Routes>
-      <Route path="/overlay" element={<Navigate to="/overlay/blank" replace />} />
-      <Route path="/overlay/:screen" element={<Overlay />} />
-      <Route path="*" element={<PricingPage />} />
-    </Routes>
-  );
+  if (!isSubscribed) {
+    return (
+      <Routes>
+        <Route path="/overlay" element={<Navigate to="/overlay/blank" replace />} />
+        <Route path="/overlay/:screen" element={<Overlay />} />
+        <Route path="*" element={<PricingPage />} />
+      </Routes>
+    );
+  }
 
   // Fully authenticated + subscribed
   return (

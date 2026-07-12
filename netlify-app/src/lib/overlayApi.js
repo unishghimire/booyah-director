@@ -1,55 +1,76 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
+import { auth } from './firebase';
 
-const BASE_URL = '/api';
+const BASE = '/api';
 
-async function callFunction(name, payload = {}, method = 'POST') {
-  const options = { method, headers: {} };
-  if (method === 'POST') {
-    options.headers['Content-Type'] = 'application/json';
-    options.body = JSON.stringify(payload);
+async function getToken(forceRefresh = false) {
+  const user = auth.currentUser;
+  if (!user) return null;
+  try { return await user.getIdToken(forceRefresh); }
+  catch { return null; }
+}
+
+async function call(name, payload = {}, method = 'POST', retry = true) {
+  const token = await getToken();
+  const headers = { 'Content-Type': 'application/json' };
+  if (token) headers['Authorization'] = `Bearer ${token}`;
+
+  const isGet = method === 'GET';
+  const url = isGet && Object.keys(payload).length
+    ? `${BASE}/${name}?${new URLSearchParams(payload)}`
+    : `${BASE}/${name}`;
+
+  const opts = { method, headers };
+  if (!isGet) opts.body = JSON.stringify(payload);
+
+  let res;
+  try { res = await fetch(url, opts); }
+  catch (e) {
+    if (retry) return call(name, payload, method, false); // retry once
+    throw new Error('Network error — please check your connection');
   }
-  const url =
-    method === 'GET' && Object.keys(payload).length
-      ? `${BASE_URL}/${name}?${new URLSearchParams(payload)}`
-      : `${BASE_URL}/${name}`;
-  const response = await fetch(url, options);
+
+  // Token expired — refresh and retry once
+  if (res.status === 401 && retry) {
+    await getToken(true);
+    return call(name, payload, method, false);
+  }
+
   let data = {};
-  try { data = await response.json(); } catch (e) {}
-  if (!response.ok)
-    throw new Error(data.error || data.message || `${name} failed (${response.status})`);
+  try { data = await res.json(); } catch {}
+  if (!res.ok) throw new Error(data.error || `Request failed (${res.status})`);
   return data;
 }
 
 export const overlayApi = {
-  getOverlayData:           ()  => callFunction('getOverlayData', {}, 'GET'),
-  initializeTournament:     (d) => callFunction('initializeTournament', d),
-  addTeam:                  (d) => callFunction('addTeam', d),
-  addPlayer:                (d) => callFunction('addPlayer', d),
-  deleteTeam:               (d) => callFunction('deleteTeam', d),
-  startNextMatch:           (d) => callFunction('startNextMatch', d),
-  updateMatchState:         (d) => callFunction('updateMatchState', d),
-  addKill:                  (d) => callFunction('addKill', d),
-  eliminatePlayer:          (d) => callFunction('eliminatePlayer', d),
-  revivePlayer:             (d) => callFunction('revivePlayer', d),
-  setTeamPlacement:         (d) => callFunction('setTeamPlacement', d),
-  calculateMVP:             (d) => callFunction('calculateMVP', d),
-  setMVPAndShowScreen:      (d) => callFunction('setMVPAndShowScreen', d),
-  setChampionAndShowScreen: (d) => callFunction('setChampionAndShowScreen', d),
-  switchOverlayScreen:      (d) => callFunction('switchOverlayScreen', d),
-  declareChampions:         (d) => callFunction('declareChampions', d),
-  saveDesign:               (d) => callFunction('saveDesign', d),
-  getDesign:                ()  => callFunction('getDesign', {}, 'GET'),
-  resetMatch:               (d) => callFunction('resetMatch', d),
-  updateTournament:         (d) => callFunction('updateTournament', d),
-  importFromSheet:          (d) => callFunction('importFromSheet', d),
-  resetDatabase:            ()  => callFunction('resetDatabase'),
+  getOverlayData:           (shareToken) => {
+    const token = shareToken || sessionStorage.getItem('shareToken') || '';
+    return call('getOverlayData', token ? { shareToken: token } : {}, 'GET');
+  },
+  initializeTournament:     (d) => call('initializeTournament', d),
+  addTeam:                  (d) => call('addTeam', d),
+  addPlayer:                (d) => call('addPlayer', d),
+  deleteTeam:               (d) => call('deleteTeam', d),
+  startNextMatch:           (d) => call('startNextMatch', d),
+  updateMatchState:         (d) => call('updateMatchState', d),
+  addKill:                  (d) => call('addKill', d),
+  eliminatePlayer:          (d) => call('eliminatePlayer', d),
+  revivePlayer:             (d) => call('revivePlayer', d),
+  setTeamPlacement:         (d) => call('setTeamPlacement', d),
+  calculateMVP:             (d) => call('calculateMVP', d),
+  setMVPAndShowScreen:      (d) => call('setMVPAndShowScreen', d),
+  setChampionAndShowScreen: (d) => call('setChampionAndShowScreen', d),
+  switchOverlayScreen:      (d) => call('switchOverlayScreen', d),
+  declareChampions:         (d) => call('declareChampions', d),
+  saveDesign:               (d) => call('saveDesign', d),
+  getDesign:                ()  => call('getDesign', {}, 'GET'),
+  resetMatch:               (d) => call('resetMatch', d),
+  updateTournament:         (d) => call('updateTournament', d),
+  importFromSheet:          (d) => call('importFromSheet', d),
+  resetDatabase:            ()  => call('resetDatabase'),
+  getShareToken:            ()  => call('getShareToken', {}, 'GET'),
 };
 
-/**
- * Normalise raw API response (snake_case) into camelCase shape every component expects.
- * API returns: { tournament, overlay_state, design, teams, players, current_match, kill_feed, eliminations, standings }
- * Components expect: { tournament, overlayState, design, teams, players, currentMatch, killFeed, eliminations, standings }
- */
 function normalise(raw) {
   if (!raw) return null;
   return {
@@ -65,12 +86,6 @@ function normalise(raw) {
   };
 }
 
-/**
- * useOverlayData — polls /api/getOverlayData every second.
- * Returns { data, loading, error, refresh } plus flat convenience aliases
- * so both DirectorPanel (uses data?.overlayState) and Overlay.jsx
- * (destructures overlayState directly) both work correctly.
- */
 export function useOverlayData(enabled = true) {
   const [data, setData]       = useState(null);
   const [loading, setLoading] = useState(true);
@@ -80,16 +95,9 @@ export function useOverlayData(enabled = true) {
   const refresh = useCallback(async () => {
     try {
       const raw = await overlayApi.getOverlayData();
-      if (mountedRef.current) {
-        setData(normalise(raw));
-        setLoading(false);
-        setError(null);
-      }
+      if (mountedRef.current) { setData(normalise(raw)); setLoading(false); setError(null); }
     } catch (err) {
-      if (mountedRef.current) {
-        setLoading(false);
-        setError(err.message);
-      }
+      if (mountedRef.current) { setLoading(false); setError(err.message); }
     }
   }, []);
 
@@ -97,19 +105,12 @@ export function useOverlayData(enabled = true) {
     mountedRef.current = true;
     if (!enabled) { setLoading(false); return; }
     refresh();
-    const interval = setInterval(refresh, 1000);
-    return () => {
-      mountedRef.current = false;
-      clearInterval(interval);
-    };
+    const iv = setInterval(refresh, 2000);
+    return () => { mountedRef.current = false; clearInterval(iv); };
   }, [enabled, refresh]);
 
   return {
-    data,
-    loading,
-    error,
-    refresh,
-    // Flat aliases — safe defaults when data is null
+    data, loading, error, refresh,
     overlayState: data?.overlayState ?? null,
     design:       data?.design       ?? null,
     teams:        data?.teams        ?? [],
