@@ -319,6 +319,14 @@ module.exports = async (req, res) => {
         } catch (_) {}
       }
 
+      // Any previously active tournament gets status set to 'completed'
+      db.tournaments = db.tournaments.map(t => {
+        if (t.status === 'active') {
+          return { ...t, status: 'completed' };
+        }
+        return t;
+      });
+
       const tournament = {
         id: genId(),
         name,
@@ -326,7 +334,7 @@ module.exports = async (req, res) => {
         points_per_kill,
         placement_points_config: JSON.stringify(body.placement_points_config || defaultConfig),
         current_match_number: 0,
-        status: 'setup',
+        status: 'active',
         created_at: new Date().toISOString()
       };
 
@@ -336,6 +344,63 @@ module.exports = async (req, res) => {
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true, tournament });
+    }
+
+    // ── LIST TOURNAMENTS ──────────────────────────────────────────────────
+    if (route === 'listTournaments') {
+      const sorted = [...db.tournaments].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      return ok({ tournaments: sorted });
+    }
+
+    // ── SWITCH TOURNAMENT ─────────────────────────────────────────────────
+    if (route === 'switchTournament') {
+      const { tournament_id } = body;
+      if (!tournament_id) return err(400, 'tournament_id is required');
+
+      const exists = db.tournaments.some(t => t.id === tournament_id);
+      if (!exists) return err(404, 'Tournament not found');
+
+      db.tournaments = db.tournaments.map(t => ({
+        ...t,
+        status: t.id === tournament_id ? 'active' : 'completed'
+      }));
+
+      db.overlay_state.tournament_id = tournament_id;
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true });
+    }
+
+    // ── DELETE TOURNAMENT ─────────────────────────────────────────────────
+    if (route === 'deleteTournament') {
+      if (!isOwner) return err(403, 'Forbidden: Owner permission required');
+      const { tournament_id } = body;
+      if (!tournament_id) return err(400, 'tournament_id is required');
+
+      const target = db.tournaments.find(t => t.id === tournament_id);
+      if (!target) return err(404, 'Tournament not found');
+
+      const wasActive = target.status === 'active';
+
+      // Remove the tournament
+      db.tournaments = db.tournaments.filter(t => t.id !== tournament_id);
+
+      // If it was active, sets the most recent other tournament as active
+      if (wasActive && db.tournaments.length > 0) {
+        const remainingSorted = [...db.tournaments].sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+        const mostRecent = remainingSorted[0];
+        db.tournaments = db.tournaments.map(t => ({
+          ...t,
+          status: t.id === mostRecent.id ? 'active' : 'completed'
+        }));
+        db.overlay_state.tournament_id = mostRecent.id;
+      } else if (db.tournaments.length === 0) {
+        db.overlay_state.tournament_id = null;
+      }
+
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, deleted_id: tournament_id });
     }
 
     // ── ADD TEAM ──────────────────────────────────────────────────────────
@@ -711,9 +776,34 @@ module.exports = async (req, res) => {
     // ── RESET DATABASE (OWNER ONLY) ───────────────────────────────────────
     if (route === 'resetDatabase') {
       if (!isOwner) return err(403, 'Forbidden: Owner permission required');
-      const fresh = getDefaultDb();
-      await saveDb(uid, fresh);
-      return ok({ success: true, message: 'Database reset successfully' });
+      
+      const activeT = db.tournaments.find(t => t.status === 'active');
+      if (activeT) {
+        const tid = activeT.id;
+        const activeMatchIds = new Set(db.matches.filter(m => m.tournament_id === tid).map(m => m.id));
+
+        db.teams = db.teams.filter(t => t.tournament_id !== tid);
+        db.players = db.players.filter(p => p.tournament_id !== tid);
+        db.matches = db.matches.filter(m => m.tournament_id !== tid);
+        db.match_standings = db.match_standings.filter(s => s.tournament_id !== tid);
+        db.kill_events = db.kill_events.filter(k => !activeMatchIds.has(k.match_id) && k.tournament_id !== tid);
+        db.elimination_events = db.elimination_events.filter(e => !activeMatchIds.has(e.match_id) && e.tournament_id !== tid);
+
+        if (db.overlay_state.tournament_id === tid) {
+          db.overlay_state.current_screen = 'setup_blank';
+          db.overlay_state.mvp_player_id = null;
+          db.overlay_state.mvp_player_name = null;
+          db.overlay_state.mvp_team_name = null;
+          db.overlay_state.mvp_kills = 0;
+          db.overlay_state.champion_team_id = null;
+          db.overlay_state.champion_team_name = null;
+          db.overlay_state.champion_total_points = 0;
+        }
+      }
+
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, message: 'Match data reset successfully' });
     }
 
     // ── GOOGLE SHEETS IMPORT ──────────────────────────────────────────────
