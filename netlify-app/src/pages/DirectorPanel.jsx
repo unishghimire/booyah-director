@@ -101,15 +101,17 @@ export default function DirectorPanel() {
 
   const triggerMVPOverlay = async () => {
     if (!mvp?.player_id) return toast.error('Calculate MVP first!');
+    if (!currentMatch?.id) return toast.error('No active match — start a match first');
     setMvpBusy('show');
     try {
       await overlayApi.setMVPAndShowScreen({
-        player_id: mvp.player_id,
-        player_name: mvp.name,
-        team_name: mvp.team,
-        kills: mvp.kills,
+        player_id:   mvp.player_id,
+        player_name: mvp.name   || '',
+        team_name:   mvp.team   || '',
+        kills:       mvp.kills  || 0,
+        match_id:    currentMatch.id,
       });
-      toast.success('MVP screen is now LIVE on overlay!');
+      toast.success('🏆 MVP screen is now LIVE on overlay!');
     } catch (err) {
       toast.error(err.message);
     } finally {

@@ -17,7 +17,7 @@
 import { useParams, useSearchParams } from 'react-router-dom';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award, XCircle } from 'lucide-react';
+import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award, XCircle, Mic2, Shield, BarChart2 } from 'lucide-react';
 import { MAP_IMAGES } from '@/lib/maps';
 
 /* ══════════════════════════════════════════════════
@@ -1008,8 +1008,8 @@ export default function Overlay() {
     kill_feed:       <KillFeedScreen killFeed={killFeed} design={design} />,
     maplabel:        <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
     map_label:       <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
-    'today-matches': <TodaysMatches matches={[]} design={design} />,
-    today_matches:   <TodaysMatches matches={[]} design={design} />,
+    'today-matches': <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />,
+    today_matches:   <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />,
     teams:           <TeamsToday    teams={teams} design={design} />,
     teams_today:     <TeamsToday    teams={teams} design={design} />,
     casters:         <CastersScreen design={design} />,

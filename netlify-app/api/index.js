@@ -46,7 +46,7 @@ module.exports = async (req, res) => {
 
   // 1. PUBLIC ROUTE: getOverlayData
   if (route === 'getOverlayData') {
-    const tokenParam = query.token;
+    const tokenParam = query.token || query.shareToken;
     const authHeader = req.headers.authorization || req.headers.Authorization || '';
     let uid = null;
 
@@ -315,6 +315,7 @@ module.exports = async (req, res) => {
         return p;
       });
 
+      db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true, team, players: createdPlayers });
     }
@@ -343,6 +344,7 @@ module.exports = async (req, res) => {
       };
 
       db.players.push(player);
+      db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true, player });
     }
@@ -505,14 +507,33 @@ module.exports = async (req, res) => {
       return ok({ mvp: top[0], tied: top.length > 1, tied_players: top, max_kills: maxKills });
     }
 
+
+    // ── SWITCH OVERLAY SCREEN ──────────────────────────────────────────────
+    if (route === 'switchOverlayScreen') {
+      const missing = requireFields(body, ['screen']);
+      if (missing) return err(400, missing);
+      const allowed = ['setup_blank','scoreboard','ff_scoreboard','kill_feed','standings',
+        'mvp','champions','casters_screen','pre_match_map','teams_today','elimination_alert',
+        'today_matches','blank','pre_match'];
+      const screen = sanitizeString(body.screen, 50);
+      db.overlay_state.current_screen = screen;
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, current_screen: screen });
+    }
+
     // ── SET MVP AND SHOW SCREEN ───────────────────────────────────────────
     if (route === 'setMVPAndShowScreen') {
+      const mvpMissing = requireFields(body, ['player_id', 'player_name', 'team_name']);
+      if (mvpMissing) return err(400, mvpMissing);
+      const playerExists = db.players.some(p => p.id === body.player_id);
+      if (!playerExists) return err(404, 'Player not found — calculate MVP first');
       db.overlay_state = {
         ...db.overlay_state,
         current_screen: 'mvp',
         mvp_player_id: sanitizeString(body.player_id),
-        mvp_player_name: sanitizeString(body.player_name, 100) || '',
-        mvp_team_name: sanitizeString(body.team_name, 100) || '',
+        mvp_player_name: sanitizeString(body.player_name, 100),
+        mvp_team_name: sanitizeString(body.team_name, 100),
         mvp_kills: parseInt(body.kills) || 0,
         last_updated_at: new Date().toISOString()
       };
@@ -543,6 +564,7 @@ module.exports = async (req, res) => {
       if (tIdx !== -1) db.tournaments[tIdx].status = 'completed';
 
       const teams = db.teams.filter(t => t.tournament_id === body.tournament_id).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
+      db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true, rankings: teams.map((t, i) => ({ rank: i + 1, team: t.name, total_points: t.total_tournament_points, total_kills: t.total_tournament_kills })) });
     }
@@ -555,6 +577,7 @@ module.exports = async (req, res) => {
       db.teams = db.teams.filter(t => t.id !== body.team_id);
       db.players = db.players.filter(p => p.team_id !== body.team_id);
       db.match_standings = db.match_standings.filter(s => s.team_id !== body.team_id);
+      db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true });
     }
@@ -622,6 +645,7 @@ module.exports = async (req, res) => {
       if (body.status) updates.status = sanitizeString(body.status, 20);
 
       db.tournaments[tIdx] = { ...db.tournaments[tIdx], ...updates };
+      db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true, tournament: db.tournaments[tIdx] });
     }
@@ -663,6 +687,7 @@ module.exports = async (req, res) => {
         let teamsAdded = 0, playersAdded = 0;
         for (const t of teamsData) { if (!db.teams.find(x => x.name?.toLowerCase()===t.team_name.toLowerCase())) { db.teams.push({ id:genId(), tournament_id:tournament_id||db.tournaments[0]?.id, name:t.team_name, logo_url:t.logo_url, color:t.color, total_tournament_points:0, total_tournament_kills:0 }); teamsAdded++; } }
         for (const p of playersData) { const team = db.teams.find(t => t.name?.toLowerCase()===p.team_name.toLowerCase()); if (!team) continue; if (!db.players.find(x => x.name===p.player_name&&x.team_id===team.id)) { db.players.push({ id:genId(), team_id:team.id, tournament_id:tournament_id||db.tournaments[0]?.id, name:p.player_name, role:p.role, is_alive:true, total_tournament_kills:0, current_match_kills:0 }); playersAdded++; } }
+        db.overlay_state.last_updated_at = new Date().toISOString();
         await saveDb(uid, db);
         return ok({ success:true, teams_added:teamsAdded, players_added:playersAdded });
       } catch(e) { return err(500, `Sheet import failed: ${e.message}`); }
