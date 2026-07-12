@@ -6,9 +6,6 @@
   "framework": "vite",
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/index" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
-  ],
-  "env": {
-    "NODE_VERSION": "20"
-  }
+    { "source": "/:path*",     "destination": "/index.html" }
+  ]
 }
