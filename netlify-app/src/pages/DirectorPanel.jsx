@@ -1,4 +1,5 @@
 import { MAP_IMAGES, MAPS } from '@/lib/maps';
+import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
@@ -347,7 +348,7 @@ export default function DirectorPanel() {
                           }`}
                         >
                           <img 
-                            src={MAP_IMAGES[m]} 
+                            src={MAP_IMAGES?.[m] || ''} 
                             alt={m} 
                             style={{ width: 32, height: 32, borderRadius: 4, objectFit: 'cover' }}
                             onError={e => e.target.style.display='none'}
@@ -422,7 +423,7 @@ export default function DirectorPanel() {
                       </tr>
                     </thead>
                     <tbody className="divide-y divide-white/[0.03]">
-                      {sortedTeams.map((team, idx) => {
+                      {safeArray(sortedTeams).map((team, idx) => {
                         const isTop = idx === 0;
                         return (
                           <tr
@@ -469,16 +470,20 @@ export default function DirectorPanel() {
 
             {/* DESIGN TAB */}
             {activeTab === 'design' && (
-              <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-6">
-                <DesignStudio />
-              </div>
+              <SectionBoundary label="DESIGN STUDIO">
+                <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-6">
+                  <DesignStudio />
+                </div>
+              </SectionBoundary>
             )}
 
             {/* SETUP TAB */}
             {activeTab === 'setup' && (
-              <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-6">
-                <TournamentSetup />
-              </div>
+              <SectionBoundary label="TOURNAMENT SETUP">
+                <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-6">
+                  <TournamentSetup />
+                </div>
+              </SectionBoundary>
             )}
           </>
         )}

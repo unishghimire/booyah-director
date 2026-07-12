@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import { ScrollText } from 'lucide-react';
 
 export default function KillFeedLog({ killFeed }) {
@@ -25,7 +26,7 @@ export default function KillFeedLog({ killFeed }) {
         <p className="py-3 text-center text-[10px] text-gray-600">No kills recorded</p>
       ) : (
         <div className="max-h-40 space-y-1 overflow-y-auto">
-          {recent.map((kill, i) => (
+          {safeArray(recent).map((kill, i) => (
             <div key={kill.id || i} className="flex items-center gap-1.5 rounded bg-white/5 px-2 py-1 text-[10px]">
               <span className="text-gray-500">{fmtTime(kill.timestamp || kill.created_date)}</span>
               <span className="font-bold text-orange-400">{kill.killer_name}</span>

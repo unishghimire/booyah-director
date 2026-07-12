@@ -1,4 +1,5 @@
 import ImageUpload from '@/components/ImageUpload';
+import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
 import React, { useState, useMemo } from 'react';
 import SheetImport from '@/components/control/SheetImport';
 import toast from 'react-hot-toast';
@@ -320,7 +321,7 @@ export default function DataInputer() {
                           className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
                         >
                           <option value="">— select team —</option>
-                          {teams.map((t) => (
+                          {safeArray(teams).map((t) => (
                             <option key={t.id} value={t.id}>
                               {t.name}
                             </option>
@@ -358,7 +359,7 @@ export default function DataInputer() {
                       TEAMS LIST & ROSTERS
                     </h3>
                     <div className="space-y-4">
-                      {teams.map((t, idx) => {
+                      {safeArray(teams).map((t, idx) => {
                         const teamColor = COLORS[idx % COLORS.length];
                         const teamPlayers = players.filter((p) => p.team_id === t.id);
 
@@ -393,7 +394,7 @@ export default function DataInputer() {
                               </div>
                             </div>
                             <div className="flex gap-1.5 flex-wrap max-w-xs">
-                              {teamPlayers.map((p) => (
+                              {safeArray(teamPlayers).map((p) => (
                                 <span
                                   key={p.id}
                                   className="inline-block rounded-md bg-white/[0.04] px-2.5 py-1 text-[9px] font-bold text-gray-400 border border-white/5"
@@ -428,7 +429,7 @@ export default function DataInputer() {
                         No kills logged in this match yet
                       </p>
                     ) : (
-                      killFeed.map((k, idx) => (
+                      safeArray(killFeed).map((k, idx) => (
                         <div
                           key={idx}
                           className="flex items-center justify-between bg-white/[0.02] border border-white/5 p-3 rounded-lg text-xs"
@@ -465,7 +466,7 @@ export default function DataInputer() {
                         No eliminations logged in this match yet
                       </p>
                     ) : (
-                      eliminations.map((e, idx) => (
+                      safeArray(eliminations).map((e, idx) => (
                         <div
                           key={idx}
                           className="flex items-center justify-between bg-red-950/5 border border-red-900/10 p-3 rounded-lg text-xs"
@@ -648,7 +649,7 @@ function TeamInputCard({
             No players registered
           </p>
         ) : (
-          players.map((p) => (
+          safeArray(players).map((p) => (
             <PlayerInputCard
               key={p.id}
               player={p}

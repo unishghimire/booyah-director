@@ -1,4 +1,5 @@
 import React, { useMemo } from 'react';
+import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import { Trophy, Skull, Zap } from 'lucide-react';
 
 export default function StandingsTable({ teams, standings }) {
@@ -32,7 +33,7 @@ export default function StandingsTable({ teams, standings }) {
             </tr>
           </thead>
           <tbody>
-            {sortedTeams.map((team, i) => {
+            {safeArray(sortedTeams).map((team, i) => {
               const standing = standingMap[team.id];
               return (
                 <tr key={team.id} className={`border-b border-white/5 ${i === 0 ? 'bg-orange-500/5' : ''}`}>

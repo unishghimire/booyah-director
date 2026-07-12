@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import { Skull, Crosshair, ChevronDown } from 'lucide-react';
 import { overlayApi } from '@/lib/overlayApi';
 import toast from 'react-hot-toast';
@@ -80,7 +81,7 @@ function TeamCard({ team, players, currentMatch, tournament, onAction }) {
       </div>
       <div className="space-y-0.5">
         {teamPlayers.length === 0 && <p className="text-xs text-gray-600">No players</p>}
-        {teamPlayers.map(p => <PlayerRow key={p.id} player={p} team={team} currentMatch={currentMatch} onAction={onAction} />)}
+        {safeArray(teamPlayers).map(p => <PlayerRow key={p.id} player={p} team={team} currentMatch={currentMatch} onAction={onAction} />)}
       </div>
       <div className="mt-2 flex items-center gap-1.5 border-t border-white/5 pt-2">
         <div className="relative flex-1">
@@ -112,7 +113,7 @@ export default function KillPanel({ tournament, teams, players, currentMatch, on
         <p className="py-6 text-center text-xs text-gray-600">Add teams to enable kill tracking</p>
       ) : (
         <div className="grid gap-2 md:grid-cols-2 xl:grid-cols-3">
-          {teams.map(team => <TeamCard key={team.id} team={team} players={players} currentMatch={currentMatch} tournament={tournament} onAction={onAction} />)}
+          {safeArray(teams).map(team => <TeamCard key={team.id} team={team} players={players} currentMatch={currentMatch} tournament={tournament} onAction={onAction} />)}
         </div>
       )}
     </div>

@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import { Crown, Trophy } from 'lucide-react';
 import { overlayApi } from '@/lib/overlayApi';
 import toast from 'react-hot-toast';
@@ -47,7 +48,7 @@ export default function ChampionsCard({ tournament, teams, onAction }) {
         <p className="py-3 text-center text-[10px] text-gray-600">No teams yet</p>
       ) : (
         <div className="mb-2 space-y-1">
-          {top3.map((team, i) => (
+          {safeArray(top3).map((team, i) => (
             <button key={team.id} onClick={() => handleReveal(team)} disabled={busy !== null}
               className={`flex w-full items-center justify-between rounded-lg px-2 py-1.5 text-left transition ${
                 i === 0 ? 'border border-yellow-500/30 bg-yellow-500/10' : 'bg-white/5'

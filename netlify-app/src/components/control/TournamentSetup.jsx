@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import { ChevronDown, ChevronUp, Trophy } from 'lucide-react';
 import { overlayApi } from '@/lib/overlayApi';
 import toast from 'react-hot-toast';

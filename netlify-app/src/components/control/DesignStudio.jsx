@@ -14,6 +14,7 @@
  *  8. Live preview   — mini preview bar
  */
 import React, { useState, useEffect } from 'react';
+import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import { overlayApi } from '@/lib/overlayApi';
 import { getPins, setPins } from '@/lib/auth';
 import toast from 'react-hot-toast';

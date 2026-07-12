@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import { overlayApi } from '@/lib/overlayApi';
 import toast from 'react-hot-toast';
 import { FileSpreadsheet, Download, ExternalLink, CheckCircle, AlertCircle, Info } from 'lucide-react';

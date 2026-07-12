@@ -1,4 +1,5 @@
 import React, { useState } from 'react';
+import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
 import { Crown, Zap, Check, LogOut } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import toast from 'react-hot-toast';

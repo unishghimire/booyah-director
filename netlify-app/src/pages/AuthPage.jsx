@@ -1,4 +1,5 @@
 import { signInWithPopup, GoogleAuthProvider } from 'firebase/auth';
+import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
 import React, { useState } from 'react';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '@/lib/firebase';

@@ -4,6 +4,7 @@
  * Logo shows in the team row and in all overlay screens live.
  */
 import React, { useState } from 'react';
+import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import { ChevronDown, Users, Skull, Plus, Zap, Image as ImageIcon, Trash2 } from 'lucide-react';
 import { overlayApi } from '@/lib/overlayApi';
 import ImageUpload from '@/components/ImageUpload';
@@ -130,7 +131,7 @@ function TeamRow({ team, players, onAction }) {
           {teamPlayers.length === 0 && (
             <p className="py-1 font-orbitron text-[10px] text-gray-600">No players registered</p>
           )}
-          {teamPlayers.map(p => (
+          {safeArray(teamPlayers).map(p => (
             <div key={p.id} className="flex items-center justify-between py-1.5 border-b border-white/5 last:border-0">
               <span className="text-xs text-gray-300">{p.name}</span>
               <span className={`h-2 w-2 rounded-full ${p.is_alive ? 'bg-green-500' : 'bg-red-500/50'}`} title={p.is_alive ? 'Alive' : 'Eliminated'} />
@@ -270,7 +271,7 @@ export default function TeamRoster({ tournament, teams, players, onAction }) {
             <p className="mt-1 text-xs text-gray-700">Click ADD TEAM above to register your first team</p>
           </div>
         )}
-        {teams.map(team => (
+        {safeArray(teams).map(team => (
           <TeamRow key={team.id} team={team} players={players} onAction={onAction} />
         ))}
       </div>

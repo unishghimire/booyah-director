@@ -304,7 +304,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
 
         {/* Team rows */}
         <div style={{ display:'flex', flexDirection:'column', maxHeight:460, overflowY:'hidden' }}>
-          {rows.map((team, idx) => {
+          {safeArray(rows).map((team, idx) => {
             const rank = idx + 1;
             const isTop3 = rank <= 3;
             const rankColors = ['#FFB800','#C0C0C0','#CD7F32'];
@@ -582,7 +582,7 @@ function TodaysMatches({ matches = [], design }) {
         </div>
 
         <div style={{ display:'flex', gap:16, justifyContent:'center', margin:'40px 0' }}>
-          {items.map((m, idx) => {
+          {safeArray(items).map((m, idx) => {
             const isLive = m.status==='LIVE';
             const isDone = m.status==='COMPLETED';
             return (
@@ -647,7 +647,7 @@ function TeamsToday({ teams = [], design }) {
 
         {/* Grid */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:14, flex:1 }}>
-          {displayTeams.map((team, idx) => (
+          {safeArray(displayTeams).map((team, idx) => (
             <FFPanel key={idx} style={{ padding:0 }}>
               <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:12, textAlign:'center', gap:8 }}>
                 {/* Logo ring */}
@@ -705,7 +705,7 @@ function CastersScreen({ design }) {
 
         {/* Caster cards */}
         <div style={{ display:'flex', gap:30, justifyContent:'center', flex:1, alignItems:'center' }}>
-          {casters.map((c, i) => (
+          {safeArray(casters).map((c, i) => (
             <FFPanel key={i} style={{ width:360, padding:0 }}>
               <div style={{ padding:'30px 28px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
                 {/* Photo or initials */}
