@@ -73,6 +73,9 @@ export const overlayApi = {
     return call('getOverlayData', token ? { shareToken: token } : {}, 'GET');
   },
   initializeTournament:     (d) => call('initializeTournament', d),
+  listTournaments:          () => call('listTournaments', {}, 'GET'),
+  switchTournament:         (d) => call('switchTournament', d),
+  deleteTournament:         (d) => call('deleteTournament', d),
   addTeam:                  (d) => call('addTeam', d),
   addPlayer:                (d) => call('addPlayer', d),
   deleteTeam:               (d) => call('deleteTeam', d),

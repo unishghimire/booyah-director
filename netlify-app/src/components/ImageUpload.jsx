@@ -16,15 +16,21 @@ import toast from 'react-hot-toast';
 export default function ImageUpload({ value, onChange, label = 'Upload Image', name = null, className = '' }) {
   const [uploading, setUploading] = useState(false);
   const [drag, setDrag]           = useState(false);
+  const [showSuccess, setShowSuccess] = useState(false);
   const inputRef = useRef(null);
 
   const handle = async (file) => {
     if (!file) return;
     setUploading(true);
+    setShowSuccess(false);
     try {
       const { url, deleteUrl } = await uploadImage(file, name);
       onChange(url, deleteUrl);
+      setShowSuccess(true);
       toast.success('Image uploaded!');
+      setTimeout(() => {
+        setShowSuccess(false);
+      }, 2000);
     } catch (e) {
       toast.error(e.message || 'Upload failed');
     } finally {
@@ -58,7 +64,8 @@ export default function ImageUpload({ value, onChange, label = 'Upload Image', n
           borderStyle: 'dashed',
           borderColor: drag ? '#FF6B00' : 'rgba(255,255,255,0.08)',
           background:  drag ? 'rgba(255,107,0,0.06)' : 'rgba(255,255,255,0.02)',
-          minHeight: 80,
+          boxShadow: drag ? '0 0 15px rgba(255, 107, 0, 0.4)' : 'none',
+          minHeight: 120,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
@@ -66,6 +73,8 @@ export default function ImageUpload({ value, onChange, label = 'Upload Image', n
           gap: 6,
           padding: 12,
           cursor: uploading ? 'not-allowed' : 'pointer',
+          position: 'relative',
+          overflow: 'hidden',
           transition: 'all 0.2s',
         }}
       >
@@ -74,16 +83,25 @@ export default function ImageUpload({ value, onChange, label = 'Upload Image', n
             <Loader2 className="h-6 w-6 text-[#FF6B00] animate-spin" />
             <span className="font-orbitron text-[9px] text-gray-400 tracking-wider">UPLOADING...</span>
           </>
+        ) : showSuccess ? (
+          <div className="flex flex-col items-center gap-2 animate-bounce">
+            <CheckCircle2 className="h-8 w-8 text-green-500" />
+            <span className="font-orbitron text-[10px] text-green-500 font-bold tracking-wider">UPLOAD SUCCESSFUL!</span>
+          </div>
         ) : value ? (
-          <>
+          <div className="group relative w-full h-full min-h-[120px] flex items-center justify-center">
             <img
               src={value}
               alt="preview"
-              className="h-16 max-w-full object-contain rounded-lg"
+              className="max-h-24 max-w-full object-contain rounded-lg"
               onError={(e) => { e.target.style.display = 'none'; }}
             />
-            <span className="font-orbitron text-[9px] text-[#00D4FF] tracking-wider">CLICK TO CHANGE</span>
-          </>
+            {/* Hover overlay */}
+            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 rounded-lg">
+              <Upload className="h-5 w-5 text-[#FF6B00]" />
+              <span className="font-orbitron text-[10px] text-white font-bold tracking-wider">CHANGE IMAGE</span>
+            </div>
+          </div>
         ) : (
           <>
             <ImageIcon className="h-6 w-6 text-gray-600" />
