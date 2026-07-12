@@ -53,7 +53,8 @@ export default function DataInputer() {
 
   const handleAddTeam = async (e) => {
     e.preventDefault();
-    if (!newTeamName) return toast.error('Team name is required');
+    if (!newTeamName.trim()) return toast.error('Team name is required');
+    if (!tournament?.id) return toast.error('Create a tournament first in the Director Panel');
     setTeamAdding(true);
     try {
       await overlayApi.addTeam({ tournament_id: tournament?.id, team_name: newTeamName, logo_url: newTeamLogo || '' });
@@ -71,7 +72,8 @@ export default function DataInputer() {
   const handleAddPlayer = async (e) => {
     e.preventDefault();
     if (!playerTeamId) return toast.error('Please select a team');
-    if (!newPlayerName) return toast.error('Player name is required');
+    if (!newPlayerName.trim()) return toast.error('Player name is required');
+    if (!tournament?.id) return toast.error('No active tournament found');
     setPlayerAdding(true);
     try {
       await overlayApi.addPlayer({ name: newPlayerName, team_id: playerTeamId, tournament_id: tournament?.id });

@@ -685,8 +685,15 @@ module.exports = async (req, res) => {
         const playerRows = await getRange('Players!A:C');
         const playersData = playerRows.slice(1).filter(r => r[0]&&r[1]).map(r => ({ player_name: r[0]?.trim(), team_name: r[1]?.trim(), role: r[2]?.trim()||'Player' }));
         let teamsAdded = 0, playersAdded = 0;
-        for (const t of teamsData) { if (!db.teams.find(x => x.name?.toLowerCase()===t.team_name.toLowerCase())) { db.teams.push({ id:genId(), tournament_id:tournament_id||db.tournaments[0]?.id, name:t.team_name, logo_url:t.logo_url, color:t.color, total_tournament_points:0, total_tournament_kills:0 }); teamsAdded++; } }
-        for (const p of playersData) { const team = db.teams.find(t => t.name?.toLowerCase()===p.team_name.toLowerCase()); if (!team) continue; if (!db.players.find(x => x.name===p.player_name&&x.team_id===team.id)) { db.players.push({ id:genId(), team_id:team.id, tournament_id:tournament_id||db.tournaments[0]?.id, name:p.player_name, role:p.role, is_alive:true, total_tournament_kills:0, current_match_kills:0 }); playersAdded++; } }
+        // Resolve active tournament: prefer explicit param → active status → most recent
+        const activeTournament = tournament_id
+          ? db.tournaments.find(t => t.id === tournament_id)
+          : (db.tournaments.find(t => t.status === 'active') || db.tournaments[db.tournaments.length - 1]);
+        if (!activeTournament) return err(404, 'No active tournament found. Create a tournament first.');
+        const resolvedTid = activeTournament.id;
+
+        for (const t of teamsData) { if (!db.teams.find(x => x.name?.toLowerCase()===t.team_name.toLowerCase())) { db.teams.push({ id:genId(), tournament_id:resolvedTid, name:t.team_name, logo_url:t.logo_url, color:t.color, total_tournament_points:0, total_tournament_kills:0 }); teamsAdded++; } }
+        for (const p of playersData) { const team = db.teams.find(t => t.name?.toLowerCase()===p.team_name.toLowerCase()); if (!team) continue; if (!db.players.find(x => x.name===p.player_name&&x.team_id===team.id)) { db.players.push({ id:genId(), team_id:team.id, tournament_id:resolvedTid, name:p.player_name, role:p.role, is_alive:true, total_tournament_kills:0, current_match_kills:0 }); playersAdded++; } }
         db.overlay_state.last_updated_at = new Date().toISOString();
         await saveDb(uid, db);
         return ok({ success:true, teams_added:teamsAdded, players_added:playersAdded });
