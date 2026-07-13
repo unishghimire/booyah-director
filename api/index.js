@@ -1,7 +1,293 @@
-const { loadDb, saveDb, genId, getDefaultDb } = require('./_db');
-const { verifyToken } = require('./_auth');
-const { rateLimit } = require('./_ratelimit');
-const { sanitizeString, requireFields } = require('./_validate');
+// ─────────────────────────────────────────────────────
+// BOOYAH DIRECTOR API — Single-file bundle for Vercel
+// All helpers inlined to avoid Vercel's single-file bundling limitation
+// ─────────────────────────────────────────────────────
+
+// ── VALIDATE ─────────────────────────────────────────
+/**
+ * _validate.js — Input sanitization and validation.
+ * Every function here is safe-by-default — never throws.
+ */
+
+/**
+ * Strips HTML tags, trims, and enforces max length.
+ */
+function sanitizeString(val, maxLen = 100) {
+  if (val == null) return '';
+  if (typeof val !== 'string') {
+    try { val = String(val); } catch { return ''; }
+  }
+  return val.trim().slice(0, maxLen).replace(/<[^>]*>/g, '').replace(/[<>]/g, '');
+}
+
+/**
+ * Returns null if all required fields are present, or an error message string.
+ * Treats 0 and false as valid (non-missing) values.
+ */
+function requireFields(obj, fields) {
+  if (!obj || typeof obj !== 'object') return 'Invalid request body';
+  for (const f of fields) {
+    const val = obj[f];
+    if (val === undefined || val === null || val === '') {
+      return `Missing required field: ${f}`;
+    }
+  }
+  return null;
+}
+
+/**
+ * Safely parses a number, returning fallback if NaN/Infinity.
+ */
+function sanitizeNumber(val, { min = -Infinity, max = Infinity, fallback = 0 } = {}) {
+  const n = Number(val);
+  if (!Number.isFinite(n)) return fallback;
+  return Math.max(min, Math.min(max, n));
+}
+
+/**
+ * Safely parses a URL — returns '' if invalid/non-http.
+ */
+function sanitizeUrl(val, maxLen = 500) {
+  const s = sanitizeString(val, maxLen);
+  if (!s) return '';
+  try {
+    const u = new URL(s);
+    if (!['http:', 'https:'].includes(u.protocol)) return '';
+    return s;
+  } catch {
+    return '';
+  }
+}
+
+
+// ── RATE LIMIT ───────────────────────────────────────
+const store = new Map();
+const WINDOW_MS = 60_000;
+const MAX_REQUESTS = 120; // per minute per IP
+
+function rateLimit(ip) {
+  const now = Date.now();
+  const key = ip;
+  let rec = store.get(key);
+  if (!rec || now - rec.ts > WINDOW_MS) { rec = { ts: now, count: 0 }; store.set(key, rec); }
+  rec.count++;
+  if (rec.count > MAX_REQUESTS) return false;
+  // Cleanup old entries periodically
+  if (store.size > 10000) { for (const [k, v] of store) { if (now - v.ts > WINDOW_MS) store.delete(k); } }
+  return true;
+}
+
+
+// ── DATABASE ─────────────────────────────────────────
+/**
+ * _db.js — Firebase Realtime Database adapter with graceful degradation.
+ *
+ * If Firebase is not configured (missing env vars), operations silently
+ * return empty/default data instead of crashing the API.
+ *
+ * loadDb  → always returns a valid db object, never throws
+ * saveDb  → returns false on failure instead of throwing (caller decides)
+ */
+
+const BASE_URL = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+const SECRET   = process.env.FIREBASE_DATABASE_SECRET || '';
+
+const CONFIGURED = Boolean(BASE_URL && SECRET);
+
+function fbUrl(uid, suffix = '') {
+  return `${BASE_URL}/users/${uid}/booyah${suffix}.json?auth=${SECRET}`;
+}
+
+// In-memory fallback for when Firebase is not configured
+// (data survives within a single serverless invocation, not between calls)
+const _memStore = new Map();
+
+async function loadDb(uid) {
+  if (!CONFIGURED) {
+    // Return in-memory state for the session
+    return _memStore.get(uid) || getDefaultDb();
+  }
+  try {
+    const res = await fetch(fbUrl(uid), { signal: AbortSignal.timeout(8000) });
+    if (!res.ok) {
+      console.error(`[db] Firebase read HTTP ${res.status} for uid=${uid}`);
+      return _memStore.get(uid) || getDefaultDb();
+    }
+    const data = await res.json();
+    if (!data) return getDefaultDb();
+    const def = getDefaultDb();
+    const merged = {
+      ...def,
+      ...data,
+      overlay_state: { ...def.overlay_state, ...(data.overlay_state || {}) },
+      design: { ...def.design, ...(data.design || {}) },
+      // Ensure arrays are always arrays
+      tournaments:        Array.isArray(data.tournaments)        ? data.tournaments        : [],
+      teams:              Array.isArray(data.teams)              ? data.teams              : [],
+      players:            Array.isArray(data.players)            ? data.players            : [],
+      matches:            Array.isArray(data.matches)            ? data.matches            : [],
+      match_standings:    Array.isArray(data.match_standings)    ? data.match_standings    : [],
+      kill_events:        Array.isArray(data.kill_events)        ? data.kill_events        : [],
+      elimination_events: Array.isArray(data.elimination_events) ? data.elimination_events : [],
+    };
+    _memStore.set(uid, merged); // cache for this invocation
+    return merged;
+  } catch (e) {
+    console.error('[db] loadDb error:', e.message);
+    return _memStore.get(uid) || getDefaultDb();
+  }
+}
+
+async function saveDb(uid, db) {
+  if (!CONFIGURED) {
+    _memStore.set(uid, db);
+    return true;
+  }
+  try {
+    const res = await fetch(fbUrl(uid), {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(db),
+      signal: AbortSignal.timeout(8000),
+    });
+    if (!res.ok) {
+      console.error(`[db] Firebase write HTTP ${res.status} for uid=${uid}`);
+      _memStore.set(uid, db); // cache anyway
+      return false;
+    }
+    _memStore.set(uid, db);
+    return true;
+  } catch (e) {
+    console.error('[db] saveDb error:', e.message);
+    _memStore.set(uid, db); // cache anyway
+    return false;
+  }
+}
+
+function genId() {
+  return Date.now().toString(36) + Math.random().toString(36).slice(2, 7);
+}
+
+function getDefaultDb() {
+  return {
+    tournaments:        [],
+    teams:              [],
+    players:            [],
+    matches:            [],
+    match_standings:    [],
+    kill_events:        [],
+    elimination_events: [],
+    overlay_state: {
+      id: 'singleton',
+      tournament_id: null,
+      current_screen: 'setup_blank',
+      mvp_player_id: null,
+      mvp_player_name: null,
+      mvp_team_name: null,
+      mvp_kills: 0,
+      champion_team_id: null,
+      champion_team_name: null,
+      champion_total_points: 0,
+      last_updated_at: new Date().toISOString(),
+    },
+    design: {
+      accentColor:      '#FF6B00',
+      accentColor2:     '#00D4FF',
+      bgColor:          '#060915',
+      textColor:        '#ffffff',
+      tournamentName:   'BOOYAH CUP',
+      tournamentSubtitle: 'GRAND FINALS',
+      gameLabel:        'GAME',
+      logoUrl:          '',
+      sponsorLogoUrl:   '',
+      overlayStyle:     'default',
+      fontStyle:        'orbitron',
+      casters: [
+        { name: 'CASTER ONE',   role: 'SHOUTCASTER', handle: '@caster1', photo: '' },
+        { name: 'CASTER TWO',   role: 'ANALYST',     handle: '@caster2', photo: '' },
+        { name: 'CASTER THREE', role: 'HOST',         handle: '@caster3', photo: '' },
+      ],
+      organizerName: 'GARENA',
+    },
+  };
+}
+
+
+// ── AUTH ─────────────────────────────────────────────
+/**
+ * _auth.js — Firebase token verification with graceful degradation.
+ *
+ * verifyToken() always returns either a user object or null.
+ * It never throws — auth failure = null, not a 500 error.
+ */
+
+const WEB_API_KEY = process.env.FIREBASE_WEB_API_KEY || 'AIzaSyBekqzqZv_iWvgAn9UCnpBGIw2675wr1gc';
+const OWNER_EMAILS = (process.env.OWNER_EMAILS || 'nex.unishghimire@gmail.com')
+  .split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
+
+// Simple in-process token cache — avoids re-verifying the same token on every
+// API call within a single serverless execution context.
+const _cache = new Map();
+const CACHE_TTL = 55 * 60 * 1000; // 55 min — Firebase tokens last 60min
+
+async function verifyToken(authHeader) {
+  if (!authHeader || typeof authHeader !== 'string') return null;
+  if (!authHeader.startsWith('Bearer ')) return null;
+
+  const token = authHeader.slice(7).trim();
+  if (!token || token.length < 10) return null;
+
+  // Check cache
+  const cached = _cache.get(token);
+  if (cached && cached.exp > Date.now()) return cached.user;
+
+  try {
+    const r = await fetch(
+      `https://identitytoolkit.googleapis.com/v1/accounts:lookup?key=${WEB_API_KEY}`,
+      {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ idToken: token }),
+        signal: AbortSignal.timeout(6000), // 6s timeout
+      }
+    );
+
+    if (!r.ok) {
+      // 400 = invalid/expired token (normal) — don't log as error
+      if (r.status !== 400) console.error('[auth] lookup HTTP', r.status);
+      _cache.delete(token);
+      return null;
+    }
+
+    const d = await r.json();
+    const u = d?.users?.[0];
+    if (!u?.localId) return null;
+
+    const user = {
+      uid:     u.localId,
+      email:   u.email   || '',
+      name:    u.displayName || '',
+      isOwner: OWNER_EMAILS.includes((u.email || '').toLowerCase()),
+    };
+
+    // Cache result
+    _cache.set(token, { user, exp: Date.now() + CACHE_TTL });
+
+    // Trim cache to avoid unbounded growth (max 200 tokens)
+    if (_cache.size > 200) {
+      const oldest = _cache.keys().next().value;
+      _cache.delete(oldest);
+    }
+
+    return user;
+  } catch (e) {
+    if (e?.name !== 'AbortError') console.error('[auth] verifyToken error:', e.message);
+    return null;
+  }
+}
+
+
+// ── MAIN HANDLER ─────────────────────────────────────
 
 const DEFAULT_DESIGN = {
   accentColor: '#FF6B00', accentColor2: '#00D4FF', bgColor: '#060915',
