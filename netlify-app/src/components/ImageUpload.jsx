@@ -1,128 +1,100 @@
 import React, { useState, useRef } from 'react';
-import { Upload, Loader2, CheckCircle2, Image as ImageIcon } from 'lucide-react';
-import { uploadImage } from '@/lib/imageUpload';
+import { Loader2, CheckCircle2, Image as ImageIcon, Edit3 } from 'lucide-react';
 import toast from 'react-hot-toast';
 
-/**
- * ImageUpload — drag-and-drop image uploader via ImgBB (free CDN)
- *
- * Props:
- *   value     {string}   current image URL (shows preview)
- *   onChange  {fn}       called with (url, deleteUrl) on success
- *   label     {string}   label text above the drop zone
- *   name      {string}   optional filename hint sent to ImgBB
- *   className {string}   extra wrapper class
- */
-export default function ImageUpload({ value, onChange, label = 'Upload Image', name = null, className = '' }) {
+const IMGBB_KEY = import.meta.env.VITE_IMGBB_API_KEY || '';
+
+async function uploadToImgBB(file, name) {
+  if (!IMGBB_KEY) throw new Error('VITE_IMGBB_API_KEY not set in Vercel env vars');
+  const form = new FormData();
+  form.append('image', file);
+  if (name) form.append('name', name);
+  const res = await fetch(`https://api.imgbb.com/1/upload?key=${IMGBB_KEY}`, { method: 'POST', body: form });
+  const json = await res.json();
+  if (!json.success) throw new Error(json.error?.message || 'Upload failed');
+  return { url: json.data.url, deleteUrl: json.data.delete_url };
+}
+
+export default function ImageUpload({ value, onChange, label = 'Upload Image', name = null, className = '', size = 'md' }) {
   const [uploading, setUploading] = useState(false);
-  const [drag, setDrag]           = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [success,   setSuccess]   = useState(false);
+  const [drag,      setDrag]      = useState(false);
+  const [hover,     setHover]     = useState(false);
   const inputRef = useRef(null);
 
   const handle = async (file) => {
     if (!file) return;
-    setUploading(true);
-    setShowSuccess(false);
+    if (file.size > 32 * 1024 * 1024) { toast.error('Max file size is 32 MB'); return; }
+    setUploading(true); setSuccess(false);
     try {
-      const { url, deleteUrl } = await uploadImage(file, name);
+      const { url, deleteUrl } = await uploadToImgBB(file, name);
       onChange(url, deleteUrl);
-      setShowSuccess(true);
+      setSuccess(true);
       toast.success('Image uploaded!');
-      setTimeout(() => {
-        setShowSuccess(false);
-      }, 2000);
+      setTimeout(() => setSuccess(false), 2500);
     } catch (e) {
       toast.error(e.message || 'Upload failed');
-    } finally {
-      setUploading(false);
-    }
+    } finally { setUploading(false); }
   };
 
   const onDrop = (e) => {
-    e.preventDefault();
-    setDrag(false);
+    e.preventDefault(); setDrag(false);
     const file = e.dataTransfer.files?.[0];
     if (file) handle(file);
   };
 
+  const minH = size === 'sm' ? 72 : 120;
+
   return (
     <div className={className}>
-      {label && (
-        <p className="font-orbitron text-[10px] font-black tracking-widest text-gray-400 uppercase mb-2">
-          {label}
-        </p>
-      )}
-
+      {label && <p className="font-orbitron text-[10px] font-black tracking-widest text-gray-400 uppercase mb-2">{label}</p>}
       <div
         onClick={() => !uploading && inputRef.current?.click()}
         onDrop={onDrop}
         onDragOver={(e) => { e.preventDefault(); setDrag(true); }}
         onDragLeave={() => setDrag(false)}
+        onMouseEnter={() => setHover(true)}
+        onMouseLeave={() => setHover(false)}
         style={{
-          borderRadius: 12,
-          borderWidth: 2,
-          borderStyle: 'dashed',
-          borderColor: drag ? '#FF6B00' : 'rgba(255,255,255,0.08)',
-          background:  drag ? 'rgba(255,107,0,0.06)' : 'rgba(255,255,255,0.02)',
-          boxShadow: drag ? '0 0 15px rgba(255, 107, 0, 0.4)' : 'none',
-          minHeight: 120,
-          display: 'flex',
-          alignItems: 'center',
-          justifyContent: 'center',
-          flexDirection: 'column',
-          gap: 6,
-          padding: 12,
-          cursor: uploading ? 'not-allowed' : 'pointer',
-          position: 'relative',
-          overflow: 'hidden',
-          transition: 'all 0.2s',
+          borderRadius: 12, borderWidth: 2, borderStyle: 'dashed',
+          borderColor: drag ? '#FF6B00' : success ? '#22c55e' : hover && value ? '#00D4FF55' : 'rgba(255,255,255,0.08)',
+          background: drag ? 'rgba(255,107,0,0.07)' : success ? 'rgba(34,197,94,0.07)' : 'rgba(255,255,255,0.02)',
+          minHeight: minH, display: 'flex', alignItems: 'center', justifyContent: 'center',
+          flexDirection: 'column', gap: 6, padding: size === 'sm' ? 10 : 16,
+          cursor: uploading ? 'not-allowed' : 'pointer', transition: 'all 0.2s',
+          position: 'relative', overflow: 'hidden',
         }}
       >
+        {drag && <div style={{ position:'absolute', inset:0, boxShadow:'inset 0 0 20px rgba(255,107,0,0.2)', pointerEvents:'none', borderRadius:10 }} />}
         {uploading ? (
-          <>
-            <Loader2 className="h-6 w-6 text-[#FF6B00] animate-spin" />
-            <span className="font-orbitron text-[9px] text-gray-400 tracking-wider">UPLOADING...</span>
-          </>
-        ) : showSuccess ? (
-          <div className="flex flex-col items-center gap-2 animate-bounce">
-            <CheckCircle2 className="h-8 w-8 text-green-500" />
-            <span className="font-orbitron text-[10px] text-green-500 font-bold tracking-wider">UPLOAD SUCCESSFUL!</span>
-          </div>
+          <><Loader2 className="h-6 w-6 text-[#FF6B00] animate-spin" /><span className="font-orbitron text-[9px] text-gray-400 tracking-wider">UPLOADING...</span></>
+        ) : success ? (
+          <><CheckCircle2 className="h-6 w-6 text-green-400" /><span className="font-orbitron text-[9px] text-green-400 tracking-wider">UPLOADED!</span></>
         ) : value ? (
-          <div className="group relative w-full h-full min-h-[120px] flex items-center justify-center">
-            <img
-              src={value}
-              alt="preview"
-              className="max-h-24 max-w-full object-contain rounded-lg"
-              onError={(e) => { e.target.style.display = 'none'; }}
+          <div style={{ position:'relative', width:'100%', display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <img src={value} alt="preview"
+              style={{ maxHeight: size === 'sm' ? 52 : 90, maxWidth:'100%', objectFit:'contain', borderRadius:8, display:'block' }}
+              onError={(e) => { e.target.style.display='none'; }}
             />
-            {/* Hover overlay */}
-            <div className="absolute inset-0 bg-black/60 opacity-0 group-hover:opacity-100 transition-opacity flex flex-col items-center justify-center gap-2 rounded-lg">
-              <Upload className="h-5 w-5 text-[#FF6B00]" />
-              <span className="font-orbitron text-[10px] text-white font-bold tracking-wider">CHANGE IMAGE</span>
-            </div>
+            {hover && (
+              <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.65)', borderRadius:8, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:4 }}>
+                <Edit3 className="h-5 w-5 text-[#00D4FF]" />
+                <span className="font-orbitron text-[9px] text-[#00D4FF] tracking-wider">CHANGE IMAGE</span>
+              </div>
+            )}
           </div>
         ) : (
           <>
             <ImageIcon className="h-6 w-6 text-gray-600" />
-            <span className="text-xs text-gray-500">Drag & drop or click to upload</span>
-            <div className="flex items-center gap-1">
-              <span className="rounded border border-white/5 bg-white/5 px-2 py-0.5 font-mono text-[9px] text-gray-600">PNG</span>
-              <span className="rounded border border-white/5 bg-white/5 px-2 py-0.5 font-mono text-[9px] text-gray-600">JPG</span>
-              <span className="rounded border border-white/5 bg-white/5 px-2 py-0.5 font-mono text-[9px] text-gray-600">WebP</span>
-              <span className="font-orbitron text-[9px] text-gray-600 ml-1">· Max 32MB · Free CDN</span>
+            {size !== 'sm' && <span className="text-xs text-gray-500">Drag & drop or click to upload</span>}
+            <div className="flex items-center gap-1 flex-wrap justify-center">
+              {['PNG','JPG','WebP'].map(f => <span key={f} className="rounded border border-white/5 bg-white/5 px-1.5 py-0.5 font-mono text-[9px] text-gray-600">{f}</span>)}
+              <span className="font-orbitron text-[9px] text-gray-600 ml-1">· Max 32MB</span>
             </div>
           </>
         )}
       </div>
-
-      <input
-        ref={inputRef}
-        type="file"
-        accept="image/*"
-        className="hidden"
-        onChange={(e) => e.target.files?.[0] && handle(e.target.files[0])}
-      />
+      <input ref={inputRef} type="file" accept="image/*" className="hidden" onChange={(e) => e.target.files?.[0] && handle(e.target.files[0])} />
     </div>
   );
 }

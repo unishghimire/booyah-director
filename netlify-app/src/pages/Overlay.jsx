@@ -536,15 +536,22 @@ function PreMatchMap({ match, teams = [], design }) {
             </div>
           </div>
 
-          {/* Map image */}
-          {mapImg && (
-            <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
-              <div style={{ width:480, height:480, borderRadius:16, overflow:'hidden', border:`1px solid ${primary}40`, boxShadow:`0 0 60px ${primary}30,0 0 120px ${primary}15` }}>
-                <img src={mapImg} alt={mapName} style={{ width:'100%', height:'100%', objectFit:'cover', filter:'saturate(1.2) contrast(1.05)' }} />
-                <div style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${primary}20,transparent)` }} />
-              </div>
+          {/* Map image or placeholder */}
+          <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <div style={{ width:480, height:480, borderRadius:16, overflow:'hidden', border:`1px solid ${primary}40`, boxShadow:`0 0 60px ${primary}30,0 0 120px ${primary}15`, position:'relative' }}>
+              {mapImg ? (
+                <img src={mapImg} alt={mapName} style={{ width:'100%', height:'100%', objectFit:'cover', filter:'saturate(1.2) contrast(1.05)' }} onError={e=>e.target.style.display='none'} />
+              ) : (
+                <div style={{ width:'100%', height:'100%', background:`linear-gradient(135deg,#0a1220,#162030)`, display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(0deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 48px),repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 48px)' }}>
+                  <div style={{ textAlign:'center' }}>
+                    <div style={{ fontFamily:'Orbitron', fontSize:54, fontWeight:900, color:`${primary}30`, textTransform:'uppercase', letterSpacing:'0.05em', lineHeight:1 }}>{mapName}</div>
+                    <div style={{ fontFamily:'Orbitron', fontSize:11, color:`${primary}50`, letterSpacing:'0.4em', marginTop:10 }}>FREE FIRE MAP</div>
+                  </div>
+                </div>
+              )}
+              <div style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${primary}10,transparent)` }} />
             </div>
-          )}
+          </div>
         </div>
 
         <div style={{ display:'flex', justifyContent:'space-between', borderTop:'1px solid rgba(255,255,255,0.07)', paddingTop:14 }}>
@@ -748,11 +755,15 @@ function UpcomingMap({ match, design }) {
     <div style={{ position:'absolute', left:'50%', bottom:30, transform:'translateX(-50%)', width:700, zIndex:10 }}>
       <FFPanel>
         <div style={{ display:'flex', alignItems:'center', padding:'0 20px', height:72, gap:20 }}>
-          {mapImg && (
-            <div style={{ width:80, height:52, borderRadius:6, overflow:'hidden', border:`1px solid ${primary}44`, flexShrink:0 }}>
-              <img src={mapImg} alt={mapName} style={{ width:'100%', height:'100%', objectFit:'cover' }} />
-            </div>
-          )}
+          <div style={{ width:80, height:52, borderRadius:6, overflow:'hidden', border:`1px solid ${primary}44`, flexShrink:0, background:'#0a1220' }}>
+            {mapImg ? (
+              <img src={mapImg} alt={mapName} style={{ width:'100%', height:'100%', objectFit:'cover' }} onError={e=>e.target.style.display='none'} />
+            ) : (
+              <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)' }}>
+                <span style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:`${primary}80`, textAlign:'center', lineHeight:1.1 }}>{mapName}</span>
+              </div>
+            )}
+          </div>
           <div style={{ flex:1 }}>
             <div style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em', marginBottom:4 }}>UPCOMING MAP</div>
             <div style={{ fontFamily:'Orbitron', fontSize:28, fontWeight:900, color:'#fff', textTransform:'uppercase', lineHeight:1 }}>{mapName}</div>
@@ -1028,7 +1039,6 @@ export default function Overlay() {
     elimination:     <EliminationAlert eliminations={eliminations} design={design} />,
     elimination_alert: <EliminationAlert eliminations={eliminations} design={design} />,
     pre_match_map:   <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
-    upcoming_map:    <UpcomingMap   match={currentMatch} design={design} />,
     mvp:             <MVPScreen     players={players} teams={teams} design={design} overlayState={overlayState} />,
     mvp_screen:      <MVPScreen     players={players} teams={teams} design={design} overlayState={overlayState} />,
     champions:       <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
