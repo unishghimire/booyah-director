@@ -20,9 +20,10 @@ import { getPins, setPins } from '@/lib/auth';
 import toast from 'react-hot-toast';
 import {
   Paintbrush, Check, Layers, Type, Eye, Mic2,
-  Lock, RefreshCw, Save, RotateCcw
+  Lock, RefreshCw, Save, RotateCcw, Map
 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
+import { MAPS } from '@/lib/maps';
 
 /* ─── Colour presets matching official FF tournament palettes ─── */
 const PRESETS = [
@@ -53,6 +54,7 @@ const DEFAULT_DESIGN = {
   tournamentName:'FF OFFICIAL', tournamentSubtitle:'GRAND FINALS',
   gameLabel:'MATCH', logoUrl:'', overlayStyle:'ff_classic', fontStyle:'orbitron',
   sponsorLogoUrl:'',
+  mapImages:{},  // custom map images — overrides defaults
   casters:[
     { name:'CASTER 1', handle:'@handle', role:'PLAY-BY-PLAY' },
     { name:'CASTER 2', handle:'@handle', role:'COLOR CASTER' },
@@ -192,6 +194,31 @@ export default function DesignStudio({ onAction }) {
             </button>
           ))}
         </div>
+      </Section>
+
+      {/* ── MAP IMAGES ── */}
+      <Section title="MAP IMAGES" icon={Map}>
+        <p className="mb-3 text-[10px] text-gray-500">Upload custom map images to replace the defaults. These appear in the pre-match map overlay and scoreboard screens.</p>
+        <div className="grid grid-cols-2 gap-3">
+          {MAPS.map(mapName => (
+            <div key={mapName} className="rounded-xl border border-white/8 bg-black/20 p-3">
+              <p className="font-orbitron text-[9px] font-black text-gray-400 mb-2 tracking-wider">{mapName.toUpperCase()}</p>
+              <ImageUpload
+                value={(design.mapImages || {})[mapName] || ''}
+                onChange={(url) => upd('mapImages', { ...(design.mapImages || {}), [mapName]: url })}
+                label=""
+                name={`map-${mapName.toLowerCase().replace(/\s+/g,'-')}`}
+                size="sm"
+              />
+            </div>
+          ))}
+        </div>
+        <button
+          onClick={() => upd('mapImages', {})}
+          className="mt-3 w-full rounded-lg border border-white/10 py-2 text-[10px] font-orbitron text-gray-500 hover:text-white hover:border-white/20 transition-all"
+        >
+          Reset All Map Images to Defaults
+        </button>
       </Section>
 
       {/* ── BRANDING ── */}

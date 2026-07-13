@@ -18,7 +18,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Skull, Star, Crown, Zap, Calendar, Users, MapPin, Award, XCircle, Mic2, Shield, Flame } from 'lucide-react';
-import { MAP_IMAGES } from '@/lib/maps';
+import { MAP_IMAGES, getMapImages } from '@/lib/maps';
 import { safeArray } from '@/components/ErrorBoundary';
 
 /* ══════════════════════════════════════════════════
@@ -52,6 +52,10 @@ function useOverlayPoll(shareToken) {
         setError(null);
         setReady(true);
         // Normalise keys
+        // Push custom map images to the maps module for overlay rendering
+        if (json.design?.mapImages) {
+          import('@/lib/maps').then(m => m.setCustomMapImages(json.design.mapImages));
+        }
         setData({
           tournament:   json.tournament    ?? null,
           overlayState: json.overlay_state ?? null,
@@ -90,7 +94,8 @@ function useOverlayPoll(shareToken) {
    BACKGROUND — atmospheric gaming backdrop
 ══════════════════════════════════════════════════ */
 function GamingBackground({ mapName, accent = '#FF6B00', accent2 = '#00D4FF' }) {
-  const mapImg = MAP_IMAGES?.[mapName] || null;
+  const mapImages = getMapImages();
+  const mapImg = mapImages?.[mapName] || null;
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
       <div style={{ position: 'absolute', inset: 0, background: '#060912' }} />
@@ -483,7 +488,8 @@ function PreMatchMap({ match, teams = [], design }) {
   const matchNum = match?.match_number ? `MATCH ${String(match.match_number).padStart(2,'0')}` : 'UPCOMING MATCH';
   const primary  = tok.acc(design);
   const secondary = tok.acc2(design);
-  const mapImg   = MAP_IMAGES?.[mapName] || null;
+  const mapImages2 = getMapImages();
+  const mapImg   = mapImages2?.[mapName] || null;
   const tLogo    = tok.logo(design);
 
   return (
@@ -754,7 +760,8 @@ function UpcomingMap({ match, design }) {
   const mapName = match?.map_name || match?.mapName || 'Bermuda';
   const primary = tok.acc(design);
   const secondary = tok.acc2(design);
-  const mapImg = MAP_IMAGES?.[mapName] || null;
+  const mapImages = getMapImages();
+  const mapImg = mapImages?.[mapName] || null;
 
   return (
     <div style={{ position:'absolute', left:'50%', bottom:50, transform:'translateX(-50%)', width:800, zIndex:10 }}>
@@ -845,6 +852,8 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
   const mvpTeam   = overlayState?.mvp_team_name   || overlayState?.mvpTeamName   || 'SQUAD';
   const mvpKills  = overlayState?.mvp_kills        || overlayState?.mvpKills       || 0;
   const mvpTeamObj = safeArray(teams).find(t => t.name === mvpTeam) ?? null;
+  const mvpPlayerObj = safeArray(players).find(p => p.id === overlayState?.mvp_player_id || p.name === mvpName) ?? null;
+  const mvpPhoto = mvpPlayerObj?.photo_url || null;
 
   return (
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column' }}>
@@ -873,7 +882,20 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
             <div style={{ padding:'40px 48px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
               {/* Team logo circle */}
               <div style={{ width:100, height:100, borderRadius:'50%', border:`3px solid ${primary}`, boxShadow:`0 0 30px ${primary}55`, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.6)', marginBottom:20 }}>
-                <TeamLogo team={mvpTeamObj} size={70} />
+                {/* Player Photo */}
+                {mvpPhoto ? (
+                  <div style={{
+                    width: 160, height: 160, borderRadius: '50%', overflow: 'hidden',
+                    border: `4px solid ${primary}`,
+                    boxShadow: `0 0 40px ${primary}88`,
+                    marginBottom: 16,
+                  }}>
+                    <img src={mvpPhoto} alt={mvpName} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
+                      onError={e => { e.target.parentElement.style.display = 'none'; }} />
+                  </div>
+                ) : (
+                  <TeamLogo team={mvpTeamObj} size={70} />
+                )}
               </div>
               <span style={{ fontFamily:'Orbitron', fontSize:12, color:primary, letterSpacing:'0.25em', marginBottom:6, textTransform:'uppercase' }}>{mvpTeam}</span>
               <span style={{ fontFamily:'Orbitron', fontSize:44, fontWeight:900, color:'#fff', marginBottom:28, letterSpacing:'0.05em', textTransform:'uppercase' }}>{mvpName}</span>

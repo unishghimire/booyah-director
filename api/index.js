@@ -851,6 +851,8 @@ module.exports = async (req, res) => {
         team_id: team.id,
         tournament_id: body.tournament_id ? sanitizeString(body.tournament_id) : team.tournament_id,
         name: sanitizeString(body.name, 100),
+        role: sanitizeString(body.role || '', 50),
+        photo_url: sanitizeUrl(body.photo_url || ''),
         is_alive: true,
         current_match_kills: 0,
         total_tournament_kills: 0,
@@ -1111,6 +1113,34 @@ module.exports = async (req, res) => {
     }
 
     // ── DELETE TEAM ───────────────────────────────────────────────────────
+    // ── UPDATE PLAYER (photo, role, name) ──────────────────────────────────
+    if (route === 'updatePlayer') {
+      const missing = requireFields(body, ['player_id']);
+      if (missing) return err(400, missing);
+      const idx = db.players.findIndex(p => p.id === body.player_id);
+      if (idx === -1) return err(404, 'Player not found');
+      if (body.name)      db.players[idx].name      = sanitizeString(body.name, 100);
+      if (body.role)      db.players[idx].role      = sanitizeString(body.role, 50);
+      if (body.photo_url !== undefined) db.players[idx].photo_url = sanitizeUrl(body.photo_url || '');
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, player: db.players[idx] });
+    }
+
+    // ── UPDATE TEAM (logo, color) ──────────────────────────────────────────
+    if (route === 'updateTeam') {
+      const missing = requireFields(body, ['team_id']);
+      if (missing) return err(400, missing);
+      const idx = db.teams.findIndex(t => t.id === body.team_id);
+      if (idx === -1) return err(404, 'Team not found');
+      if (body.team_name) db.teams[idx].name      = sanitizeString(body.team_name, 100);
+      if (body.logo_url !== undefined) db.teams[idx].logo_url = sanitizeUrl(body.logo_url || '');
+      if (body.color)     db.teams[idx].color     = sanitizeString(body.color, 20);
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, team: db.teams[idx] });
+    }
+
     if (route === 'deleteTeam') {
       const missing = requireFields(body, ['team_id']);
       if (missing) return err(400, missing);
@@ -1256,45 +1286,94 @@ module.exports = async (req, res) => {
       return ok({ success: true, code, discountPercent: discountPct, originalPrice, discountedPrice, savings });
     }
 
-    // ── GOOGLE SHEETS IMPORT ──────────────────────────────────────────────
+    // ── GOOGLE SHEETS IMPORT (Public CSV — no service account needed) ────────
     if (route === 'importFromSheet') {
       const { sheet_url, tournament_id } = body;
       if (!sheet_url) return err(400, 'sheet_url is required');
+
+      // Extract sheet ID from URL
       const match = sheet_url.match(/\/spreadsheets\/d\/([a-zA-Z0-9-_]+)/);
-      if (!match) return err(400, 'Invalid Google Sheets URL');
+      if (!match) return err(400, 'Invalid Google Sheets URL. Make sure you paste the full URL from your browser.');
       const sheetId = match[1];
-      const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-      const privateKey  = process.env.GOOGLE_PRIVATE_KEY?.replace(/\n/g, '\n');
-      if (!clientEmail || !privateKey) return err(500, 'Google Sheets credentials not configured');
+
+      let teamsAdded = 0, playersAdded = 0;
       try {
-        const crypto = require('crypto');
-        const now = Math.floor(Date.now() / 1000);
-        const jwtHeader  = Buffer.from(JSON.stringify({ alg:'RS256', typ:'JWT' })).toString('base64url');
-        const jwtPayload = Buffer.from(JSON.stringify({ iss:clientEmail, scope:'https://www.googleapis.com/auth/spreadsheets.readonly', aud:'https://oauth2.googleapis.com/token', iat:now, exp:now+3600 })).toString('base64url');
-        const toSign = `${jwtHeader}.${jwtPayload}`;
-        const signature = crypto.createSign('RSA-SHA256').update(toSign).sign(privateKey, 'base64url');
-        const jwt = `${toSign}.${signature}`;
-        const tokenRes = await fetch('https://oauth2.googleapis.com/token', { method:'POST', headers:{'Content-Type':'application/x-www-form-urlencoded'}, body:`grant_type=urn%3Aietf%3Aparams%3Aoauth%3Agrant-type%3Ajwt-bearer&assertion=${jwt}` });
-        const { access_token } = await tokenRes.json();
-        if (!access_token) return err(500, 'Failed to get Google access token');
-        const getRange = async (range) => { const r = await fetch(`https://sheets.googleapis.com/v4/spreadsheets/${sheetId}/values/${encodeURIComponent(range)}`, { headers:{ Authorization:`Bearer ${access_token}` } }); return r.ok ? (await r.json()).values || [] : []; };
-        const teamsRows = await getRange('Teams!A:C');
-        const teamsData = teamsRows.slice(1).filter(r => r[0]).map(r => ({ team_name: r[0]?.trim(), logo_url: r[1]?.trim()||'', color: r[2]?.trim()||'' }));
-        const playerRows = await getRange('Players!A:C');
-        const playersData = playerRows.slice(1).filter(r => r[0]&&r[1]).map(r => ({ player_name: r[0]?.trim(), team_name: r[1]?.trim(), role: r[2]?.trim()||'Player' }));
-        let teamsAdded = 0, playersAdded = 0;
-        // Resolve active tournament: prefer explicit param → active status → most recent
+        // Fetch Teams tab as public CSV
+        const teamsUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=Teams`;
+        const playersUrl = `https://docs.google.com/spreadsheets/d/${sheetId}/gviz/tq?tqx=out:csv&sheet=Players`;
+
+        const fetchCsv = async (url) => {
+          const r = await fetch(url);
+          if (!r.ok) return null;
+          const text = await r.text();
+          if (!text || text.includes('<!DOCTYPE')) return null; // private sheet
+          return text;
+        };
+
+        const parseCsv = (text) => {
+          if (!text) return [];
+          return text.split('\n')
+            .slice(1) // skip header row
+            .map(line => {
+              // Handle quoted CSV fields
+              const cols = [];
+              let cur = '', inQ = false;
+              for (const ch of line) {
+                if (ch === '"') { inQ = !inQ; }
+                else if (ch === ',' && !inQ) { cols.push(cur.trim()); cur = ''; }
+                else { cur += ch; }
+              }
+              cols.push(cur.trim());
+              return cols;
+            })
+            .filter(row => row[0] && row[0].replace(/"/g,'').trim()); // skip empty rows
+        };
+
+        // Resolve active tournament
         const activeTournament = tournament_id
           ? db.tournaments.find(t => t.id === tournament_id)
           : (db.tournaments.find(t => t.status === 'active') || db.tournaments[db.tournaments.length - 1]);
-        if (!activeTournament) return err(404, 'No active tournament found. Create a tournament first.');
+        if (!activeTournament) return err(404, 'No active tournament. Create one first.');
         const resolvedTid = activeTournament.id;
 
-        for (const t of teamsData) { if (!db.teams.find(x => x.name?.toLowerCase()===t.team_name.toLowerCase())) { db.teams.push({ id:genId(), tournament_id:resolvedTid, name:t.team_name, logo_url:t.logo_url, color:t.color, total_tournament_points:0, total_tournament_kills:0 }); teamsAdded++; } }
-        for (const p of playersData) { const team = db.teams.find(t => t.name?.toLowerCase()===p.team_name.toLowerCase()); if (!team) continue; if (!db.players.find(x => x.name===p.player_name&&x.team_id===team.id)) { db.players.push({ id:genId(), team_id:team.id, tournament_id:resolvedTid, name:p.player_name, role:p.role, is_alive:true, total_tournament_kills:0, current_match_kills:0 }); playersAdded++; } }
+        // Import Teams
+        const teamsCsv = await fetchCsv(teamsUrl);
+        if (teamsCsv === null) return err(403, 'Could not read sheet. Make sure it is shared publicly: File → Share → Anyone with link can view.');
+        const teamsData = parseCsv(teamsCsv);
+
+        for (const row of teamsData) {
+          const teamName = (row[0] || '').replace(/"/g,'').trim();
+          const logoUrl  = (row[1] || '').replace(/"/g,'').trim();
+          const color    = (row[2] || '').replace(/"/g,'').trim();
+          if (!teamName) continue;
+          if (!db.teams.find(t => t.name?.toLowerCase() === teamName.toLowerCase())) {
+            db.teams.push({ id:genId(), tournament_id:resolvedTid, name:teamName, logo_url:sanitizeUrl(logoUrl), color:color||'', total_tournament_points:0, total_tournament_kills:0 });
+            teamsAdded++;
+          }
+        }
+
+        // Import Players
+        const playersCsv = await fetchCsv(playersUrl);
+        if (playersCsv) {
+          const playersData = parseCsv(playersCsv);
+          for (const row of playersData) {
+            const playerName = (row[0] || '').replace(/"/g,'').trim();
+            const teamName   = (row[1] || '').replace(/"/g,'').trim();
+            const role       = (row[2] || '').replace(/"/g,'').trim();
+            const photoUrl   = (row[3] || '').replace(/"/g,'').trim();
+            if (!playerName || !teamName) continue;
+            const team = db.teams.find(t => t.name?.toLowerCase() === teamName.toLowerCase());
+            if (!team) continue;
+            if (db.players.find(p => p.name === playerName && p.team_id === team.id)) continue;
+            if (db.players.filter(p => p.team_id === team.id).length >= 6) continue;
+            db.players.push({ id:genId(), team_id:team.id, tournament_id:resolvedTid, name:playerName, role:role||'', photo_url:sanitizeUrl(photoUrl)||'', is_alive:true, current_match_kills:0, total_tournament_kills:0, created_at:new Date().toISOString() });
+            playersAdded++;
+          }
+        }
+
         db.overlay_state.last_updated_at = new Date().toISOString();
         await saveDb(uid, db);
-        return ok({ success:true, teams_added:teamsAdded, players_added:playersAdded });
+        return ok({ success:true, teams_added:teamsAdded, players_added:playersAdded, sheet_id:sheetId });
       } catch(e) { return err(500, `Sheet import failed: ${e.message}`); }
     }
 

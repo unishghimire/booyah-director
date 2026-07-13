@@ -31,6 +31,8 @@ export default function DataInputer() {
   // Add Player state
   const [playerTeamId, setPlayerTeamId] = useState('');
   const [newPlayerName, setNewPlayerName] = useState('');
+  const [newPlayerPhoto, setNewPlayerPhoto] = useState('');
+  const [newPlayerRole, setNewPlayerRole] = useState('');
   const [playerAdding, setPlayerAdding] = useState(false);
 
   // General busy state
@@ -76,9 +78,11 @@ export default function DataInputer() {
     if (!tournament?.id) return toast.error('No active tournament found');
     setPlayerAdding(true);
     try {
-      await overlayApi.addPlayer({ name: newPlayerName, team_id: playerTeamId, tournament_id: tournament?.id });
+      await overlayApi.addPlayer({ name: newPlayerName, team_id: playerTeamId, tournament_id: tournament?.id, photo_url: newPlayerPhoto || '', role: newPlayerRole || '' });
       toast.success(`Player "${newPlayerName}" added!`);
       setNewPlayerName('');
+      setNewPlayerPhoto('');
+      setNewPlayerRole('');
       refresh();
     } catch (err) {
       toast.error(err.message || 'Error adding player');
@@ -346,6 +350,25 @@ export default function DataInputer() {
                           className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
                         />
                       </div>
+                      <div>
+                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-gray-500 uppercase mb-2">
+                          Role / IGN <span className="text-gray-700 normal-case">(optional)</span>
+                        </label>
+                        <input
+                          type="text"
+                          value={newPlayerRole}
+                          onChange={(e) => setNewPlayerRole(e.target.value)}
+                          placeholder="e.g. Assaulter, IGL..."
+                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
+                        />
+                      </div>
+                      <ImageUpload
+                        value={newPlayerPhoto}
+                        onChange={(url) => setNewPlayerPhoto(url)}
+                        label="Player Photo (optional — shows on MVP overlay)"
+                        name={newPlayerName ? `player-${newPlayerName.toLowerCase()}` : 'player-photo'}
+                        size="sm"
+                      />
                       <button
                         type="submit"
                         disabled={playerAdding}
