@@ -37,6 +37,7 @@ export default function DirectorPanel() {
   const tournament = data?.tournament;
   const teams = data?.teams || [];
   const players = data?.players || [];
+  const standings = data?.standings || [];
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -665,13 +666,13 @@ export default function DirectorPanel() {
                               {team.name}
                             </td>
                             <td className="py-3 px-4 text-center text-gray-400 font-mono">
-                              {team.matches_played || 0}
+                              {standings.filter(s => s.team_id === team.id).length || 0}
                             </td>
                             <td className="py-3 px-4 text-center font-mono font-bold text-[#FF6B00]">
-                              {team.booyah_count || 0}
+                              {standings.filter(s => s.team_id === team.id && s.placement === 1).length || 0}
                             </td>
                             <td className="py-3 px-4 text-center text-gray-400 font-mono">
-                              {team.kill_points || 0}
+                              {team.total_tournament_kills || 0}
                             </td>
                             <td className="py-3 px-4 text-center font-mono font-black text-[#00D4FF]">
                               {team.total_tournament_points || 0}

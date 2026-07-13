@@ -832,12 +832,22 @@ module.exports = async (req, res) => {
       const plan = sanitizeString(body.plan || '', 20).toLowerCase();
       if (!code) return err(400, 'Promo code is required');
 
-      // Load promo codes from DB
-      const promoCodes = db.promo_codes || {};
-      const promo = promoCodes[code];
+      // Promo codes live in the admin database, not user DB
+      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+      const secret = process.env.FIREBASE_DATABASE_SECRET;
+
+      let promo = null;
+      if (dbBaseUrl && secret) {
+        try {
+          const r = await fetch(`${dbBaseUrl}/booyah_admin/promo_codes/${encodeURIComponent(code)}.json?auth=${secret}`);
+          if (r.ok) promo = await r.json();
+        } catch (_) {}
+      }
+
       if (!promo) return err(404, 'Invalid promo code');
-      if (promo.used_count >= (promo.max_uses || 1)) return err(400, 'Promo code has expired');
+      if (promo.used_count >= (promo.max_uses || 1)) return err(400, 'Promo code has been fully redeemed');
       if (promo.expires_at && new Date(promo.expires_at) < new Date()) return err(400, 'Promo code has expired');
+      if (promo.active === false) return err(400, 'Promo code is inactive');
 
       const PRICES = { weekly: 299, monthly: 599, yearly: 2999 };
       const originalPrice = PRICES[plan] || PRICES.monthly;

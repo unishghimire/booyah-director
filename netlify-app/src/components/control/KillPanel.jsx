@@ -12,10 +12,13 @@ function PlayerRow({ player, team, currentMatch, onAction }) {
     setBusy(true);
     try {
       await overlayApi.addKill({
-        player_id: player.id,
-        match_id: currentMatch.id,
-        killed_player_name: '',
-        killed_team_name: '',
+        killer_player_id:  player.id,
+        killer_name:       player.name,
+        killer_team_name:  team?.name || '',
+        match_id:          currentMatch.id,
+        tournament_id:     currentMatch.tournament_id || '',
+        killed_player_name: 'Opponent',
+        killed_team_name:   '',
       });
       onAction?.();
     } catch (err) { toast.error(`Kill: ${err.message}`); } finally { setBusy(false); }
@@ -25,7 +28,13 @@ function PlayerRow({ player, team, currentMatch, onAction }) {
     if (!currentMatch?.id) { toast.error('No active match'); return; }
     setBusy(true);
     try {
-      await overlayApi.eliminatePlayer({ player_id: player.id, match_id: currentMatch.id });
+      await overlayApi.eliminatePlayer({
+        player_id:     player.id,
+        match_id:      currentMatch.id,
+        player_name:   player.name,
+        team_name:     team?.name || '',
+        tournament_id: currentMatch.tournament_id || '',
+      });
       onAction?.();
     } catch (err) { toast.error(`Elim: ${err.message}`); } finally { setBusy(false); }
   };
@@ -63,10 +72,11 @@ function TeamCard({ team, players, currentMatch, tournament, onAction }) {
     setBusy(true);
     try {
       await overlayApi.setTeamPlacement({
-        team_id: team.id,
-        match_id: currentMatch.id,
-        placement: Number(placement),
-        tournament_id: tournament.id,
+        team_id:       team.id,
+        team_name:     team.name,
+        match_id:      currentMatch.id,
+        placement:     Number(placement),
+        tournament_id: tournament?.id || currentMatch.tournament_id || '',
       });
       toast.success(`${team.name}: #${placement}`);
       onAction?.();
