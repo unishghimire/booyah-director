@@ -4,6 +4,7 @@
   "outputDirectory": "netlify-app/dist",
   "functions": {
     "api/index.js": {
+      "runtime": "nodejs20.x",
       "maxDuration": 15
     }
   },
