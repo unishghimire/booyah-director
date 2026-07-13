@@ -17,7 +17,6 @@ const SCREENS = [
   { key: 'champions',         label: 'BOOYAH!',       icon: Trophy,       desc: 'Champions reveal',          group: 'scene' },
   // ── Transparent overlays (layer over gameplay) ──
   { key: 'scoreboard',        label: 'SCOREBOARD',    icon: LayoutList,   desc: 'Live scoreboard overlay',   group: 'overlay' },
-  { key: 'ff_scoreboard',     label: 'FF STYLE',      icon: LayoutList,   desc: 'Free Fire style board (same as Scoreboard)', group: 'overlay' },
   { key: 'standings',         label: 'STANDINGS',     icon: Trophy,       desc: 'Full tournament standings', group: 'overlay' },
   { key: 'kill_feed',         label: 'KILL FEED',     icon: Crosshair,    desc: 'Live kill events',          group: 'overlay' },
   { key: 'elim_alert',        label: 'ELIM ALERT',    icon: AlertTriangle,desc: 'Last elimination popup',   group: 'overlay' },

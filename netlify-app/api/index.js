@@ -15,6 +15,28 @@ const DEFAULT_DESIGN = {
   organizerName: 'GARENA', sponsorLogoUrl: '',
 };
 
+
+// ── Recalculate and persist team totals from all match standings ──────────────
+function recalcTeamTotals(db, tournament_id) {
+  const teams = tournament_id
+    ? db.teams.filter(t => t.tournament_id === tournament_id)
+    : db.teams;
+
+  for (const team of teams) {
+    const teamStandings = db.match_standings.filter(s => s.team_id === team.id);
+    const teamPlayers   = db.players.filter(p => p.team_id === team.id);
+
+    const totalPoints = teamStandings.reduce((sum, s) => sum + (s.total_match_points || 0), 0);
+    const totalKills  = teamPlayers.reduce((sum, p) => sum + (p.total_tournament_kills || 0), 0);
+
+    const idx = db.teams.findIndex(t => t.id === team.id);
+    if (idx !== -1) {
+      db.teams[idx].total_tournament_points = totalPoints;
+      db.teams[idx].total_tournament_kills  = totalKills;
+    }
+  }
+}
+
 module.exports = async (req, res) => {
   // GLOBAL_CATCH — ensures every error returns JSON, never crashes the function cold
   try {
@@ -137,11 +159,11 @@ module.exports = async (req, res) => {
       if (!tournament) return ok({ tournament: null, overlay_state: db.overlay_state, design: db.design, teams: [], players: [], current_match: null, kill_feed: [], eliminations: [], standings: [] });
       const tid = tournament.id;
       const teams = db.teams.filter(t => t.tournament_id === tid).map(t => {
+        // total_match_points already includes placement + kills*ppk (set by setTeamPlacement)
         const standingsForTeam = db.match_standings.filter(s => s.tournament_id === tid && s.team_id === t.id);
-        const placementPoints  = standingsForTeam.reduce((sum, s) => sum + (s.placement_points_awarded || 0), 0);
+        const totalPoints      = standingsForTeam.reduce((sum, s) => sum + (s.total_match_points || 0), 0);
         const teamPlayers      = db.players.filter(p => p.team_id === t.id);
         const totalKills       = teamPlayers.reduce((sum, p) => sum + (p.total_tournament_kills || 0), 0);
-        const totalPoints      = placementPoints + (totalKills * (tournament.points_per_kill || 1));
         return { ...t, total_tournament_kills: totalKills, total_tournament_points: totalPoints };
       }).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
       const players = db.players.filter(p => p.tournament_id === tid).map(p => ({ ...p, is_alive: p.is_alive !== undefined ? p.is_alive : true }));
@@ -517,6 +539,7 @@ module.exports = async (req, res) => {
 
       db.matches.push(match);
       db.players = db.players.map(p => p.tournament_id === match.tournament_id ? { ...p, is_alive: true, current_match_kills: 0 } : p);
+      db.overlay_state.current_screen = 'maplabel';
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true, match, match_number: newMatchNumber });
@@ -563,6 +586,9 @@ module.exports = async (req, res) => {
         db.players[pIdx].current_match_kills = (db.players[pIdx].current_match_kills || 0) + 1;
         db.players[pIdx].total_tournament_kills = (db.players[pIdx].total_tournament_kills || 0) + 1;
       }
+
+      // Roll up team kill totals
+      recalcTeamTotals(db, kill.tournament_id);
 
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
@@ -626,6 +652,9 @@ module.exports = async (req, res) => {
 
       if (existing !== -1) db.match_standings[existing] = standing;
       else db.match_standings.push(standing);
+
+      // Roll up team totals after each placement entry
+      recalcTeamTotals(db, body.tournament_id || standing.tournament_id);
 
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
