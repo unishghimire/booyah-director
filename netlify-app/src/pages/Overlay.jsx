@@ -298,8 +298,8 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
           <div style={{ width:30, fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,255,255,0.35)', textAlign:'center' }}>#</div>
           <div style={{ width:26 }} />
           <div style={{ flex:1, fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,255,255,0.35)', paddingLeft:6, letterSpacing:'0.1em' }}>TEAM</div>
-          <div style={{ width:28, textAlign:'center', fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,107,0,0.7)', letterSpacing:'0.05em' }}>⚡</div>
-          <div style={{ width:28, textAlign:'center', fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(0,212,255,0.7)', letterSpacing:'0.05em' }}>💀</div>
+          <div style={{ width:28, textAlign:'center', fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,107,0,0.7)', letterSpacing:'0.05em' }}>💀</div>
+          <div style={{ width:28, textAlign:'center', fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(0,212,255,0.7)', letterSpacing:'0.05em' }}>PT</div>
           <div style={{ width:32, textAlign:'center', fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,255,255,0.35)' }}>ALIVE</div>
         </div>
 
@@ -354,13 +354,13 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
             <span style={{ fontSize:7, fontWeight:900, color:'#000', letterSpacing:'0.06em', textAlign:'center', lineHeight:1.3 }}>MAP<br/>ROTATE</span>
           </div>
           <div style={{ display:'flex', alignItems:'center', flex:1, padding:'0 4px', gap:2, overflowX:'hidden' }}>
-            {['Bermuda','Purgatory','Kalahari','Bermuda','Purgatory','Kalahari'].map((map, i) => {
+            {Array.from({ length: Math.max(currentMatch?.match_number || 1, 6) }, (_, i) => {
               const isCurr = currentMatch?.match_number === i+1;
-              const isDone = currentMatch?.match_number > i+1;
+              const isDone = (currentMatch?.match_number || 0) > i+1;
               return (
                 <div key={i} style={{
                   display:'flex', flexDirection:'column', alignItems:'center',
-                  padding:'3px 4px', borderRadius:3, minWidth:32,
+                  padding:'3px 4px', borderRadius:3, minWidth:28,
                   background: isCurr ? `${primary}20` : 'transparent',
                   border: isCurr ? `1px solid ${primary}60` : '1px solid transparent',
                   position:'relative',
@@ -368,7 +368,6 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
                   {isCurr && <span style={{ position:'absolute', top:-6, left:'50%', transform:'translateX(-50%)', background:'#e53935', color:'#fff', fontSize:5, fontWeight:900, padding:'1px 3px', borderRadius:2 }}>LIVE</span>}
                   {isDone && <span style={{ position:'absolute', top:-5, left:'50%', transform:'translateX(-50%)', fontSize:7, color:'#4ade80' }}>✓</span>}
                   <span style={{ fontSize:7, fontWeight:700, color: isCurr ? primary : 'rgba(255,255,255,0.35)' }}>M{i+1}</span>
-                  <span style={{ fontSize:6, fontWeight:700, color: isCurr ? '#fff' : 'rgba(255,255,255,0.4)', whiteSpace:'nowrap' }}>{map.substring(0,4)}</span>
                 </div>
               );
             })}
@@ -393,8 +392,8 @@ function FullStandings({ teams = [], design }) {
         <FFPanelHeader design={design} center="OVERALL STANDINGS" />
         {/* Headers */}
         <div style={{ display:'flex', alignItems:'center', height:30, background:'rgba(0,0,0,0.4)', borderBottom:'2px solid rgba(255,107,0,0.3)', padding:'0 14px', flexShrink:0 }}>
-          {[['RANK',40],['',30],['TEAM NAME',1],['KILLS',68],['BOOYAH',68],['PLACE PTS',78],['TOTAL PTS',86]].map(([label,w], i) => (
-            <div key={i} style={{ width: typeof w==='number'&&w!==1 ? w : undefined, flex:w===1?1:undefined, textAlign:w===1?undefined:'center', paddingLeft: w===1?10:undefined, fontFamily:'Orbitron', fontSize:9, fontWeight:900, color: label==='TOTAL PTS'?'#00D4FF':'rgba(255,255,255,0.5)', letterSpacing:'0.12em' }}>
+          {[['RANK',40],['',30],['TEAM NAME',1],['KILLS',80],['TOTAL PTS',100]].map(([label,w], i) => (
+            <div key={i} style={{ width: typeof w==='number'&&w!==1 ? w : undefined, flex:w===1?1:undefined, textAlign:w===1?undefined:'center', paddingLeft: w===1?10:undefined, fontFamily:'Orbitron', fontSize:9, fontWeight:900, color: label==='TOTAL PTS'?'#00D4FF':label==='KILLS'?'#FF6B00':'rgba(255,255,255,0.5)', letterSpacing:'0.12em' }}>
               {label}
             </div>
           ))}
@@ -412,10 +411,8 @@ function FullStandings({ teams = [], design }) {
                   <TeamLogo team={team} size={22} />
                 </div>
                 <div style={{ flex:1, paddingLeft:10, fontFamily:'Orbitron', fontSize:12, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{team.name||'—'}</div>
-                <div style={{ width:68, textAlign:'center', fontFamily:'Orbitron', fontSize:12, color:'#FF6B00', fontWeight:700 }}>{team.total_tournament_kills||0}</div>
-                <div style={{ width:68, textAlign:'center', fontFamily:'Orbitron', fontSize:12, color:'#00D4FF', fontWeight:700 }}>{team.booyahs||0}</div>
-                <div style={{ width:78, textAlign:'center', fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.6)' }}>{team.placement_points||0}</div>
-                <div style={{ width:86, textAlign:'center', fontFamily:'Orbitron', fontSize:15, fontWeight:900, color:'#fff' }}>{team.total_tournament_points||0}</div>
+                <div style={{ width:80, textAlign:'center', fontFamily:'Orbitron', fontSize:13, color:'#FF6B00', fontWeight:700 }}>{team.total_tournament_kills||0}</div>
+                <div style={{ width:100, textAlign:'center', fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:'#00D4FF' }}>{team.total_tournament_points||0}</div>
               </div>
             );
           })}
@@ -712,21 +709,29 @@ function CastersScreen({ design }) {
         </div>
 
         {/* Caster cards */}
-        <div style={{ display:'flex', gap:30, justifyContent:'center', flex:1, alignItems:'center' }}>
+        <div style={{ display:'flex', gap:30, justifyContent:'center', flex:1, alignItems:'stretch' }}>
           {safeArray(casters).map((c, i) => (
             <FFPanel key={i} style={{ width:360, padding:0 }}>
-              <div style={{ padding:'30px 28px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
+              <div style={{ padding:'30px 28px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', flex:1, justifyContent:'center' }}>
                 {/* Photo or initials */}
-                <div style={{ width:110, height:110, borderRadius:'50%', border:`3px solid ${i===0?primary:secondary}`, boxShadow:`0 0 30px ${i===0?primary:secondary}44`, overflow:'hidden', marginBottom:20, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
-                  {c.photo ? (
-                    <img src={c.photo} alt={c.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} onError={e=>e.target.style.display='none'} />
-                  ) : (
-                    <span style={{ fontFamily:'Orbitron', fontSize:36, fontWeight:900, color: i===0 ? primary : secondary }}>
-                      {(c.name||'C').charAt(0)}
-                    </span>
-                  )}
-                </div>
-                <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color: i===0?primary:secondary, letterSpacing:'0.2em', marginBottom:6 }}>{c.role||'CASTER'}</span>
+                {(() => {
+                  const cColor = i===0 ? primary : i===1 ? secondary : primary;
+                  return (
+                    <div style={{ width:110, height:110, borderRadius:'50%', border:`3px solid ${cColor}`, boxShadow:`0 0 30px ${cColor}44`, overflow:'hidden', marginBottom:20, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                      {c.photo ? (
+                        <img src={c.photo} alt={c.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} onError={e=>e.target.style.display='none'} />
+                      ) : (
+                        <span style={{ fontFamily:'Orbitron', fontSize:36, fontWeight:900, color: cColor }}>
+                          {(c.name||'C').charAt(0)}
+                        </span>
+                      )}
+                    </div>
+                  );
+                })()}
+                {(() => {
+                  const cColor = i===0 ? primary : i===1 ? secondary : primary;
+                  return <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color: cColor, letterSpacing:'0.2em', marginBottom:6 }}>{c.role||'CASTER'}</span>;
+                })()}
                 <span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', marginBottom:8 }}>{c.name||'—'}</span>
                 <span style={{ fontFamily:'Orbitron', fontSize:11, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>{c.handle||''}</span>
               </div>
