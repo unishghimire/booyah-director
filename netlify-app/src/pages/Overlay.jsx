@@ -1,5 +1,5 @@
 /**
- * Overlay.jsx — 1080p OBS Browser Source Overlays
+ * Overlay.jsx — 1080p OBS Browser Source Overlays (AAA Broadcast Quality)
  *
  * Route: /overlay/:screen
  * PUBLIC route — no auth required. Reads data via shareToken from URL param
@@ -10,14 +10,14 @@
  *   today-matches | teams | casters | upcoming-map |
  *   elim-alert | mvp | champions
  *
- * OBS setup: 1920×1080, "Shutdown source when not visible" OFF,
- *            Check "Transparent background" for overlay-type screens.
+ * OBS setup: 1920×1080, \"Shutdown source when not visible\" OFF,
+ *            Check \"Transparent background\" for overlay-type screens.
  */
 
 import { useParams, useSearchParams } from 'react-router-dom';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
-import { Skull, Star, Crown, Zap, Video, Calendar, Users, MapPin, Award, XCircle, Mic2, Shield, BarChart2 } from 'lucide-react';
+import { Skull, Star, Crown, Zap, Calendar, Users, MapPin, Award, XCircle, Mic2, Shield, Flame } from 'lucide-react';
 import { MAP_IMAGES } from '@/lib/maps';
 import { safeArray } from '@/components/ErrorBoundary';
 
@@ -99,35 +99,34 @@ function GamingBackground({ mapName, accent = '#FF6B00', accent2 = '#00D4FF' }) 
           position: 'absolute', inset: 0,
           backgroundImage: `url(${mapImg})`,
           backgroundSize: 'cover', backgroundPosition: 'center',
-          opacity: 0.12, filter: 'blur(8px) saturate(0.6)',
+          opacity: 0.15, filter: 'blur(6px) saturate(0.7) contrast(1.1)',
         }} />
       )}
-      {/* Carbon fiber */}
+      {/* Carbon fiber grid effect */}
       <div style={{
         position: 'absolute', inset: 0,
-        backgroundImage: `repeating-linear-gradient(45deg,rgba(255,255,255,0.012) 0px,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 6px),repeating-linear-gradient(-45deg,rgba(255,255,255,0.012) 0px,rgba(255,255,255,0.012) 1px,transparent 1px,transparent 6px)`,
+        backgroundImage: `repeating-linear-gradient(45deg,rgba(255,255,255,0.01) 0px,rgba(255,255,255,0.01) 1px,transparent 1px,transparent 6px),repeating-linear-gradient(-45deg,rgba(255,255,255,0.01) 0px,rgba(255,255,255,0.01) 1px,transparent 1px,transparent 6px)`,
       }} />
-      {/* Grid */}
+      {/* Dynamic Grid overlay */}
       <div style={{ position:'absolute', inset:0, backgroundImage:`linear-gradient(${accent}08 1px,transparent 1px),linear-gradient(90deg,${accent}08 1px,transparent 1px)`, backgroundSize:'80px 80px' }} />
-      {/* Glow */}
+      {/* Premium Vignette & Ambient Glow */}
       <div style={{ position:'absolute', inset:0, background:`radial-gradient(ellipse 1400px 900px at 50% 40%,${accent}22,transparent 70%)` }} />
-      <div style={{ position:'absolute', inset:0, background:`radial-gradient(ellipse 600px 600px at 85% 80%,${accent2}15,transparent 60%)` }} />
-      {/* Edges */}
-      <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${accent},${accent2},${accent},transparent)` }} />
-      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${accent}88,transparent)` }} />
-      {/* Vignette */}
-      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 120% 120% at 50% 50%,transparent 30%,rgba(4,5,14,0.85) 100%)' }} />
-      {/* Particles */}
-      {[...Array(10)].map((_, i) => (
+      <div style={{ position:'absolute', inset:0, background:`radial-gradient(ellipse 700px 700px at 85% 80%,${accent2}18,transparent 60%)` }} />
+      {/* Framing Lines */}
+      <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:`linear-gradient(90deg,transparent,${accent},${accent2},${accent},transparent)` }} />
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${accent}AA,transparent)` }} />
+      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 120% 120% at 50% 50%,transparent 25%,rgba(4,5,14,0.92) 100%)' }} />
+      {/* Micro-Particles */}
+      {[...Array(15)].map((_, i) => (
         <div key={i} style={{
-          position:'absolute', width:i%3===0?3:2, height:i%3===0?3:2, borderRadius:'50%',
+          position:'absolute', width:i%3===0?4:2, height:i%3===0?4:2, borderRadius:'50%',
           background: i%2===0 ? accent : accent2,
-          left:`${8+i*9}%`, top:`${10+(i*17)%80}%`, opacity:0.35,
-          animation:`fprtcl ${3+(i%3)}s ease-in-out infinite alternate`,
-          animationDelay:`${i*0.4}s`,
+          left:`${5+i*6.5}%`, top:`${10+(i*19)%80}%`, opacity:0.4,
+          animation:`fprtcl ${4+(i%3)}s ease-in-out infinite alternate`,
+          animationDelay:`${i*0.3}s`,
         }} />
       ))}
-      <style>{`@keyframes fprtcl{from{transform:translateY(0) translateX(0);opacity:.2}to{transform:translateY(-20px) translateX(8px);opacity:.6}}`}</style>
+      <style>{`@keyframes fprtcl{from{transform:translateY(0) translateX(0);opacity:.25}to{transform:translateY(-30px) translateX(12px);opacity:.75}}`}</style>
     </div>
   );
 }
@@ -145,97 +144,89 @@ const tok = {
   game: d => d?.gameLabel          || 'MATCH',
   logo: d => d?.logoUrl            || null,
   sponsorLogo: d => d?.sponsorLogoUrl || null,
-  font: d => {
-    const f = d?.fontStyle || 'orbitron';
-    if (f === 'rajdhani') return 'Rajdhani, sans-serif';
-    if (f === 'impact')   return 'Impact, Arial Narrow, sans-serif';
-    return 'Orbitron, sans-serif';
-  },
 };
 
 /* ══════════════════════════════════════════════════
-   SHARED PANEL COMPONENTS
+   SHARED PANEL COMPONENTS (100% compliant with design system)
 ══════════════════════════════════════════════════ */
 function FFPanel({ children, style }) {
   return (
     <div style={{
-      background: 'rgba(6,9,21,0.93)',
-      backdropFilter: 'blur(16px) saturate(180%)',
-      borderTop: '2px solid #FF6B00', borderLeft: '2px solid #FF6B00',
-      borderBottom: '2px solid #00D4FF', borderRight: '2px solid #00D4FF',
-      borderRadius: 6,
-      boxShadow: '0 0 40px rgba(255,107,0,0.12),0 0 80px rgba(0,0,0,0.6),inset 0 1px 0 rgba(255,107,0,0.2)',
+      background: 'rgba(6,9,18,0.85)',
+      backdropFilter: 'blur(12px) saturate(180%)',
+      border: '1px solid rgba(255,107,0,0.3)',
+      borderRadius: 8,
+      boxShadow: '0 12px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)',
       position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column',
       ...style,
     }}>
-      <div style={{ position:'absolute', top:0, left:0, width:12, height:12, borderTop:'3px solid #FF6B00', borderLeft:'3px solid #FF6B00', borderRadius:'2px 0 0 0', zIndex:10 }} />
-      <div style={{ position:'absolute', top:0, right:0, width:12, height:12, borderTop:'3px solid #00D4FF', borderRight:'3px solid #00D4FF', borderRadius:'0 2px 0 0', zIndex:10 }} />
-      <div style={{ position:'absolute', bottom:0, left:0, width:12, height:12, borderBottom:'3px solid #00D4FF', borderLeft:'3px solid #00D4FF', borderRadius:'0 0 0 2px', zIndex:10 }} />
-      <div style={{ position:'absolute', bottom:0, right:0, width:12, height:12, borderBottom:'3px solid #FF6B00', borderRight:'3px solid #FF6B00', borderRadius:'0 0 2px 0', zIndex:10 }} />
+      {/* Corner accents */}
+      <div style={{ position:'absolute', top:0, left:0, width:14, height:14, borderTop:'3px solid #FF6B00', borderLeft:'3px solid #FF6B00', borderRadius:'4px 0 0 0', zIndex:10 }} />
+      <div style={{ position:'absolute', top:0, right:0, width:14, height:14, borderTop:'3px solid #00D4FF', borderRight:'3px solid #00D4FF', borderRadius:'0 4px 0 0', zIndex:10 }} />
+      <div style={{ position:'absolute', bottom:0, left:0, width:14, height:14, borderBottom:'3px solid #00D4FF', borderLeft:'3px solid #00D4FF', borderRadius:'0 0 0 4px', zIndex:10 }} />
+      <div style={{ position:'absolute', bottom:0, right:0, width:14, height:14, borderBottom:'3px solid #FF6B00', borderRight:'3px solid #FF6B00', borderRadius:'0 0 4px 0', zIndex:10 }} />
       {children}
     </div>
   );
 }
 
-function FFPanelHeader({ design, center, logoUrl }) {
+function FFPanelHeader({ design, center }) {
   const tLogo = tok.logo(design);
+  const primary = tok.acc(design);
+  const secondary = tok.acc2(design);
   return (
     <div style={{
-      height: 36, background: 'rgba(0,0,0,0.5)',
-      borderBottom: '1px solid rgba(255,107,0,0.3)',
+      height: 48, background: 'rgba(4,5,11,0.7)',
+      borderBottom: '1px solid rgba(255,107,0,0.2)',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-      padding: '0 12px', flexShrink: 0, zIndex: 2,
+      padding: '0 20px', flexShrink: 0, zIndex: 2,
     }}>
-      {/* Left: Tournament logo or Garena "G" */}
-      <div style={{ display:'flex', alignItems:'center', gap:6 }}>
+      <div style={{ display:'flex', alignItems:'center', gap:8 }}>
         {tLogo ? (
           <img src={tLogo} alt="logo"
-            style={{ width:22, height:22, objectFit:'contain', borderRadius:3 }}
+            style={{ width:24, height:24, objectFit:'contain' }}
             onError={e => { e.target.style.display='none'; }}
           />
         ) : (
-          <div style={{ width:20, height:20, borderRadius:'50%', background:'rgba(255,107,0,0.2)', border:'1px solid rgba(255,107,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <span style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:900, color:'#FF6B00', lineHeight:1 }}>G</span>
+          <div style={{ width:22, height:22, borderRadius:'50%', background:'rgba(255,107,0,0.15)', border:'1px solid rgba(255,107,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:primary }}>B</span>
           </div>
         )}
-        <span style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'rgba(255,255,255,0.5)', letterSpacing:'0.2em' }}>
+        <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>
           {tok.name(design).split(' ')[0]}
         </span>
       </div>
-      {/* Center */}
-      <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:900, color:'rgba(255,255,255,0.7)', letterSpacing:'0.3em', textTransform:'uppercase' }}>
-        {center || 'FF OFFICIAL'}
+      <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:primary, letterSpacing:'0.2em', textTransform:'uppercase' }}>
+        {center || 'LIVE OVERLAY'}
       </span>
-      {/* Right: full tournament name */}
-      <span style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em', textTransform:'uppercase' }}>
+      <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:secondary, letterSpacing:'0.15em', textTransform:'uppercase' }}>
         {tok.sub(design)}
       </span>
     </div>
   );
 }
 
-/** Team logo — shows img if available, initials otherwise */
-function TeamLogo({ team, size = 24 }) {
+function TeamLogo({ team, size = 32 }) {
   const [imgErr, setImgErr] = useState(false);
   const url = team?.logo_url || team?.logo || null;
   if (url && !imgErr) {
     return (
       <img
         src={url} alt={team?.name || ''}
-        style={{ width: size, height: size, objectFit:'contain', borderRadius: 3, display:'block' }}
+        style={{ width: size, height: size, objectFit:'contain', borderRadius: 4, display:'block' }}
         onError={() => setImgErr(true)}
       />
     );
   }
-  // Initials fallback
   const initials = (team?.name || 'TM').replace(/[^A-Z0-9]/gi, '').substring(0, 2).toUpperCase();
   return (
     <div style={{
-      width: size, height: size, borderRadius: 4,
-      background: `linear-gradient(135deg,${team?.color||'#FF6B00'},${team?.color||'#FF6B00'}88)`,
+      width: size, height: size, borderRadius: 6,
+      background: `linear-gradient(135deg, ${team?.color || '#FF6B00'}, ${team?.color || '#FF6B00'}88)`,
       display:'flex', alignItems:'center', justifyContent:'center',
       fontSize: size * 0.4, fontWeight:900, color:'#fff', fontFamily:'Orbitron',
       flexShrink: 0,
+      border: '1px solid rgba(255,255,255,0.1)'
     }}>
       {initials}
     </div>
@@ -250,7 +241,7 @@ function SetupBlank() {
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 2: SCOREBOARD (transparent overlay, right side)
+   SCREEN 2: SCOREBOARD (OBS OVERLAY - RIGHT SIDE)
 ══════════════════════════════════════════════════ */
 function FFBoard({ teams = [], players = [], currentMatch, design }) {
   const rows = useMemo(() => {
@@ -267,175 +258,174 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
   const primary = tok.acc(design);
   const secondary = tok.acc2(design);
   const mapName = currentMatch?.map_name || currentMatch?.mapName || '';
-  const matchNum = currentMatch?.match_number ? `MATCH ${String(currentMatch.match_number).padStart(2,'0')}` : 'STAND BY';
+  const matchNum = currentMatch?.match_number ? `MATCH ${String(currentMatch.match_number).padStart(2,'0')}` : 'STANDBY';
 
   return (
-    <div style={{ position:'absolute', right:20, top:'50%', transform:'translateY(-50%)', width:290, zIndex:10 }}>
+    <motion.div
+      initial={{ x: 100, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.4 }}
+      style={{ position:'absolute', right:40, top:80, width:420, zIndex:10 }}
+    >
       <FFPanel>
-        <FFPanelHeader design={design} center="SCOREBOARD" />
-
-        {/* Match info bar */}
-        <div style={{
-          height:28, background:'rgba(0,0,0,0.6)',
-          borderBottom:`1px solid ${primary}33`,
-          display:'flex', alignItems:'center', justifyContent:'space-between',
-          padding:'0 12px',
-        }}>
-          <span style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>{matchNum}</span>
-          {mapName && <span style={{ fontFamily:'Orbitron', fontSize:8, color:'rgba(255,255,255,0.5)', letterSpacing:'0.1em' }}>{mapName.toUpperCase()}</span>}
-          <div style={{ display:'flex', alignItems:'center', gap:4 }}>
-            <span style={{ width:5, height:5, borderRadius:'50%', background:'#FF6B00', animation:'ping 1.5s infinite' }} />
-            <span style={{ fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'#FF6B00' }}>LIVE</span>
+        {/* Dual column header: Orange Left / Cyan Right */}
+        <div style={{ height: 48, background: 'rgba(0,0,0,0.8)', borderBottom: `1px solid ${primary}44`, display: 'flex', overflow: 'hidden' }}>
+          <div style={{ flex: 1, background: `linear-gradient(90deg, ${primary}33, transparent)`, display: 'flex', alignItems: 'center', paddingLeft: 16 }}>
+            <span style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>SCOREBOARD</span>
+          </div>
+          <div style={{ flex: 1, background: `linear-gradient(270deg, ${secondary}33, transparent)`, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 16 }}>
+            <span style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:700, color:secondary, letterSpacing:'0.15em' }}>{matchNum}</span>
           </div>
         </div>
 
-        {/* Column headers */}
+        {/* Column Headers */}
         <div style={{
-          display:'flex', alignItems:'center', height:22,
-          background:'rgba(0,0,0,0.4)', borderBottom:`1px solid rgba(255,107,0,0.2)`,
-          padding:'0 8px', flexShrink:0,
+          display:'flex', alignItems:'center', height:28,
+          background:'rgba(0,0,0,0.5)', borderBottom:`1px solid rgba(255,107,0,0.15)`,
+          padding:'0 16px', flexShrink:0,
         }}>
-          <div style={{ width:30, fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,255,255,0.35)', textAlign:'center' }}>#</div>
-          <div style={{ width:26 }} />
-          <div style={{ flex:1, fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,255,255,0.35)', paddingLeft:6, letterSpacing:'0.1em' }}>TEAM</div>
-          <div style={{ width:28, textAlign:'center', fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,107,0,0.7)', letterSpacing:'0.05em' }}>💀</div>
-          <div style={{ width:28, textAlign:'center', fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(0,212,255,0.7)', letterSpacing:'0.05em' }}>PT</div>
-          <div style={{ width:32, textAlign:'center', fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,255,255,0.35)' }}>ALIVE</div>
+          <div style={{ width:30, fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:'rgba(255,255,255,0.4)', textAlign:'center' }}>#</div>
+          <div style={{ width:32 }} />
+          <div style={{ flex:1, fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:'rgba(255,255,255,0.4)', paddingLeft:8, letterSpacing:'0.15em' }}>TEAM</div>
+          <div style={{ width:40, textAlign:'center', fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:primary, letterSpacing:'0.1em' }}>KILLS</div>
+          <div style={{ width:40, textAlign:'center', fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:secondary, letterSpacing:'0.1em' }}>PTS</div>
+          <div style={{ width:48, textAlign:'center', fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>ALIVE</div>
         </div>
 
-        {/* Team rows */}
-        <div style={{ display:'flex', flexDirection:'column', maxHeight:460, overflowY:'hidden' }}>
+        {/* Rows */}
+        <div style={{ display:'flex', flexDirection:'column' }}>
           {safeArray(rows).map((team, idx) => {
             const rank = idx + 1;
             const isTop3 = rank <= 3;
-            const rankColors = ['#FFB800','#C0C0C0','#CD7F32'];
-            const rankColor = isTop3 ? rankColors[rank-1] : 'rgba(255,255,255,0.4)';
-            const rowBg = rank === 1 ? 'rgba(255,184,0,0.06)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
+            const rankColors = ['#FFD700', '#E5E4E2', '#CD7F32'];
+            const rankColor = isTop3 ? rankColors[rank-1] : 'rgba(255,255,255,0.6)';
+            const rowBg = rank === 1 ? 'rgba(255,107,0,0.05)' : idx % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'transparent';
 
             return (
               <div key={team.id || idx} style={{
-                display:'flex', alignItems:'center', height:34,
+                display:'flex', alignItems:'center', height:44,
                 background: rowBg,
                 borderBottom:'1px solid rgba(255,255,255,0.03)',
-                borderLeft: isTop3 ? `3px solid ${rankColors[rank-1]}` : '3px solid transparent',
-                padding:'0 8px',
+                borderLeft: isTop3 ? `4px solid ${rankColors[rank-1]}` : '4px solid transparent',
+                padding:'0 16px',
               }}>
-                <div style={{ width:30, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:rankColor }}>
-                  {rank}
+                <div style={{ width:30, textAlign:'center', fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:rankColor }}>
+                  {String(rank).padStart(2, '0')}
                 </div>
-                <div style={{ width:26, display:'flex', justifyContent:'center' }}>
-                  <TeamLogo team={team} size={20} />
+                <div style={{ width:32, display:'flex', justifyContent:'center' }}>
+                  <TeamLogo team={team} size={24} />
                 </div>
-                <div style={{ flex:1, paddingLeft:6, fontFamily:'Orbitron', fontSize:10, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                <div style={{ flex:1, paddingLeft:8, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', textTransform:'uppercase', letterSpacing:'0.05em' }}>
                   {team.name || 'TEAM'}
                 </div>
-                <div style={{ width:28, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:primary }}>
+                <div style={{ width:40, textAlign:'center', fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color:primary }}>
                   {team.total_tournament_kills || 0}
                 </div>
-                <div style={{ width:28, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:secondary }}>
+                <div style={{ width:40, textAlign:'center', fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color:secondary }}>
                   {team.total_tournament_points || 0}
                 </div>
-                <div style={{ width:32, textAlign:'center', fontFamily:'Orbitron', fontSize:10, color: (team.alive||0) > 0 ? '#4ade80' : 'rgba(255,255,255,0.3)' }}>
-                  {team.alive !== undefined ? team.alive : '—'}/{team.totalPlayers||4}
+                <div style={{ width:48, textAlign:'center', fontFamily:'Rajdhani', fontSize:12, fontWeight:700, color: (team.alive||0) > 0 ? '#4ade80' : 'rgba(255,255,255,0.2)' }}>
+                  {team.alive !== undefined ? team.alive : '0'}/{team.totalPlayers||4}
                 </div>
               </div>
             );
           })}
           {rows.length === 0 && (
-            <div style={{ padding:'20px 0', textAlign:'center', fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.25)', letterSpacing:'0.1em' }}>
-              AWAITING TEAM DATA
+            <div style={{ padding:'30px 0', textAlign:'center', fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.15em' }}>
+              WAITING FOR TEAM DATA...
             </div>
           )}
         </div>
-
-        {/* Map strip */}
-        <div style={{ background:'rgba(10,4,2,0.97)', borderTop:`1px solid ${primary}33`, display:'flex', alignItems:'center', minHeight:30, overflow:'hidden', flexShrink:0 }}>
-          <div style={{ background:primary, padding:'0 8px', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0, minWidth:56, height:'100%' }}>
-            <span style={{ fontSize:7, fontWeight:900, color:'#000', letterSpacing:'0.06em', textAlign:'center', lineHeight:1.3 }}>MAP<br/>ROTATE</span>
-          </div>
-          <div style={{ display:'flex', alignItems:'center', flex:1, padding:'0 4px', gap:2, overflowX:'hidden' }}>
-            {Array.from({ length: Math.max(currentMatch?.match_number || 1, 6) }, (_, i) => {
-              const isCurr = currentMatch?.match_number === i+1;
-              const isDone = (currentMatch?.match_number || 0) > i+1;
-              return (
-                <div key={i} style={{
-                  display:'flex', flexDirection:'column', alignItems:'center',
-                  padding:'3px 4px', borderRadius:3, minWidth:28,
-                  background: isCurr ? `${primary}20` : 'transparent',
-                  border: isCurr ? `1px solid ${primary}60` : '1px solid transparent',
-                  position:'relative',
-                }}>
-                  {isCurr && <span style={{ position:'absolute', top:-6, left:'50%', transform:'translateX(-50%)', background:'#e53935', color:'#fff', fontSize:5, fontWeight:900, padding:'1px 3px', borderRadius:2 }}>LIVE</span>}
-                  {isDone && <span style={{ position:'absolute', top:-5, left:'50%', transform:'translateX(-50%)', fontSize:7, color:'#4ade80' }}>✓</span>}
-                  <span style={{ fontSize:7, fontWeight:700, color: isCurr ? primary : 'rgba(255,255,255,0.35)' }}>M{i+1}</span>
-                </div>
-              );
-            })}
-          </div>
-        </div>
       </FFPanel>
-      <style>{`@keyframes ping{0%,100%{opacity:1}50%{opacity:0.3}}`}</style>
-    </div>
+    </motion.div>
   );
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 3: FULL STANDINGS (transparent, centered)
+   SCREEN 3: STANDINGS (FULL TOURNAMENT TABLE)
 ══════════════════════════════════════════════════ */
 function FullStandings({ teams = [], design }) {
   const sorted = useMemo(() => [...safeArray(teams)].sort((a,b) => (b.total_tournament_points||0)-(a.total_tournament_points||0)||(b.total_tournament_kills||0)-(a.total_tournament_kills||0)), [teams]);
-  const rankColors = ['#FFB800','#C0C0C0','#CD7F32'];
+  const rankColors = ['#FFD700','#E5E4E2','#CD7F32'];
+  const primary = tok.acc(design);
+  const secondary = tok.acc2(design);
 
   return (
-    <div style={{ position:'absolute', left:'50%', top:'50%', transform:'translate(-50%,-50%)', width:880 }}>
-      <FFPanel>
-        <FFPanelHeader design={design} center="OVERALL STANDINGS" />
-        {/* Headers */}
-        <div style={{ display:'flex', alignItems:'center', height:30, background:'rgba(0,0,0,0.4)', borderBottom:'2px solid rgba(255,107,0,0.3)', padding:'0 14px', flexShrink:0 }}>
-          {[['RANK',40],['',30],['TEAM NAME',1],['KILLS',80],['TOTAL PTS',100]].map(([label,w], i) => (
-            <div key={i} style={{ width: typeof w==='number'&&w!==1 ? w : undefined, flex:w===1?1:undefined, textAlign:w===1?undefined:'center', paddingLeft: w===1?10:undefined, fontFamily:'Orbitron', fontSize:9, fontWeight:900, color: label==='TOTAL PTS'?'#00D4FF':label==='KILLS'?'#FF6B00':'rgba(255,255,255,0.5)', letterSpacing:'0.12em' }}>
-              {label}
+    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
+      <GamingBackground accent={primary} accent2={secondary} />
+      <div style={{ position:'relative', zIndex:1, padding:'60px 80px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'center' }}>
+        
+        {/* Giant header */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:24, borderBottom:`2px solid ${primary}`, paddingBottom:12 }}>
+          <div>
+            <div style={{ fontFamily:'Orbitron', fontSize:14, color:primary, letterSpacing:'0.4em', fontWeight:900 }}>LEADERBOARD</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:42, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>OVERALL STANDINGS</div>
+          </div>
+          <div style={{ textAlign:'right', fontFamily:'Orbitron' }}>
+            <div style={{ fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em' }}>{tok.name(design)}</div>
+            <div style={{ fontSize:14, color:secondary, fontWeight:900, letterSpacing:'0.15em' }}>{tok.sub(design)}</div>
+          </div>
+        </div>
+
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4 }}
+        >
+          <FFPanel style={{ width:'100%', maxHeight:700 }}>
+            {/* Headers */}
+            <div style={{ display:'flex', alignItems:'center', height:48, background:'rgba(0,0,0,0.6)', borderBottom:`2px solid ${primary}44`, padding:'0 24px' }}>
+              <div style={{ width:60, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', textAlign:'center', letterSpacing:'0.15em' }}>RANK</div>
+              <div style={{ width:40 }} />
+              <div style={{ flex:1, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', paddingLeft:16, letterSpacing:'0.15em' }}>TEAM NAME</div>
+              <div style={{ width:120, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>KILLS</div>
+              <div style={{ width:150, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:secondary, letterSpacing:'0.15em' }}>TOTAL PTS</div>
             </div>
-          ))}
-        </div>
-        {/* Rows */}
-        <div style={{ display:'flex', flexDirection:'column', maxHeight:540, overflowY:'auto' }}>
-          {sorted.map((team, idx) => {
-            const rank = idx+1;
-            const rc = rank<=3 ? rankColors[rank-1] : '#fff';
-            const rowBg = rank===1 ? 'rgba(255,184,0,0.07)' : rank===2 ? 'rgba(148,163,184,0.04)' : rank===3 ? 'rgba(205,127,50,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
-            return (
-              <div key={team.id||idx} style={{ display:'flex', alignItems:'center', height:38, background:rowBg, borderBottom:'1px solid rgba(255,255,255,0.03)', borderLeft:`3px solid ${rank<=3?rankColors[rank-1]:'transparent'}`, padding:'0 14px' }}>
-                <div style={{ width:40, textAlign:'center', fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:rc }}>#{rank}</div>
-                <div style={{ width:30, display:'flex', justifyContent:'center' }}>
-                  <TeamLogo team={team} size={22} />
-                </div>
-                <div style={{ flex:1, paddingLeft:10, fontFamily:'Orbitron', fontSize:12, fontWeight:700, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{team.name||'—'}</div>
-                <div style={{ width:80, textAlign:'center', fontFamily:'Orbitron', fontSize:13, color:'#FF6B00', fontWeight:700 }}>{team.total_tournament_kills||0}</div>
-                <div style={{ width:100, textAlign:'center', fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:'#00D4FF' }}>{team.total_tournament_points||0}</div>
-              </div>
-            );
-          })}
-          {sorted.length===0 && (
-            <div style={{ padding:'40px 0', textAlign:'center', fontFamily:'Orbitron', fontSize:11, color:'rgba(255,255,255,0.2)', letterSpacing:'0.2em' }}>NO STANDINGS DATA YET</div>
-          )}
-        </div>
-      </FFPanel>
+
+            {/* Rows */}
+            <div style={{ display:'flex', flexDirection:'column', overflowY:'auto' }}>
+              {sorted.map((team, idx) => {
+                const rank = idx+1;
+                const rc = rank<=3 ? rankColors[rank-1] : '#fff';
+                const rowBg = rank===1 ? 'rgba(255,107,0,0.06)' : rank===2 ? 'rgba(0,212,255,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
+                return (
+                  <div key={team.id||idx} style={{ display:'flex', alignItems:'center', height:52, background:rowBg, borderBottom:'1px solid rgba(255,255,255,0.03)', borderLeft:`4px solid ${rank<=3?rankColors[rank-1]:'transparent'}`, padding:'0 24px' }}>
+                    <div style={{ width:60, textAlign:'center', fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:rc }}>#{rank}</div>
+                    <div style={{ width:40, display:'flex', justifyContent:'center' }}>
+                      <TeamLogo team={team} size={28} />
+                    </div>
+                    <div style={{ flex:1, paddingLeft:16, fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:'#fff', textTransform:'uppercase', letterSpacing:'0.1em' }}>{team.name||'—'}</div>
+                    <div style={{ width:120, textAlign:'center', fontFamily:'Rajdhani', fontSize:20, color:primary, fontWeight:900 }}>{team.total_tournament_kills||0}</div>
+                    <div style={{ width:150, textAlign:'center', fontFamily:'Rajdhani', fontSize:24, fontWeight:900, color:secondary }}>{team.total_tournament_points||0}</div>
+                  </div>
+                );
+              })}
+              {sorted.length===0 && (
+                <div style={{ padding:'60px 0', textAlign:'center', fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>NO STANDINGS DATA YET</div>
+              )}
+            </div>
+          </FFPanel>
+        </motion.div>
+      </div>
     </div>
   );
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 4: KILL FEED (transparent, bottom-left)
+   SCREEN 4: KILLFEED (OBS SCROLLING LIVE FEED)
 ══════════════════════════════════════════════════ */
 function KillFeedScreen({ killFeed = [], design }) {
   const activeKills = useMemo(() => [...safeArray(killFeed)].slice(-6).reverse(), [killFeed]);
   const primary = tok.acc(design);
+  const secondary = tok.acc2(design);
 
   return (
-    <div style={{ position:'absolute', left:24, bottom:60, width:360, zIndex:10 }}>
+    <div style={{ position:'absolute', left:40, top:80, width:420, zIndex:10 }}>
       <FFPanel>
-        <FFPanelHeader design={design} center="BATTLE FEED" />
+        <div style={{ height: 48, background: 'rgba(0,0,0,0.8)', borderBottom: `1px solid ${primary}44`, display: 'flex', alignItems: 'center', padding: '0 16px' }}>
+          <Skull size={18} style={{ color: primary, marginRight: 8 }} />
+          <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>BATTLE FEED</span>
+        </div>
         <div style={{ display:'flex', flexDirection:'column', padding:'4px 0' }}>
           <AnimatePresence initial={false}>
             {activeKills.map((kill, idx) => (
@@ -444,32 +434,39 @@ function KillFeedScreen({ killFeed = [], design }) {
                 initial={{ x:-40, opacity:0 }}
                 animate={{ x:0, opacity:1 }}
                 exit={{ x:40, opacity:0 }}
-                transition={{ duration:0.25 }}
+                transition={{ duration:0.3 }}
                 style={{
-                  display:'flex', alignItems:'center', padding:'5px 10px', gap:8,
-                  borderBottom:'1px solid rgba(255,255,255,0.04)',
-                  background: idx===0 ? `${primary}08` : 'transparent',
+                  display:'flex', alignItems:'center', padding:'10px 16px', gap:10,
+                  borderBottom:'1px solid rgba(255,255,255,0.03)',
+                  background: idx===0 ? `rgba(255,107,0,0.08)` : 'transparent',
                 }}
               >
-                <Skull size={12} style={{ color:primary, flexShrink:0 }} />
-                <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', flex:1, overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                  {kill.killer_name || kill.killer || '???'}
+                <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
+                  <Skull size={14} style={{ color: primary }} />
+                  <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:120 }}>
+                    {kill.killer_name || kill.killer || '???'}
+                  </span>
+                </div>
+                
+                {kill.killer_team_name && (
+                  <span style={{ fontFamily:'Orbitron', fontSize:9, color:secondary, border:`1px solid ${secondary}40`, padding:'2px 6px', borderRadius:4, textTransform:'uppercase', letterSpacing:'0.05em' }}>
+                    {kill.killer_team_name.substring(0,8)}
+                  </span>
+                )}
+
+                <span style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:900, color:primary, flex:1, textAlign:'center', letterSpacing:'0.05em' }}>
+                  [{kill.weapon?.toUpperCase() || 'FRAG'}]
                 </span>
-                <span style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.35)', flexShrink:0 }}>
-                  {kill.killer_team_name ? kill.killer_team_name.substring(0,8) : ''}
-                </span>
-                <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:800, color:primary, flexShrink:0 }}>
-                  {kill.weapon || 'FRAG'}
-                </span>
-                <span style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)', flexShrink:0 }}>
+
+                <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:'rgba(255,255,255,0.6)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:120 }}>
                   {kill.killed_player_name || kill.killed || '???'}
                 </span>
               </motion.div>
             ))}
           </AnimatePresence>
           {activeKills.length===0 && (
-            <div style={{ height:48, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.25)', letterSpacing:'0.1em' }}>
-              AWAITING COMBAT...
+            <div style={{ height:60, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.15em' }}>
+              WAITING FOR COMBAT...
             </div>
           )}
         </div>
@@ -479,7 +476,7 @@ function KillFeedScreen({ killFeed = [], design }) {
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 5: PRE-MATCH MAP (solid bg)
+   SCREEN 5: PRE-MATCH MAP LABEL
 ══════════════════════════════════════════════════ */
 function PreMatchMap({ match, teams = [], design }) {
   const mapName  = match?.map_name || match?.mapName || 'Bermuda';
@@ -490,70 +487,73 @@ function PreMatchMap({ match, teams = [], design }) {
   const tLogo    = tok.logo(design);
 
   return (
-    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column' }}>
+    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
       <GamingBackground mapName={mapName} accent={primary} accent2={secondary} />
-      <div style={{ position:'relative', zIndex:1, padding:'40px 60px', flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
+      <div style={{ position:'relative', zIndex:1, padding:'60px 80px', flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between', height:'100%' }}>
         {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-          <div style={{ display:'flex', alignItems:'center', gap:14 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             {tLogo ? (
               <img src={tLogo} alt="logo" style={{ width:48, height:48, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
             ) : (
-              <div style={{ width:38, height:38, borderRadius:'50%', background:`${primary}22`, border:`1px solid ${primary}`, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                <span style={{ fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:primary }}>B</span>
+              <div style={{ width:40, height:40, borderRadius:'50%', background:`${primary}22`, border:`1px solid ${primary}`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+                <span style={{ fontFamily:'Orbitron', fontSize:18, fontWeight:900, color:primary }}>B</span>
               </div>
             )}
             <div>
-              <div style={{ fontFamily:'Orbitron', fontSize:18, fontWeight:900, color:'#fff', letterSpacing:'0.1em' }}>{tok.name(design)}</div>
-              <div style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:secondary, letterSpacing:'0.2em' }}>{tok.sub(design)}</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', letterSpacing:'0.1em' }}>{tok.name(design)}</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:700, color:secondary, letterSpacing:'0.25em' }}>{tok.sub(design)}</div>
             </div>
           </div>
-          <div style={{ background:`${primary}15`, border:`1px solid ${primary}55`, padding:'6px 20px', borderRadius:4, fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:primary }}>
+          <div style={{ background:`${primary}18`, border:`1px solid ${primary}66`, padding:'8px 24px', borderRadius:6, fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:primary, letterSpacing:'0.1em' }}>
             {matchNum}
           </div>
         </div>
 
-        {/* Main content */}
-        <div style={{ display:'flex', gap:60, alignItems:'center', flex:1, margin:'40px 0' }}>
+        {/* Main Content */}
+        <div style={{ display:'flex', gap:80, alignItems:'center', flex:1, margin:'40px 0' }}>
           <div style={{ flex:1.2 }}>
-            <span style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:secondary, letterSpacing:'0.4em' }}>NEXT MAP</span>
-            <motion.h1 initial={{ scale:0.85, opacity:0 }} animate={{ scale:1, opacity:1 }} transition={{ type:'spring', stiffness:120 }}
-              style={{ fontFamily:'Orbitron', fontSize:96, fontWeight:900, color:'#fff', lineHeight:0.9, margin:'10px 0 30px', textShadow:`0 0 30px ${primary}40`, textTransform:'uppercase' }}>
+            <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:secondary, letterSpacing:'0.4em' }}>NEXT MAP</span>
+            <motion.h1
+              initial={{ scale:0.85, opacity:0 }}
+              animate={{ scale:1, opacity:1 }}
+              transition={{ type:'spring', stiffness:120 }}
+              style={{ fontFamily:'Orbitron', fontSize:110, fontWeight:900, color:'#fff', lineHeight:0.9, margin:'12px 0 32px', textShadow:`0 0 40px ${primary}50`, textTransform:'uppercase', letterSpacing:'0.05em' }}
+            >
               {mapName}
             </motion.h1>
-            <div style={{ display:'flex', gap:30 }}>
-              <div style={{ borderLeft:`3px solid ${primary}`, paddingLeft:12 }}>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>TEAMS IN LOBBY</div>
-                <div style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff' }}>{teams.length||0} TEAMS</div>
+            <div style={{ display:'flex', gap:40 }}>
+              <div style={{ borderLeft:`3px solid ${primary}`, paddingLeft:16 }}>
+                <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em' }}>TEAMS IN LOBBY</div>
+                <div style={{ fontFamily:'Orbitron', fontSize:24, fontWeight:900, color:'#fff', marginTop:4 }}>{teams.length||12} TEAMS</div>
               </div>
-              <div style={{ borderLeft:`3px solid ${secondary}`, paddingLeft:12 }}>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>BATTLEGROUND</div>
-                <div style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', textTransform:'uppercase' }}>{mapName}</div>
+              <div style={{ borderLeft:`3px solid ${secondary}`, paddingLeft:16 }}>
+                <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em' }}>BATTLEGROUND</div>
+                <div style={{ fontFamily:'Orbitron', fontSize:24, fontWeight:900, color:'#fff', textTransform:'uppercase', marginTop:4 }}>{mapName}</div>
               </div>
             </div>
           </div>
 
-          {/* Map image or placeholder */}
           <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <div style={{ width:480, height:480, borderRadius:16, overflow:'hidden', border:`1px solid ${primary}40`, boxShadow:`0 0 60px ${primary}30,0 0 120px ${primary}15`, position:'relative' }}>
+            <div style={{ width:500, height:500, borderRadius:16, overflow:'hidden', border:`2px solid ${primary}44`, boxShadow:`0 0 60px ${primary}30, 0 0 120px rgba(0,0,0,0.6)`, position:'relative' }}>
               {mapImg ? (
                 <img src={mapImg} alt={mapName} style={{ width:'100%', height:'100%', objectFit:'cover', filter:'saturate(1.2) contrast(1.05)' }} onError={e=>e.target.style.display='none'} />
               ) : (
-                <div style={{ width:'100%', height:'100%', background:`linear-gradient(135deg,#0a1220,#162030)`, display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(0deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 48px),repeating-linear-gradient(90deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 48px)' }}>
+                <div style={{ width:'100%', height:'100%', background:`linear-gradient(135deg,#0a1220,#162030)`, display:'flex', alignItems:'center', justifyContent:'center' }}>
                   <div style={{ textAlign:'center' }}>
-                    <div style={{ fontFamily:'Orbitron', fontSize:54, fontWeight:900, color:`${primary}30`, textTransform:'uppercase', letterSpacing:'0.05em', lineHeight:1 }}>{mapName}</div>
+                    <div style={{ fontFamily:'Orbitron', fontSize:54, fontWeight:900, color:`${primary}30`, textTransform:'uppercase', letterSpacing:'0.05em' }}>{mapName}</div>
                     <div style={{ fontFamily:'Orbitron', fontSize:11, color:`${primary}50`, letterSpacing:'0.4em', marginTop:10 }}>FREE FIRE MAP</div>
                   </div>
                 </div>
               )}
-              <div style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${primary}10,transparent)` }} />
+              <div style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${primary}15,transparent)` }} />
             </div>
           </div>
         </div>
 
-        <div style={{ display:'flex', justifyContent:'space-between', borderTop:'1px solid rgba(255,255,255,0.07)', paddingTop:14 }}>
-          <span style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.3)', letterSpacing:'0.15em' }}>OFFICIAL BROADCAST SYSTEM</span>
-          <span style={{ fontFamily:'Orbitron', fontSize:9, color:primary, fontWeight:900, letterSpacing:'0.15em' }}>LIVE</span>
+        <div style={{ display:'flex', justifyContent:'space-between', borderTop:'1px solid rgba(255,255,255,0.08)', paddingTop:16 }}>
+          <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em' }}>BOOYAH TOURNAMENT OVERLAY SYSTEM</span>
+          <span style={{ fontFamily:'Orbitron', fontSize:10, color:primary, fontWeight:900, letterSpacing:'0.2em' }}>BROADCAST SOURCE READY</span>
         </div>
       </div>
     </div>
@@ -561,7 +561,7 @@ function PreMatchMap({ match, teams = [], design }) {
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 6: TODAY'S MATCHES
+   SCREEN 6: TODAY'S MATCH SCHEDULE
 ══════════════════════════════════════════════════ */
 function TodaysMatches({ matches = [], design }) {
   const items = matches.length > 0 ? matches : [
@@ -575,37 +575,37 @@ function TodaysMatches({ matches = [], design }) {
   const secondary = tok.acc2(design);
 
   return (
-    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column' }}>
+    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
       <GamingBackground accent={primary} accent2={secondary} />
-      <div style={{ position:'relative', zIndex:1, padding:'40px 60px', flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
+      <div style={{ position:'relative', zIndex:1, padding:'60px 80px', flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between', height:'100%' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
-            <div style={{ fontFamily:'Orbitron', fontSize:24, fontWeight:900, color:'#fff', letterSpacing:'0.1em' }}>TODAY'S MATCH SCHEDULE</div>
-            <div style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:700, color:secondary, letterSpacing:'0.2em' }}>{tok.name(design)}</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:32, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>TODAY'S SCHEDULE</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:700, color:secondary, letterSpacing:'0.25em', marginTop:4 }}>{tok.name(design)}</div>
           </div>
-          <Calendar style={{ color:primary }} size={30} />
+          <Calendar style={{ color:primary }} size={36} />
         </div>
 
-        <div style={{ display:'flex', gap:16, justifyContent:'center', margin:'40px 0' }}>
+        <div style={{ display:'flex', gap:24, justifyContent:'center', margin:'40px 0' }}>
           {safeArray(items).map((m, idx) => {
             const isLive = m.status==='LIVE';
             const isDone = m.status==='COMPLETED';
             return (
-              <FFPanel key={idx} style={{ width:240, height:340, background: isLive ? `${primary}08` : 'rgba(6,9,21,0.9)' }}>
-                <div style={{ padding:18, flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
+              <FFPanel key={idx} style={{ width:280, height:380, background: isLive ? 'rgba(255,107,0,0.06)' : 'rgba(6,9,18,0.85)' }}>
+                <div style={{ padding:24, flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                    <span style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:900, color:'rgba(255,255,255,0.4)' }}>{m.matchNumber||`MATCH 0${idx+1}`}</span>
-                    <span style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:900, padding:'2px 8px', borderRadius:3, background: isLive ? primary : isDone ? 'rgba(255,255,255,0.08)' : `${secondary}18`, color: isLive ? '#000' : isDone ? 'rgba(255,255,255,0.5)' : secondary }}>
+                    <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>{m.matchNumber||`MATCH 0${idx+1}`}</span>
+                    <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:900, padding:'3px 10px', borderRadius:4, background: isLive ? primary : isDone ? 'rgba(255,255,255,0.08)' : `${secondary}18`, color: isLive ? '#000' : isDone ? 'rgba(255,255,255,0.4)' : secondary }}>
                       {m.status||'UPCOMING'}
                     </span>
                   </div>
-                  <div style={{ textAlign:'center', margin:'20px 0' }}>
-                    <MapPin size={28} style={{ color: isLive ? primary : secondary, margin:'0 auto 10px' }} />
-                    <h3 style={{ fontFamily:'Orbitron', fontSize:20, fontWeight:900, color:'#fff', margin:0, textTransform:'uppercase' }}>{m.mapName||'BERMUDA'}</h3>
+                  <div style={{ textAlign:'center', margin:'24px 0' }}>
+                    <MapPin size={36} style={{ color: isLive ? primary : secondary, margin:'0 auto 12px' }} />
+                    <h3 style={{ fontFamily:'Orbitron', fontSize:24, fontWeight:900, color:'#fff', margin:0, textTransform:'uppercase', letterSpacing:'0.05em' }}>{m.mapName||'BERMUDA'}</h3>
                   </div>
-                  <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:14, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
-                    <span style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)' }}>EST START</span>
-                    <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color: isLive ? primary : '#fff' }}>{m.time||'18:00'}</span>
+                  <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:16, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+                    <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>EST TIME</span>
+                    <span style={{ fontFamily:'Rajdhani', fontSize:20, fontWeight:900, color: isLive ? primary : '#fff' }}>{m.time||'18:00'}</span>
                   </div>
                 </div>
               </FFPanel>
@@ -613,9 +613,9 @@ function TodaysMatches({ matches = [], design }) {
           })}
         </div>
 
-        <div style={{ background:'rgba(0,0,0,0.4)', border:'1px solid rgba(255,255,255,0.04)', padding:'12px 24px', borderRadius:6, display:'flex', justifyContent:'space-between', fontFamily:'Orbitron', fontSize:9 }}>
-          <span style={{ color:'rgba(255,255,255,0.35)', letterSpacing:'0.1em' }}>ALL TIMINGS ARE LOCAL</span>
-          <span style={{ color:secondary, fontWeight:700 }}>OFFICIAL BROADCAST</span>
+        <div style={{ display:'flex', justifyContent:'space-between', borderTop:'1px solid rgba(255,255,255,0.08)', paddingTop:16 }}>
+          <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em' }}>BOOYAH TOURNAMENT OVERLAY SYSTEM</span>
+          <span style={{ fontFamily:'Orbitron', fontSize:10, color:primary, fontWeight:900, letterSpacing:'0.2em' }}>BROADCAST LIVE SCHEDULE</span>
         </div>
       </div>
     </div>
@@ -623,7 +623,7 @@ function TodaysMatches({ matches = [], design }) {
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 7: TEAMS SHOWCASE (solid bg)
+   SCREEN 7: MEET THE TEAMS
 ══════════════════════════════════════════════════ */
 function TeamsToday({ teams = [], design }) {
   const displayTeams = useMemo(() => {
@@ -637,40 +637,40 @@ function TeamsToday({ teams = [], design }) {
   return (
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
       <GamingBackground accent={primary} accent2={secondary} />
-      <div style={{ position:'relative', zIndex:1, padding:'40px 60px', height:'100%', display:'flex', flexDirection:'column' }}>
+      <div style={{ position:'relative', zIndex:1, padding:'60px 80px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
         {/* Header */}
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:32 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             {tLogo && <img src={tLogo} alt="logo" style={{ width:48, height:48, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />}
             <div>
-              <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:secondary, letterSpacing:'0.3em' }}>{tok.sub(design)}</div>
-              <div style={{ fontFamily:'Orbitron', fontSize:28, fontWeight:900, color:'#fff', letterSpacing:'0.06em' }}>MEET THE TEAMS</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:32, fontWeight:900, color:'#fff', letterSpacing:'0.1em' }}>MEET THE TEAMS</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:700, color:secondary, letterSpacing:'0.3em', marginTop:4 }}>{tok.sub(design)}</div>
             </div>
           </div>
-          <Users style={{ color:primary }} size={32} />
+          <Users style={{ color:primary }} size={36} />
         </div>
 
         {/* Grid */}
-        <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:14, flex:1 }}>
+        <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:20, flex:1, margin:'40px 0', alignItems:'center' }}>
           {safeArray(displayTeams).map((team, idx) => (
-            <FFPanel key={idx} style={{ padding:0 }}>
-              <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:12, textAlign:'center', gap:8 }}>
+            <FFPanel key={idx} style={{ height:180 }}>
+              <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:16, textAlign:'center', gap:12 }}>
                 {/* Logo ring */}
-                <div style={{ width:60, height:60, borderRadius:'50%', border:`2px solid ${primary}`, boxShadow:`0 0 14px ${primary}44`, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.4)' }}>
-                  <TeamLogo team={team} size={40} />
+                <div style={{ width:72, height:72, borderRadius:'50%', border:`2px solid ${primary}`, boxShadow:`0 0 20px ${primary}33`, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.5)' }}>
+                  <TeamLogo team={team} size={48} />
                 </div>
-                <span style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:900, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', width:'100%' }}>
+                <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:'#fff', whiteSpace:'nowrap', overflow:'hidden', textOverflow:'ellipsis', width:'100%', letterSpacing:'0.05em', textTransform:'uppercase' }}>
                   {team.name||'TEAM'}
                 </span>
-                <span style={{ fontFamily:'Orbitron', fontSize:8, color:secondary, letterSpacing:'0.1em' }}>QUALIFIED</span>
+                <span style={{ fontFamily:'Orbitron', fontSize:8, color:secondary, letterSpacing:'0.15em' }}>QUALIFIED</span>
               </div>
             </FFPanel>
           ))}
         </div>
 
-        <div style={{ marginTop:20, height:34, background:`${primary}12`, border:`1px solid ${primary}33`, borderRadius:6, display:'flex', alignItems:'center', justifyContent:'center', gap:10, fontFamily:'Orbitron', fontSize:10, color:'#fff' }}>
-          <span style={{ width:6, height:6, borderRadius:'50%', background:primary }} />
-          LOBBY READY — <strong style={{ color:secondary }}>{displayTeams.length} ACTIVE CONTENDERS</strong>
+        <div style={{ height: 44, background:`${primary}15`, border:`1px solid ${primary}44`, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', gap:12, fontFamily:'Orbitron', fontSize:11, color:'#fff', letterSpacing:'0.1em' }}>
+          <span style={{ width:8, height:8, borderRadius:'50%', background:primary }} />
+          LOBBY MATCH READY — <strong style={{ color:secondary }}>{displayTeams.length} CONTENDERS DETECTED</strong>
         </div>
       </div>
     </div>
@@ -678,7 +678,7 @@ function TeamsToday({ teams = [], design }) {
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 8: CASTERS (solid bg)
+   SCREEN 8: CASTERS (3 SIDE-BY-SIDE CARDS)
 ══════════════════════════════════════════════════ */
 function CastersScreen({ design }) {
   const casters = design?.casters?.length ? design.casters : [
@@ -694,34 +694,34 @@ function CastersScreen({ design }) {
   return (
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
       <GamingBackground accent={primary} accent2={secondary} />
-      <div style={{ position:'relative', zIndex:1, padding:'40px 60px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
+      <div style={{ position:'relative', zIndex:1, padding:'60px 80px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
         {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
-            <div style={{ fontFamily:'Orbitron', fontSize:24, fontWeight:900, color:'#fff', letterSpacing:'0.1em' }}>ON THE DESK</div>
-            <div style={{ fontFamily:'Orbitron', fontSize:10, color:secondary, letterSpacing:'0.25em' }}>BROADCAST TEAM — {tok.name(design)}</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:32, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>ON THE ANALYST DESK</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:11, color:secondary, letterSpacing:'0.3em', marginTop:4 }}>OFFICIAL BROADCAST CREW</div>
           </div>
-          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
-            {sponsorLogo && <img src={sponsorLogo} alt="sponsor" style={{ height:40, objectFit:'contain', opacity:0.8 }} onError={e=>e.target.style.display='none'} />}
-            {tLogo && <img src={tLogo} alt="logo" style={{ height:40, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />}
-            <Mic2 style={{ color:primary }} size={28} />
+          <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+            {sponsorLogo && <img src={sponsorLogo} alt="sponsor" style={{ height:44, objectFit:'contain', opacity:0.9 }} onError={e=>e.target.style.display='none'} />}
+            {tLogo && <img src={tLogo} alt="logo" style={{ height:44, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />}
+            <Mic2 style={{ color:primary }} size={32} />
           </div>
         </div>
 
         {/* Caster cards */}
-        <div style={{ display:'flex', gap:30, justifyContent:'center', flex:1, alignItems:'stretch' }}>
+        <div style={{ display:'flex', gap:32, justifyContent:'center', flex:1, alignItems:'center', margin:'40px 0' }}>
           {safeArray(casters).map((c, i) => (
-            <FFPanel key={i} style={{ width:360, padding:0 }}>
-              <div style={{ padding:'30px 28px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', flex:1, justifyContent:'center' }}>
+            <FFPanel key={i} style={{ width:400, height:480 }}>
+              <div style={{ padding:'40px 32px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', flex:1, justifyContent:'center' }}>
                 {/* Photo or initials */}
                 {(() => {
                   const cColor = i===0 ? primary : i===1 ? secondary : primary;
                   return (
-                    <div style={{ width:110, height:110, borderRadius:'50%', border:`3px solid ${cColor}`, boxShadow:`0 0 30px ${cColor}44`, overflow:'hidden', marginBottom:20, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+                    <div style={{ width:140, height:140, borderRadius:'50%', border:`3px solid ${cColor}`, boxShadow:`0 0 30px ${cColor}44`, overflow:'hidden', marginBottom:28, background:'rgba(0,0,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
                       {c.photo ? (
                         <img src={c.photo} alt={c.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} onError={e=>e.target.style.display='none'} />
                       ) : (
-                        <span style={{ fontFamily:'Orbitron', fontSize:36, fontWeight:900, color: cColor }}>
+                        <span style={{ fontFamily:'Orbitron', fontSize:48, fontWeight:900, color: cColor }}>
                           {(c.name||'C').charAt(0)}
                         </span>
                       )}
@@ -730,17 +730,17 @@ function CastersScreen({ design }) {
                 })()}
                 {(() => {
                   const cColor = i===0 ? primary : i===1 ? secondary : primary;
-                  return <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color: cColor, letterSpacing:'0.2em', marginBottom:6 }}>{c.role||'CASTER'}</span>;
+                  return <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color: cColor, letterSpacing:'0.25em', marginBottom:8, textTransform:'uppercase' }}>{c.role||'CASTER'}</span>;
                 })()}
-                <span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', marginBottom:8 }}>{c.name||'—'}</span>
-                <span style={{ fontFamily:'Orbitron', fontSize:11, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>{c.handle||''}</span>
+                <span style={{ fontFamily:'Orbitron', fontSize:26, fontWeight:900, color:'#fff', marginBottom:12, textTransform:'uppercase', letterSpacing:'0.05em' }}>{c.name||'—'}</span>
+                <span style={{ fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em' }}>{c.handle||''}</span>
               </div>
             </FFPanel>
           ))}
         </div>
 
-        <div style={{ textAlign:'center', fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.25)', letterSpacing:'0.2em' }}>
-          {tok.name(design)} · {tok.sub(design)} · OFFICIAL BROADCAST
+        <div style={{ textAlign:'center', fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.25em' }}>
+          {tok.name(design)} · {tok.sub(design)} · OFFICIAL BROADCAST SOURCE
         </div>
       </div>
     </div>
@@ -748,7 +748,7 @@ function CastersScreen({ design }) {
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 9: UPCOMING MAP BANNER (transparent overlay)
+   SCREEN 9: UPCOMING MAP BANNER
 ══════════════════════════════════════════════════ */
 function UpcomingMap({ match, design }) {
   const mapName = match?.map_name || match?.mapName || 'Bermuda';
@@ -757,25 +757,25 @@ function UpcomingMap({ match, design }) {
   const mapImg = MAP_IMAGES?.[mapName] || null;
 
   return (
-    <div style={{ position:'absolute', left:'50%', bottom:30, transform:'translateX(-50%)', width:700, zIndex:10 }}>
+    <div style={{ position:'absolute', left:'50%', bottom:50, transform:'translateX(-50%)', width:800, zIndex:10 }}>
       <FFPanel>
-        <div style={{ display:'flex', alignItems:'center', padding:'0 20px', height:72, gap:20 }}>
-          <div style={{ width:80, height:52, borderRadius:6, overflow:'hidden', border:`1px solid ${primary}44`, flexShrink:0, background:'#0a1220' }}>
+        <div style={{ display:'flex', alignItems:'center', padding:'0 24px', height:90, gap:24 }}>
+          <div style={{ width:110, height:64, borderRadius:8, overflow:'hidden', border:`1px solid ${primary}44`, flexShrink:0, background:'#0a1220' }}>
             {mapImg ? (
               <img src={mapImg} alt={mapName} style={{ width:'100%', height:'100%', objectFit:'cover' }} onError={e=>e.target.style.display='none'} />
             ) : (
               <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)' }}>
-                <span style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:`${primary}80`, textAlign:'center', lineHeight:1.1 }}>{mapName}</span>
+                <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:900, color:`${primary}80`, textAlign:'center' }}>{mapName}</span>
               </div>
             )}
           </div>
           <div style={{ flex:1 }}>
-            <div style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em', marginBottom:4 }}>UPCOMING MAP</div>
-            <div style={{ fontFamily:'Orbitron', fontSize:28, fontWeight:900, color:'#fff', textTransform:'uppercase', lineHeight:1 }}>{mapName}</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.25em', marginBottom:2 }}>UPCOMING BATTLEGROUND</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:32, fontWeight:900, color:'#fff', textTransform:'uppercase', lineHeight:1, letterSpacing:'0.05em' }}>{mapName}</div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4 }}>
-            <span style={{ fontFamily:'Orbitron', fontSize:9, color:secondary, letterSpacing:'0.15em' }}>MATCH {match?.match_number||'—'}</span>
-            <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:primary }}>PREPARING LOBBY</span>
+            <span style={{ fontFamily:'Orbitron', fontSize:10, color:secondary, letterSpacing:'0.15em' }}>MATCH {match?.match_number||'01'}</span>
+            <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:primary, letterSpacing:'0.1em' }}>WAITING IN LOBBY</span>
           </div>
         </div>
       </FFPanel>
@@ -784,22 +784,22 @@ function UpcomingMap({ match, design }) {
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 10: ELIMINATION ALERT (transparent, bottom center)
+   SCREEN 10: ELIMINATION ALERT (TICKER)
 ══════════════════════════════════════════════════ */
 function EliminationAlert({ eliminations = [], design }) {
   const latest = eliminations.length > 0 ? eliminations[eliminations.length - 1] : null;
   const primary = tok.acc(design);
 
   if (!latest) return (
-    <div style={{ position:'absolute', bottom:40, left:'50%', transform:'translateX(-50%)' }}>
-      <FFPanel style={{ padding:'10px 24px' }}>
-        <span style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.25)', letterSpacing:'0.15em' }}>AWAITING ELIMINATIONS</span>
+    <div style={{ position:'absolute', bottom:60, left:'50%', transform:'translateX(-50%)' }}>
+      <FFPanel style={{ padding:'12px 32px' }}>
+        <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>MONITORING COMBAT...</span>
       </FFPanel>
     </div>
   );
 
   return (
-    <div style={{ position:'absolute', bottom:40, left:'50%', transform:'translateX(-50%)', width:560, zIndex:10 }}>
+    <div style={{ position:'absolute', bottom:60, left:'50%', transform:'translateX(-50%)', width:640, zIndex:10 }}>
       <AnimatePresence mode="wait">
         <motion.div key={latest.id || latest.timestamp}
           initial={{ y:30, opacity:0, scale:0.95 }}
@@ -808,20 +808,22 @@ function EliminationAlert({ eliminations = [], design }) {
           transition={{ duration:0.3, type:'spring' }}
         >
           <FFPanel>
-            <div style={{ display:'flex', alignItems:'center', padding:'10px 20px', gap:16 }}>
-              <XCircle size={28} style={{ color:'#ef4444', flexShrink:0 }} />
+            <div style={{ display:'flex', alignItems:'center', padding:'12px 24px', gap:20 }}>
+              <div style={{ width:40, height:40, borderRadius:'50%', background:'rgba(239,68,68,0.1)', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid #ef4444' }}>
+                <Flame size={20} style={{ color:'#ef4444' }} />
+              </div>
               <div>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em', marginBottom:2 }}>ELIMINATION</div>
-                <div style={{ fontFamily:'Orbitron', fontSize:20, fontWeight:900, color:'#fff' }}>
-                  {latest.eliminated_player_name || latest.player_name || '???'}
+                <div style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)', letterSpacing:'0.25em', marginBottom:2 }}>TEAM SQUAD ELIMINATED</div>
+                <div style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', textTransform:'uppercase' }}>
+                  {latest.eliminated_player_name || latest.player_name || 'SQUAD'}
                 </div>
-                <div style={{ fontFamily:'Orbitron', fontSize:10, color:primary, letterSpacing:'0.1em' }}>
-                  {latest.eliminated_team_name || latest.team_name || ''}
+                <div style={{ fontFamily:'Orbitron', fontSize:11, color:primary, letterSpacing:'0.15em' }}>
+                  {latest.eliminated_team_name || latest.team_name || 'CONTENDER'}
                 </div>
               </div>
               <div style={{ marginLeft:'auto', textAlign:'right' }}>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.3)' }}>TEAM ELIMINATED</div>
-                <div style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:'#ef4444' }}>OUT</div>
+                <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>STATUS</div>
+                <div style={{ fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:'#ef4444', letterSpacing:'0.15em' }}>OUT</div>
               </div>
             </div>
           </FFPanel>
@@ -832,76 +834,81 @@ function EliminationAlert({ eliminations = [], design }) {
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 11: MVP (solid bg)
+   SCREEN 11: MVP (MATCH REVEAL)
 ══════════════════════════════════════════════════ */
 function MVPScreen({ players = [], teams = [], design, overlayState }) {
   const primary = tok.acc(design);
   const secondary = tok.acc2(design);
   const tLogo = tok.logo(design);
 
-  // Try overlayState first, then derive from players
-  const mvpName   = overlayState?.mvp_player_name || overlayState?.mvpPlayerName || '—';
-  const mvpTeam   = overlayState?.mvp_team_name   || overlayState?.mvpTeamName   || '—';
+  const mvpName   = overlayState?.mvp_player_name || overlayState?.mvpPlayerName || 'MVP PLAYER';
+  const mvpTeam   = overlayState?.mvp_team_name   || overlayState?.mvpTeamName   || 'SQUAD';
   const mvpKills  = overlayState?.mvp_kills        || overlayState?.mvpKills       || 0;
-  const mvpPlayer  = safeArray(players).find(p => p.name === mvpName) ?? null;
   const mvpTeamObj = safeArray(teams).find(t => t.name === mvpTeam) ?? null;
 
   return (
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column' }}>
       <GamingBackground accent={primary} accent2={secondary} />
-      <style>{`@keyframes starPulse{0%,100%{transform:scale(1) rotate(0deg);filter:drop-shadow(0 0 10px ${primary}88)}50%{transform:scale(1.12) rotate(5deg);filter:drop-shadow(0 0 30px ${primary})}}`}</style>
+      <style>{`@keyframes starPulse{0%,100%{transform:scale(1) rotate(0deg);filter:drop-shadow(0 0 15px ${primary}88)}50%{transform:scale(1.12) rotate(5deg);filter:drop-shadow(0 0 35px ${primary})}}`}</style>
 
-      {/* Gold ambient */}
-      <div style={{ position:'absolute', inset:0, background:`radial-gradient(ellipse 900px 700px at 50% 40%,${primary}18,transparent)`, zIndex:0 }} />
+      {/* Gold ambient lighting */}
+      <div style={{ position:'absolute', inset:0, background:`radial-gradient(ellipse 1000px 800px at 50% 40%,${primary}1A,transparent)`, zIndex:0 }} />
 
-      <div style={{ position:'relative', zIndex:1, flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:20, padding:40 }}>
-        {/* Trophy + header */}
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8 }}>
+      <div style={{ position:'relative', zIndex:1, flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:24, padding:40 }}>
+        {/* Trophy icon with animation */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:10 }}>
           <div style={{ animation:'starPulse 2.5s infinite ease-in-out' }}>
-            <Star size={60} style={{ color: primary }} fill={primary} />
+            <Award size={80} style={{ color: primary }} />
           </div>
-          <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:secondary, letterSpacing:'0.5em' }}>MATCH MVP</span>
+          <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:secondary, letterSpacing:'0.6em' }}>MATCH MVP</span>
         </div>
 
-        {/* MVP card */}
-        <FFPanel style={{ width:520, padding:0 }}>
-          <div style={{ padding:'28px 32px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
-            {/* Team logo */}
-            <div style={{ width:80, height:80, borderRadius:'50%', border:`3px solid ${primary}`, boxShadow:`0 0 30px ${primary}55`, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.5)', marginBottom:16 }}>
-              <TeamLogo team={mvpTeamObj} size={56} />
-            </div>
-            <span style={{ fontFamily:'Orbitron', fontSize:11, color:primary, letterSpacing:'0.2em', marginBottom:4 }}>{mvpTeam}</span>
-            <span style={{ fontFamily:'Orbitron', fontSize:36, fontWeight:900, color:'#fff', marginBottom:20 }}>{mvpName}</span>
-            {/* Stats row */}
-            <div style={{ display:'flex', gap:0, width:'100%', borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:18, justifyContent:'space-around' }}>
-              <div>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, color:primary, letterSpacing:'0.1em' }}>KILLS</div>
-                <div style={{ fontFamily:'Orbitron', fontSize:28, fontWeight:900, color:'#fff', marginTop:4 }}>{mvpKills}</div>
+        {/* MVP Card */}
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4 }}
+        >
+          <FFPanel style={{ width:600, padding:0 }}>
+            <div style={{ padding:'40px 48px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
+              {/* Team logo circle */}
+              <div style={{ width:100, height:100, borderRadius:'50%', border:`3px solid ${primary}`, boxShadow:`0 0 30px ${primary}55`, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.6)', marginBottom:20 }}>
+                <TeamLogo team={mvpTeamObj} size={70} />
               </div>
-              <div style={{ width:1, background:'rgba(255,255,255,0.06)' }} />
-              <div>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, color:secondary, letterSpacing:'0.1em' }}>TEAM</div>
-                <div style={{ fontFamily:'Orbitron', fontSize:18, fontWeight:900, color:'#fff', marginTop:4 }}>{mvpTeam}</div>
+              <span style={{ fontFamily:'Orbitron', fontSize:12, color:primary, letterSpacing:'0.25em', marginBottom:6, textTransform:'uppercase' }}>{mvpTeam}</span>
+              <span style={{ fontFamily:'Orbitron', fontSize:44, fontWeight:900, color:'#fff', marginBottom:28, letterSpacing:'0.05em', textTransform:'uppercase' }}>{mvpName}</span>
+              
+              {/* Stats layout */}
+              <div style={{ display:'flex', gap:0, width:'100%', borderTop:'1px solid rgba(255,255,255,0.08)', paddingTop:24, justifyContent:'space-around' }}>
+                <div>
+                  <div style={{ fontFamily:'Orbitron', fontSize:10, color:primary, letterSpacing:'0.15em' }}>TOTAL KILLS</div>
+                  <div style={{ fontFamily:'Rajdhani', fontSize:40, fontWeight:900, color:'#fff', marginTop:6 }}>{mvpKills}</div>
+                </div>
+                <div style={{ width:1, background:'rgba(255,255,255,0.08)' }} />
+                <div>
+                  <div style={{ fontFamily:'Orbitron', fontSize:10, color:secondary, letterSpacing:'0.15em' }}>TEAM</div>
+                  <div style={{ fontFamily:'Orbitron', fontSize:20, fontWeight:900, color:'#fff', marginTop:6, letterSpacing:'0.1em' }}>{mvpTeam}</div>
+                </div>
               </div>
             </div>
-          </div>
-        </FFPanel>
+          </FFPanel>
+        </motion.div>
 
-        {tLogo && <img src={tLogo} alt="logo" style={{ height:36, objectFit:'contain', opacity:0.6, marginTop:8 }} onError={e=>e.target.style.display='none'} />}
+        {tLogo && <img src={tLogo} alt="logo" style={{ height:44, objectFit:'contain', opacity:0.7, marginTop:12 }} onError={e=>e.target.style.display='none'} />}
       </div>
     </div>
   );
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 12: CHAMPIONS / BOOYAH (solid bg)
+   SCREEN 12: CHAMPIONS (WINNER REVEAL SCREEN)
 ══════════════════════════════════════════════════ */
 function ChampionsScreen({ teams = [], design, overlayState }) {
   const primary = tok.acc(design);
   const secondary = tok.acc2(design);
   const tLogo = tok.logo(design);
 
-  const winnerName   = overlayState?.champion_team_name   || teams[0]?.name || '—';
+  const winnerName   = overlayState?.champion_team_name   || teams[0]?.name || 'CHAMPIONS';
   const totalPoints  = overlayState?.champion_total_points || teams[0]?.total_tournament_points || 0;
   const winnerTeamObj = safeArray(teams).find(t=>t.name===winnerName) || safeArray(teams)[0] || null;
   const totalKills   = winnerTeamObj?.total_tournament_kills || 0;
@@ -911,66 +918,73 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
       <GamingBackground accent={primary} accent2={secondary} />
       <style>{`
         @keyframes confettiFall{0%{transform:translateY(-60px) rotate(0deg);opacity:1}100%{transform:translateY(1120px) rotate(360deg);opacity:0}}
-        @keyframes crownPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 15px #FFB80099)}50%{transform:scale(1.08);filter:drop-shadow(0 0 35px #FFB800)}}
+        @keyframes crownPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px #FFD700BB)}50%{transform:scale(1.1);filter:drop-shadow(0 0 45px #FFD700)}}
       `}</style>
 
-      {/* Gold glow */}
-      <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle,rgba(255,184,0,0.13) 0%,transparent 72%)', zIndex:0 }} />
+      {/* Gold winner ambient bloom */}
+      <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 75%)', zIndex:0 }} />
 
-      {/* Confetti */}
-      {Array.from({length:28}).map((_,i) => {
-        const colors = ['#FFB800','#FF6B00','#00D4FF','#ffffff','#4ade80'];
+      {/* Confetti Particle System using pure CSS */}
+      {Array.from({length:40}).map((_,i) => {
+        const colors = ['#FFD700','#FF6B00','#00D4FF','#ffffff','#4ade80'];
         return (
           <div key={i} style={{
-            position:'absolute', top:-20, left:`${(i*7.14)%100}%`,
-            width: 6+i%8, height: 6+i%8,
-            background: colors[i%colors.length],
-            borderRadius: i%2===0?'50%':2, opacity:0.85, zIndex:1,
-            animation:`confettiFall ${4+i%4}s linear infinite`,
-            animationDelay:`${i*0.22}s`,
+            position:'absolute', top:-30, left:`${(i * 4.9) % 100}%`,
+            width: 8 + i % 6, height: 8 + i % 6,
+            background: colors[i % colors.length],
+            borderRadius: i % 2 === 0 ? '50%' : 2, opacity: 0.9, zIndex: 1,
+            animation:`confettiFall ${3.5 + i % 5}s linear infinite`,
+            animationDelay:`${i * 0.18}s`,
           }} />
         );
       })}
 
-      <div style={{ position:'relative', zIndex:2, display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', gap:16, maxWidth:960 }}>
-        <div style={{ animation:'crownPulse 2.5s infinite ease-in-out', marginBottom:4 }}>
-          <Crown size={76} style={{ color:'#FFB800' }} />
+      <div style={{ position:'relative', zIndex:2, display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', gap:20, maxWidth:1000 }}>
+        <div style={{ animation:'crownPulse 2s infinite ease-in-out', marginBottom:6 }}>
+          <Crown size={90} style={{ color:'#FFD700' }} />
         </div>
 
-        <h1 style={{ fontFamily:'Orbitron', fontSize:108, fontWeight:900, background:'linear-gradient(135deg,#FFB800,#FF6B00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', lineHeight:0.9, margin:0, letterSpacing:'0.04em', filter:'drop-shadow(0 0 30px rgba(255,107,0,0.4))' }}>
+        <h1 style={{ fontFamily:'Orbitron', fontSize:120, fontWeight:900, background:'linear-gradient(135deg,#FFD700,#FF6B00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', lineHeight:0.9, margin:0, letterSpacing:'0.06em', filter:'drop-shadow(0 0 40px rgba(255,107,0,0.5))' }}>
           BOOYAH!
         </h1>
 
-        <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:secondary, letterSpacing:'0.5em', textTransform:'uppercase' }}>
-          TOURNAMENT CHAMPION DECLARED
+        <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:secondary, letterSpacing:'0.6em', textTransform:'uppercase' }}>
+          GRAND TOURNAMENT CHAMPION
         </span>
 
-        <FFPanel style={{ width:540, padding:0 }}>
-          <div style={{ padding:'24px 30px', display:'flex', flexDirection:'column', alignItems:'center' }}>
-            {/* Winner logo */}
-            <div style={{ width:76, height:76, borderRadius:'50%', border:`3px solid #FFB800`, boxShadow:'0 0 30px rgba(255,184,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.5)', marginBottom:14 }}>
-              <TeamLogo team={winnerTeamObj} size={54} />
-            </div>
-            <span style={{ fontFamily:'Orbitron', fontSize:11, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em', marginBottom:6 }}>MATCH WINNER</span>
-            <span style={{ fontFamily:'Orbitron', fontSize:32, fontWeight:900, color:'#fff', letterSpacing:'0.04em', textTransform:'uppercase' }}>{winnerName}</span>
-            <div style={{ display:'flex', width:'100%', marginTop:18, paddingTop:16, borderTop:'1px solid rgba(255,255,255,0.06)', justifyContent:'space-around' }}>
-              <div>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, color:'#FF6B00', letterSpacing:'0.1em' }}>TOTAL KILLS</div>
-                <div style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', marginTop:3 }}>{totalKills}</div>
+        <motion.div
+          initial={{ y: 20, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4 }}
+        >
+          <FFPanel style={{ width:620, padding:0 }}>
+            <div style={{ padding:'32px 40px', display:'flex', flexDirection:'column', alignItems:'center' }}>
+              {/* Champion Logo Circle */}
+              <div style={{ width:110, height:110, borderRadius:'50%', border:`3px solid #FFD700`, boxShadow:'0 0 35px rgba(255,215,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.6)', marginBottom:18 }}>
+                <TeamLogo team={winnerTeamObj} size={80} />
               </div>
-              <div style={{ width:1, background:'rgba(255,255,255,0.06)' }} />
-              <div>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, color:'#00D4FF', letterSpacing:'0.1em' }}>TOTAL POINTS</div>
-                <div style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', marginTop:3 }}>{totalPoints}</div>
+              <span style={{ fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em', marginBottom:6 }}>CHAMPIONSHIP SQUAD</span>
+              <span style={{ fontFamily:'Orbitron', fontSize:36, fontWeight:900, color:'#fff', letterSpacing:'0.05em', textTransform:'uppercase' }}>{winnerName}</span>
+              
+              <div style={{ display:'flex', width:'100%', marginTop:24, paddingTop:20, borderTop:'1px solid rgba(255,255,255,0.08)', justifyContent:'space-around' }}>
+                <div>
+                  <div style={{ fontFamily:'Orbitron', fontSize:10, color:'#FF6B00', letterSpacing:'0.15em' }}>TOTAL KILLS</div>
+                  <div style={{ fontFamily:'Rajdhani', fontSize:28, fontWeight:900, color:'#fff', marginTop:4 }}>{totalKills}</div>
+                </div>
+                <div style={{ width:1, background:'rgba(255,255,255,0.08)' }} />
+                <div>
+                  <div style={{ fontFamily:'Orbitron', fontSize:10, color:'#00D4FF', letterSpacing:'0.15em' }}>TOTAL POINTS</div>
+                  <div style={{ fontFamily:'Rajdhani', fontSize:28, fontWeight:900, color:'#fff', marginTop:4 }}>{totalPoints}</div>
+                </div>
               </div>
             </div>
-          </div>
-        </FFPanel>
+          </FFPanel>
+        </motion.div>
 
-        {tLogo && <img src={tLogo} alt="logo" style={{ height:40, objectFit:'contain', opacity:0.65, marginTop:4 }} onError={e=>e.target.style.display='none'} />}
+        {tLogo && <img src={tLogo} alt="logo" style={{ height:44, objectFit:'contain', opacity:0.8, marginTop:8 }} onError={e=>e.target.style.display='none'} />}
 
-        <span style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.25)', letterSpacing:'0.15em', marginTop:8 }}>
-          CONGRATULATIONS TO ALL COMPETING TEAMS — {tok.name(design)}
+        <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em', marginTop:12 }}>
+          CONGRATULATIONS TO ALL TEAMS — {tok.name(design)}
         </span>
       </div>
     </div>
@@ -1012,7 +1026,6 @@ export default function Overlay() {
     design,
   } = data || {};
 
-  // Always guarantee arrays — prevents .map() crashes if API returns null
   const teams        = safeArray(_teams);
   const players      = safeArray(_players);
   const killFeed     = safeArray(_killFeed);

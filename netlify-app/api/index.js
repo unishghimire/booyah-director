@@ -326,171 +326,206 @@ function recalcTeamTotals(db, tournament_id) {
 module.exports = async (req, res) => {
   // GLOBAL_CATCH — ensures every error returns JSON, never crashes the function cold
   try {
-  // CORS Configuration
-  const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
-  const CORS = {
-    'Access-Control-Allow-Origin': allowedOrigin,
-    'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
-    'Access-Control-Allow-Headers': 'Content-Type, Authorization',
-  };
+    // CORS Configuration
+    const allowedOrigin = process.env.ALLOWED_ORIGIN || '*';
+    const CORS = {
+      'Access-Control-Allow-Origin': allowedOrigin,
+      'Access-Control-Allow-Methods': 'GET, POST, OPTIONS',
+      'Access-Control-Allow-Headers': 'Content-Type, Authorization',
+    };
 
-  Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
-  if (req.method === 'OPTIONS') return res.status(200).end();
+    Object.entries(CORS).forEach(([k, v]) => res.setHeader(k, v));
+    if (req.method === 'OPTIONS') return res.status(200).end();
 
-  // Rate Limiting
-  const ip = req.headers['x-nf-client-connection-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
-  if (!rateLimit(ip)) {
-    return res.status(429).json({ error: 'Too many requests. Please try again later.' });
-  }
-
-  // Parse Route and Query
-  const urlObj = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
-  const route = urlObj.pathname.replace(/^\/api\/?/, '').split('/')[0];
-  const query = Object.fromEntries(urlObj.searchParams.entries());
-  const body = req.body || {};
-
-  const ok  = (data) => res.status(200).json(data);
-  const err = (code, msg) => res.status(code).json({ error: msg });
-
-  // 1. PUBLIC ROUTE: getOverlayData
-  if (route === 'getOverlayData') {
-    const tokenParam = query.token || query.shareToken;
-    const authHeader = req.headers.authorization || req.headers.Authorization || '';
-    let uid = null;
-
-    if (authHeader.startsWith('Bearer ')) {
-      const authUser = await verifyToken(authHeader);
-      if (authUser) uid = authUser.uid;
+    // Rate Limiting
+    const ip = req.headers['x-nf-client-connection-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    if (!rateLimit(ip)) {
+      return res.status(429).json({ error: 'Too many requests. Please try again later.' });
     }
 
-    // Fallback: If no Bearer token, we authenticate overlay view via shareToken
-    if (!uid && tokenParam) {
-      // Direct query fallback for dev / OBS sources with authenticated URLs
-      if (query.uid) {
-        uid = query.uid;
-      } else if (process.env.VITE_DEV_MODE || process.env.DEV_UID) {
-        uid = process.env.DEV_UID || 'dev_fallback_uid';
+    // Parse Route and Query
+    const urlObj = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
+    const route = urlObj.pathname.replace(/^\/api\/?/, '').split('/')[0];
+    const query = Object.fromEntries(urlObj.searchParams.entries());
+    const body = req.body || {};
+
+    const ok  = (data) => res.status(200).json(data);
+    const err = (code, msg) => res.status(code).json({ error: msg });
+
+    // 1. PUBLIC ROUTE: getOverlayData
+    if (route === 'getOverlayData') {
+      const tokenParam = query.token || query.shareToken;
+      const authHeader = req.headers.authorization || req.headers.Authorization || '';
+      let uid = null;
+
+      if (authHeader.startsWith('Bearer ')) {
+        const authUser = await verifyToken(authHeader);
+        if (authUser) uid = authUser.uid;
       }
 
-      if (!uid) {
-        // Find which user owns this shareToken
-        // We look it up under /booyah_admin/share_tokens/{token}
-        const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
-        const secret = process.env.FIREBASE_DATABASE_SECRET;
-        if (dbBaseUrl && secret) {
-          try {
-            // Encode token param in case of unusual characters
-            const encodedToken = encodeURIComponent(tokenParam);
-            const rToken = await fetch(`${dbBaseUrl}/booyah_admin/share_tokens/${encodedToken}.json?auth=${secret}`);
-            if (rToken.ok) {
-              uid = await rToken.json(); // returns the uid string
-            }
+      // Fallback: If no Bearer token, we authenticate overlay view via shareToken
+      if (!uid && tokenParam) {
+        // Direct query fallback for dev / OBS sources with authenticated URLs
+        if (query.uid) {
+          uid = query.uid;
+        } else if (process.env.VITE_DEV_MODE || process.env.DEV_UID) {
+          uid = process.env.DEV_UID || 'dev_fallback_uid';
+        }
 
-            // Option B: scan users node fallback if direct mapping lookup missed
-            if (!uid) {
-              try {
-                const usersR = await fetch(`${dbBaseUrl}/booyah_admin/users.json?auth=${secret}&shallow=true`);
-                if (usersR.ok) {
-                  const usersObj = await usersR.json();
-                  if (usersObj) {
-                    for (const testUid of Object.keys(usersObj)) {
-                      const stR = await fetch(`${dbBaseUrl}/booyah_admin/users/${testUid}/shareToken.json?auth=${secret}`);
-                      if (stR.ok) {
-                        const st = await stR.json();
-                        if (st === tokenParam) {
-                          uid = testUid;
-                          break;
+        if (!uid) {
+          // Find which user owns this shareToken
+          // We look it up under /booyah_admin/share_tokens/{token}
+          const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+          const secret = process.env.FIREBASE_DATABASE_SECRET;
+          if (dbBaseUrl && secret) {
+            try {
+              // Encode token param in case of unusual characters
+              const encodedToken = encodeURIComponent(tokenParam);
+              const rToken = await fetch(`${dbBaseUrl}/booyah_admin/share_tokens/${encodedToken}.json?auth=${secret}`);
+              if (rToken.ok) {
+                uid = await rToken.json(); // returns the uid string
+              }
+
+              // Option B: scan users node fallback if direct mapping lookup missed
+              if (!uid) {
+                try {
+                  const usersR = await fetch(`${dbBaseUrl}/booyah_admin/users.json?auth=${secret}&shallow=true`);
+                  if (usersR.ok) {
+                    const usersObj = await usersR.json();
+                    if (usersObj) {
+                      for (const testUid of Object.keys(usersObj)) {
+                        const stR = await fetch(`${dbBaseUrl}/booyah_admin/users/${testUid}/shareToken.json?auth=${secret}`);
+                        if (stR.ok) {
+                          const st = await stR.json();
+                          if (st === tokenParam) {
+                            uid = testUid;
+                            break;
+                          }
                         }
                       }
                     }
                   }
+                } catch (e) {
+                  console.error('[getOverlayData] fallback scan error:', e.message);
                 }
-              } catch (e) {
-                console.error('[getOverlayData] fallback scan error:', e.message);
               }
+            } catch (e) {
+              console.error('[getOverlayData] Token fetch error:', e.message);
             }
-          } catch (e) {
-            console.error('[getOverlayData] Token fetch error:', e.message);
           }
         }
+      } else if (!uid && query.uid) {
+        // Direct ?uid= fallback even without token parameter
+        uid = query.uid;
       }
-    } else if (!uid && query.uid) {
-      // Direct ?uid= fallback even without token parameter
-      uid = query.uid;
-    }
 
-    if (!uid) {
-      return ok({
-        tournament: null,
-        overlay_state: { 
-          id: 'singleton', 
-          tournament_id: null, 
-          current_screen: 'setup_blank', 
-          error: 'Invalid or missing share token',
-          last_updated_at: new Date().toISOString() 
-        },
-        design: DEFAULT_DESIGN,
-        teams: [],
-        players: [],
-        current_match: null,
-        kill_feed: [],
-        eliminations: [],
-        standings: []
-      });
-    }
-
-    try {
-      const db = await loadDb(uid);
-      const tournament = db.tournaments.find(t => t.status === 'active') || db.tournaments[db.tournaments.length - 1] || null;
-      if (!tournament) return ok({ tournament: null, overlay_state: db.overlay_state, design: db.design, teams: [], players: [], current_match: null, kill_feed: [], eliminations: [], standings: [] });
-      const tid = tournament.id;
-      const teams = db.teams.filter(t => t.tournament_id === tid).map(t => {
-        // total_match_points already includes placement + kills*ppk (set by setTeamPlacement)
-        const standingsForTeam = db.match_standings.filter(s => s.tournament_id === tid && s.team_id === t.id);
-        const totalPoints      = standingsForTeam.reduce((sum, s) => sum + (s.total_match_points || 0), 0);
-        const teamPlayers      = db.players.filter(p => p.team_id === t.id);
-        const totalKills       = teamPlayers.reduce((sum, p) => sum + (p.total_tournament_kills || 0), 0);
-        return { ...t, total_tournament_kills: totalKills, total_tournament_points: totalPoints };
-      }).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
-      const players = db.players.filter(p => p.tournament_id === tid).map(p => ({ ...p, is_alive: p.is_alive !== undefined ? p.is_alive : true }));
-      const matches = db.matches.filter(m => m.tournament_id === tid).sort((a, b) => (b.match_number || 0) - (a.match_number || 0));
-      const currentMatch = matches[0] || null;
-      let killFeed = [], eliminations = [], standings = [];
-      if (currentMatch) {
-        killFeed     = db.kill_events.filter(k => k.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 15).map(k => ({ ...k, killed_name: k.killed_player_name || k.killed_name || 'Opponent' }));
-        eliminations = db.elimination_events.filter(e => e.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
-        standings    = db.match_standings.filter(s => s.match_id === currentMatch.id);
+      if (!uid) {
+        return ok({
+          tournament: null,
+          overlay_state: { 
+            id: 'singleton', 
+            tournament_id: null, 
+            current_screen: 'setup_blank', 
+            error: 'Invalid or missing share token',
+            last_updated_at: new Date().toISOString() 
+          },
+          design: DEFAULT_DESIGN,
+          teams: [],
+          players: [],
+          matches: [],
+          match_standings: [],
+          kill_events: [],
+          elimination_events: [],
+          current_match: null,
+          kill_feed: [],
+          eliminations: [],
+          standings: []
+        });
       }
-      return ok({ tournament, overlay_state: db.overlay_state, design: db.design, teams, players, current_match: currentMatch, kill_feed: killFeed, eliminations, standings });
-    } catch (e) {
-      return err(500, 'Database load error');
-    }
-  }
 
-  // 2. PUBLIC ROUTE: registerUser (Firebase signup callback)
-  if (route === 'registerUser') {
+      try {
+        const db = await loadDb(uid);
+        const tournament = db.tournaments.find(t => t.status === 'active') || db.tournaments[db.tournaments.length - 1] || null;
+        if (!tournament) {
+          return ok({
+            tournament: null,
+            overlay_state: db.overlay_state,
+            design: db.design || DEFAULT_DESIGN,
+            teams: [],
+            players: [],
+            matches: [],
+            match_standings: [],
+            kill_events: [],
+            elimination_events: [],
+            current_match: null,
+            kill_feed: [],
+            eliminations: [],
+            standings: []
+          });
+        }
+        const tid = tournament.id;
+        const teams = db.teams.filter(t => t.tournament_id === tid).map(t => {
+          // total_match_points already includes placement + kills*ppk (set by setTeamPlacement)
+          const standingsForTeam = db.match_standings.filter(s => s.tournament_id === tid && s.team_id === t.id);
+          const totalPoints      = standingsForTeam.reduce((sum, s) => sum + (s.total_match_points || 0), 0);
+          const teamPlayers      = db.players.filter(p => p.team_id === t.id);
+          const totalKills       = teamPlayers.reduce((sum, p) => sum + (p.total_tournament_kills || 0), 0);
+          return { ...t, total_tournament_kills: totalKills, total_tournament_points: totalPoints };
+        }).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
+        
+        const players = db.players.filter(p => p.tournament_id === tid).map(p => ({ ...p, is_alive: p.is_alive !== undefined ? p.is_alive : true }));
+        const matches = db.matches.filter(m => m.tournament_id === tid).sort((a, b) => (b.match_number || 0) - (a.match_number || 0));
+        const currentMatch = matches[0] || null;
+        
+        let killFeed = [], eliminations = [], standings = [];
+        if (currentMatch) {
+          killFeed     = db.kill_events.filter(k => k.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 15).map(k => ({ ...k, killed_name: k.killed_player_name || k.killed_name || 'Opponent' }));
+          eliminations = db.elimination_events.filter(e => e.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
+          standings    = db.match_standings.filter(s => s.match_id === currentMatch.id);
+        }
+        return ok({
+          tournament,
+          overlay_state: db.overlay_state,
+          design: db.design || DEFAULT_DESIGN,
+          teams,
+          players,
+          matches,
+          match_standings: db.match_standings.filter(s => s.tournament_id === tid),
+          kill_events: db.kill_events.filter(k => k.tournament_id === tid),
+          elimination_events: db.elimination_events.filter(e => e.tournament_id === tid),
+          current_match: currentMatch,
+          kill_feed: killFeed,
+          eliminations,
+          standings
+        });
+      } catch (e) {
+        return err(500, 'Database load error');
+      }
+    }
+
+    // 2. PUBLIC ROUTE: registerUser (Firebase signup callback)
+    if (route === 'registerUser') {
+      const authHeader = req.headers.authorization || req.headers.Authorization || '';
+      const user = await verifyToken(authHeader);
+      if (!user) return err(401, 'Invalid or expired authentication token');
+
+      try {
+        // Just initialize database default structure
+        const db = await loadDb(user.uid);
+        await saveDb(user.uid, db);
+        return ok({ success: true, uid: user.uid, email: user.email });
+      } catch (e) {
+        return err(500, 'Failed to register user database');
+      }
+    }
+
+    // ─── AUTHENTICATION REQUIRED FOR ALL OTHER ROUTES ───
     const authHeader = req.headers.authorization || req.headers.Authorization || '';
     const user = await verifyToken(authHeader);
-    if (!user) return err(401, 'Invalid or expired authentication token');
+    if (!user) return err(401, 'Unauthorized: Valid Bearer token required');
 
-    try {
-      // Just initialize database default structure
-      const db = await loadDb(user.uid);
-      await saveDb(user.uid, db);
-      return ok({ success: true, uid: user.uid, email: user.email });
-    } catch (e) {
-      return err(500, 'Failed to register user database');
-    }
-  }
+    const { uid, isOwner } = user;
 
-  // ─── AUTHENTICATION REQUIRED FOR ALL OTHER ROUTES ───
-  const authHeader = req.headers.authorization || req.headers.Authorization || '';
-  const user = await verifyToken(authHeader);
-  if (!user) return err(401, 'Unauthorized: Valid Bearer token required');
-
-  const { uid, isOwner } = user;
-
-  try {
     const db = await loadDb(uid);
     if (!db.design)              db.design = { ...DEFAULT_DESIGN };
     if (!db.tournaments)         db.tournaments = [];
@@ -550,14 +585,36 @@ module.exports = async (req, res) => {
             method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(token)
           });
         }
-        return ok({ shareToken: token });
+        return ok({ token, shareToken: token });
       } catch (e) {
         return err(500, 'Failed to fetch or generate share token');
       }
     }
 
-    // ── SAVE / GET DESIGN ────────────────────────────────────────────────
-    if (route === 'saveDesign') {
+    // ── GENERATE SHARE TOKEN ──────────────────────────────────────────────
+    if (route === 'generateShareToken') {
+      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+      const secret = process.env.FIREBASE_DATABASE_SECRET;
+      if (!secret || !dbBaseUrl) return err(500, 'Database credentials missing');
+
+      try {
+        const token = genId() + genId();
+        // Write mapping token -> uid
+        await fetch(`${dbBaseUrl}/booyah_admin/share_tokens/${token}.json?auth=${secret}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(uid)
+        });
+        // Write user -> token
+        await fetch(`${dbBaseUrl}/booyah_admin/users/${uid}/shareToken.json?auth=${secret}`, {
+          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(token)
+        });
+        return ok({ token });
+      } catch (e) {
+        return err(500, 'Failed to generate share token');
+      }
+    }
+
+    // ── SAVE / UPDATE / GET DESIGN ────────────────────────────────────────
+    if (route === 'saveDesign' || route === 'updateDesign') {
       const sanitizedCasters = (body.casters || []).map(c => ({
         name: sanitizeString(c.name, 40),
         role: sanitizeString(c.role, 40),
@@ -586,13 +643,15 @@ module.exports = async (req, res) => {
 
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
-      return ok({ success: true, design: db.design });
+      return ok(route === 'getDesign' ? (db.design || DEFAULT_DESIGN) : { success: true, design: db.design });
     }
 
-    if (route === 'getDesign') return ok({ design: db.design || DEFAULT_DESIGN });
+    if (route === 'getDesign') {
+      return ok(db.design || DEFAULT_DESIGN);
+    }
 
-    // ── INITIALIZE TOURNAMENT ─────────────────────────────────────────────
-    if (route === 'initializeTournament') {
+    // ── CREATE / INITIALIZE TOURNAMENT ────────────────────────────────────
+    if (route === 'initializeTournament' || route === 'createTournament') {
       const missing = requireFields(body, ['name', 'total_matches']);
       if (missing) return err(400, missing);
 
@@ -647,8 +706,8 @@ module.exports = async (req, res) => {
       return ok({ success: true, tournament });
     }
 
-    // ── LIST TOURNAMENTS ──────────────────────────────────────────────────
-    if (route === 'listTournaments') {
+    // ── LIST / GET TOURNAMENTS ────────────────────────────────────────────
+    if (route === 'listTournaments' || route === 'getTournaments') {
       const enriched = db.tournaments.map(t => {
         const tid = t.id;
         const tournamentTeams = db.teams.filter(team => team.tournament_id === tid);
@@ -677,6 +736,10 @@ module.exports = async (req, res) => {
       });
 
       const sorted = enriched.sort((a, b) => new Date(b.created_at || 0) - new Date(a.created_at || 0));
+      
+      if (route === 'getTournaments') {
+        return ok(sorted);
+      }
       return ok({ tournaments: sorted });
     }
 
@@ -701,7 +764,6 @@ module.exports = async (req, res) => {
 
     // ── DELETE TOURNAMENT ─────────────────────────────────────────────────
     if (route === 'deleteTournament') {
-      // Any authenticated user can delete their own tournaments (data is UID-scoped)
       const { tournament_id } = body;
       if (!tournament_id) return err(400, 'tournament_id is required');
 
@@ -787,7 +849,7 @@ module.exports = async (req, res) => {
       const player = {
         id: genId(),
         team_id: team.id,
-        tournament_id: team.tournament_id,
+        tournament_id: body.tournament_id ? sanitizeString(body.tournament_id) : team.tournament_id,
         name: sanitizeString(body.name, 100),
         is_alive: true,
         current_match_kills: 0,
@@ -801,8 +863,8 @@ module.exports = async (req, res) => {
       return ok({ success: true, player });
     }
 
-    // ── START NEXT MATCH ──────────────────────────────────────────────────
-    if (route === 'startNextMatch') {
+    // ── START / START NEXT MATCH ──────────────────────────────────────────
+    if (route === 'startNextMatch' || route === 'startMatch') {
       const missing = requireFields(body, ['tournament_id']);
       if (missing) return err(400, missing);
 
@@ -854,10 +916,17 @@ module.exports = async (req, res) => {
       const missing = requireFields(body, ['match_id', 'killer_player_id']);
       if (missing) return err(400, missing);
 
+      // Resolve tournament_id from match if not provided in body
+      let resolvedTid = body.tournament_id;
+      if (!resolvedTid) {
+        const m = db.matches.find(match => match.id === body.match_id);
+        if (m) resolvedTid = m.tournament_id;
+      }
+
       const kill = {
         id: genId(),
         match_id: sanitizeString(body.match_id),
-        tournament_id: sanitizeString(body.tournament_id || ''),
+        tournament_id: sanitizeString(resolvedTid || ''),
         killer_player_id: sanitizeString(body.killer_player_id),
         killer_name: sanitizeString(body.killer_name, 100) || 'Unknown',
         killer_team_name: sanitizeString(body.killer_team_name, 100) || '',
@@ -886,10 +955,17 @@ module.exports = async (req, res) => {
       const missing = requireFields(body, ['match_id', 'player_id']);
       if (missing) return err(400, missing);
 
+      // Resolve tournament_id from match if not provided in body
+      let resolvedTid = body.tournament_id;
+      if (!resolvedTid) {
+        const m = db.matches.find(match => match.id === body.match_id);
+        if (m) resolvedTid = m.tournament_id;
+      }
+
       const elim = {
         id: genId(),
         match_id: sanitizeString(body.match_id),
-        tournament_id: sanitizeString(body.tournament_id || ''),
+        tournament_id: sanitizeString(resolvedTid || ''),
         eliminated_player_id: sanitizeString(body.player_id),
         eliminated_player_name: sanitizeString(body.player_name, 100) || 'Unknown',
         eliminated_team_name: sanitizeString(body.team_name, 100) || '',
@@ -910,7 +986,14 @@ module.exports = async (req, res) => {
       const missing = requireFields(body, ['match_id', 'team_id', 'placement']);
       if (missing) return err(400, missing);
 
-      const tournament = db.tournaments.find(t => t.id === body.tournament_id);
+      // Resolve tournament_id from match if not provided in body
+      let resolvedTid = body.tournament_id;
+      if (!resolvedTid) {
+        const m = db.matches.find(match => match.id === body.match_id);
+        if (m) resolvedTid = m.tournament_id;
+      }
+
+      const tournament = db.tournaments.find(t => t.id === resolvedTid);
       let config = { 1:15, 2:12, 3:10, 4:8, 5:6, 6:4, 7:2, 8:1, 9:1, 10:1, 11:1, 12:1 };
       try {
         if (tournament?.placement_points_config) config = JSON.parse(tournament.placement_points_config);
@@ -927,7 +1010,7 @@ module.exports = async (req, res) => {
       const standing = {
         id: existing !== -1 ? db.match_standings[existing].id : genId(),
         match_id: sanitizeString(body.match_id),
-        tournament_id: sanitizeString(body.tournament_id || ''),
+        tournament_id: sanitizeString(resolvedTid || ''),
         team_id: sanitizeString(body.team_id),
         team_name: sanitizeString(body.team_name, 100) || '',
         placement,
@@ -940,7 +1023,7 @@ module.exports = async (req, res) => {
       else db.match_standings.push(standing);
 
       // Roll up team totals after each placement entry
-      recalcTeamTotals(db, body.tournament_id || standing.tournament_id);
+      recalcTeamTotals(db, resolvedTid || standing.tournament_id);
 
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
@@ -980,8 +1063,8 @@ module.exports = async (req, res) => {
       return ok({ success: true, current_screen: screen });
     }
 
-    // ── SET MVP AND SHOW SCREEN ───────────────────────────────────────────
-    if (route === 'setMVPAndShowScreen') {
+    // ── SET MVP / SET MVP AND SHOW SCREEN ─────────────────────────────────
+    if (route === 'setMVPAndShowScreen' || route === 'setMVP') {
       const mvpMissing = requireFields(body, ['player_id', 'player_name', 'team_name']);
       if (mvpMissing) return err(400, mvpMissing);
       const playerExists = db.players.some(p => p.id === body.player_id);
@@ -999,8 +1082,8 @@ module.exports = async (req, res) => {
       return ok({ success: true });
     }
 
-    // ── SET CHAMPION AND SHOW SCREEN ──────────────────────────────────────
-    if (route === 'setChampionAndShowScreen') {
+    // ── SET CHAMPION / SET CHAMPION AND SHOW SCREEN ───────────────────────
+    if (route === 'setChampionAndShowScreen' || route === 'setChampion') {
       db.overlay_state = {
         ...db.overlay_state,
         current_screen: 'champions',
@@ -1141,7 +1224,7 @@ module.exports = async (req, res) => {
       return ok({ success: true, message: 'Match data reset successfully' });
     }
 
-    // ── GOOGLE SHEETS IMPORT ──────────────────────────────────────────────
+    // ── VALIDATE PROMO ────────────────────────────────────────────────────
     if (route === 'validatePromo') {
       const code = sanitizeString(body.code || '', 50).toUpperCase();
       const plan = sanitizeString(body.plan || '', 20).toLowerCase();
@@ -1173,6 +1256,7 @@ module.exports = async (req, res) => {
       return ok({ success: true, code, discountPercent: discountPct, originalPrice, discountedPrice, savings });
     }
 
+    // ── GOOGLE SHEETS IMPORT ──────────────────────────────────────────────
     if (route === 'importFromSheet') {
       const { sheet_url, tournament_id } = body;
       if (!sheet_url) return err(400, 'sheet_url is required');
@@ -1180,7 +1264,7 @@ module.exports = async (req, res) => {
       if (!match) return err(400, 'Invalid Google Sheets URL');
       const sheetId = match[1];
       const clientEmail = process.env.GOOGLE_CLIENT_EMAIL;
-      const privateKey  = process.env.GOOGLE_PRIVATE_KEY?.replace(/\\n/g, '\n');
+      const privateKey  = process.env.GOOGLE_PRIVATE_KEY?.replace(/\n/g, '\n');
       if (!clientEmail || !privateKey) return err(500, 'Google Sheets credentials not configured');
       try {
         const crypto = require('crypto');
@@ -1218,3 +1302,4 @@ module.exports = async (req, res) => {
   } catch (e) {
     return err(500, 'Internal Server Error');
   }
+};
