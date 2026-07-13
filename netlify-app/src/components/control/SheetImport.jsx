@@ -15,8 +15,9 @@ export default function SheetImport({ tournamentId, onImported }) {
     setResult(null);
     try {
       const r = await overlayApi.importFromSheet({ sheet_url: url.trim(), tournament_id: tournamentId });
-      setResult(r);
-      toast.success(`✅ ${r.message}`);
+      const msg = `✅ ${r.teams_added || 0} teams, ${r.players_added || 0} players imported`;
+      setResult({ ...r, message: msg });
+      toast.success(msg);
       onImported?.();
     } catch (err) {
       toast.error(err.message);

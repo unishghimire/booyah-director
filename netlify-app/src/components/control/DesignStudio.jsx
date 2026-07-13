@@ -121,12 +121,12 @@ export default function DesignStudio({ onAction }) {
 
   const reset = () => { setDesign(DEFAULT_DESIGN); toast('Design reset to defaults'); };
 
-  const savePins = () => {
-    const current = getPins();
+  const savePins = async () => {
+    const current = await getPins();
     const next = { ...current };
     if (pins.director?.length === 4) next.director = pins.director;
     if (pins.inputer?.length === 4)  next.inputer  = pins.inputer;
-    setPins(next);
+    await setPins(next);
     setPinsState({ director:'', inputer:'' });
     setPinSaved(true);
     setTimeout(() => setPinSaved(false), 2000);

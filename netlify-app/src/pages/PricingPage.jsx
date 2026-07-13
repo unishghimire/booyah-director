@@ -1,6 +1,7 @@
 import React, { useState } from 'react';
 import { Crown, Zap, Check, LogOut, Tag, Sparkles, Star } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
+import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 
 const PLANS = [
@@ -30,8 +31,10 @@ export default function PricingPage() {
     if (!promoCode.trim()) { toast.error('Enter a promo code'); return; }
     setChecking(true);
     try {
+      const token = auth.currentUser ? await auth.currentUser.getIdToken() : '';
       const r = await fetch('/api/validatePromo', {
-        method:'POST', headers:{'Content-Type':'application/json'},
+        method:'POST',
+        headers:{'Content-Type':'application/json', ...(token ? { Authorization: `Bearer ${token}` } : {}) },
         body: JSON.stringify({ code: promoCode.trim().toUpperCase(), plan: selected }),
       });
       const data = await r.json();

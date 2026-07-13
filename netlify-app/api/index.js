@@ -393,7 +393,7 @@ module.exports = async (req, res) => {
 
     // ── DELETE TOURNAMENT ─────────────────────────────────────────────────
     if (route === 'deleteTournament') {
-      if (!isOwner) return err(403, 'Forbidden: Owner permission required');
+      // Any authenticated user can delete their own tournaments (data is UID-scoped)
       const { tournament_id } = body;
       if (!tournament_id) return err(400, 'tournament_id is required');
 

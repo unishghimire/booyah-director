@@ -724,7 +724,7 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction }) {
         killed_player_name: '',
         killed_team_name: '',
       });
-      toast.success(`+1 Kill for ${player.name}! (${r.kill?.killer_name || player.name})`);
+      toast.success(`+1 Kill for ${player.name}!`);
       onAction();
     } catch (err) {
       toast.error(err.message || 'Error adding kill');
@@ -738,8 +738,11 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction }) {
     setBusy('elim');
     try {
       await overlayApi.eliminatePlayer({
-        player_id: player.id,
-        match_id: currentMatch.id,
+        player_id:   player.id,
+        match_id:    currentMatch.id,
+        player_name: player.name,
+        team_name:   team?.name || '',
+        tournament_id: currentMatch.tournament_id || '',
       });
       toast(`Player "${player.name}" has been eliminated.`, { icon: '💀' });
       onAction();
