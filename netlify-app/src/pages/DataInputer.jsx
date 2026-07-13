@@ -661,6 +661,7 @@ function TeamInputCard({
             <PlayerInputCard
               key={p.id}
               player={p}
+              team={team}
               teamColor={teamColor}
               currentMatch={currentMatch}
               onAction={onAction}
@@ -703,7 +704,7 @@ function TeamInputCard({
 /* ─────────────────────────────────────────
    PLAYER INPUT CARD COMPONENT
 ───────────────────────────────────────── */
-function PlayerInputCard({ player, teamColor, currentMatch, onAction }) {
+function PlayerInputCard({ player, team, teamColor, currentMatch, onAction }) {
   const [busy, setBusy] = useState(null);
   const alive = player.is_alive;
   const kills = player.current_match_kills || 0;
@@ -715,12 +716,15 @@ function PlayerInputCard({ player, teamColor, currentMatch, onAction }) {
     setBusy('kill');
     try {
       const r = await overlayApi.addKill({
-        player_id: player.id,
+        killer_player_id: player.id,
         match_id: currentMatch.id,
+        tournament_id: currentMatch.tournament_id || '',
+        killer_name: player.name,
+        killer_team_name: team?.name || '',
         killed_player_name: '',
         killed_team_name: '',
       });
-      toast.success(`+1 Kill for ${player.name}! (${r.player.current_match_kills || 0} total)`);
+      toast.success(`+1 Kill for ${player.name}! (${r.kill?.killer_name || player.name})`);
       onAction();
     } catch (err) {
       toast.error(err.message || 'Error adding kill');

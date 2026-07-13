@@ -131,13 +131,6 @@ module.exports = async (req, res) => {
       });
     }
 
-    if (!uid) {
-      return ok({
-        tournament: null, overlay_state: { id: 'singleton', tournament_id: null, current_screen: 'setup_blank', last_updated_at: new Date().toISOString() },
-        design: DEFAULT_DESIGN, teams: [], players: [], current_match: null, kill_feed: [], eliminations: [], standings: []
-      });
-    }
-
     try {
       const db = await loadDb(uid);
       const tournament = db.tournaments.find(t => t.status === 'active') || db.tournaments[db.tournaments.length - 1] || null;
@@ -834,6 +827,27 @@ module.exports = async (req, res) => {
     }
 
     // ── GOOGLE SHEETS IMPORT ──────────────────────────────────────────────
+    if (route === 'validatePromo') {
+      const code = sanitizeString(body.code || '', 50).toUpperCase();
+      const plan = sanitizeString(body.plan || '', 20).toLowerCase();
+      if (!code) return err(400, 'Promo code is required');
+
+      // Load promo codes from DB
+      const promoCodes = db.promo_codes || {};
+      const promo = promoCodes[code];
+      if (!promo) return err(404, 'Invalid promo code');
+      if (promo.used_count >= (promo.max_uses || 1)) return err(400, 'Promo code has expired');
+      if (promo.expires_at && new Date(promo.expires_at) < new Date()) return err(400, 'Promo code has expired');
+
+      const PRICES = { weekly: 299, monthly: 599, yearly: 2999 };
+      const originalPrice = PRICES[plan] || PRICES.monthly;
+      const discountPct = promo.discount_percent || 0;
+      const discountedPrice = Math.round(originalPrice * (1 - discountPct / 100));
+      const savings = originalPrice - discountedPrice;
+
+      return ok({ success: true, code, discountPercent: discountPct, originalPrice, discountedPrice, savings });
+    }
+
     if (route === 'importFromSheet') {
       const { sheet_url, tournament_id } = body;
       if (!sheet_url) return err(400, 'sheet_url is required');

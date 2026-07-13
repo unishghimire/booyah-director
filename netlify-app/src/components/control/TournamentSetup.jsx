@@ -37,7 +37,7 @@ export default function TournamentSetup({ onCreated }) {
       if (tid) {
         const validTeams = teams.filter(t => t.name.trim());
         for (const team of validTeams) {
-          await overlayApi.addTeam({ tournament_id: tid, name: team.name.trim(), logo_url: team.logoUrl || '' });
+          await overlayApi.addTeam({ tournament_id: tid, team_name: team.name.trim(), logo_url: team.logoUrl || '' });
         }
       }
 
