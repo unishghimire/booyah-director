@@ -1,9 +1,14 @@
 {
   "version": 2,
-  "buildCommand": "cd netlify-app && npm install && npm run build",
+  "buildCommand": "cd netlify-app && npm install && npm run build && cp -r api/* ../api/",
   "outputDirectory": "netlify-app/dist",
-  "rewrites": [
-    { "source": "/api/:path*", "destination": "/netlify-app/api/index.js" },
-    { "source": "/:path*",     "destination": "/index.html" }
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 15
+    }
+  },
+  "routes": [
+    { "src": "/api/(.*)", "dest": "/api/index.js" },
+    { "src": "/(.*)",     "dest": "/index.html"   }
   ]
 }
