@@ -443,7 +443,7 @@ module.exports = async (req, res) => {
       }
 
       case 'delete-promo': {
-        if (req.method !== 'DELETE') return err(res, 405, 'Method not allowed');
+        if (req.method !== 'DELETE' && req.method !== 'POST') return err(res, 405, 'Method not allowed');
         const { code } = body;
         if (!code) {
           return err(res, 400, 'code is required');
@@ -487,6 +487,7 @@ module.exports = async (req, res) => {
       }
 
       case 'revoke-admin': {
+        if (req.method !== 'POST' && req.method !== 'DELETE') return err(res, 405, 'Method not allowed');
         const { uid: revokeUid } = body;
         if (!revokeUid) return err(res, 400, 'uid required');
         if (revokeUid === admin.uid) return err(res, 400, 'Cannot revoke your own access');
@@ -527,6 +528,20 @@ module.exports = async (req, res) => {
         await dbUpdate(`/booyah_admin/users/${reqData.uid}`, { subscription: sub, updatedAt: now });
         // Mark request as approved
         await dbUpdate(`/booyah_admin/subscription_requests/${requestId}`, { status: 'approved', approvedAt: now, discountPercent: disc });
+        // Sync to user's director DB path
+        try {
+          const dUrl = process.env.FIREBASE_DATABASE_URL?.replace(/\/$/, '');
+          const dSecret = process.env.FIREBASE_DATABASE_SECRET;
+          if (dUrl && dSecret) {
+            await fetch(`${dUrl}/users/${reqData.uid}/booyah/subscription.json?auth=${dSecret}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(sub),
+            });
+          }
+        } catch(syncErr) {
+          console.error('[approve-subscription-request] Director DB sync failed:', syncErr.message);
+        }
         return ok(res, { success: true, subscription: sub });
       }
 
@@ -566,6 +581,20 @@ module.exports = async (req, res) => {
         };
         await dbUpdate(`/booyah_admin/users/${reqData.uid}`, { subscription: sub, pendingPayment: null, updatedAt: now });
         await dbUpdate(`/booyah_admin/payment_requests/${requestId}`, { status:'approved', approvedAt: now, adminNote: note });
+        // Also sync to user's director DB path so their app sees the active subscription immediately
+        try {
+          const directorDbUrl = process.env.FIREBASE_DATABASE_URL?.replace(/\/$/, '');
+          const directorSecret = process.env.FIREBASE_DATABASE_SECRET;
+          if (directorDbUrl && directorSecret) {
+            await fetch(`${directorDbUrl}/users/${reqData.uid}/booyah/subscription.json?auth=${directorSecret}`, {
+              method: 'PUT',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify(sub),
+            });
+          }
+        } catch(syncErr) {
+          console.error('[approve-payment] Director DB sync failed:', syncErr.message);
+        }
         return ok(res, { success:true, subscription: sub });
       }
 
