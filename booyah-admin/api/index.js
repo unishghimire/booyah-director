@@ -249,9 +249,11 @@ module.exports = async (req, res) => {
   }
 
   // 3. ADMIN AUTHENTICATED ROUTES
-  const admin = await verifyAdminToken(req.headers.authorization || req.headers.Authorization);
-  if (!admin) {
-    return err(res, 401, 'Unauthorized access — admin credentials required');
+  if (route !== 'payment-info') {
+    const admin = await verifyAdminToken(req.headers.authorization || req.headers.Authorization);
+    if (!admin) {
+      return err(res, 401, 'Unauthorized access — admin credentials required');
+    }
   }
 
   try {
@@ -546,6 +548,27 @@ module.exports = async (req, res) => {
         await dbUpdate(`/booyah_admin/payment_requests/${rId}`, { status:'rejected', rejectedAt: Date.now(), rejectionReason: reason });
         await dbUpdate(`/booyah_admin/users/${rReq.uid}`, { pendingPayment: { status:'rejected', reason, requestId: rId }, updatedAt: Date.now() });
         return ok(res, { success:true });
+      }
+
+      case 'payment-info': {
+        // Public endpoint — no auth required
+        // Returns only the payment-relevant subset of settings
+        const s = (await dbGet('/booyah_admin/settings')) || {};
+        return ok(res, {
+          esewa: {
+            number: s.esewaNumber || '',
+            name: s.esewaName || '',
+            qrUrl: s.esewaQrUrl || '',
+          },
+          bank: {
+            bankName: s.bankName || '',
+            accountName: s.bankAccountName || '',
+            accountNumber: s.bankAccountNumber || '',
+            branch: s.bankBranch || '',
+            qrUrl: s.bankQrUrl || '',
+          },
+          imgbbApiKey: '', // never expose
+        });
       }
 
       default:
