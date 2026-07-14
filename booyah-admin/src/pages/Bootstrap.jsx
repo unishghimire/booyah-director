@@ -13,10 +13,19 @@ import React, { useState } from 'react';
 import { auth } from '../firebase';
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword } from 'firebase/auth';
 import toast from 'react-hot-toast';
-import { Shield, Zap, Key, UserPlus, CheckCircle } from 'lucide-react';
+import { Shield, Zap, Key, UserPlus, CheckCircle, AlertTriangle } from 'lucide-react';
+import { useEffect } from 'react';
 
 export default function Bootstrap() {
   const [step, setStep]         = useState(1); // 1=enter secret, 2=enter creds, 3=done
+  const [envStatus, setEnvStatus] = useState(null);
+
+  useEffect(() => {
+    fetch('/api/env-check')
+      .then(r => r.json())
+      .then(d => setEnvStatus(d))
+      .catch(() => setEnvStatus(null));
+  }, []);
   const [secret, setSecret]     = useState('');
   const [email, setEmail]       = useState('');
   const [password, setPassword] = useState('');
@@ -61,7 +70,9 @@ export default function Bootstrap() {
         'auth/weak-password':      'Password must be at least 6 characters',
         'auth/invalid-email':      'Invalid email address',
       };
-      toast.error(msgs[err.code] || err.message);
+      const displayMsg = msgs[err.code] || err.message;
+      toast.error(displayMsg, { duration: 8000 });
+      console.error('[Bootstrap] Error:', err);
     } finally {
       setLoading(false);
     }
@@ -105,6 +116,31 @@ export default function Bootstrap() {
           <p className="text-[#FF6B00] font-black">⚠️ ONE-TIME SETUP ONLY</p>
           <p>Enter your Vercel <span className="text-white">SUPER_ADMIN_SECRET</span> env variable, then your admin email & password. This registers you as super admin in Firebase.</p>
           <p className="text-gray-600">If you don't have a Firebase account yet, one will be created automatically.</p>
+
+        {/* Env var status */}
+        {envStatus && (
+          <div className="mt-2 pt-2 border-t border-white/5 space-y-1">
+            <p className="text-[#00D4FF] font-black text-[9px] tracking-wider">SERVER ENV STATUS:</p>
+            {[
+              { key: 'FIREBASE_DATABASE_SECRET', label: 'Firebase DB Secret' },
+              { key: 'SUPER_ADMIN_SECRET', label: 'Super Admin Secret' },
+              { key: 'FIREBASE_DATABASE_URL', label: 'Firebase DB URL' },
+            ].map(({ key, label }) => (
+              <div key={key} className="flex items-center justify-between">
+                <span className="text-gray-500 text-[8px]">{label}</span>
+                <span className={`text-[8px] font-black ${envStatus[key] ? 'text-emerald-400' : 'text-red-400'}`}>
+                  {envStatus[key] ? '✓ SET' : '✗ MISSING'}
+                </span>
+              </div>
+            ))}
+            {!envStatus.FIREBASE_DATABASE_SECRET && (
+              <p className="text-red-400 text-[8px] mt-1">⚠ Add FIREBASE_DATABASE_SECRET to Vercel env vars first!</p>
+            )}
+            {!envStatus.SUPER_ADMIN_SECRET && (
+              <p className="text-red-400 text-[8px]">⚠ Add SUPER_ADMIN_SECRET to Vercel env vars first!</p>
+            )}
+          </div>
+        )}
         </div>
 
         <form onSubmit={handleBootstrap} className="rounded-2xl border border-white/8 bg-[#0a0e1a] p-5 space-y-4">

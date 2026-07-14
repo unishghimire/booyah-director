@@ -127,25 +127,34 @@ async function verifyAdminToken(authHeader) {
         body: JSON.stringify({ idToken: token }),
       }
     );
-    if (!r.ok) return null;
+    if (!r.ok) {
+      const errBody = await r.json().catch(() => ({}));
+      console.error('[verifyAdminToken] Identity Toolkit error:', errBody);
+      return null;
+    }
     const data = await r.json();
     const user = data.users?.[0];
     if (!user) return null;
 
-    // Direct check: ADMIN_EMAIL match
+    // Layer 1: hardcoded ADMIN_EMAIL env var — always superadmin
     const envAdminEmail = process.env.ADMIN_EMAIL || 'admin@booyah.gg';
     if (user.email === envAdminEmail) {
       return { uid: user.localId, email: user.email, isAdmin: true, isSuperAdmin: true };
     }
 
-    // DB whitelist check
+    // Layer 2: DB whitelist — requires FIREBASE_DATABASE_SECRET
+    if (!process.env.FIREBASE_DATABASE_SECRET) {
+      console.error('[verifyAdminToken] FIREBASE_DATABASE_SECRET not set — DB whitelist check skipped');
+      return null;
+    }
     const adminRecord = await dbGet(`/booyah_admin/admins/${user.localId}`);
     if (adminRecord && adminRecord.enabled === true) {
       return { uid: user.localId, email: user.email, isAdmin: true };
     }
-    
+
     return null;
-  } catch {
+  } catch (e) {
+    console.error('[verifyAdminToken] Unexpected error:', e.message);
     return null;
   }
 }
@@ -186,6 +195,18 @@ module.exports = async (req, res) => {
   // 1. PUBLIC ROUTES
   if (route === 'health') {
     return ok(res, { status: 'ok', ts: Date.now() });
+  }
+
+  // Debug env check — confirms which required env vars are present (values never exposed)
+  if (route === 'env-check') {
+    return ok(res, {
+      FIREBASE_DATABASE_SECRET:  !!process.env.FIREBASE_DATABASE_SECRET,
+      FIREBASE_DATABASE_URL:     !!process.env.FIREBASE_DATABASE_URL,
+      FIREBASE_WEB_API_KEY:      !!process.env.FIREBASE_WEB_API_KEY,
+      SUPER_ADMIN_SECRET:        !!process.env.SUPER_ADMIN_SECRET,
+      ADMIN_EMAIL:               !!process.env.ADMIN_EMAIL,
+      VITE_ADMIN_ACCESS_CODE:    !!process.env.VITE_ADMIN_ACCESS_CODE,
+    });
   }
 
   if (route === 'plans') {
@@ -230,22 +251,31 @@ module.exports = async (req, res) => {
     const { secret, uid, email } = body;
     const superSecret = process.env.SUPER_ADMIN_SECRET;
     if (!superSecret) {
-      return err(res, 500, 'Super admin secret environment variable is not configured');
+      return err(res, 500, 'SUPER_ADMIN_SECRET environment variable is not configured in Vercel');
     }
     if (secret !== superSecret) {
-      return err(res, 403, 'Invalid super admin secret');
+      return err(res, 403, 'Invalid super admin secret — check your SUPER_ADMIN_SECRET env var');
     }
     if (!uid || !email) {
       return err(res, 400, 'uid and email are required');
     }
-    await dbSet(`/booyah_admin/admins/${uid}`, {
-      uid,
-      email,
-      enabled: true,
-      role: 'superadmin',
-      addedAt: Date.now(),
-    });
-    return ok(res, { success: true, message: `Admin ${email} granted access successfully.` });
+    if (!process.env.FIREBASE_DATABASE_SECRET) {
+      return err(res, 500, 'FIREBASE_DATABASE_SECRET environment variable is not configured in Vercel — cannot write to database');
+    }
+    try {
+      await dbSet(`/booyah_admin/admins/${uid}`, {
+        uid,
+        email,
+        enabled: true,
+        role: 'superadmin',
+        addedAt: Date.now(),
+      });
+      // Also set ADMIN_EMAIL fallback in DB for reference
+      await dbSet(`/booyah_admin/meta/bootstrappedAt`, Date.now());
+    } catch (e) {
+      return err(res, 500, `Database write failed: ${e.message} — verify FIREBASE_DATABASE_SECRET and database rules`);
+    }
+    return ok(res, { success: true, message: `Admin ${email} granted super admin access successfully.` });
   }
 
   // 3. ADMIN AUTHENTICATED ROUTES
@@ -574,7 +604,8 @@ module.exports = async (req, res) => {
       default:
         return err(res, 404, `Unknown route: ${route}`);
     }
-  } catch {
-    return err(res, 500, 'Internal Server Error');
+  } catch (e) {
+    console.error('[admin-api] Unhandled error:', e.message, e.stack);
+    return err(res, 500, `Internal Server Error: ${e.message}`);
   }
 };
