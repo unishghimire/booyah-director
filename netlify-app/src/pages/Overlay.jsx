@@ -609,16 +609,18 @@ function PreMatchMap({ match, teams = [], design }) {
 
           <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
             <div style={{ width:500, height:500, borderRadius:16, overflow:'hidden', border:`2px solid ${primary}44`, boxShadow:`0 0 60px ${primary}30, 0 0 120px rgba(0,0,0,0.6)`, position:'relative' }}>
-              {mapImg ? (
-                <img src={mapImg} alt={mapName} style={{ width:'100%', height:'100%', objectFit:'cover', filter:'saturate(1.2) contrast(1.05)' }} onError={e=>e.target.style.display='none'} />
-              ) : (
-                <div style={{ width:'100%', height:'100%', background:`linear-gradient(135deg,#0a1220,#162030)`, display:'flex', alignItems:'center', justifyContent:'center' }}>
-                  <div style={{ textAlign:'center' }}>
-                    <div style={{ fontFamily:'Orbitron', fontSize:54, fontWeight:900, color:`${primary}30`, textTransform:'uppercase', letterSpacing:'0.05em' }}>{mapName}</div>
-                    <div style={{ fontFamily:'Orbitron', fontSize:11, color:`${primary}50`, letterSpacing:'0.4em', marginTop:10 }}>FREE FIRE MAP</div>
-                  </div>
+              <div style={{ width:'100%', height:'100%', background:`linear-gradient(135deg,#0a1220,#162030)`, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
+                {mapImg && (
+                  <img src={mapImg} alt={mapName}
+                    style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', filter:'saturate(1.2) contrast(1.05)' }}
+                    onError={e=>{ e.target.style.display='none'; }}
+                  />
+                )}
+                <div style={{ position:'relative', zIndex:1, textAlign:'center', pointerEvents:'none' }}>
+                  <div style={{ fontFamily:'Orbitron', fontSize:54, fontWeight:900, color:`${primary}30`, textTransform:'uppercase', letterSpacing:'0.05em' }}>{mapName}</div>
+                  <div style={{ fontFamily:'Orbitron', fontSize:11, color:`${primary}50`, letterSpacing:'0.4em', marginTop:10 }}>FREE FIRE MAP</div>
                 </div>
-              )}
+              </div>
               <div style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${primary}15,transparent)` }} />
             </div>
           </div>
@@ -835,13 +837,15 @@ function UpcomingMap({ match, design }) {
       <FFPanel>
         <div style={{ display:'flex', alignItems:'center', padding:'0 24px', height:90, gap:24 }}>
           <div style={{ width:110, height:64, borderRadius:8, overflow:'hidden', border:`1px solid ${primary}44`, flexShrink:0, background:'#0a1220' }}>
-            {mapImg ? (
-              <img src={mapImg} alt={mapName} style={{ width:'100%', height:'100%', objectFit:'cover' }} onError={e=>e.target.style.display='none'} />
-            ) : (
-              <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)' }}>
-                <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:900, color:`${primary}80`, textAlign:'center' }}>{mapName}</span>
-              </div>
-            )}
+            <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)', position:'relative', background:'#0a1220' }}>
+              {mapImg && (
+                <img src={mapImg} alt={mapName}
+                  style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }}
+                  onError={e=>{ e.target.style.display='none'; }}
+                />
+              )}
+              <span style={{ position:'relative', zIndex:1, fontFamily:'Orbitron', fontSize:9, fontWeight:900, color:`${primary}80`, textAlign:'center' }}>{mapName}</span>
+            </div>
           </div>
           <div style={{ flex:1 }}>
             <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.25em', marginBottom:2 }}>UPCOMING BATTLEGROUND</div>
