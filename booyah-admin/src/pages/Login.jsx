@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { auth } from '../firebase';
 import toast from 'react-hot-toast';
-import { Shield, Eye, EyeOff, Zap, Lock } from 'lucide-react';
+import { Shield, Eye, EyeOff, Zap, Lock, Key } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 // Access code gate — prevents even seeing the login form
 // Set VITE_ADMIN_ACCESS_CODE in Netlify env vars (e.g. a random 12-char string)
@@ -136,6 +137,13 @@ export default function Login() {
             </p>
           </form>
         )}
+      </div>
+
+      {/* First-time setup */}
+      <div className="relative z-10 mt-6 text-center">
+        <Link to="/bootstrap" className="font-orbitron text-[8px] text-gray-700 hover:text-[#FF6B00] tracking-wider transition-colors inline-flex items-center gap-1">
+          <Key className="w-2.5 h-2.5" /> First-time setup? Bootstrap super admin
+        </Link>
       </div>
     </div>
   );
