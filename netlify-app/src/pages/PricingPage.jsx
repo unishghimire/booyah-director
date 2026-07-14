@@ -23,9 +23,22 @@ const PLANS = [
 export default function PricingPage() {
   const { user, logout, subscription, refreshSubscription } = useAuth();
   
+
   // Subscription Status Polling
   const [polling, setPolling] = useState(false);
   const [localSub, setLocalSub] = useState(subscription);
+
+  const [paymentInfo, setPaymentInfo] = useState(null);
+  const [paymentInfoLoading, setPaymentInfoLoading] = useState(true);
+
+  useEffect(() => {
+    const adminUrl = import.meta.env.VITE_ADMIN_API_URL || '';
+    if (!adminUrl) { setPaymentInfoLoading(false); return; }
+    fetch(adminUrl + '/api/payment-info')
+      .then(r => r.json())
+      .then(d => { setPaymentInfo(d); setPaymentInfoLoading(false); })
+      .catch(() => setPaymentInfoLoading(false));
+  }, []);
 
   const fetchStatus = async () => {
     setPolling(true);
@@ -369,6 +382,12 @@ export default function PricingPage() {
         {/* STEP 2: Payment Method Selection & Form */}
         {step === 2 && (
           <div style={{ background: 'rgba(10,14,26,0.8)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, padding: '32px', backdropFilter: 'blur(20px)' }}>
+            {paymentInfoLoading ? (
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '200px', gap: '16px' }}>
+                <RefreshCw size={24} className="animate-spin" style={{ color: '#FF6B00', animation: 'spin 1.5s linear infinite' }} />
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em' }}>LOADING PAYMENT DETAILS...</span>
+              </div>
+            ) : (<>
             <h3 style={{ fontFamily: 'Orbitron', fontSize: 16, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', marginBottom: 24, textAlign: 'center' }}>CHOOSE PAYMENT METHOD</h3>
             
             {/* Payment Options Toggles */}
@@ -395,37 +414,51 @@ export default function PricingPage() {
             {paymentMethod === 'esewa' ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, marginBottom: 32, padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>
                 <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>SCAN QR CODE TO PAY</span>
-                <img src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=esewa:nex.unishghimire@gmail.com`} alt="eSewa QR Code"
-                  style={{ width: 180, height: 180, borderRadius: 12, border: '4px solid #fff', boxShadow: '0 0 20px rgba(255,255,255,0.1)' }} />
+                {paymentInfo?.esewa?.qrUrl ? (
+                  <img src={paymentInfo.esewa.qrUrl} alt="eSewa QR Code"
+                    style={{ width: 200, height: 200, borderRadius: 12, border: '4px solid #fff', boxShadow: '0 0 20px rgba(255,107,0,0.3)', objectFit: 'contain' }} />
+                ) : (
+                  <div style={{ width: 200, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>No QR uploaded yet</div>
+                )}
                 
                 <div style={{ textAlign: 'center' }}>
-                  <p style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px' }}>eSewa Number: <strong style={{ color: '#FF6B00', fontSize: 13 }}>9800000000</strong></p>
+                  <p style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px' }}>Name: <strong style={{ color: '#fff', fontSize: 12 }}>{paymentInfo?.esewa?.name || ''}</strong></p>
+                  <p style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px' }}>eSewa Number: <strong style={{ color: '#FF6B00', fontSize: 13 }}>{paymentInfo?.esewa?.number || 'Contact admin'}</strong></p>
                   <p style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: 0 }}>Exact Amount: <strong style={{ color: '#00D4FF', fontSize: 13 }}>NPR {finalPrice}</strong></p>
                 </div>
               </div>
             ) : (
-              <div style={{ marginBottom: 32, padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>
-                <h4 style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: '#FF6B00', letterSpacing: '0.05em', margin: '0 0 16px 0', textAlign: 'center' }}>BANK ACCOUNT DETAILS</h4>
-                <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
-                    <span>Bank Name:</span>
-                    <strong style={{ color: '#fff' }}>NIC Asia Bank</strong>
+              <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 20, marginBottom: 32, padding: '24px', background: 'rgba(255,255,255,0.02)', borderRadius: 16, border: '1px solid rgba(255,255,255,0.05)' }}>
+                {paymentInfo?.bank?.qrUrl && (
+                  <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: 12 }}>
+                    <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>SCAN QR CODE TO PAY</span>
+                    <img src={paymentInfo.bank.qrUrl} alt="Bank QR Code"
+                      style={{ width: 200, height: 200, borderRadius: 12, border: '4px solid #fff', boxShadow: '0 0 20px rgba(0,212,255,0.3)', objectFit: 'contain' }} />
                   </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
-                    <span>Account Name:</span>
-                    <strong style={{ color: '#fff' }}>Unish Ghimire</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
-                    <span>Account Number:</span>
-                    <strong style={{ color: '#FF6B00' }}>1234567890</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
-                    <span>Branch:</span>
-                    <strong style={{ color: '#fff' }}>Kathmandu</strong>
-                  </div>
-                  <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 6 }}>
-                    <span>Amount to Transfer:</span>
-                    <strong style={{ color: '#00D4FF' }}>NPR {finalPrice}</strong>
+                )}
+                <div style={{ width: '100%' }}>
+                  <h4 style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: '#FF6B00', letterSpacing: '0.05em', margin: '0 0 16px 0', textAlign: 'center' }}>BANK ACCOUNT DETAILS</h4>
+                  <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
+                      <span>Bank Name:</span>
+                      <strong style={{ color: '#fff' }}>{paymentInfo?.bank?.bankName || 'Contact admin'}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
+                      <span>Account Name:</span>
+                      <strong style={{ color: '#fff' }}>{paymentInfo?.bank?.accountName || ''}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
+                      <span>Account Number:</span>
+                      <strong style={{ color: '#FF6B00' }}>{paymentInfo?.bank?.accountNumber || '—'}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
+                      <span>Branch:</span>
+                      <strong style={{ color: '#fff' }}>{paymentInfo?.bank?.branch || ''}</strong>
+                    </div>
+                    <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 6 }}>
+                      <span>Amount to Transfer:</span>
+                      <strong style={{ color: '#00D4FF' }}>NPR {finalPrice}</strong>
+                    </div>
                   </div>
                 </div>
               </div>
@@ -493,6 +526,7 @@ export default function PricingPage() {
                 </button>
               </div>
             </form>
+            </>)}
           </div>
         )}
 
