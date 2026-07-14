@@ -473,7 +473,7 @@ module.exports = async (req, res) => {
         if (req.method !== 'POST') return err(res, 405, 'Method not allowed');
         const { requestId, discountPercent: disc = 0 } = body;
         if (!requestId) return err(res, 400, 'requestId required');
-        const reqData = await dbGet(\`/booyah_admin/subscription_requests/\${requestId}\`);
+        const reqData = await dbGet(`/booyah_admin/subscription_requests/${requestId}`);
         if (!reqData) return err(res, 404, 'Request not found');
         const PLAN_DURATION = { weekly: 7, monthly: 30, yearly: 365 };
         const PLAN_PRICES = { weekly: 299, monthly: 599, yearly: 2999 };
@@ -492,9 +492,9 @@ module.exports = async (req, res) => {
           approvedByAdmin: true,
         };
         // Update user subscription
-        await dbUpdate(\`/booyah_admin/users/\${reqData.uid}\`, { subscription: sub, updatedAt: now });
+        await dbUpdate(`/booyah_admin/users/${reqData.uid}`, { subscription: sub, updatedAt: now });
         // Mark request as approved
-        await dbUpdate(\`/booyah_admin/subscription_requests/\${requestId}\`, { status: 'approved', approvedAt: now, discountPercent: disc });
+        await dbUpdate(`/booyah_admin/subscription_requests/${requestId}`, { status: 'approved', approvedAt: now, discountPercent: disc });
         return ok(res, { success: true, subscription: sub });
       }
 
@@ -502,7 +502,7 @@ module.exports = async (req, res) => {
         if (req.method !== 'POST') return err(res, 405, 'Method not allowed');
         const { requestId, reason: rejReason = '' } = body;
         if (!requestId) return err(res, 400, 'requestId required');
-        await dbUpdate(\`/booyah_admin/subscription_requests/\${requestId}\`, {
+        await dbUpdate(`/booyah_admin/subscription_requests/${requestId}`, {
           status: 'rejected', rejectedAt: Date.now(), reason: rejReason,
         });
         return ok(res, { success: true });
