@@ -100,6 +100,10 @@ export const overlayApi = {
   resetDatabase:            ()  => call('resetDatabase'),
   getShareToken:            ()  => call('getShareToken', {}, 'GET'),
   updateTeamLogo:           (d) => call('updateTeamLogo', d),
+  // Discord webhook
+  saveDiscordWebhook:       (d) => call('saveDiscordWebhook', d),
+  testDiscordWebhook:       (d) => call('testDiscordWebhook', d),
+  postDiscord:              (d) => call('postDiscord', d),
 };
 
 // ── Data normaliser ───────────────────────────────────────────────────────────

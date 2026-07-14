@@ -21,7 +21,7 @@ import toast from 'react-hot-toast';
 import {
   Paintbrush, Check, Layers, Type, Eye, Mic2,
   Lock, RefreshCw, Save, RotateCcw, Map,
-  Image, FolderOpen
+  Image, FolderOpen, BotMessageSquare, Send, TestTube2, Link, CheckCircle2, Trash2, Trophy, Users, BarChart3, Star
 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import { MAPS } from '@/lib/maps';
@@ -235,8 +235,193 @@ function ImageManagementSection({ design, upd, teams, players }) {
   );
 }
 
+
+/* ─── Discord Webhook Section ─────────────────────────────────────── */
+function DiscordSection({ tournament }) {
+  const [webhookUrl,  setWebhookUrl]  = useState(tournament?.discord_webhook_url  || '');
+  const [channelName, setChannelName] = useState(tournament?.discord_channel_name || '');
+  const [saving,  setSaving]  = useState(false);
+  const [testing, setTesting] = useState(false);
+  const [posting, setPosting] = useState('');
+
+  // Sync from tournament prop changes
+  React.useEffect(() => {
+    setWebhookUrl(tournament?.discord_webhook_url || '');
+    setChannelName(tournament?.discord_channel_name || '');
+  }, [tournament?.id]);
+
+  if (!tournament) return (
+    <div className="rounded-xl border border-white/5 bg-black/20 p-5 text-center">
+      <p className="text-[11px] text-gray-500 font-orbitron">No active tournament. Create one first.</p>
+    </div>
+  );
+
+  const save = async () => {
+    setSaving(true);
+    try {
+      await overlayApi.saveDiscordWebhook({
+        tournament_id: tournament.id,
+        discord_webhook_url: webhookUrl.trim(),
+        discord_channel_name: channelName.trim(),
+      });
+      toast.success('Webhook saved!');
+    } catch (e) { toast.error(e.message); }
+    setSaving(false);
+  };
+
+  const test = async () => {
+    if (!webhookUrl.trim()) { toast.error('Enter a webhook URL first'); return; }
+    // Save first then test
+    setTesting(true);
+    try {
+      await overlayApi.saveDiscordWebhook({
+        tournament_id: tournament.id,
+        discord_webhook_url: webhookUrl.trim(),
+        discord_channel_name: channelName.trim(),
+      });
+      await overlayApi.testDiscordWebhook({ tournament_id: tournament.id });
+      toast.success('✅ Test message sent to Discord!');
+    } catch (e) { toast.error(e.message); }
+    setTesting(false);
+  };
+
+  const post = async (type, label) => {
+    setPosting(type);
+    try {
+      await overlayApi.postDiscord({ tournament_id: tournament.id, type });
+      toast.success(`📨 ${label} posted to Discord!`);
+    } catch (e) { toast.error(e.message); }
+    setPosting('');
+  };
+
+  const isConnected = !!tournament.discord_webhook_url;
+
+  const POST_BUTTONS = [
+    { type: 'standings', label: 'LIVE STANDINGS',  icon: BarChart3, color: '#00D4FF' },
+    { type: 'mvp',       label: 'MATCH MVP',        icon: Star,      color: '#FFD700' },
+    { type: 'champion',  label: 'CHAMPIONS',        icon: Trophy,    color: '#FF6B00' },
+    { type: 'teams',     label: 'TEAMS LINEUP',     icon: Users,     color: '#a855f7' },
+  ];
+
+  return (
+    <div className="space-y-5">
+      {/* Status Banner */}
+      <div className={`flex items-center gap-3 rounded-xl border p-3 ${
+        isConnected
+          ? 'border-emerald-500/20 bg-emerald-500/5'
+          : 'border-white/5 bg-black/20'
+      }`}>
+        <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-gray-600'}`} />
+        <div>
+          <p className={`font-orbitron text-[10px] font-black tracking-wider ${isConnected ? 'text-emerald-400' : 'text-gray-500'}`}>
+            {isConnected ? 'WEBHOOK CONNECTED' : 'NOT CONFIGURED'}
+          </p>
+          {isConnected && tournament.discord_channel_name && (
+            <p className="text-[9px] text-gray-500 mt-0.5">#{tournament.discord_channel_name}</p>
+          )}
+        </div>
+        {isConnected && (
+          <button
+            onClick={() => { setWebhookUrl(''); setChannelName(''); overlayApi.saveDiscordWebhook({ tournament_id: tournament.id, discord_webhook_url: '', discord_channel_name: '' }).catch(()=>{}); }}
+            className="ml-auto text-gray-600 hover:text-red-400 transition-colors"
+            title="Remove webhook"
+          >
+            <Trash2 className="w-3.5 h-3.5" />
+          </button>
+        )}
+      </div>
+
+      {/* Webhook config */}
+      <div className="space-y-3">
+        <div>
+          <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wider text-gray-500">
+            <Link className="inline w-3 h-3 mr-1" />
+            DISCORD WEBHOOK URL
+          </label>
+          <input
+            type="url"
+            value={webhookUrl}
+            onChange={e => setWebhookUrl(e.target.value)}
+            placeholder="https://discord.com/api/webhooks/..."
+            className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-[11px] font-mono text-white placeholder-gray-600 outline-none focus:border-[#5865F2]/50 transition-colors"
+          />
+          <p className="mt-1 text-[9px] text-gray-600">In Discord: Channel Settings → Integrations → Webhooks → New Webhook → Copy URL</p>
+        </div>
+        <div>
+          <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wider text-gray-500">CHANNEL NAME (optional label)</label>
+          <input
+            type="text"
+            value={channelName}
+            onChange={e => setChannelName(e.target.value)}
+            placeholder="e.g. #tournament-updates"
+            className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-[#5865F2]/50 transition-colors"
+          />
+        </div>
+        <div className="flex gap-2">
+          <button
+            onClick={save} disabled={saving}
+            className="flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-[11px] font-orbitron font-black tracking-wider text-white transition-all disabled:opacity-50"
+            style={{ background: 'linear-gradient(135deg, #5865F2, #7289da)' }}
+          >
+            {saving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
+            {saving ? 'SAVING...' : 'SAVE'}
+          </button>
+          <button
+            onClick={test} disabled={testing || !webhookUrl.trim()}
+            className="flex items-center justify-center gap-2 px-4 rounded-xl border border-white/10 text-[11px] font-orbitron font-black tracking-wider text-gray-300 hover:border-white/20 hover:text-white transition-all disabled:opacity-40"
+          >
+            {testing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <TestTube2 className="w-3.5 h-3.5" />}
+            TEST
+          </button>
+        </div>
+      </div>
+
+      {/* Post buttons */}
+      {isConnected && (
+        <div className="space-y-2">
+          <p className="text-[9px] font-orbitron font-black tracking-widest text-gray-500 uppercase">POST TO DISCORD NOW</p>
+          <div className="grid grid-cols-2 gap-2">
+            {POST_BUTTONS.map(({ type, label, icon: Icon, color }) => (
+              <button
+                key={type}
+                onClick={() => post(type, label)}
+                disabled={!!posting}
+                className="flex items-center justify-center gap-2 rounded-xl border border-white/8 bg-black/30 px-3 py-3 font-orbitron text-[10px] font-black tracking-wider transition-all hover:bg-white/5 disabled:opacity-40"
+                style={{ color: posting === type ? '#fff' : color, borderColor: posting === type ? color + '44' : undefined }}
+              >
+                {posting === type
+                  ? <RefreshCw className="w-3.5 h-3.5 animate-spin" />
+                  : <Icon className="w-3.5 h-3.5" />
+                }
+                {posting === type ? 'POSTING...' : label}
+              </button>
+            ))}
+          </div>
+          <p className="text-[9px] text-gray-600 text-center">Posts a rich embed to your Discord channel instantly</p>
+        </div>
+      )}
+
+      {/* How to get webhook URL guide */}
+      {!isConnected && (
+        <div className="rounded-xl border border-white/5 bg-black/20 p-4 space-y-2">
+          <p className="font-orbitron text-[10px] font-black text-gray-400 tracking-wider">HOW TO GET A WEBHOOK URL</p>
+          {[
+            '1. Open your Discord server',
+            '2. Right-click the channel → Edit Channel',
+            '3. Go to Integrations → Webhooks',
+            '4. Click "New Webhook" → Copy Webhook URL',
+            '5. Paste it above and click Save',
+          ].map((step, i) => (
+            <p key={i} className="text-[10px] text-gray-500">{step}</p>
+          ))}
+        </div>
+      )}
+    </div>
+  );
+}
+
 export default function DesignStudio(props) {
-  const { onAction, teams = [], players = [] } = props;
+  const { onAction, teams = [], players = [], tournament = null } = props;
   const [design, setDesign] = useState(DEFAULT_DESIGN);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -459,6 +644,11 @@ export default function DesignStudio(props) {
           {pinSaved ? '✓ PINs Updated!' : 'Save PINs'}
         </button>
         <p className="mt-2 text-[9px] text-gray-700">Default: Director=1234, Inputer=5678</p>
+      </Section>
+
+      {/* ── DISCORD WEBHOOKS ── */}
+      <Section title="DISCORD WEBHOOKS" icon={BotMessageSquare}>
+        <DiscordSection tournament={tournament} />
       </Section>
 
       {/* ── LIVE PREVIEW ── */}

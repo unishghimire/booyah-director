@@ -1411,6 +1411,9 @@ module.exports = async (req, res) => {
       if (body.points_per_kill) updates.points_per_kill = parseInt(body.points_per_kill);
       if (body.placement_points_config) updates.placement_points_config = JSON.stringify(body.placement_points_config);
       if (body.status) updates.status = sanitizeString(body.status, 20);
+      // Discord webhook config per tournament
+      if (body.discord_webhook_url !== undefined) updates.discord_webhook_url = sanitizeString(body.discord_webhook_url || '', 500);
+      if (body.discord_channel_name !== undefined) updates.discord_channel_name = sanitizeString(body.discord_channel_name || '', 100);
 
       db.tournaments[tIdx] = { ...db.tournaments[tIdx], ...updates };
       db.overlay_state.last_updated_at = new Date().toISOString();
@@ -1452,6 +1455,170 @@ module.exports = async (req, res) => {
     }
 
     // ── VALIDATE PROMO ────────────────────────────────────────────────────
+    // ── DISCORD WEBHOOK: SAVE CONFIG ─────────────────────────────────────
+    if (route === 'saveDiscordWebhook') {
+      const { tournament_id, discord_webhook_url, discord_channel_name = '' } = body;
+      if (!tournament_id) return err(400, 'tournament_id required');
+      const tIdx = db.tournaments.findIndex(t => t.id === tournament_id);
+      if (tIdx === -1) return err(404, 'Tournament not found');
+      // Basic URL validation
+      const url = sanitizeString(discord_webhook_url || '', 500);
+      if (url && !url.startsWith('https://discord.com/api/webhooks/')) {
+        return err(400, 'Invalid Discord webhook URL — must start with https://discord.com/api/webhooks/');
+      }
+      db.tournaments[tIdx].discord_webhook_url  = url;
+      db.tournaments[tIdx].discord_channel_name = sanitizeString(discord_channel_name, 100);
+      await saveDb(uid, db);
+      return ok({ success: true });
+    }
+
+    // ── DISCORD WEBHOOK: TEST ─────────────────────────────────────────────
+    if (route === 'testDiscordWebhook') {
+      const { tournament_id } = body;
+      if (!tournament_id) return err(400, 'tournament_id required');
+      const t = db.tournaments.find(t => t.id === tournament_id);
+      if (!t) return err(404, 'Tournament not found');
+      if (!t.discord_webhook_url) return err(400, 'No webhook URL configured for this tournament');
+      try {
+        const r = await fetch(t.discord_webhook_url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            embeds: [{
+              title: '⚡ Booyah Director — Webhook Connected!',
+              description: `Tournament **${t.name}** is now linked to this channel.\n\nStandings, MVP, and Champion announcements will appear here automatically.`,
+              color: 0xFF6B00,
+              footer: { text: 'Booyah Director • Powered by Nexoverlays' },
+              timestamp: new Date().toISOString(),
+            }]
+          }),
+        });
+        if (!r.ok) {
+          const txt = await r.text().catch(() => '');
+          return err(400, `Discord rejected the webhook: ${r.status} ${txt}`);
+        }
+        return ok({ success: true });
+      } catch (e) {
+        return err(500, `Webhook request failed: ${e.message}`);
+      }
+    }
+
+    // ── DISCORD WEBHOOK: POST EVENT ───────────────────────────────────────
+    if (route === 'postDiscord') {
+      const { tournament_id, type } = body; // type: 'standings' | 'mvp' | 'champion' | 'teams'
+      if (!tournament_id || !type) return err(400, 'tournament_id and type required');
+      const tournament = db.tournaments.find(t => t.id === tournament_id);
+      if (!tournament) return err(404, 'Tournament not found');
+      if (!tournament.discord_webhook_url) return err(400, 'No Discord webhook configured for this tournament. Add one in Settings.');
+
+      const tid = tournament_id;
+      const teams = db.teams.filter(t => t.tournament_id === tid);
+      const players = db.players.filter(p => p.tournament_id === tid);
+      const overlay = db.overlay_state || {};
+
+      let embedPayload;
+
+      if (type === 'standings') {
+        // Build sorted standings
+        const sorted = [...teams].sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
+        const rows = sorted.slice(0, 12).map((team, i) => {
+          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : \`\${i + 1}.\`;
+          const pts = team.total_tournament_points || 0;
+          const kills = team.total_tournament_kills || 0;
+          return \`\${medal} **\${team.name}** — \${pts} pts · \${kills} kills\`;
+        }).join('\n');
+
+        embedPayload = {
+          embeds: [{
+            title: \`📊 \${tournament.name} — LIVE STANDINGS\`,
+            description: rows || 'No teams yet.',
+            color: 0x00D4FF,
+            fields: [
+              { name: 'Match', value: \`\${tournament.current_match_number || 0} / \${tournament.total_matches}\`, inline: true },
+              { name: 'Teams', value: \`\${teams.length}\`, inline: true },
+            ],
+            footer: { text: 'Booyah Director • Live Standings Update' },
+            timestamp: new Date().toISOString(),
+          }]
+        };
+
+      } else if (type === 'mvp') {
+        const mvpName = overlay.mvp_player_name || body.mvp_name || 'Unknown';
+        const mvpTeam = overlay.mvp_team_name  || body.mvp_team || '';
+        const mvpKills = overlay.mvp_kills || body.mvp_kills || 0;
+        const mvpPhoto = body.mvp_photo || '';
+
+        embedPayload = {
+          embeds: [{
+            title: \`⭐ MATCH MVP — \${mvpName}\`,
+            description: \`**\${mvpName}** from **\${mvpTeam}** dominated the match!\n\n🔫 **\${mvpKills} kills** this match\`,
+            color: 0xFFD700,
+            thumbnail: mvpPhoto ? { url: mvpPhoto } : undefined,
+            fields: [
+              { name: 'Team', value: mvpTeam || '—', inline: true },
+              { name: 'Kills', value: \`\${mvpKills}\`, inline: true },
+            ],
+            footer: { text: \`\${tournament.name} · Match MVP\` },
+            timestamp: new Date().toISOString(),
+          }]
+        };
+
+      } else if (type === 'champion') {
+        const champName  = overlay.champion_team_name   || body.champion_name   || 'Unknown';
+        const champPts   = overlay.champion_total_points || body.champion_points || 0;
+        const champLogo  = body.champion_logo || '';
+
+        embedPayload = {
+          embeds: [{
+            title: \`🏆 BOOYAH! CHAMPIONS — \${tournament.name}\`,
+            description: \`🎉 **\${champName}** has won **\${tournament.name}**!\n\n🏅 **\${champPts} total points**\n\nCongratulations to the champions!\`,
+            color: 0xFF6B00,
+            thumbnail: champLogo ? { url: champLogo } : undefined,
+            fields: [
+              { name: 'Tournament', value: tournament.name, inline: true },
+              { name: 'Final Score', value: \`\${champPts} pts\`, inline: true },
+            ],
+            footer: { text: 'Booyah Director • Tournament Complete' },
+            timestamp: new Date().toISOString(),
+          }]
+        };
+
+      } else if (type === 'teams') {
+        const rows = teams.map(t => \`• **\${t.name}**\`).join('\n');
+        embedPayload = {
+          embeds: [{
+            title: \`👥 \${tournament.name} — REGISTERED TEAMS\`,
+            description: rows || 'No teams registered yet.',
+            color: 0x9B59B6,
+            fields: [
+              { name: 'Total Teams', value: \`\${teams.length}\`, inline: true },
+              { name: 'Total Players', value: \`\${players.length}\`, inline: true },
+            ],
+            footer: { text: 'Booyah Director • Team Lineup' },
+            timestamp: new Date().toISOString(),
+          }]
+        };
+
+      } else {
+        return err(400, \`Unknown post type: \${type}. Use: standings, mvp, champion, teams\`);
+      }
+
+      try {
+        const r = await fetch(tournament.discord_webhook_url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(embedPayload),
+        });
+        if (!r.ok) {
+          const txt = await r.text().catch(() => '');
+          return err(400, \`Discord rejected the post: \${r.status} \${txt}\`);
+        }
+        return ok({ success: true, type, tournament: tournament.name });
+      } catch (e) {
+        return err(500, \`Discord post failed: \${e.message}\`);
+      }
+    }
+
     if (route === 'validatePromo') {
       const code = sanitizeString(body.code || '', 50).toUpperCase();
       const plan = sanitizeString(body.plan || '', 20).toLowerCase();

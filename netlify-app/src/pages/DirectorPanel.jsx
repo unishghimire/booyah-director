@@ -706,7 +706,7 @@ export default function DirectorPanel() {
             {/* DESIGN TAB */}
             {activeTab === 'design' && (
               <SectionBoundary label="OVERLAY DESIGN STUDIO">
-                <DesignStudio overlayState={state} />
+                <DesignStudio overlayState={state} tournament={tournament} teams={teams} players={players} onAction={refresh} />
               </SectionBoundary>
             )}
 
