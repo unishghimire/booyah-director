@@ -483,6 +483,46 @@ module.exports = async (req, res) => {
         return ok(res, { success: true });
       }
 
+      case 'payment-requests': {
+        // GET: fetch all payment requests sorted by submittedAt desc
+        const reqs = (await dbGet('/booyah_admin/payment_requests')) || {};
+        const arr = Object.values(reqs).sort((a,b)=>(b.submittedAt||0)-(a.submittedAt||0));
+        return ok(res, { requests: arr });
+      }
+
+      case 'approve-payment': {
+        // POST: { requestId, note }
+        const { requestId, note='' } = body;
+        if (!requestId) return err(res, 400, 'requestId required');
+        const reqData = await dbGet(`/booyah_admin/payment_requests/${requestId}`);
+        if (!reqData) return err(res, 404, 'Not found');
+        const PLAN_DURATION = { weekly:7, monthly:30, yearly:365 };
+        const now = Date.now();
+        const durationDays = PLAN_DURATION[reqData.plan] || 30;
+        const sub = {
+          plan: reqData.plan, status:'active',
+          price: reqData.finalPrice, originalPrice: reqData.originalPrice,
+          discountPercent: reqData.promoDiscount||0,
+          startedAt: now, expiresAt: now + durationDays*86400000,
+          paymentMethod: reqData.paymentMethod, transactionId: reqData.transactionId,
+          approvedAt: now, adminNote: note,
+        };
+        await dbUpdate(`/booyah_admin/users/${reqData.uid}`, { subscription: sub, pendingPayment: null, updatedAt: now });
+        await dbUpdate(`/booyah_admin/payment_requests/${requestId}`, { status:'approved', approvedAt: now, adminNote: note });
+        return ok(res, { success:true, subscription: sub });
+      }
+
+      case 'reject-payment': {
+        // POST: { requestId, reason }
+        const { requestId: rId, reason } = body;
+        if (!rId || !reason) return err(res, 400, 'requestId and reason required');
+        const rReq = await dbGet(`/booyah_admin/payment_requests/${rId}`);
+        if (!rReq) return err(res, 404, 'Not found');
+        await dbUpdate(`/booyah_admin/payment_requests/${rId}`, { status:'rejected', rejectedAt: Date.now(), rejectionReason: reason });
+        await dbUpdate(`/booyah_admin/users/${rReq.uid}`, { pendingPayment: { status:'rejected', reason, requestId: rId }, updatedAt: Date.now() });
+        return ok(res, { success:true });
+      }
+
       default:
         return err(res, 404, `Unknown route: ${route}`);
     }

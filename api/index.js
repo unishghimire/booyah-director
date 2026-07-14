@@ -599,6 +599,148 @@ module.exports = async (req, res) => {
       return ok({ success: true, requestId: reqId, message: 'Subscription request submitted. Admin will activate your plan soon.' });
     }
 
+    // ── SUBMIT PAYMENT (authenticated) ──────────────────────────────────
+    if (route === 'submitPayment') {
+      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+      const secret = process.env.FIREBASE_DATABASE_SECRET;
+      if (!secret || !dbBaseUrl) return err(500, 'Database not configured');
+
+      const body = req.body || {};
+      const plan = sanitizeString(body.plan);
+      const paymentMethod = sanitizeString(body.paymentMethod);
+      const transactionId = sanitizeString(body.transactionId);
+      const screenshotUrl = sanitizeUrl(body.screenshotUrl);
+      const promoCode = sanitizeString(body.promoCode);
+      const pUid = sanitizeString(body.uid || uid);
+      const email = sanitizeString(body.email || user.email || '');
+      const displayName = sanitizeString(body.displayName || user.displayName || '');
+
+      const VALID_PLANS = ['weekly', 'monthly', 'yearly'];
+      if (!plan || !VALID_PLANS.includes(plan)) {
+        return err(400, 'Valid plan required: weekly, monthly, or yearly');
+      }
+      if (!transactionId) {
+        return err(400, 'transactionId must be a non-empty string');
+      }
+      if (!screenshotUrl) {
+        return err(400, 'screenshotUrl must be a non-empty string');
+      }
+
+      const PLAN_PRICES = { weekly: 299, monthly: 599, yearly: 2999 };
+      const originalPrice = PLAN_PRICES[plan];
+      let finalPrice = originalPrice;
+      let discountPercent = 0;
+
+      if (promoCode) {
+        try {
+          const promoR = await fetch(`${dbBaseUrl}/booyah_admin/promo_codes/${promoCode}.json?auth=${secret}`);
+          if (promoR.ok) {
+            const promoData = await promoR.json();
+            if (promoData && promoData.active !== false) {
+              discountPercent = sanitizeNumber(promoData.discountPercent || promoData.discount || 0);
+              finalPrice = Math.max(0, originalPrice - Math.round(originalPrice * (discountPercent / 100)));
+            }
+          }
+        } catch (e) {
+          console.error('Promo validation error:', e.message);
+        }
+      }
+
+      const requestId = genId();
+      const submittedAt = Date.now();
+
+      const paymentRequest = {
+        id: requestId,
+        uid: pUid,
+        email,
+        displayName,
+        plan,
+        paymentMethod,
+        transactionId,
+        screenshotUrl,
+        promoCode: promoCode || '',
+        promoDiscount: discountPercent || 0,
+        originalPrice,
+        finalPrice,
+        status: 'pending',
+        submittedAt
+      };
+
+      try {
+        // Write to /booyah_admin/payment_requests/{requestId}
+        await fetch(`${dbBaseUrl}/booyah_admin/payment_requests/${requestId}.json?auth=${secret}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(paymentRequest)
+        });
+
+        // Update /booyah_admin/users/{pUid} with pendingPayment
+        // First read existing user details to preserve subscription status, etc.
+        const userR = await fetch(`${dbBaseUrl}/booyah_admin/users/${pUid}.json?auth=${secret}`);
+        const userData = userR.ok ? await userR.json() : {};
+        const updatedUser = {
+          ...(userData || {}),
+          pendingPayment: {
+            requestId,
+            plan,
+            status: 'pending',
+            submittedAt
+          }
+        };
+
+        await fetch(`${dbBaseUrl}/booyah_admin/users/${pUid}.json?auth=${secret}`, {
+          method: 'PUT',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(updatedUser)
+        });
+
+        return ok({ success: true, requestId, message: 'Payment submitted for review' });
+      } catch (e) {
+        return err(500, 'Failed to process payment submission: ' + e.message);
+      }
+    }
+
+    // ── GET PAYMENT STATUS (authenticated) ──────────────────────────────
+    if (route === 'getPaymentStatus') {
+      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+      const secret = process.env.FIREBASE_DATABASE_SECRET;
+      if (!secret || !dbBaseUrl) return err(500, 'Database not configured');
+
+      const targetUid = sanitizeString(req.query.uid || uid);
+
+      try {
+        // 1. Read /booyah_admin/users/{uid}
+        const userR = await fetch(`${dbBaseUrl}/booyah_admin/users/${targetUid}.json?auth=${secret}`);
+        const userData = userR.ok ? await userR.json() : null;
+
+        // 2. Read all payment_requests and filter by uid
+        const requestsR = await fetch(`${dbBaseUrl}/booyah_admin/payment_requests.json?auth=${secret}`);
+        const allRequests = requestsR.ok ? await requestsR.json() : null;
+
+        const paymentHistory = [];
+        if (allRequests && typeof allRequests === 'object') {
+          for (const key in allRequests) {
+            const reqData = allRequests[key];
+            if (reqData && reqData.uid === targetUid) {
+              paymentHistory.push(reqData);
+            }
+          }
+        }
+
+        // Sort by submittedAt desc
+        paymentHistory.sort((a, b) => (b.submittedAt || 0) - (a.submittedAt || 0));
+
+        return ok({
+          subscription: (userData && userData.subscription) || null,
+          pendingPayment: (userData && userData.pendingPayment) || null,
+          paymentHistory
+        });
+      } catch (e) {
+        return err(500, 'Failed to fetch payment status: ' + e.message);
+      }
+    }
+
+
     // ── CHECK SUBSCRIPTION ───────────────────────────────────────────────
     if (route === 'checkSubscription') {
       if (isOwner) {
@@ -610,7 +752,7 @@ module.exports = async (req, res) => {
         try {
           const subR = await fetch(`${dbBaseUrl}/booyah_admin/users/${uid}.json?auth=${secret}`);
           const subData = subR.ok ? await subR.json() : null;
-          return ok({ uid, subscription: subData?.subscription || null });
+          return ok({ uid, subscription: subData?.subscription || null, pendingPayment: subData?.pendingPayment || null });
         } catch {
           return ok({ uid, subscription: null });
         }

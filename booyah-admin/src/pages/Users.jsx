@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Search, UserCheck, UserX, Ban, CreditCard, RefreshCw, ChevronDown } from 'lucide-react';
+import { Search, UserCheck, UserX, Ban, CreditCard, RefreshCw, XCircle } from 'lucide-react';
 import Modal from '../components/Modal';
 import { adminFetch } from './Dashboard';
 import toast from 'react-hot-toast';
@@ -12,6 +12,7 @@ export default function Users() {
   const [loading, setLoading]   = useState(true);
   const [search, setSearch]     = useState('');
   const [subModal, setSubModal] = useState(null); // uid of user to assign sub
+  const [selectedUser, setSelectedUser] = useState(null);
   const [subForm, setSubForm]   = useState({ plan: 'monthly', discountPercent: 0, notes: '' });
 
   const load = async () => {
@@ -35,6 +36,7 @@ export default function Users() {
       await adminFetch('assign-subscription', { method: 'POST', body: JSON.stringify({ uid: subModal, ...subForm }) });
       toast.success('Subscription assigned');
       setSubModal(null);
+      setSelectedUser(null);
       load();
     } catch (e) { toast.error(e.message); }
   };
@@ -77,7 +79,7 @@ export default function Users() {
 
       {/* Table */}
       <div className="rounded-xl border border-white/5 bg-[#0a0e1a] overflow-hidden">
-        <div className="grid grid-cols-[1fr_140px_160px_180px_160px] text-[9px] font-orbitron font-black text-gray-500 tracking-widest px-4 py-3 border-b border-white/5">
+        <div className="grid grid-cols-[1fr_140px_160px_180px_180px] text-[9px] font-orbitron font-black text-gray-500 tracking-widest px-4 py-3 border-b border-white/5">
           <div>USER</div><div>STATUS</div><div>PLAN</div><div>EXPIRES</div><div>ACTIONS</div>
         </div>
         {loading ? (
@@ -91,7 +93,7 @@ export default function Users() {
           const isActive = sub?.status === 'active' && sub?.expiresAt > now;
           const expiryDate = sub?.expiresAt ? new Date(sub.expiresAt).toLocaleDateString() : '—';
           return (
-            <div key={user.uid} className="grid grid-cols-[1fr_140px_160px_180px_160px] items-center px-4 py-3 border-b border-white/3 hover:bg-white/2 transition-all">
+            <div key={user.uid} className="grid grid-cols-[1fr_140px_160px_180px_180px] items-center px-4 py-3 border-b border-white/3 hover:bg-white/2 transition-all">
               <div>
                 <p className="font-orbitron text-[11px] text-white">{user.displayName || 'Unknown'}</p>
                 <p className="font-mono text-[9px] text-gray-500">{user.email}</p>
@@ -111,25 +113,31 @@ export default function Users() {
               </div>
               <div className="font-mono text-[10px] text-gray-400">{expiryDate}</div>
               <div className="flex gap-1">
-                <button onClick={() => { setSubModal(user.uid); setSubForm({ plan: sub?.plan || 'monthly', discountPercent: 0, notes: '' }); }}
-                  className="p-1.5 rounded border border-[#00D4FF]/30 text-[#00D4FF] hover:bg-[#00D4FF]/10 transition-all" title="Assign Subscription">
-                  <CreditCard className="w-3 h-3" />
+                <button onClick={() => { setSubModal(user.uid); setSelectedUser(user); setSubForm({ plan: sub?.plan || 'monthly', discountPercent: 0, notes: '' }); }}
+                  className="p-1.5 rounded border border-[#00D4FF]/30 text-[#00D4FF] hover:bg-[#00D4FF]/10 transition-all font-orbitron text-[9px] font-bold flex items-center gap-1" title="Extend/Assign Subscription">
+                  <CreditCard className="w-3 h-3" /> EXTEND
                 </button>
+                {isActive && (
+                  <button onClick={() => revokeSub(user.uid)}
+                    className="p-1.5 rounded border border-red-500/30 text-red-500 hover:bg-red-500/10 transition-all font-orbitron text-[9px] font-bold flex items-center gap-1" title="Revoke Subscription">
+                    <XCircle className="w-3 h-3" /> REVOKE
+                  </button>
+                )}
                 {user.status !== 'active' && (
                   <button onClick={() => setStatus(user.uid, 'active')}
-                    className="p-1.5 rounded border border-[#22c55e]/30 text-[#22c55e] hover:bg-[#22c55e]/10 transition-all" title="Activate">
+                    className="p-1.5 rounded border border-[#22c55e]/30 text-[#22c55e] hover:bg-[#22c55e]/10 transition-all" title="Activate User">
                     <UserCheck className="w-3 h-3" />
                   </button>
                 )}
                 {user.status !== 'suspended' && (
                   <button onClick={() => setStatus(user.uid, 'suspended')}
-                    className="p-1.5 rounded border border-[#FF6B00]/30 text-[#FF6B00] hover:bg-[#FF6B00]/10 transition-all" title="Suspend">
+                    className="p-1.5 rounded border border-[#FF6B00]/30 text-[#FF6B00] hover:bg-[#FF6B00]/10 transition-all" title="Suspend User">
                     <UserX className="w-3 h-3" />
                   </button>
                 )}
                 {user.status !== 'banned' && (
                   <button onClick={() => setStatus(user.uid, 'banned')}
-                    className="p-1.5 rounded border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all" title="Ban">
+                    className="p-1.5 rounded border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all" title="Ban User">
                     <Ban className="w-3 h-3" />
                   </button>
                 )}
@@ -140,9 +148,26 @@ export default function Users() {
       </div>
 
       {/* Subscription Modal */}
-      {subModal && (
-        <Modal title="ASSIGN SUBSCRIPTION" onClose={() => setSubModal(null)}>
+      {subModal && selectedUser && (
+        <Modal title="ASSIGN / EXTEND SUBSCRIPTION" onClose={() => { setSubModal(null); setSelectedUser(null); }}>
           <div className="space-y-4">
+            {/* Current subscription details */}
+            <div className="rounded-lg bg-black/40 p-3 border border-white/5 space-y-1">
+              <p className="font-orbitron text-[9px] text-gray-500 tracking-wider">CURRENT SUBSCRIPTION</p>
+              {selectedUser.subscription && selectedUser.subscription.status === 'active' && selectedUser.subscription.expiresAt > Date.now() ? (
+                <div>
+                  <p className="font-orbitron text-[11px] text-[#22c55e] font-black">
+                    ACTIVE: {selectedUser.subscription.plan?.toUpperCase()}
+                  </p>
+                  <p className="font-mono text-[9px] text-gray-400">
+                    Expires: {new Date(selectedUser.subscription.expiresAt).toLocaleString()}
+                  </p>
+                </div>
+              ) : (
+                <p className="font-orbitron text-[11px] text-gray-400 font-bold">NO ACTIVE SUBSCRIPTION</p>
+              )}
+            </div>
+
             <div>
               <label className="font-orbitron text-[9px] text-gray-500 tracking-wider block mb-1.5">PLAN</label>
               <select value={subForm.plan} onChange={e => setSubForm(p => ({...p, plan: e.target.value}))}
