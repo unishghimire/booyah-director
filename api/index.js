@@ -509,10 +509,36 @@ module.exports = async (req, res) => {
       const user = await verifyToken(authHeader);
       if (!user) return err(401, 'Invalid or expired authentication token');
 
+      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+      const secret = process.env.FIREBASE_DATABASE_SECRET;
+
       try {
-        // Just initialize database default structure
+        // Initialize user's own DB structure
         const db = await loadDb(user.uid);
         await saveDb(user.uid, db);
+
+        // Register/update user profile in /booyah_admin/users/ so admin panel can see them
+        if (secret && dbBaseUrl) {
+          const existingR = await fetch(`${dbBaseUrl}/booyah_admin/users/${user.uid}.json?auth=${secret}`);
+          const existing = existingR.ok ? await existingR.json() : null;
+          const now = Date.now();
+          const profile = {
+            uid: user.uid,
+            email: user.email || '',
+            displayName: req.body?.displayName || user.displayName || user.email?.split('@')[0] || 'User',
+            photoURL: req.body?.photoURL || user.photoURL || '',
+            status: existing?.status || 'active',
+            subscription: existing?.subscription || null,
+            registeredAt: existing?.registeredAt || now,
+            lastSeenAt: now,
+          };
+          await fetch(`${dbBaseUrl}/booyah_admin/users/${user.uid}.json?auth=${secret}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(profile),
+          });
+        }
+
         return ok({ success: true, uid: user.uid, email: user.email });
       } catch (e) {
         return err(500, 'Failed to register user database');
@@ -542,6 +568,35 @@ module.exports = async (req, res) => {
         champion_team_id: null, champion_team_name: null, champion_total_points: 0,
         last_updated_at: new Date().toISOString(),
       };
+    }
+
+    // ── REQUEST SUBSCRIPTION (user asks admin to activate a plan) ───────
+    if (route === 'requestSubscription') {
+      const dbBaseUrl2 = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
+      const secret2 = process.env.FIREBASE_DATABASE_SECRET;
+      if (!secret2 || !dbBaseUrl2) return err(500, 'Database not configured');
+      const { plan, notes: subNotes } = req.body || {};
+      const VALID_PLANS = ['weekly', 'monthly', 'yearly'];
+      if (!plan || !VALID_PLANS.includes(plan)) return err(400, 'Valid plan required');
+      const PLAN_PRICES = { weekly: 299, monthly: 599, yearly: 2999 };
+      const reqId = genId();
+      const requestRecord = {
+        id: reqId,
+        uid: uid,
+        email: user.email || '',
+        displayName: user.displayName || user.email?.split('@')[0] || 'User',
+        plan,
+        price: PLAN_PRICES[plan],
+        notes: subNotes || '',
+        status: 'pending',
+        requestedAt: Date.now(),
+      };
+      // Write to /booyah_admin/subscription_requests/{reqId}
+      await fetch(`${dbBaseUrl2}/booyah_admin/subscription_requests/${reqId}.json?auth=${secret2}`, {
+        method: 'PUT', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestRecord),
+      });
+      return ok({ success: true, requestId: reqId, message: 'Subscription request submitted. Admin will activate your plan soon.' });
     }
 
     // ── CHECK SUBSCRIPTION ───────────────────────────────────────────────

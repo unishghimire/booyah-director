@@ -269,11 +269,15 @@ module.exports = async (req, res) => {
           0
         );
 
+        const subReqs = (await dbGet('/booyah_admin/subscription_requests')) || {};
+        const pendingRequests = Object.values(subReqs).filter(r => r.status === 'pending').length;
+
         return ok(res, {
           totalUsers: userArr.length,
           activeUsers: active.length,
           totalRevenue,
           promoCodes: Object.keys(promos).length,
+          pendingRequests,
           planBreakdown: {
             weekly: active.filter(u => u.subscription?.plan === 'weekly').length,
             monthly: active.filter(u => u.subscription?.plan === 'monthly').length,
@@ -431,6 +435,52 @@ module.exports = async (req, res) => {
           return ok(res, { success: true });
         }
         return err(res, 405, 'Method not allowed');
+      }
+
+      case 'subscription-requests': {
+        if (req.method !== 'GET') return err(res, 405, 'Method not allowed');
+        const reqs = (await dbGet('/booyah_admin/subscription_requests')) || {};
+        const arr = Object.values(reqs).sort((a, b) => (b.requestedAt || 0) - (a.requestedAt || 0));
+        return ok(res, { requests: arr });
+      }
+
+      case 'approve-subscription-request': {
+        if (req.method !== 'POST') return err(res, 405, 'Method not allowed');
+        const { requestId, discountPercent: disc = 0 } = body;
+        if (!requestId) return err(res, 400, 'requestId required');
+        const reqData = await dbGet(\`/booyah_admin/subscription_requests/\${requestId}\`);
+        if (!reqData) return err(res, 404, 'Request not found');
+        const PLAN_DURATION = { weekly: 7, monthly: 30, yearly: 365 };
+        const PLAN_PRICES = { weekly: 299, monthly: 599, yearly: 2999 };
+        const plan = reqData.plan;
+        const durationDays = PLAN_DURATION[plan] || 30;
+        const now = Date.now();
+        const sub = {
+          plan,
+          status: 'active',
+          price: Math.round((PLAN_PRICES[plan] || 0) * (1 - disc / 100)),
+          originalPrice: PLAN_PRICES[plan] || 0,
+          discountPercent: disc,
+          startedAt: now,
+          expiresAt: now + durationDays * 86400000,
+          notes: reqData.notes || '',
+          approvedByAdmin: true,
+        };
+        // Update user subscription
+        await dbUpdate(\`/booyah_admin/users/\${reqData.uid}\`, { subscription: sub, updatedAt: now });
+        // Mark request as approved
+        await dbUpdate(\`/booyah_admin/subscription_requests/\${requestId}\`, { status: 'approved', approvedAt: now, discountPercent: disc });
+        return ok(res, { success: true, subscription: sub });
+      }
+
+      case 'reject-subscription-request': {
+        if (req.method !== 'POST') return err(res, 405, 'Method not allowed');
+        const { requestId, reason: rejReason = '' } = body;
+        if (!requestId) return err(res, 400, 'requestId required');
+        await dbUpdate(\`/booyah_admin/subscription_requests/\${requestId}\`, {
+          status: 'rejected', rejectedAt: Date.now(), reason: rejReason,
+        });
+        return ok(res, { success: true });
       }
 
       default:

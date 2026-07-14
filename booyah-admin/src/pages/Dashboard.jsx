@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Users, CreditCard, TrendingUp, Tag, Activity, Crown, Zap } from 'lucide-react';
+import { Users, CreditCard, TrendingUp, Tag, Activity, Crown, Zap, Bell } from 'lucide-react';
 import StatCard from '../components/StatCard';
 import { auth } from '../firebase';
 
@@ -39,9 +39,26 @@ export default function Dashboard() {
           <StatCard title="TOTAL USERS"    value={stats?.totalUsers}   icon={Users}      accent="#00D4FF" />
           <StatCard title="ACTIVE SUBS"    value={stats?.activeUsers}  icon={Crown}      accent="#FF6B00" />
           <StatCard title="TOTAL REVENUE"  value={`NPR ${stats?.totalRevenue?.toLocaleString() ?? 0}`} icon={TrendingUp} accent="#22c55e" />
-          <StatCard title="PROMO CODES"    value={stats?.promoCodes}   icon={Tag}        accent="#a855f7" />
+          <StatCard title="PENDING REQS"   value={stats?.pendingRequests ?? 0} icon={Bell} accent="#facc15" />
         </div>
       )}
+      {stats?.pendingRequests > 0 && (
+        <div className="mb-4 rounded-xl border border-[#FF6B00]/40 bg-[#FF6B00]/8 p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#FF6B00] animate-pulse" />
+            <div>
+              <p className="font-orbitron text-[10px] font-black text-[#FF6B00] tracking-wider">
+                {stats.pendingRequests} PENDING SUBSCRIPTION REQUEST{stats.pendingRequests > 1 ? 'S' : ''}
+              </p>
+              <p className="font-orbitron text-[8px] text-gray-500 mt-0.5">Users are waiting for activation — review in Subscriptions</p>
+            </div>
+          </div>
+          <a href="/subscriptions" className="px-4 py-2 rounded-lg font-orbitron text-[9px] font-black text-black" style={{ background: 'linear-gradient(135deg, #FF6B00, #ff8c00)' }}>
+            REVIEW NOW →
+          </a>
+        </div>
+      )}
+
       {stats?.planBreakdown && (
         <div className="rounded-xl border border-white/5 bg-[#0a0e1a] p-5">
           <h2 className="font-orbitron text-[10px] font-black text-gray-400 tracking-widest mb-4">PLAN BREAKDOWN</h2>

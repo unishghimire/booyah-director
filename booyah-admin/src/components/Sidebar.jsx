@@ -1,16 +1,28 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, CreditCard, Tag, Settings, Zap } from 'lucide-react';
+import { LayoutDashboard, Users, CreditCard, Tag, Settings, Zap, Bell } from 'lucide-react';
+import { adminFetch } from '../pages/Dashboard';
 
 const nav = [
   { to: '/dashboard',     icon: LayoutDashboard, label: 'DASHBOARD' },
   { to: '/users',         icon: Users,           label: 'USERS' },
-  { to: '/subscriptions', icon: CreditCard,      label: 'SUBSCRIPTIONS' },
+  { to: '/subscriptions', icon: CreditCard,      label: 'SUBSCRIPTIONS', badge: 'pendingRequests' },
   { to: '/promo-codes',   icon: Tag,             label: 'PROMO CODES' },
   { to: '/settings',      icon: Settings,        label: 'SETTINGS' },
 ];
 
 export default function Sidebar() {
+  const [pendingCount, setPendingCount] = useState(0);
+
+  useEffect(() => {
+    const fetchPending = () => {
+      adminFetch('stats').then(d => setPendingCount(d.pendingRequests || 0)).catch(() => {});
+    };
+    fetchPending();
+    const t = setInterval(fetchPending, 30000); // poll every 30s
+    return () => clearInterval(t);
+  }, []);
+
   return (
     <div className="w-56 flex-shrink-0 bg-[#0a0e1a] border-r border-white/5 flex flex-col">
       {/* Logo */}
@@ -19,28 +31,42 @@ export default function Sidebar() {
           <Zap className="w-4 h-4 text-[#FF6B00]" />
         </div>
         <div>
-          <p className="font-orbitron text-[11px] font-black text-white tracking-wider">BOOYAH</p>
-          <p className="font-orbitron text-[8px] text-[#FF6B00] tracking-widest">ADMIN PANEL</p>
+          <p className="font-orbitron text-[11px] font-black text-white">BOOYAH</p>
+          <p className="font-orbitron text-[7px] text-[#FF6B00] tracking-widest">ADMIN PANEL</p>
         </div>
       </div>
+
       {/* Nav */}
-      <nav className="flex-1 py-4 px-2">
-        {nav.map(({ to, icon: Icon, label }) => (
-          <NavLink key={to} to={to} className={({ isActive }) =>
-            `flex items-center gap-3 px-3 py-2.5 rounded-lg mb-1 text-[10px] font-orbitron font-black tracking-wider transition-all ${
-              isActive
-                ? 'bg-[#FF6B00]/15 text-[#FF6B00] border border-[#FF6B00]/30'
-                : 'text-gray-500 hover:text-white hover:bg-white/5'
-            }`
-          }>
-            <Icon className="w-4 h-4 flex-shrink-0" />
-            {label}
-          </NavLink>
-        ))}
+      <nav className="flex-1 p-3 space-y-0.5">
+        {nav.map(({ to, icon: Icon, label, badge }) => {
+          const badgeCount = badge === 'pendingRequests' ? pendingCount : 0;
+          return (
+            <NavLink key={to} to={to} className={({ isActive }) =>
+              `flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all group ${
+                isActive
+                  ? 'bg-[#FF6B00]/15 text-[#FF6B00]'
+                  : 'text-gray-500 hover:text-white hover:bg-white/3'
+              }`
+            }>
+              <div className="flex items-center gap-3">
+                <Icon className="w-4 h-4 flex-shrink-0" />
+                <span className="font-orbitron text-[9px] font-black tracking-wider">{label}</span>
+              </div>
+              {badgeCount > 0 && (
+                <span className="flex h-4 min-w-4 items-center justify-center rounded-full px-1 font-orbitron text-[7px] font-black text-black animate-pulse"
+                  style={{ background: '#FF6B00' }}>
+                  {badgeCount}
+                </span>
+              )}
+            </NavLink>
+          );
+        })}
       </nav>
-      {/* Version */}
+
+      {/* Footer */}
       <div className="p-4 border-t border-white/5">
-        <p className="text-[8px] font-orbitron text-gray-600 tracking-widest">V1.0.0 — SECURE BUILD</p>
+        <p className="font-orbitron text-[7px] text-gray-700 tracking-widest">BOOYAH DIRECTOR v2.0</p>
+        <p className="font-orbitron text-[6px] text-gray-800 tracking-widest mt-0.5">SECURE ADMIN CONTROL</p>
       </div>
     </div>
   );
