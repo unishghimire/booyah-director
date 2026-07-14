@@ -246,100 +246,167 @@ function SetupBlank() {
 }
 
 /* ══════════════════════════════════════════════════
-   SCREEN 2: SCOREBOARD (OBS OVERLAY - RIGHT SIDE)
+   SCREEN 2: SCOREBOARD — FF INDICATOR STYLE
+   Each team shows 4 life-line bars: green=alive, gray=eliminated
+   Live updates via poll — revive turns gray → green instantly
 ══════════════════════════════════════════════════ */
 function FFBoard({ teams = [], players = [], currentMatch, design }) {
   const rows = useMemo(() => {
     return [...safeArray(teams)]
       .map(team => {
         const tp = safeArray(players).filter(p => p.team_id === team.id);
-        const alive = tp.filter(p => p.is_alive).length;
-        return { ...team, alive, totalPlayers: tp.length || 4 };
+        // Build exactly 4 slots — pad with dead slots if fewer than 4 players
+        const slots = [];
+        for (let i = 0; i < 4; i++) {
+          if (tp[i]) slots.push({ name: tp[i].name, alive: tp[i].is_alive });
+          else       slots.push({ name: null, alive: false }); // empty slot
+        }
+        const aliveCount = tp.filter(p => p.is_alive).length;
+        return { ...team, slots, aliveCount, totalPlayers: tp.length };
       })
-      .sort((a, b) => (b.total_tournament_points||0) - (a.total_tournament_points||0) || (b.total_tournament_kills||0) - (a.total_tournament_kills||0))
+      .sort((a, b) =>
+        (b.total_tournament_points||0) - (a.total_tournament_points||0) ||
+        (b.total_tournament_kills||0)  - (a.total_tournament_kills||0)
+      )
       .slice(0, 12);
   }, [teams, players]);
 
-  const primary = tok.acc(design);
+  const primary   = tok.acc(design);
   const secondary = tok.acc2(design);
-  const mapName = currentMatch?.map_name || currentMatch?.mapName || '';
-  const matchNum = currentMatch?.match_number ? `MATCH ${String(currentMatch.match_number).padStart(2,'0')}` : 'STANDBY';
+  const matchNum  = currentMatch?.match_number
+    ? `MATCH ${String(currentMatch.match_number).padStart(2,'0')}`
+    : 'STANDBY';
 
   return (
     <motion.div
       initial={{ x: 100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.4 }}
-      style={{ position:'absolute', right:40, top:80, width:420, zIndex:10 }}
+      style={{ position:'absolute', right:40, top:80, width:400, zIndex:10 }}
     >
       <FFPanel>
-        {/* Dual column header: Orange Left / Cyan Right */}
-        <div style={{ height: 48, background: 'rgba(0,0,0,0.8)', borderBottom: `1px solid ${primary}44`, display: 'flex', overflow: 'hidden' }}>
-          <div style={{ flex: 1, background: `linear-gradient(90deg, ${primary}33, transparent)`, display: 'flex', alignItems: 'center', paddingLeft: 16 }}>
-            <span style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>SCOREBOARD</span>
+        {/* ── Header ── */}
+        <div style={{ height:48, background:'rgba(0,0,0,0.85)', borderBottom:`1px solid ${primary}44`, display:'flex', overflow:'hidden' }}>
+          <div style={{ flex:1, background:`linear-gradient(90deg,${primary}44,transparent)`, display:'flex', alignItems:'center', paddingLeft:16 }}>
+            <span style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:primary, letterSpacing:'0.18em' }}>SCOREBOARD</span>
           </div>
-          <div style={{ flex: 1, background: `linear-gradient(270deg, ${secondary}33, transparent)`, display: 'flex', alignItems: 'center', justifyContent: 'flex-end', paddingRight: 16 }}>
+          <div style={{ flex:1, background:`linear-gradient(270deg,${secondary}33,transparent)`, display:'flex', alignItems:'center', justifyContent:'flex-end', paddingRight:16 }}>
             <span style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:700, color:secondary, letterSpacing:'0.15em' }}>{matchNum}</span>
           </div>
         </div>
 
-        {/* Column Headers */}
-        <div style={{
-          display:'flex', alignItems:'center', height:28,
-          background:'rgba(0,0,0,0.5)', borderBottom:`1px solid rgba(255,107,0,0.15)`,
-          padding:'0 16px', flexShrink:0,
-        }}>
-          <div style={{ width:30, fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:'rgba(255,255,255,0.4)', textAlign:'center' }}>#</div>
-          <div style={{ width:32 }} />
-          <div style={{ flex:1, fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:'rgba(255,255,255,0.4)', paddingLeft:8, letterSpacing:'0.15em' }}>TEAM</div>
-          <div style={{ width:40, textAlign:'center', fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:primary, letterSpacing:'0.1em' }}>KILLS</div>
-          <div style={{ width:40, textAlign:'center', fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:secondary, letterSpacing:'0.1em' }}>PTS</div>
-          <div style={{ width:48, textAlign:'center', fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>ALIVE</div>
+        {/* ── Column Headers ── */}
+        <div style={{ display:'flex', alignItems:'center', height:24, background:'rgba(0,0,0,0.6)', borderBottom:`1px solid rgba(255,255,255,0.04)`, padding:'0 12px 0 14px' }}>
+          <div style={{ width:28, fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,255,255,0.35)', textAlign:'center', letterSpacing:'0.1em' }}>#</div>
+          <div style={{ width:28 }} />
+          <div style={{ flex:1, fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,255,255,0.35)', paddingLeft:6, letterSpacing:'0.12em' }}>SQUAD</div>
+          <div style={{ width:82, fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:'rgba(255,255,255,0.35)', textAlign:'center', letterSpacing:'0.1em' }}>ALIVE</div>
+          <div style={{ width:36, textAlign:'center', fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:primary, letterSpacing:'0.1em' }}>KLS</div>
+          <div style={{ width:36, textAlign:'center', fontFamily:'Orbitron', fontSize:7, fontWeight:900, color:secondary, letterSpacing:'0.1em' }}>PTS</div>
         </div>
 
-        {/* Rows */}
+        {/* ── Rows ── */}
         <div style={{ display:'flex', flexDirection:'column' }}>
           {safeArray(rows).map((team, idx) => {
-            const rank = idx + 1;
-            const isTop3 = rank <= 3;
-            const rankColors = ['#FFD700', '#E5E4E2', '#CD7F32'];
-            const rankColor = isTop3 ? rankColors[rank-1] : 'rgba(255,255,255,0.6)';
-            const rowBg = rank === 1 ? 'rgba(255,107,0,0.05)' : idx % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'transparent';
+            const rank      = idx + 1;
+            const rankColors = ['#FFD700','#C0C0C0','#CD7F32'];
+            const rankColor = rank <= 3 ? rankColors[rank-1] : 'rgba(255,255,255,0.45)';
+            const rowBg     = rank === 1
+              ? `linear-gradient(90deg, ${primary}12, transparent)`
+              : rank === 2 ? `linear-gradient(90deg, rgba(192,192,192,0.04), transparent)`
+              : idx % 2 === 0 ? 'rgba(255,255,255,0.01)' : 'transparent';
+            const isEliminated = team.aliveCount === 0 && team.totalPlayers > 0;
 
             return (
               <div key={team.id || idx} style={{
-                display:'flex', alignItems:'center', height:44,
+                display:'flex', alignItems:'center', height:46,
                 background: rowBg,
                 borderBottom:'1px solid rgba(255,255,255,0.03)',
-                borderLeft: isTop3 ? `4px solid ${rankColors[rank-1]}` : '4px solid transparent',
-                padding:'0 16px',
+                borderLeft: rank <= 3 ? `3px solid ${rankColors[rank-1]}` : '3px solid transparent',
+                padding:'0 12px 0 11px',
+                opacity: isEliminated ? 0.45 : 1,
+                transition:'opacity 0.4s ease',
               }}>
-                <div style={{ width:30, textAlign:'center', fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:rankColor }}>
-                  {String(rank).padStart(2, '0')}
+                {/* Rank */}
+                <div style={{ width:28, textAlign:'center', fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:rankColor }}>
+                  {String(rank).padStart(2,'0')}
                 </div>
-                <div style={{ width:32, display:'flex', justifyContent:'center' }}>
-                  <TeamLogo team={team} size={24} />
+
+                {/* Team logo */}
+                <div style={{ width:28, display:'flex', justifyContent:'center' }}>
+                  <TeamLogo team={team} size={22} />
                 </div>
-                <div style={{ flex:1, paddingLeft:8, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', textTransform:'uppercase', letterSpacing:'0.05em' }}>
+
+                {/* Team name */}
+                <div style={{ flex:1, paddingLeft:6, fontFamily:'Orbitron', fontSize:10, fontWeight:900, color: isEliminated ? 'rgba(255,255,255,0.3)' : '#fff', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', textTransform:'uppercase', letterSpacing:'0.04em' }}>
                   {team.name || 'TEAM'}
                 </div>
-                <div style={{ width:40, textAlign:'center', fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color:primary }}>
+
+                {/* ── 4 LIFE-LINE INDICATORS ── */}
+                <div style={{ width:82, display:'flex', alignItems:'center', justifyContent:'center', gap:4 }}>
+                  {team.slots.map((slot, si) => {
+                    const isAlive   = slot.alive;
+                    const isEmpty   = slot.name === null;
+                    const barColor  = isAlive
+                      ? '#22c55e'                        // green — alive
+                      : isEmpty
+                      ? 'rgba(255,255,255,0.06)'         // very faint — no player in slot
+                      : 'rgba(255,255,255,0.18)';        // gray — eliminated
+
+                    return (
+                      <div key={si} style={{
+                        width: 14,
+                        height: 28,
+                        borderRadius: 3,
+                        background: barColor,
+                        boxShadow: isAlive ? `0 0 8px #22c55eaa, 0 0 2px #22c55e` : 'none',
+                        transition: 'background 0.35s ease, box-shadow 0.35s ease',
+                        position: 'relative',
+                        overflow: 'hidden',
+                      }}>
+                        {/* Alive shimmer stripe */}
+                        {isAlive && (
+                          <div style={{
+                            position:'absolute', top:0, left:0, right:0, height:'40%',
+                            background:'rgba(255,255,255,0.25)',
+                            borderRadius:'3px 3px 0 0',
+                          }} />
+                        )}
+                      </div>
+                    );
+                  })}
+                </div>
+
+                {/* Kills */}
+                <div style={{ width:36, textAlign:'center', fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color: isEliminated ? 'rgba(255,107,0,0.4)' : primary }}>
                   {team.total_tournament_kills || 0}
                 </div>
-                <div style={{ width:40, textAlign:'center', fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color:secondary }}>
+
+                {/* Points */}
+                <div style={{ width:36, textAlign:'center', fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color: isEliminated ? 'rgba(0,212,255,0.4)' : secondary }}>
                   {team.total_tournament_points || 0}
-                </div>
-                <div style={{ width:48, textAlign:'center', fontFamily:'Rajdhani', fontSize:12, fontWeight:700, color: (team.alive||0) > 0 ? '#4ade80' : 'rgba(255,255,255,0.2)' }}>
-                  {team.alive !== undefined ? team.alive : '0'}/{team.totalPlayers||4}
                 </div>
               </div>
             );
           })}
+
           {rows.length === 0 && (
-            <div style={{ padding:'30px 0', textAlign:'center', fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.15em' }}>
+            <div style={{ padding:'30px 0', textAlign:'center', fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.25)', letterSpacing:'0.15em' }}>
               WAITING FOR TEAM DATA...
             </div>
           )}
+        </div>
+
+        {/* ── Footer legend ── */}
+        <div style={{ height:26, background:'rgba(0,0,0,0.7)', borderTop:`1px solid rgba(255,255,255,0.04)`, display:'flex', alignItems:'center', justifyContent:'center', gap:16 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+            <div style={{ width:10, height:18, borderRadius:2, background:'#22c55e', boxShadow:'0 0 6px #22c55eaa' }} />
+            <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>ALIVE</span>
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:5 }}>
+            <div style={{ width:10, height:18, borderRadius:2, background:'rgba(255,255,255,0.18)' }} />
+            <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>ELIMINATED</span>
+          </div>
         </div>
       </FFPanel>
     </motion.div>

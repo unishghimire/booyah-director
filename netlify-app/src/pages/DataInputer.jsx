@@ -582,6 +582,47 @@ function TeamInputCard({
     }
   };
 
+  // Eliminate ALL players on this team (team wiped)
+  const handleEliminateAll = async () => {
+    if (!currentMatch?.id) return toast.error('Start a match first');
+    setBusy(true);
+    try {
+      const alivePlayers = players.filter(p => p.is_alive);
+      if (alivePlayers.length === 0) { toast('No alive players to eliminate', { icon: 'ℹ️' }); return; }
+      for (const p of alivePlayers) {
+        await overlayApi.eliminatePlayer({
+          player_id: p.id, match_id: currentMatch.id,
+          player_name: p.name, team_name: team.name,
+          tournament_id: currentMatch.tournament_id || '',
+        });
+      }
+      toast(`💀 ${team.name} wiped — all ${alivePlayers.length} players eliminated`, { icon: '💀' });
+      onAction();
+    } catch (err) {
+      toast.error(err.message || 'Error eliminating team');
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  // Revive ALL players on this team (full team revive)
+  const handleReviveAll = async () => {
+    setBusy(true);
+    try {
+      const deadPlayers = players.filter(p => !p.is_alive);
+      if (deadPlayers.length === 0) { toast('All players already alive', { icon: 'ℹ️' }); return; }
+      for (const p of deadPlayers) {
+        await overlayApi.revivePlayer({ player_id: p.id });
+      }
+      toast.success(`✅ ${team.name} revived — ${deadPlayers.length} player${deadPlayers.length > 1 ? 's' : ''} back`);
+      onAction();
+    } catch (err) {
+      toast.error(err.message || 'Error reviving team');
+    } finally {
+      setBusy(false);
+    }
+  };
+
   return (
     <div
       className="rounded-xl border overflow-hidden flex flex-col justify-between"
@@ -632,19 +673,32 @@ function TeamInputCard({
           </div>
         </div>
 
-        {/* Alive vertical tally bars */}
-        <div className="flex gap-0.5 flex-shrink-0 ml-1">
-          {Array.from({ length: Math.max(players.length, 4) }).map((_, i) => (
-            <div
-              key={i}
-              className="rounded-sm"
-              style={{
-                width: 3,
-                height: 14,
-                background: i < aliveCount ? teamColor : 'rgba(255, 255, 255, 0.1)',
-              }}
-            />
-          ))}
+        {/* Alive indicator bars — match scoreboard style */}
+        <div className="flex flex-col items-center gap-1 flex-shrink-0 ml-1">
+          <div className="flex gap-0.5">
+            {Array.from({ length: Math.max(players.length, 4) }).map((_, i) => {
+              const isAlive = players[i] ? players[i].is_alive : false;
+              const isEmpty = !players[i];
+              return (
+                <div key={i} className="rounded-sm transition-all duration-300"
+                  style={{
+                    width: 5,
+                    height: 18,
+                    background: isEmpty
+                      ? 'rgba(255,255,255,0.05)'
+                      : isAlive
+                      ? '#22c55e'
+                      : 'rgba(255,255,255,0.15)',
+                    boxShadow: isAlive ? '0 0 5px #22c55eaa' : 'none',
+                  }}
+                />
+              );
+            })}
+          </div>
+          <span className="font-orbitron text-[7px] font-black"
+            style={{ color: aliveCount > 0 ? '#22c55e' : 'rgba(255,255,255,0.2)' }}>
+            {aliveCount}/{Math.max(players.length, 4)}
+          </span>
         </div>
 
         {/* Delete button */}
@@ -691,6 +745,24 @@ function TeamInputCard({
             />
           ))
         )}
+      </div>
+
+      {/* Quick Team Actions — Elim All / Revive All */}
+      <div className="flex items-center gap-2 border-t border-white/[0.04] bg-black/10 px-3 py-2">
+        <button
+          onClick={handleEliminateAll}
+          disabled={busy !== false || aliveCount === 0}
+          className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-red-500/30 bg-red-950/20 py-1.5 font-orbitron text-[9px] font-black text-red-400 hover:bg-red-500/15 active:scale-95 transition-all disabled:opacity-30"
+        >
+          <span>💀</span> ELIM ALL
+        </button>
+        <button
+          onClick={handleReviveAll}
+          disabled={busy !== false || aliveCount === players.length}
+          className="flex-1 flex items-center justify-center gap-1.5 rounded-lg border border-emerald-500/30 bg-emerald-950/20 py-1.5 font-orbitron text-[9px] font-black text-emerald-400 hover:bg-emerald-500/15 active:scale-95 transition-all disabled:opacity-30"
+        >
+          <span>💚</span> REVIVE ALL
+        </button>
       </div>
 
       {/* Placement row (bottom) */}
