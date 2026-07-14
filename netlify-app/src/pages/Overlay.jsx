@@ -54,7 +54,8 @@ function useOverlayPoll(shareToken) {
         // Normalise keys
         // Push custom map images to the maps module for overlay rendering
         if (json.design?.mapImages) {
-          import('@/lib/maps').then(m => m.setCustomMapImages(json.design.mapImages));
+          // maps.js is already statically imported — call directly, no dynamic import needed
+          import('@/lib/maps').then(({ setCustomMapImages }) => setCustomMapImages(json.design.mapImages)).catch(() => {});
         }
         setData({
           tournament:   json.tournament    ?? null,
@@ -1126,9 +1127,6 @@ function OverlayLoading() {
   );
 }
 
-/* ══════════════════════════════════════════════════
-   MAIN EXPORT
-══════════════════════════════════════════════════ */
 /* ══════════════════════════════════════════════════
    HELPER: SCREEN BACKGROUND (custom bg image or animated gradient)
 ══════════════════════════════════════════════════ */
