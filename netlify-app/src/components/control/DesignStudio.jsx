@@ -20,7 +20,8 @@ import { getPins, setPins } from '@/lib/auth';
 import toast from 'react-hot-toast';
 import {
   Paintbrush, Check, Layers, Type, Eye, Mic2,
-  Lock, RefreshCw, Save, RotateCcw, Map
+  Lock, RefreshCw, Save, RotateCcw, Map,
+  Image, FolderOpen
 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import { MAPS } from '@/lib/maps';
@@ -54,7 +55,10 @@ const DEFAULT_DESIGN = {
   tournamentName:'FF OFFICIAL', tournamentSubtitle:'GRAND FINALS',
   gameLabel:'MATCH', logoUrl:'', overlayStyle:'ff_classic', fontStyle:'orbitron',
   sponsorLogoUrl:'',
-  mapImages:{},  // custom map images — overrides defaults
+  mapImages:{},
+  backgrounds: { standings: '', champion: '', teams: '', scoreboard: '' },
+  teamLogos: {},
+  playerPhotos: {},  // custom map images — overrides defaults
   casters:[
     { name:'CASTER 1', handle:'@handle', role:'PLAY-BY-PLAY' },
     { name:'CASTER 2', handle:'@handle', role:'COLOR CASTER' },
@@ -89,7 +93,150 @@ function ColorPicker({ label, value, onChange }) {
   );
 }
 
-export default function DesignStudio({ onAction }) {
+
+function BackgroundsSection({ design, upd }) {
+  const [activeTab, setActiveTab] = useState("STANDINGS");
+  const bg = design.backgrounds || { standings: "", champion: "", teams: "", scoreboard: "" };
+
+  const tabs = [
+    { key: "standings", label: "FULL STANDINGS" },
+    { key: "champion", label: "CHAMPION" },
+    { key: "teams", label: "TEAMS TODAY" },
+    { key: "scoreboard", label: "SCOREBOARD" },
+  ];
+
+  return (
+    <div className="space-y-4">
+      {/* Small tab-bar */}
+      <div className="flex border-b border-white/5 pb-1 gap-1 overflow-x-auto">
+        {tabs.map(t => (
+          <button
+            key={t.key}
+            type="button"
+            onClick={() => setActiveTab(t.key.toUpperCase())}
+            className={`px-3 py-1.5 text-[10px] font-orbitron font-bold tracking-wider rounded-lg transition-all ${
+              activeTab === t.key.toUpperCase()
+                ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
+                : "text-gray-400 hover:text-white hover:bg-white/5 border border-transparent"
+            }`}
+          >
+            {t.label}
+          </button>
+        ))}
+      </div>
+
+      {/* Tab content */}
+      {tabs.map(t => {
+        if (activeTab !== t.key.toUpperCase()) return null;
+        const url = bg[t.key] || "";
+        return (
+          <div key={t.key} className="space-y-3">
+            <ImageUpload
+              value={url}
+              onChange={(newUrl) => upd("backgrounds", { ...bg, [t.key]: newUrl })}
+              label={`${t.label} BACKGROUND`}
+              name={`bg-${t.key}`}
+              size="md"
+            />
+            <p className="text-[10px] text-gray-500 leading-normal">
+              Replaces the default animated gradient background for this screen. Upload 1920×1080 PNG/JPG.
+            </p>
+            {url && (
+              <button
+                type="button"
+                onClick={() => upd("backgrounds", { ...bg, [t.key]: "" })}
+                className="rounded px-2.5 py-1 text-[9px] font-orbitron font-black bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white transition-all tracking-wider"
+              >
+                CLEAR
+              </button>
+            )}
+          </div>
+        );
+      })}
+    </div>
+  );
+}
+
+function ImageManagementSection({ design, upd, teams, players }) {
+  return (
+    <div className="space-y-6">
+      {/* TOURNAMENT LOGO */}
+      <div className="rounded-xl border border-white/8 bg-black/20 p-3">
+        <ImageUpload
+          value={design.logoUrl || ""}
+          onChange={(url) => upd("logoUrl", url)}
+          label="TOURNAMENT LOGO"
+          name="tournament-logo"
+          size="md"
+        />
+      </div>
+
+      {/* TEAM LOGOS */}
+      <div className="rounded-xl border border-white/8 bg-black/20 p-3">
+        <p className="font-orbitron text-[10px] font-black tracking-widest text-gray-400 uppercase mb-3 border-b border-white/5 pb-1.5">
+          TEAM LOGOS
+        </p>
+        <div className="max-h-[300px] overflow-y-auto space-y-3 pr-1 custom-scrollbar">
+          {teams.length === 0 ? (
+            <p className="text-[10px] text-gray-600 italic">No teams available. Note: Add teams prop to parent if missing.</p>
+          ) : (
+            teams.map(team => (
+              <div key={team.id} className="flex items-center justify-between gap-4 p-2 rounded-lg bg-white/2 hover:bg-white/5 transition-all">
+                <span className="font-orbitron text-xs font-bold text-white max-w-[150px] truncate">{team.name}</span>
+                <div className="w-[180px]">
+                  <ImageUpload
+                    value={(design.teamLogos || {})[team.id] || ""}
+                    onChange={(url) => upd("teamLogos", { ...(design.teamLogos || {}), [team.id]: url })}
+                    label=""
+                    name={`team-logo-${team.id}`}
+                    size="sm"
+                  />
+                </div>
+              </div>
+            ))
+          )}
+        </div>
+      </div>
+
+      {/* PLAYER PHOTOS */}
+      <div className="rounded-xl border border-white/8 bg-black/20 p-3">
+        <p className="font-orbitron text-[10px] font-black tracking-widest text-gray-400 uppercase mb-3 border-b border-white/5 pb-1.5">
+          PLAYER PHOTOS
+        </p>
+        <div className="max-h-[400px] overflow-y-auto space-y-3 pr-1 custom-scrollbar">
+          {players.length === 0 ? (
+            <p className="text-[10px] text-gray-600 italic">No players available. Note: Add players prop to parent if missing.</p>
+          ) : (
+            players.map(player => {
+              const team = teams.find(t => t.id === player.teamId || t.name === player.teamName);
+              const teamBadge = team ? team.name : player.teamName || "NO TEAM";
+              return (
+                <div key={player.id} className="flex items-center justify-between gap-4 p-2 rounded-lg bg-white/2 hover:bg-white/5 transition-all">
+                  <div className="flex flex-col gap-0.5 min-w-0 flex-1">
+                    <span className="font-orbitron text-xs font-bold text-white truncate">{player.name}</span>
+                    <span className="inline-block self-start text-[8px] font-black tracking-wider px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-400 uppercase font-orbitron">{teamBadge}</span>
+                  </div>
+                  <div className="w-[180px]">
+                    <ImageUpload
+                      value={(design.playerPhotos || {})[player.id] || ""}
+                      onChange={(url) => upd("playerPhotos", { ...(design.playerPhotos || {}), [player.id]: url })}
+                      label=""
+                      name={`player-photo-${player.id}`}
+                      size="sm"
+                    />
+                  </div>
+                </div>
+              );
+            })
+          )}
+        </div>
+      </div>
+    </div>
+  );
+}
+
+export default function DesignStudio(props) {
+  const { onAction, teams = [], players = [] } = props;
   const [design, setDesign] = useState(DEFAULT_DESIGN);
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -221,7 +368,18 @@ export default function DesignStudio({ onAction }) {
         </button>
       </Section>
 
-      {/* ── BRANDING ── */}
+      
+      {/* ── BACKGROUNDS ── */}
+      <Section title="BACKGROUNDS" icon={Image}>
+        <BackgroundsSection design={design} upd={upd} />
+      </Section>
+
+      {/* ── IMAGE MANAGEMENT ── */}
+      <Section title="IMAGE MANAGEMENT" icon={FolderOpen}>
+        <ImageManagementSection design={design} upd={upd} teams={teams} players={players} />
+      </Section>
+
+{/* ── BRANDING ── */}
       <Section title="BRANDING" icon={Eye}>
         <div className="space-y-3">
           {[

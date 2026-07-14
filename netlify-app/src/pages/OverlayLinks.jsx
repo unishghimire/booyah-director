@@ -1,13 +1,12 @@
 import React, { useState } from 'react';
 import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
-import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play } from 'lucide-react';
+import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import toast from 'react-hot-toast';
 
 export const OVERLAYS = [
   // Transparent overlays — sit on top of gameplay
   { id: 'scoreboard',    label: 'FF SCOREBOARD',    icon: Monitor,    transparent: true,  desc: 'Live ranked board during match' },
-  { id: 'killfeed',      label: 'KILL FEED',         icon: Crosshair,  transparent: true,  desc: 'Bottom-left live kill events' },
   { id: 'standings',     label: 'FULL STANDINGS',    icon: Layers,     transparent: true,  desc: 'Full tournament points table' },
   // Full-scene replacements — solid background
   { id: 'blank',         label: 'BLANK / IDLE',      icon: Shield,     transparent: false, desc: 'Black holding screen' },
@@ -16,6 +15,7 @@ export const OVERLAYS = [
   { id: 'champions',     label: 'BOOYAH! CHAMPION',  icon: Crown,      transparent: false, desc: 'Tournament winner reveal' },
   { id: 'maplabel',      label: 'MAP INTRO',         icon: Zap,        transparent: false, desc: 'Map name + teams pre-match' },
   { id: 'teams',         label: 'TEAMS TODAY',       icon: Layers,     transparent: false, desc: 'All competing teams display' },
+  { id: 'team_roster',   label: 'TEAM ROSTER',       icon: Users,      transparent: false, desc: 'Full team + player photo roster, auto-slides every 6s' },
 ];
 
 export function CopyBtn({ text, id, copied, onCopy }) {
@@ -157,8 +157,8 @@ export default function OverlayLinks() {
       {/* Solid Scene Overlays */}
       <div>
         <div className="flex items-center gap-2 mb-4">
-          <div className="h-1.5 w-1.5 bg-[#FF6B00] rounded-full animate-pulse" />
-          <span className="font-orbitron text-[10px] font-black text-[#FF6B00] tracking-widest">FULL SCENE — REPLACE ENTIRE SCREEN</span>
+          <div className="h-1.5 w-1.5 bg-[#00D4FF] rounded-full animate-pulse" />
+          <span className="font-orbitron text-[10px] font-black text-[#00D4FF] tracking-widest">FULL SCENE — USE SOLID BACKGROUND</span>
           <div className="h-px flex-1 bg-white/5" />
         </div>
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -168,19 +168,19 @@ export default function OverlayLinks() {
             return (
               <div
                 key={ov.id}
-                className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#FF6B00]/30 hover:shadow-[0_0_15px_rgba(255,107,0,0.05)] transition-all group"
+                className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#00D4FF]/30 hover:shadow-[0_0_15px_rgba(0,212,255,0.05)] transition-all group"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#FF6B00]/10 border border-[#FF6B00]/20 group-hover:bg-[#FF6B00]/20 transition-all">
-                      <Icon className="h-4 w-4 text-[#FF6B00]" />
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#00D4FF]/10 border border-[#00D4FF]/20 group-hover:bg-[#00D4FF]/20 transition-all">
+                      <Icon className="h-4 w-4 text-[#00D4FF]" />
                     </div>
                     <div>
                       <h3 className="font-orbitron text-xs font-black text-white tracking-wider">{ov.label}</h3>
                       <p className="text-[10px] text-gray-400 mt-0.5">{ov.desc}</p>
                     </div>
                   </div>
-                  <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#FF6B00]/80 truncate">
+                  <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#00D4FF]/80 truncate">
                     {url}
                   </div>
                 </div>
@@ -192,7 +192,7 @@ export default function OverlayLinks() {
                       href={url}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-[#FF6B00] hover:border-[#FF6B00]/30 transition-all"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-[#00D4FF] hover:border-[#00D4FF]/30 transition-all"
                       title="Open Link"
                     >
                       <ExternalLink className="h-4 w-4" />

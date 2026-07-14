@@ -13,12 +13,12 @@ const SCREENS = [
   { key: 'maplabel',          label: 'MAP INTRO',     icon: Map,          desc: 'Map reveal + team list',    group: 'scene' },
   { key: 'teams',             label: 'TEAMS TODAY',   icon: Users,        desc: 'All teams grid',            group: 'scene' },
   { key: 'casters',           label: 'CASTERS',       icon: Mic2,         desc: 'Caster introduction',       group: 'scene' },
+  { key: 'team_roster',       label: 'TEAM ROSTER',   icon: Users,        desc: 'Full team + player photo roster, auto-slides every 6s', group: 'scene' },
   { key: 'mvp',               label: 'MVP',           icon: Star,         desc: 'MVP spotlight screen',      group: 'scene' },
   { key: 'champions',         label: 'BOOYAH!',       icon: Trophy,       desc: 'Champions reveal',          group: 'scene' },
   // ── Transparent overlays (layer over gameplay) ──
   { key: 'scoreboard',        label: 'SCOREBOARD',    icon: LayoutList,   desc: 'Live scoreboard overlay',   group: 'overlay' },
   { key: 'standings',         label: 'STANDINGS',     icon: Trophy,       desc: 'Full tournament standings', group: 'overlay' },
-  { key: 'kill_feed',         label: 'KILL FEED',     icon: Crosshair,    desc: 'Live kill events',          group: 'overlay' },
   { key: 'elim_alert',        label: 'ELIM ALERT',    icon: AlertTriangle,desc: 'Last elimination popup',   group: 'overlay' },
 ];
 
