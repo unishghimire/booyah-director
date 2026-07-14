@@ -241,9 +241,6 @@ function TeamLogo({ team, size = 32 }) {
 /* ══════════════════════════════════════════════════
    SCREEN 1: BLANK
 ══════════════════════════════════════════════════ */
-function SetupBlank() {
-  return <div style={{ width:'100%', height:'100%', background:'transparent' }} />;
-}
 
 /* ══════════════════════════════════════════════════
    SCREEN 2: SCOREBOARD — FF INDICATOR STYLE
@@ -422,18 +419,30 @@ function FullStandings({ teams = [], design }) {
   const primary = tok.acc(design);
   const secondary = tok.acc2(design);
 
+  const tLogo2 = tok.logo(design);
+  const sponsorLogo2 = tok.sponsorLogo(design);
+  const bgUrl = design?.backgrounds?.standings || '';
+
   return (
-    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
-      <GamingBackground accent={primary} accent2={secondary} />
+    <ScreenBackground bgUrl={bgUrl} accent={primary} accent2={secondary}>
       <div style={{ position:'relative', zIndex:1, padding:'60px 80px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'center' }}>
         
         {/* Giant header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:24, borderBottom:`2px solid ${primary}`, paddingBottom:12 }}>
-          <div>
-            <div style={{ fontFamily:'Orbitron', fontSize:14, color:primary, letterSpacing:'0.4em', fontWeight:900 }}>LEADERBOARD</div>
-            <div style={{ fontFamily:'Orbitron', fontSize:42, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>OVERALL STANDINGS</div>
+          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+            {tLogo2 && <img src={tLogo2} alt="logo" style={{ height:52, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />}
+            <div>
+              <div style={{ fontFamily:'Orbitron', fontSize:14, color:primary, letterSpacing:'0.4em', fontWeight:900 }}>LEADERBOARD</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:42, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>OVERALL STANDINGS</div>
+            </div>
           </div>
-          <div style={{ textAlign:'right', fontFamily:'Orbitron' }}>
+          <div style={{ textAlign:'right', fontFamily:'Orbitron', display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6 }}>
+            {sponsorLogo2 && (
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:2 }}>
+                <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>SPONSORED BY</span>
+                <img src={sponsorLogo2} alt="sponsor" style={{ height:28, objectFit:'contain', opacity:0.85 }} onError={e=>e.target.style.display='none'} />
+              </div>
+            )}
             <div style={{ fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em' }}>{tok.name(design)}</div>
             <div style={{ fontSize:14, color:secondary, fontWeight:900, letterSpacing:'0.15em' }}>{tok.sub(design)}</div>
           </div>
@@ -479,7 +488,7 @@ function FullStandings({ teams = [], design }) {
           </FFPanel>
         </motion.div>
       </div>
-    </div>
+    </ScreenBackground>
   );
 }
 
@@ -708,10 +717,11 @@ function TeamsToday({ teams = [], design }) {
   const primary = tok.acc(design);
   const secondary = tok.acc2(design);
   const tLogo = tok.logo(design);
+  const sponsorLogo = tok.sponsorLogo(design);
+  const bgUrl = design?.backgrounds?.teams || '';
 
   return (
-    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
-      <GamingBackground accent={primary} accent2={secondary} />
+    <ScreenBackground bgUrl={bgUrl} accent={primary} accent2={secondary}>
       <div style={{ position:'relative', zIndex:1, padding:'60px 80px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
         {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
@@ -722,7 +732,15 @@ function TeamsToday({ teams = [], design }) {
               <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:700, color:secondary, letterSpacing:'0.3em', marginTop:4 }}>{tok.sub(design)}</div>
             </div>
           </div>
-          <Users style={{ color:primary }} size={36} />
+          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+            {sponsorLogo && (
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:3 }}>
+                <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>SPONSORED BY</span>
+                <img src={sponsorLogo} alt="sponsor" style={{ height:36, objectFit:'contain', opacity:0.9 }} onError={e=>e.target.style.display='none'} />
+              </div>
+            )}
+            <Users style={{ color:primary }} size={36} />
+          </div>
         </div>
 
         {/* Grid */}
@@ -748,7 +766,7 @@ function TeamsToday({ teams = [], design }) {
           LOBBY MATCH READY — <strong style={{ color:secondary }}>{displayTeams.length} CONTENDERS DETECTED</strong>
         </div>
       </div>
-    </div>
+    </ScreenBackground>
   );
 }
 
@@ -1007,8 +1025,8 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
   const totalKills   = winnerTeamObj?.total_tournament_kills || 0;
 
   return (
-    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
-      <GamingBackground accent={primary} accent2={secondary} />
+    <ScreenBackground bgUrl={design?.backgrounds?.champion||''} accent={primary} accent2={secondary}>
+      <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
       <style>{`
         @keyframes confettiFall{0%{transform:translateY(-60px) rotate(0deg);opacity:1}100%{transform:translateY(1120px) rotate(360deg);opacity:0}}
         @keyframes crownPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px #FFD700BB)}50%{transform:scale(1.1);filter:drop-shadow(0 0 45px #FFD700)}}
@@ -1074,13 +1092,22 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
           </FFPanel>
         </motion.div>
 
-        {tLogo && <img src={tLogo} alt="logo" style={{ height:44, objectFit:'contain', opacity:0.8, marginTop:8 }} onError={e=>e.target.style.display='none'} />}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8, marginTop:8 }}>
+          {tLogo && <img src={tLogo} alt="logo" style={{ height:44, objectFit:'contain', opacity:0.9 }} onError={e=>e.target.style.display='none'} />}
+          {tok.sponsorLogo(design) && (
+            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
+              <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>SPONSORED BY</span>
+              <img src={tok.sponsorLogo(design)} alt="sponsor" style={{ height:32, objectFit:'contain', opacity:0.85 }} onError={e=>e.target.style.display='none'} />
+            </div>
+          )}
+        </div>
 
         <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em', marginTop:12 }}>
           CONGRATULATIONS TO ALL TEAMS — {tok.name(design)}
         </span>
       </div>
-    </div>
+      </div>
+    </ScreenBackground>
   );
 }
 
@@ -1102,6 +1129,187 @@ function OverlayLoading() {
 /* ══════════════════════════════════════════════════
    MAIN EXPORT
 ══════════════════════════════════════════════════ */
+/* ══════════════════════════════════════════════════
+   HELPER: SCREEN BACKGROUND (custom bg image or animated gradient)
+══════════════════════════════════════════════════ */
+function ScreenBackground({ bgUrl, accent, accent2, children }) {
+  return (
+    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
+      {bgUrl ? (
+        <div style={{
+          position:'absolute', inset:0,
+          backgroundImage:`url(${bgUrl})`,
+          backgroundSize:'cover', backgroundPosition:'center',
+          filter:'brightness(0.45) saturate(1.1)',
+          zIndex:0,
+        }} />
+      ) : (
+        <GamingBackground accent={accent} accent2={accent2} />
+      )}
+      <div style={{ position:'relative', zIndex:1, width:'100%', height:'100%' }}>
+        {children}
+      </div>
+    </div>
+  );
+}
+
+/* ══════════════════════════════════════════════════
+   SCREEN: TEAM ROSTER (6 teams per slide, auto-cycles)
+══════════════════════════════════════════════════ */
+function TeamRosterCard({ team, primary, secondary, design }) {
+  const playerPhotos = design?.playerPhotos || {};
+  const teamLogoUrl  = design?.teamLogos?.[team.id] || team.logo_url || '';
+  const roster       = team.roster || [];
+
+  return (
+    <div style={{
+      borderRadius:16,
+      border:`1px solid ${primary}33`,
+      background:'rgba(0,0,0,0.58)',
+      backdropFilter:'blur(14px)',
+      display:'flex', flexDirection:'column',
+      overflow:'hidden',
+      boxShadow:`0 0 30px rgba(0,0,0,0.5), inset 0 1px 0 rgba(255,255,255,0.05)`,
+    }}>
+      {/* Team header */}
+      <div style={{ display:'flex', alignItems:'center', gap:12, padding:'14px 18px', borderBottom:`1px solid ${primary}22`, background:`${primary}0a` }}>
+        <div style={{ width:40, height:40, borderRadius:'50%', border:`2px solid ${primary}66`, overflow:'hidden', flexShrink:0, background:'rgba(0,0,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+          {teamLogoUrl ? (
+            <img src={teamLogoUrl} alt={team.name} style={{ width:'100%', height:'100%', objectFit:'cover' }} onError={e=>e.target.style.display='none'} />
+          ) : (
+            <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:primary }}>{(team.name||'T').charAt(0)}</span>
+          )}
+        </div>
+        <div style={{ flex:1, minWidth:0 }}>
+          <div style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:'#fff', textTransform:'uppercase', letterSpacing:'0.08em', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>{team.name||'TEAM'}</div>
+          <div style={{ fontFamily:'Orbitron', fontSize:8, color:secondary, letterSpacing:'0.2em', marginTop:2 }}>{roster.length} PLAYERS</div>
+        </div>
+      </div>
+      {/* Player 2×2 photo grid */}
+      <div style={{ display:'grid', gridTemplateColumns:'1fr 1fr', gap:6, padding:12, flex:1 }}>
+        {[0,1,2,3].map(i => {
+          const player   = roster[i];
+          const photoUrl = player ? (playerPhotos[player.id] || player.photo_url || '') : '';
+          return (
+            <div key={i} style={{
+              borderRadius:10, overflow:'hidden',
+              background: player ? `${primary}0d` : 'rgba(255,255,255,0.02)',
+              border:`1px solid ${player ? primary+'33' : 'rgba(255,255,255,0.04)'}`,
+              aspectRatio:'1/1',
+              display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center',
+              position:'relative',
+            }}>
+              {player ? (
+                <>
+                  {photoUrl && (
+                    <img src={photoUrl} alt={player.name}
+                      style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }}
+                      onError={e=>{ e.target.style.display='none'; }}
+                    />
+                  )}
+                  <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'4px 6px', background:'linear-gradient(transparent,rgba(0,0,0,0.88))', display:'flex', flexDirection:'column', alignItems:'center' }}>
+                    <span style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:'#fff', textTransform:'uppercase', letterSpacing:'0.05em', textAlign:'center', lineHeight:1.2 }}>{player.name||'PLAYER'}</span>
+                  </div>
+                  {!photoUrl && (
+                    <span style={{ fontFamily:'Orbitron', fontSize:20, fontWeight:900, color:`${primary}66`, zIndex:1 }}>{(player.name||'P').charAt(0)}</span>
+                  )}
+                </>
+              ) : (
+                <span style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.1)', letterSpacing:'0.1em' }}>SLOT {i+1}</span>
+              )}
+            </div>
+          );
+        })}
+      </div>
+    </div>
+  );
+}
+
+function TeamRosterScreen({ teams = [], players = [], design }) {
+  const primary   = tok.acc(design);
+  const secondary = tok.acc2(design);
+  const bgUrl     = design?.backgrounds?.teams || '';
+  const tLogo     = tok.logo(design);
+  const sponsorLogo = tok.sponsorLogo(design);
+
+  const enriched = useMemo(() => {
+    const teamsArr   = safeArray(teams);
+    const playersArr = safeArray(players);
+    return teamsArr.map(t => ({
+      ...t,
+      roster: playersArr.filter(p => p.team_id === t.id || p.teamId === t.id).slice(0, 4),
+    }));
+  }, [teams, players]);
+
+  const TEAMS_PER_SLIDE = 6;
+  const slides = [];
+  for (let i = 0; i < Math.max(enriched.length, 1); i += TEAMS_PER_SLIDE) {
+    slides.push(enriched.slice(i, i + TEAMS_PER_SLIDE));
+  }
+  if (slides.length === 0) slides.push([]);
+
+  const [slideIdx, setSlideIdx] = useState(0);
+  useEffect(() => {
+    if (slides.length <= 1) return;
+    const t = setInterval(() => setSlideIdx(i => (i + 1) % slides.length), 6000);
+    return () => clearInterval(t);
+  }, [slides.length]);
+
+  const currentSlide = slides[slideIdx] || [];
+
+  return (
+    <ScreenBackground bgUrl={bgUrl} accent={primary} accent2={secondary}>
+      <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column', padding:'48px 64px', boxSizing:'border-box' }}>
+        {/* Header */}
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:28 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+            {tLogo && <img src={tLogo} alt="logo" style={{ height:52, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />}
+            <div>
+              <div style={{ fontFamily:'Orbitron', fontSize:26, fontWeight:900, color:'#fff', letterSpacing:'0.12em', textTransform:'uppercase' }}>{tok.name(design)}</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:700, color:secondary, letterSpacing:'0.35em', marginTop:3 }}>TEAM ROSTER</div>
+            </div>
+          </div>
+          <div style={{ display:'flex', alignItems:'center', gap:20 }}>
+            {sponsorLogo && (
+              <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
+                <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>SPONSORED BY</span>
+                <img src={sponsorLogo} alt="sponsor" style={{ height:36, objectFit:'contain', opacity:0.9 }} onError={e=>e.target.style.display='none'} />
+              </div>
+            )}
+            {slides.length > 1 && (
+              <div style={{ display:'flex', gap:6 }}>
+                {slides.map((_, i) => (
+                  <div key={i} style={{ width:i===slideIdx?24:8, height:8, borderRadius:4, background:i===slideIdx?primary:'rgba(255,255,255,0.15)', transition:'all 0.4s' }} />
+                ))}
+              </div>
+            )}
+            <div style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:primary, letterSpacing:'0.15em', border:`1px solid ${primary}44`, padding:'6px 16px', borderRadius:6 }}>
+              {enriched.length} TEAMS
+            </div>
+          </div>
+        </div>
+        {/* Gradient divider */}
+        <div style={{ height:2, background:`linear-gradient(90deg,${primary},${secondary},transparent)`, marginBottom:28, borderRadius:2 }} />
+        {/* 3×2 team grid */}
+        <motion.div
+          key={slideIdx}
+          initial={{ opacity:0, y:20 }}
+          animate={{ opacity:1, y:0 }}
+          transition={{ duration:0.5 }}
+          style={{ display:'grid', gridTemplateColumns:'repeat(3,1fr)', gridTemplateRows:'repeat(2,1fr)', gap:20, flex:1 }}
+        >
+          {currentSlide.map((team, idx) => (
+            <TeamRosterCard key={team.id||idx} team={team} primary={primary} secondary={secondary} design={design} />
+          ))}
+          {Array.from({ length: Math.max(0, TEAMS_PER_SLIDE - currentSlide.length) }).map((_, i) => (
+            <div key={`empty-${i}`} style={{ borderRadius:16, border:'1px solid rgba(255,255,255,0.04)', background:'rgba(255,255,255,0.01)' }} />
+          ))}
+        </motion.div>
+      </div>
+    </ScreenBackground>
+  );
+}
+
 export default function Overlay() {
   const { screen }         = useParams();
   const [searchParams]     = useSearchParams();
@@ -1127,14 +1335,10 @@ export default function Overlay() {
   if (!ready) return <div style={{ width:1920, height:1080, position:'relative', overflow:'hidden' }}><OverlayLoading /></div>;
 
   const screens = {
-    blank:           <SetupBlank />,
-    setup_blank:     <SetupBlank />,
     scoreboard:      <FFBoard       teams={teams} players={players} currentMatch={currentMatch} design={design} />,
     ff_scoreboard:   <FFBoard       teams={teams} players={players} currentMatch={currentMatch} design={design} />,
     standings:       <FullStandings teams={teams} design={design} />,
     full_standings:  <FullStandings teams={teams} design={design} />,
-    killfeed:        <KillFeedScreen killFeed={killFeed} design={design} />,
-    kill_feed:       <KillFeedScreen killFeed={killFeed} design={design} />,
     maplabel:        <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
     map_label:       <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
     'today-matches': <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />,
@@ -1155,9 +1359,11 @@ export default function Overlay() {
     champions:       <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
     champion:        <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
     booyah:          <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
+    team_roster:     <TeamRosterScreen teams={teams} players={players} design={design} />,
+    teamroster:      <TeamRosterScreen teams={teams} players={players} design={design} />,
   };
 
-  const component = screens[screen] ?? screens[screen?.replace(/-/g,'_')] ?? <SetupBlank />;
+  const component = screens[screen] ?? screens[screen?.replace(/-/g,'_')] ?? null;
 
   return (
     <div style={{ width:1920, height:1080, position:'relative', overflow:'hidden', background:'transparent' }}>

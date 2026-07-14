@@ -9,7 +9,6 @@ import toast from 'react-hot-toast';
 
 const SCREENS = [
   // ── Full-scene replacements (solid background) ──
-  { key: 'setup_blank',       label: 'STANDBY',      icon: Monitor,      desc: 'Black hold screen',         group: 'scene' },
   { key: 'maplabel',          label: 'MAP INTRO',     icon: Map,          desc: 'Map reveal + team list',    group: 'scene' },
   { key: 'teams',             label: 'TEAMS TODAY',   icon: Users,        desc: 'All teams grid',            group: 'scene' },
   { key: 'casters',           label: 'CASTERS',       icon: Mic2,         desc: 'Caster introduction',       group: 'scene' },

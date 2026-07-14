@@ -9,7 +9,6 @@ export const OVERLAYS = [
   { id: 'scoreboard',    label: 'FF SCOREBOARD',    icon: Monitor,    transparent: true,  desc: 'Live ranked board during match' },
   { id: 'standings',     label: 'FULL STANDINGS',    icon: Layers,     transparent: true,  desc: 'Full tournament points table' },
   // Full-scene replacements — solid background
-  { id: 'blank',         label: 'BLANK / IDLE',      icon: Shield,     transparent: false, desc: 'Black holding screen' },
   { id: 'casters',       label: 'CASTERS',           icon: Mic2,       transparent: false, desc: 'Caster & analyst profiles' },
   { id: 'mvp',           label: 'MVP REVEAL',        icon: Star,       transparent: false, desc: 'Match MVP player full-screen' },
   { id: 'champions',     label: 'BOOYAH! CHAMPION',  icon: Crown,      transparent: false, desc: 'Tournament winner reveal' },
