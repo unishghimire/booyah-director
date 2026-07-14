@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, CreditCard, Tag, Settings, Zap, Bell } from 'lucide-react';
+import { LayoutDashboard, Users, CreditCard, Tag, Settings, Zap, Bell, Receipt } from 'lucide-react';
 import { adminFetch } from '../pages/Dashboard';
 
 const nav = [
@@ -9,14 +9,20 @@ const nav = [
   { to: '/subscriptions', icon: CreditCard,      label: 'SUBSCRIPTIONS', badge: 'pendingRequests' },
   { to: '/promo-codes',   icon: Tag,             label: 'PROMO CODES' },
   { to: '/settings',      icon: Settings,        label: 'SETTINGS' },
+  { to: '/payment-requests', icon: Receipt,        label: 'PAYMENTS', badge: 'pendingPayments' },
 ];
 
 export default function Sidebar() {
   const [pendingCount, setPendingCount] = useState(0);
+  const [pendingPaymentsCount, setPendingPaymentsCount] = useState(0);
 
   useEffect(() => {
     const fetchPending = () => {
       adminFetch('stats').then(d => setPendingCount(d.pendingRequests || 0)).catch(() => {});
+      adminFetch('payment-requests').then(d => {
+        const pending = (d.requests || []).filter(r => r.status === 'pending' || !r.status);
+        setPendingPaymentsCount(pending.length);
+      }).catch(() => {});
     };
     fetchPending();
     const t = setInterval(fetchPending, 30000); // poll every 30s
@@ -39,7 +45,7 @@ export default function Sidebar() {
       {/* Nav */}
       <nav className="flex-1 p-3 space-y-0.5">
         {nav.map(({ to, icon: Icon, label, badge }) => {
-          const badgeCount = badge === 'pendingRequests' ? pendingCount : 0;
+          const badgeCount = badge === 'pendingRequests' ? pendingCount : (badge === 'pendingPayments' ? pendingPaymentsCount : 0);
           return (
             <NavLink key={to} to={to} className={({ isActive }) =>
               `flex items-center justify-between gap-3 px-3 py-2.5 rounded-lg transition-all group ${

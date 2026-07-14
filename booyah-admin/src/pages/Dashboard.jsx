@@ -20,8 +20,18 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null);
   const [loading, setLoading] = useState(true);
 
+  const [pendingPaymentsCount, setPendingPaymentsCount] = useState(0);
+
   useEffect(() => {
-    adminFetch('stats').then(d => { setStats(d); setLoading(false); }).catch(() => setLoading(false));
+    Promise.all([
+      adminFetch('stats'),
+      adminFetch('payment-requests')
+    ]).then(([sData, pData]) => {
+      setStats(sData);
+      const pending = (pData.requests || []).filter(r => r.status === 'pending' || !r.status);
+      setPendingPaymentsCount(pending.length);
+      setLoading(false);
+    }).catch(() => setLoading(false));
   }, []);
 
   return (
@@ -54,6 +64,23 @@ export default function Dashboard() {
             </div>
           </div>
           <a href="/subscriptions" className="px-4 py-2 rounded-lg font-orbitron text-[9px] font-black text-black" style={{ background: 'linear-gradient(135deg, #FF6B00, #ff8c00)' }}>
+            REVIEW NOW →
+          </a>
+        </div>
+      )}
+
+      {pendingPaymentsCount > 0 && (
+        <div className="mb-4 rounded-xl border border-[#00D4FF]/40 bg-[#00D4FF]/8 p-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <div className="w-2 h-2 rounded-full bg-[#00D4FF] animate-pulse" />
+            <div>
+              <p className="font-orbitron text-[10px] font-black text-[#00D4FF] tracking-wider">
+                {pendingPaymentsCount} PENDING PAYMENT REQUEST{pendingPaymentsCount > 1 ? 'S' : ''}
+              </p>
+              <p className="font-orbitron text-[8px] text-gray-500 mt-0.5">Users have submitted transaction proof — review in Payment Requests</p>
+            </div>
+          </div>
+          <a href="/payment-requests" className="px-4 py-2 rounded-lg font-orbitron text-[9px] font-black text-black" style={{ background: 'linear-gradient(135deg, #00D4FF, #00b8e6)' }}>
             REVIEW NOW →
           </a>
         </div>

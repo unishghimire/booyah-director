@@ -437,6 +437,31 @@ module.exports = async (req, res) => {
         return err(res, 405, 'Method not allowed');
       }
 
+      case 'clear-payments': {
+        if (req.method !== 'POST') return err(res, 405, 'Method not allowed');
+        await dbSet('/booyah_admin/payment_requests', null);
+        return ok(res, { success:true });
+      }
+
+      case 'export-users': {
+        if (req.method !== 'GET') return err(res, 405, 'Method not allowed');
+        const u = (await dbGet('/booyah_admin/users')) || {};
+        return ok(res, { users: Object.values(u), exportedAt: new Date().toISOString() });
+      }
+
+      case 'list-admins': {
+        const admins = (await dbGet('/booyah_admin/admins')) || {};
+        return ok(res, { admins: Object.values(admins) });
+      }
+
+      case 'revoke-admin': {
+        const { uid: revokeUid } = body;
+        if (!revokeUid) return err(res, 400, 'uid required');
+        if (revokeUid === admin.uid) return err(res, 400, 'Cannot revoke your own access');
+        await dbDelete(`/booyah_admin/admins/${revokeUid}`);
+        return ok(res, { success:true });
+      }
+
       case 'subscription-requests': {
         if (req.method !== 'GET') return err(res, 405, 'Method not allowed');
         const reqs = (await dbGet('/booyah_admin/subscription_requests')) || {};
