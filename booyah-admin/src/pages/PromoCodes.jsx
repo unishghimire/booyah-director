@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Plus, Trash2, ToggleLeft, ToggleRight, Tag, RefreshCw } from 'lucide-react';
+import { Plus, Trash2, ToggleLeft, ToggleRight, Tag, RefreshCw, Copy } from 'lucide-react';
 import Modal from '../components/Modal';
 import { adminFetch } from './Dashboard';
 import toast from 'react-hot-toast';
@@ -35,6 +35,7 @@ export default function PromoCodes() {
   const toggle = async (code, active) => {
     try {
       await adminFetch('toggle-promo', { method: 'POST', body: JSON.stringify({ code, active }) });
+      toast.success(`Promo code ${active ? 'activated' : 'deactivated'}`);
       load();
     } catch (e) { toast.error(e.message); }
   };
@@ -46,6 +47,11 @@ export default function PromoCodes() {
       toast.success('Deleted');
       load();
     } catch (e) { toast.error(e.message); }
+  };
+
+  const copyToClipboard = (text) => {
+    navigator.clipboard.writeText(text);
+    toast.success(`Copied: ${text}`);
   };
 
   const togglePlan = (plan) => {
@@ -75,8 +81,8 @@ export default function PromoCodes() {
       </div>
 
       <div className="rounded-xl border border-white/5 bg-[#0a0e1a] overflow-hidden">
-        <div className="grid grid-cols-[140px_1fr_120px_100px_100px_100px] text-[9px] font-orbitron font-black text-gray-500 tracking-widest px-4 py-3 border-b border-white/5">
-          <div>CODE</div><div>DESCRIPTION</div><div>DISCOUNT</div><div>USES</div><div>STATUS</div><div>ACTIONS</div>
+        <div className="grid grid-cols-[140px_1fr_120px_100px_120px_100px_120px] text-[9px] font-orbitron font-black text-gray-500 tracking-widest px-4 py-3 border-b border-white/5">
+          <div>CODE</div><div>DESCRIPTION</div><div>DISCOUNT</div><div>USES</div><div>EXPIRY</div><div>STATUS</div><div>ACTIONS</div>
         </div>
         {loading ? (
           <div className="flex items-center justify-center h-24">
@@ -85,7 +91,7 @@ export default function PromoCodes() {
         ) : codes.length === 0 ? (
           <div className="text-center py-10 font-orbitron text-[10px] text-gray-600">NO PROMO CODES YET</div>
         ) : codes.map(c => (
-          <div key={c.id} className="grid grid-cols-[140px_1fr_120px_100px_100px_100px] items-center px-4 py-3 border-b border-white/3">
+          <div key={c.id} className="grid grid-cols-[140px_1fr_120px_100px_120px_100px_120px] items-center px-4 py-3 border-b border-white/3">
             <div className="font-orbitron text-[11px] font-black text-[#FF6B00]">{c.code}</div>
             <div className="font-mono text-[9px] text-gray-400 truncate">{c.description || '—'}</div>
             <div className="font-orbitron text-[10px] text-[#22c55e]">
@@ -93,6 +99,9 @@ export default function PromoCodes() {
               {c.discountAmount > 0 ? `-NPR${c.discountAmount}` : ''}
             </div>
             <div className="font-orbitron text-[10px] text-gray-400">{c.usedCount}/{c.maxUses}</div>
+            <div className="font-mono text-[10px] text-gray-400">
+              {c.expiresAt ? new Date(c.expiresAt).toLocaleDateString() : '—'}
+            </div>
             <div>
               <button onClick={() => toggle(c.code, !c.active)}>
                 {c.active
@@ -100,7 +109,10 @@ export default function PromoCodes() {
                   : <ToggleLeft className="w-5 h-5 text-gray-600" />}
               </button>
             </div>
-            <div>
+            <div className="flex gap-2">
+              <button onClick={() => copyToClipboard(c.code)} className="p-1.5 rounded border border-gray-500/30 text-gray-400 hover:bg-gray-500/10 transition-all font-orbitron text-[8px] font-bold flex items-center gap-1" title="Copy Promo Code">
+                <Copy className="w-3 h-3" /> COPY CODE
+              </button>
               <button onClick={() => del(c.code)} className="p-1.5 rounded border border-red-500/30 text-red-400 hover:bg-red-500/10 transition-all">
                 <Trash2 className="w-3 h-3" />
               </button>

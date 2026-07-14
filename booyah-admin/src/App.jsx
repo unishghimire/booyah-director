@@ -8,6 +8,7 @@ import Users from './pages/Users';
 import Subscriptions from './pages/Subscriptions';
 import PromoCodes from './pages/PromoCodes';
 import Settings from './pages/Settings';
+import PaymentRequests from './pages/PaymentRequests';
 import Bootstrap from './pages/Bootstrap';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
@@ -85,6 +86,7 @@ export default function App() {
             <Route path="/subscriptions" element={<Subscriptions />} />
             <Route path="/promo-codes"   element={<PromoCodes />} />
             <Route path="/settings"      element={<Settings />} />
+            <Route path="/payment-requests" element={<PaymentRequests />} />
             <Route path="/bootstrap"     element={<Bootstrap />} />
             <Route path="*"              element={<Navigate to="/dashboard" replace />} />
           </Routes>
