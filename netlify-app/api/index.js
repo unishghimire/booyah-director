@@ -340,7 +340,7 @@ module.exports = async (req, res) => {
     if (req.method === 'OPTIONS') return res.status(200).end();
 
     // Rate Limiting
-    const ip = req.headers['x-nf-client-connection-ip'] || req.headers['x-forwarded-for'] || req.socket.remoteAddress || 'unknown';
+    const ip = req.headers['x-nf-client-connection-ip'] || req.headers['x-forwarded-for'] || (req.socket && req.socket.remoteAddress) || 'unknown';
     if (!rateLimit(ip)) {
       return res.status(429).json({ error: 'Too many requests. Please try again later.' });
     }
@@ -569,7 +569,7 @@ module.exports = async (req, res) => {
     if (route === 'getShareToken') {
       const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
       const secret = process.env.FIREBASE_DATABASE_SECRET;
-      if (!secret || !dbBaseUrl) return err(500, 'Database credentials missing');
+      if (!secret || !dbBaseUrl) return ok({ token: null, shareToken: null, error: 'Database not configured' });
 
       try {
         // Read current shareToken for this user
@@ -597,7 +597,7 @@ module.exports = async (req, res) => {
     if (route === 'generateShareToken') {
       const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
       const secret = process.env.FIREBASE_DATABASE_SECRET;
-      if (!secret || !dbBaseUrl) return err(500, 'Database credentials missing');
+      if (!secret || !dbBaseUrl) return ok({ token: null, shareToken: null, error: 'Database not configured' });
 
       try {
         const token = genId() + genId();
