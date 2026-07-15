@@ -92,6 +92,155 @@ function useOverlayPoll(shareToken) {
 }
 
 /* ══════════════════════════════════════════════════
+   THEME SYSTEM — 4 design layouts
+   Switch via design.overlayStyle:
+     'default'  — Orange/Cyan dual-border glass (original)
+     'neon'     — Neon green/purple cyber grid
+     'military' — Olive/khaki tactical HUD
+     'minimal'  — Clean white-on-dark editorial
+     'retro'    — Red/gold arcade CRT scanline
+══════════════════════════════════════════════════ */
+
+// ── Theme token resolver
+function getTheme(design) {
+  const style = design?.overlayStyle || 'default';
+  const userAcc  = design?.accentColor  || null;
+  const userAcc2 = design?.accentColor2 || null;
+
+  const presets = {
+    default:  { p:'#FF6B00', s:'#00D4FF', bg:'rgba(6,9,18,0.88)',  border:'rgba(255,107,0,0.30)',  headerBg:'rgba(0,0,0,0.85)',       rowEven:'rgba(255,255,255,0.01)', shine:'rgba(255,107,0,0.12)',  cornerStyle:'dual',     gridOpacity:0.06, scanlines:false, glow:true  },
+    neon:     { p:'#00FF88', s:'#BF00FF', bg:'rgba(2,4,12,0.92)',   border:'rgba(0,255,136,0.35)',  headerBg:'rgba(0,0,0,0.90)',       rowEven:'rgba(0,255,136,0.02)',  shine:'rgba(0,255,136,0.10)', cornerStyle:'glow',     gridOpacity:0.10, scanlines:false, glow:true  },
+    military: { p:'#9ABF30', s:'#C8A850', bg:'rgba(8,12,6,0.92)',   border:'rgba(154,191,48,0.28)', headerBg:'rgba(5,8,3,0.90)',       rowEven:'rgba(154,191,48,0.02)', shine:'rgba(154,191,48,0.08)',cornerStyle:'tick',     gridOpacity:0.04, scanlines:false, glow:false },
+    minimal:  { p:'#FFFFFF', s:'#888888', bg:'rgba(10,10,12,0.94)', border:'rgba(255,255,255,0.12)',headerBg:'rgba(255,255,255,0.04)', rowEven:'rgba(255,255,255,0.02)',shine:'rgba(255,255,255,0.06)',cornerStyle:'none',     gridOpacity:0.00, scanlines:false, glow:false },
+    retro:    { p:'#FF3030', s:'#FFD700', bg:'rgba(6,2,2,0.92)',    border:'rgba(255,48,48,0.35)',  headerBg:'rgba(0,0,0,0.88)',       rowEven:'rgba(255,48,48,0.02)',  shine:'rgba(255,48,48,0.10)', cornerStyle:'rect',     gridOpacity:0.08, scanlines:true,  glow:true  },
+  };
+
+  const t = { ...(presets[style] || presets.default) };
+  if (userAcc  && style === 'default') t.p = userAcc;
+  if (userAcc2 && style === 'default') t.s = userAcc2;
+  return t;
+}
+
+// ── Themed Panel ─────────────────────────────
+function ThemedPanel({ children, style: extraStyle, design }) {
+  const t = getTheme(design);
+
+  const corners = () => {
+    if (t.cornerStyle === 'none') return null;
+    if (t.cornerStyle === 'dual') return (
+      <>
+        <div style={{ position:'absolute', top:0, left:0, width:14, height:14, borderTop:`3px solid ${t.p}`, borderLeft:`3px solid ${t.p}`, borderRadius:'4px 0 0 0', zIndex:10 }} />
+        <div style={{ position:'absolute', top:0, right:0, width:14, height:14, borderTop:`3px solid ${t.s}`, borderRight:`3px solid ${t.s}`, borderRadius:'0 4px 0 0', zIndex:10 }} />
+        <div style={{ position:'absolute', bottom:0, left:0, width:14, height:14, borderBottom:`3px solid ${t.s}`, borderLeft:`3px solid ${t.s}`, borderRadius:'0 0 0 4px', zIndex:10 }} />
+        <div style={{ position:'absolute', bottom:0, right:0, width:14, height:14, borderBottom:`3px solid ${t.p}`, borderRight:`3px solid ${t.p}`, borderRadius:'0 0 4px 0', zIndex:10 }} />
+      </>
+    );
+    if (t.cornerStyle === 'glow') return (
+      <>
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${t.p},${t.s},${t.p},transparent)`, boxShadow:`0 0 12px ${t.p}` }} />
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${t.p}55,transparent)` }} />
+      </>
+    );
+    if (t.cornerStyle === 'tick') return (
+      <>
+        <div style={{ position:'absolute', top:0, left:0, width:20, height:3, background:t.p }} />
+        <div style={{ position:'absolute', top:0, left:0, width:3, height:20, background:t.p }} />
+        <div style={{ position:'absolute', bottom:0, right:0, width:20, height:3, background:t.s }} />
+        <div style={{ position:'absolute', bottom:0, right:0, width:3, height:20, background:t.s }} />
+      </>
+    );
+    if (t.cornerStyle === 'rect') return (
+      <>
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:t.p, boxShadow:`0 0 8px ${t.p}` }} />
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, height:3, background:t.s, boxShadow:`0 0 8px ${t.s}` }} />
+      </>
+    );
+    return null;
+  };
+
+  return (
+    <div style={{
+      background: t.bg,
+      backdropFilter:'blur(14px) saturate(160%)',
+      border:`1px solid ${t.border}`,
+      borderRadius: t.cornerStyle === 'none' ? 2 : 8,
+      boxShadow: t.glow
+        ? `0 12px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)`
+        : `0 8px 32px rgba(0,0,0,0.6)`,
+      position:'relative', overflow:'hidden', display:'flex', flexDirection:'column',
+      ...extraStyle,
+    }}>
+      {t.scanlines && (
+        <div style={{ position:'absolute', inset:0, zIndex:0, pointerEvents:'none', backgroundImage:'repeating-linear-gradient(0deg,transparent,transparent 2px,rgba(0,0,0,0.15) 2px,rgba(0,0,0,0.15) 4px)' }} />
+      )}
+      {corners()}
+      {children}
+    </div>
+  );
+}
+
+// ── Themed Background ────────────────────────
+function ThemedBackground({ design, mapName, children }) {
+  const t = getTheme(design);
+  const style = design?.overlayStyle || 'default';
+  const mapImages = getMapImages();
+  const mapImg = mapName ? (mapImages?.[mapName] || null) : null;
+
+  const grids = {
+    default:  { img:`linear-gradient(${t.p}08 1px,transparent 1px),linear-gradient(90deg,${t.p}08 1px,transparent 1px)`, sz:'80px 80px' },
+    neon:     { img:`linear-gradient(${t.p}12 1px,transparent 1px),linear-gradient(90deg,${t.p}12 1px,transparent 1px)`, sz:'60px 60px' },
+    military: { img:`repeating-linear-gradient(0deg,${t.p}06 0,${t.p}06 1px,transparent 1px,transparent 20px),repeating-linear-gradient(90deg,${t.p}06 0,${t.p}06 1px,transparent 1px,transparent 20px)`, sz:'20px 20px' },
+    minimal:  { img:`linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px)`, sz:'120px 120px' },
+    retro:    { img:`repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,48,48,0.04) 3px,rgba(255,48,48,0.04) 4px)`, sz:'4px 4px' },
+  };
+  const g = grids[style] || grids.default;
+
+  return (
+    <div style={{ position:'absolute', inset:0, overflow:'hidden' }}>
+      <div style={{ position:'absolute', inset:0, background:design?.bgColor || '#060912' }} />
+      {mapImg && <div style={{ position:'absolute', inset:0, backgroundImage:`url(${mapImg})`, backgroundSize:'cover', backgroundPosition:'center', opacity:style==='minimal'?0.05:0.12, filter:'blur(8px) saturate(0.6)' }} />}
+      <div style={{ position:'absolute', inset:0, backgroundImage:g.img, backgroundSize:g.sz }} />
+      <div style={{ position:'absolute', inset:0, background:`radial-gradient(ellipse 1400px 900px at 50% 40%,${t.p}20,transparent 70%)` }} />
+      <div style={{ position:'absolute', inset:0, background:`radial-gradient(ellipse 700px 700px at 85% 80%,${t.s}15,transparent 60%)` }} />
+      <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:`linear-gradient(90deg,transparent,${t.p},${t.s},${t.p},transparent)`, boxShadow:t.glow?`0 0 12px ${t.p}88`:'' }} />
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${t.p}88,transparent)` }} />
+      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 120% 120% at 50% 50%,transparent 25%,rgba(4,5,14,0.9) 100%)' }} />
+      {t.scanlines && <div style={{ position:'absolute', inset:0, pointerEvents:'none', backgroundImage:'repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(0,0,0,0.12) 3px,rgba(0,0,0,0.12) 4px)' }} />}
+      <div style={{ position:'relative', zIndex:1, width:'100%', height:'100%' }}>{children}</div>
+    </div>
+  );
+}
+
+// ── Themed Header Bar ────────────────────────
+function ThemedHeader({ design, center, rightText }) {
+  const t = getTheme(design);
+  const tLogo = tok.logo(design);
+  const sponsorLogo = tok.sponsorLogo(design);
+  return (
+    <div style={{ height:52, background:t.headerBg, borderBottom:`1px solid ${t.border}`, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'0 24px', flexShrink:0, zIndex:2 }}>
+      <div style={{ display:'flex', alignItems:'center', gap:10 }}>
+        {tLogo ? (
+          <img src={tLogo} alt="logo" style={{ width:28, height:28, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+        ) : (
+          <div style={{ width:24, height:24, borderRadius:4, background:`${t.p}22`, border:`1px solid ${t.p}66`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <span style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:900, color:t.p }}>B</span>
+          </div>
+        )}
+        <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>{tok.name(design).split(' ')[0]}</span>
+      </div>
+      <span style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:t.p, letterSpacing:'0.25em', textShadow:t.glow?`0 0 20px ${t.p}`:'none' }}>
+        {center || 'LIVE OVERLAY'}
+      </span>
+      <div style={{ display:'flex', alignItems:'center', gap:12 }}>
+        {sponsorLogo && <img src={sponsorLogo} alt="sponsor" style={{ height:20, objectFit:'contain', opacity:0.75 }} onError={e=>e.target.style.display='none'} />}
+        <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:t.s, letterSpacing:'0.15em' }}>{rightText || tok.sub(design)}</span>
+      </div>
+    </div>
+  );
+}
+
+
+/* ══════════════════════════════════════════════════
    BACKGROUND — atmospheric gaming backdrop
 ══════════════════════════════════════════════════ */
 function GamingBackground({ mapName, accent = '#FF6B00', accent2 = '#00D4FF' }) {
@@ -178,8 +327,9 @@ function FFPanel({ children, style }) {
 
 function FFPanelHeader({ design, center }) {
   const tLogo = tok.logo(design);
-  const primary = tok.acc(design);
-  const secondary = tok.acc2(design);
+  const t = getTheme(design);
+  const primary = t.p;
+  const secondary = t.s;
   return (
     <div style={{
       height: 48, background: 'rgba(4,5,11,0.7)',
@@ -269,8 +419,9 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
       .slice(0, 12);
   }, [teams, players]);
 
-  const primary   = tok.acc(design);
-  const secondary = tok.acc2(design);
+  const t         = getTheme(design);
+  const primary   = t.p;
+  const secondary = t.s;
   const matchNum  = currentMatch?.match_number
     ? `MATCH ${String(currentMatch.match_number).padStart(2,'0')}`
     : 'STANDBY';
@@ -282,11 +433,11 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
       transition={{ duration: 0.4 }}
       style={{ position:'absolute', right:40, top:80, width:400, zIndex:10 }}
     >
-      <FFPanel>
+      <ThemedPanel design={design}>
         {/* ── Header ── */}
-        <div style={{ height:48, background:'rgba(0,0,0,0.85)', borderBottom:`1px solid ${primary}44`, display:'flex', overflow:'hidden' }}>
+        <div style={{ height:48, background:t.headerBg, borderBottom:`1px solid ${primary}44`, display:'flex', overflow:'hidden' }}>
           <div style={{ flex:1, background:`linear-gradient(90deg,${primary}44,transparent)`, display:'flex', alignItems:'center', paddingLeft:16 }}>
-            <span style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:primary, letterSpacing:'0.18em' }}>SCOREBOARD</span>
+            <span style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:primary, letterSpacing:'0.18em', textShadow:t.glow?`0 0 16px ${primary}`:'none' }}>SCOREBOARD</span>
           </div>
           <div style={{ flex:1, background:`linear-gradient(270deg,${secondary}33,transparent)`, display:'flex', alignItems:'center', justifyContent:'flex-end', paddingRight:16 }}>
             <span style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:700, color:secondary, letterSpacing:'0.15em' }}>{matchNum}</span>
@@ -396,9 +547,9 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
         </div>
 
         {/* ── Footer legend ── */}
-        <div style={{ height:26, background:'rgba(0,0,0,0.7)', borderTop:`1px solid rgba(255,255,255,0.04)`, display:'flex', alignItems:'center', justifyContent:'center', gap:16 }}>
+        <div style={{ height:26, background:t.headerBg, borderTop:`1px solid rgba(255,255,255,0.04)`, display:'flex', alignItems:'center', justifyContent:'center', gap:16 }}>
           <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-            <div style={{ width:10, height:18, borderRadius:2, background:'#22c55e', boxShadow:'0 0 6px #22c55eaa' }} />
+            <div style={{ width:10, height:18, borderRadius:2, background:'#22c55e', boxShadow:t.glow?'0 0 6px #22c55eaa':'none' }} />
             <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>ALIVE</span>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:5 }}>
@@ -406,7 +557,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
             <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>ELIMINATED</span>
           </div>
         </div>
-      </FFPanel>
+      </ThemedPanel>
     </motion.div>
   );
 }
@@ -417,8 +568,9 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
 function FullStandings({ teams = [], design }) {
   const sorted = useMemo(() => [...safeArray(teams)].sort((a,b) => (b.total_tournament_points||0)-(a.total_tournament_points||0)||(b.total_tournament_kills||0)-(a.total_tournament_kills||0)), [teams]);
   const rankColors = ['#FFD700','#E5E4E2','#CD7F32'];
-  const primary = tok.acc(design);
-  const secondary = tok.acc2(design);
+  const t = getTheme(design);
+  const primary = t.p;
+  const secondary = t.s;
 
   const tLogo2 = tok.logo(design);
   const sponsorLogo2 = tok.sponsorLogo(design);
@@ -426,14 +578,15 @@ function FullStandings({ teams = [], design }) {
 
   return (
     <ScreenBackground bgUrl={bgUrl} accent={primary} accent2={secondary}>
+      <ThemedBackground design={design}>
       <div style={{ position:'relative', zIndex:1, padding:'60px 80px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'center' }}>
         
         {/* Giant header */}
-        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:24, borderBottom:`2px solid ${primary}`, paddingBottom:12 }}>
+        <div style={{ display:'flex', justifyContent:'space-between', alignItems:'flex-end', marginBottom:24, borderBottom:`2px solid ${primary}88`, paddingBottom:12 }}>
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             {tLogo2 && <img src={tLogo2} alt="logo" style={{ height:52, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />}
             <div>
-              <div style={{ fontFamily:'Orbitron', fontSize:14, color:primary, letterSpacing:'0.4em', fontWeight:900 }}>LEADERBOARD</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:14, color:primary, letterSpacing:'0.4em', fontWeight:900, textShadow:t.glow?`0 0 20px ${primary}`:'none' }}>LEADERBOARD</div>
               <div style={{ fontFamily:'Orbitron', fontSize:42, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>OVERALL STANDINGS</div>
             </div>
           </div>
@@ -454,9 +607,9 @@ function FullStandings({ teams = [], design }) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <FFPanel style={{ width:'100%', maxHeight:700 }}>
+          <ThemedPanel design={design} style={{ width:'100%', maxHeight:700 }}>
             {/* Headers */}
-            <div style={{ display:'flex', alignItems:'center', height:48, background:'rgba(0,0,0,0.6)', borderBottom:`2px solid ${primary}44`, padding:'0 24px' }}>
+            <div style={{ display:'flex', alignItems:'center', height:48, background:t.headerBg, borderBottom:`2px solid ${primary}44`, padding:'0 24px' }}>
               <div style={{ width:60, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', textAlign:'center', letterSpacing:'0.15em' }}>RANK</div>
               <div style={{ width:40 }} />
               <div style={{ flex:1, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', paddingLeft:16, letterSpacing:'0.15em' }}>TEAM NAME</div>
@@ -486,9 +639,10 @@ function FullStandings({ teams = [], design }) {
                 <div style={{ padding:'60px 0', textAlign:'center', fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>NO STANDINGS DATA YET</div>
               )}
             </div>
-          </FFPanel>
+          </ThemedPanel>
         </motion.div>
       </div>
+      </ThemedBackground>
     </ScreenBackground>
   );
 }
@@ -498,8 +652,9 @@ function FullStandings({ teams = [], design }) {
 ══════════════════════════════════════════════════ */
 function KillFeedScreen({ killFeed = [], design }) {
   const activeKills = useMemo(() => [...safeArray(killFeed)].slice(-6).reverse(), [killFeed]);
-  const primary = tok.acc(design);
-  const secondary = tok.acc2(design);
+  const t = getTheme(design);
+  const primary = t.p;
+  const secondary = t.s;
 
   return (
     <div style={{ position:'absolute', left:40, top:80, width:420, zIndex:10 }}>
@@ -570,8 +725,8 @@ function PreMatchMap({ match, teams = [], design }) {
   const tLogo    = tok.logo(design);
 
   return (
+    <ThemedBackground design={design} mapName={mapName}>
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
-      <GamingBackground mapName={mapName} accent={primary} accent2={secondary} />
       <div style={{ position:'relative', zIndex:1, padding:'60px 80px', flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between', height:'100%' }}>
         {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
@@ -642,6 +797,7 @@ function PreMatchMap({ match, teams = [], design }) {
         </div>
       </div>
     </div>
+    </ThemedBackground>
   );
 }
 
@@ -656,12 +812,13 @@ function TodaysMatches({ matches = [], design }) {
     { matchNumber:'MATCH 04', mapName:'BERMUDA',   time:'18:15', status:'UPCOMING'  },
     { matchNumber:'MATCH 05', mapName:'ALPINE',    time:'19:00', status:'UPCOMING'  },
   ];
-  const primary = tok.acc(design);
-  const secondary = tok.acc2(design);
+  const t = getTheme(design);
+  const primary = t.p;
+  const secondary = t.s;
 
   return (
+    <ThemedBackground design={design}>
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
-      <GamingBackground accent={primary} accent2={secondary} />
       <div style={{ position:'relative', zIndex:1, padding:'60px 80px', flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between', height:'100%' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
@@ -704,6 +861,7 @@ function TodaysMatches({ matches = [], design }) {
         </div>
       </div>
     </div>
+    </ThemedBackground>
   );
 }
 
@@ -715,8 +873,9 @@ function TeamsToday({ teams = [], design }) {
     if (teams.length > 0) return teams.slice(0, 12);
     return Array.from({length:12}, (_,i) => ({ name:`TEAM ${i+1}`, color:'#FF6B00' }));
   }, [teams]);
-  const primary = tok.acc(design);
-  const secondary = tok.acc2(design);
+  const t = getTheme(design);
+  const primary = t.p;
+  const secondary = t.s;
   const tLogo = tok.logo(design);
   const sponsorLogo = tok.sponsorLogo(design);
   const bgUrl = design?.backgrounds?.teams || '';
@@ -786,8 +945,8 @@ function CastersScreen({ design }) {
   const sponsorLogo = tok.sponsorLogo(design);
 
   return (
+    <ThemedBackground design={design}>
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
-      <GamingBackground accent={primary} accent2={secondary} />
       <div style={{ position:'relative', zIndex:1, padding:'60px 80px', height:'100%', display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
         {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
@@ -838,6 +997,7 @@ function CastersScreen({ design }) {
         </div>
       </div>
     </div>
+    </ThemedBackground>
   );
 }
 
@@ -846,8 +1006,9 @@ function CastersScreen({ design }) {
 ══════════════════════════════════════════════════ */
 function UpcomingMap({ match, design }) {
   const mapName = match?.map_name || match?.mapName || 'Bermuda';
-  const primary = tok.acc(design);
-  const secondary = tok.acc2(design);
+  const t = getTheme(design);
+  const primary = t.p;
+  const secondary = t.s;
   const mapImages = getMapImages();
   const mapImg = mapImages?.[mapName] || null;
 
@@ -934,8 +1095,9 @@ function EliminationAlert({ eliminations = [], design }) {
    SCREEN 11: MVP (MATCH REVEAL)
 ══════════════════════════════════════════════════ */
 function MVPScreen({ players = [], teams = [], design, overlayState }) {
-  const primary = tok.acc(design);
-  const secondary = tok.acc2(design);
+  const t = getTheme(design);
+  const primary = t.p;
+  const secondary = t.s;
   const tLogo = tok.logo(design);
 
   const mvpName   = overlayState?.mvp_player_name || overlayState?.mvpPlayerName || 'MVP PLAYER';
@@ -946,8 +1108,8 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
   const mvpPhoto = mvpPlayerObj?.photo_url || null;
 
   return (
+    <ThemedBackground design={design}>
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column' }}>
-      <GamingBackground accent={primary} accent2={secondary} />
       <style>{`@keyframes starPulse{0%,100%{transform:scale(1) rotate(0deg);filter:drop-shadow(0 0 15px ${primary}88)}50%{transform:scale(1.12) rotate(5deg);filter:drop-shadow(0 0 35px ${primary})}}`}</style>
 
       {/* Gold ambient lighting */}
@@ -968,7 +1130,7 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <FFPanel style={{ width:600, padding:0 }}>
+          <ThemedPanel design={design} style={{ width:600, padding:0 }}>
             <div style={{ padding:'40px 48px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
               {/* Team logo circle */}
               <div style={{ width:100, height:100, borderRadius:'50%', border:`3px solid ${primary}`, boxShadow:`0 0 30px ${primary}55`, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.6)', marginBottom:20 }}>
@@ -1003,12 +1165,13 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
                 </div>
               </div>
             </div>
-          </FFPanel>
+          </ThemedPanel>
         </motion.div>
 
         {tLogo && <img src={tLogo} alt="logo" style={{ height:44, objectFit:'contain', opacity:0.7, marginTop:12 }} onError={e=>e.target.style.display='none'} />}
       </div>
     </div>
+    </ThemedBackground>
   );
 }
 
@@ -1016,8 +1179,9 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
    SCREEN 12: CHAMPIONS (WINNER REVEAL SCREEN)
 ══════════════════════════════════════════════════ */
 function ChampionsScreen({ teams = [], design, overlayState }) {
-  const primary = tok.acc(design);
-  const secondary = tok.acc2(design);
+  const t = getTheme(design);
+  const primary = t.p;
+  const secondary = t.s;
   const tLogo = tok.logo(design);
 
   const winnerName   = overlayState?.champion_team_name   || teams[0]?.name || 'CHAMPIONS';
@@ -1142,12 +1306,13 @@ function ScreenBackground({ bgUrl, accent, accent2, children }) {
           zIndex:0,
         }} />
       ) : (
-        <GamingBackground accent={accent} accent2={accent2} />
+        /* GamingBackground inlined by ThemedBackground */
       )}
       <div style={{ position:'relative', zIndex:1, width:'100%', height:'100%' }}>
         {children}
       </div>
     </div>
+    </ThemedBackground>
   );
 }
 
