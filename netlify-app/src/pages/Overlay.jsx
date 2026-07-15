@@ -1509,8 +1509,8 @@ export default function Overlay() {
     map_label:       <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
     'today-matches': <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />,
     today_matches:   <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />,
-    teams:           <TeamsToday    teams={teams} design={design} />,
-    teams_today:     <TeamsToday    teams={teams} design={design} />,
+    teams:           <PointRushStandings teams={teams} design={design} />,
+    teams_today:     <PointRushStandings teams={teams} design={design} />,
     casters:         <CastersScreen design={design} />,
     casters_screen:  <CastersScreen design={design} />,
     'upcoming-map':  <UpcomingMap   match={currentMatch} design={design} />,
@@ -1531,15 +1531,13 @@ export default function Overlay() {
     game_intro:      <GameIntroBanner currentMatch={currentMatch} design={design} />,
     schedule:        <MatchScheduleGrid design={design} />,
     match_schedule:  <MatchScheduleGrid design={design} />,
-    'point-rush':    <PointRushStandings teams={teams} design={design} />,
-    point_rush:      <PointRushStandings teams={teams} design={design} />,
-    'ffws-scoreboard': (
+    'ff-scoreboard': (
       <>
         <FFBoardV2 teams={teams} players={players} currentMatch={currentMatch} design={design} />
         <MatchInfoChip currentMatch={currentMatch} design={design} />
       </>
     ),
-    ffws_scoreboard: (
+    ff_scoreboard: (
       <>
         <FFBoardV2 teams={teams} players={players} currentMatch={currentMatch} design={design} />
         <MatchInfoChip currentMatch={currentMatch} design={design} />
