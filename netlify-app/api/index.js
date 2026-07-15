@@ -668,7 +668,7 @@ module.exports = async (req, res) => {
     }
 
     if (route === 'getDesign') {
-      return ok(db.design || DEFAULT_DESIGN);
+      return ok({ design: db.design || DEFAULT_DESIGN });
     }
 
     // ── CREATE / INITIALIZE TOURNAMENT ────────────────────────────────────
@@ -713,7 +713,9 @@ module.exports = async (req, res) => {
         name,
         total_matches,
         points_per_kill,
-        placement_points_config: JSON.stringify(body.placement_points_config || defaultConfig),
+        placement_points_config: typeof body.placement_points_config === 'string'
+          ? body.placement_points_config
+          : JSON.stringify(body.placement_points_config || defaultConfig),
         current_match_number: 0,
         status: 'active',
         created_at: new Date().toISOString()
