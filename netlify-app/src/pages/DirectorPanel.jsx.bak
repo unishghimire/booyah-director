@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
 import DesignStudio from '@/components/control/DesignStudio';
+import ScreenSwitcher from '@/components/control/ScreenSwitcher';
 import TournamentSetup from '@/components/control/TournamentSetup';
 import TournamentManager from '@/components/control/TournamentManager';
 import { useAuth } from '@/lib/AuthContext';
@@ -251,6 +252,7 @@ export default function DirectorPanel() {
       <nav className="flex h-11 border-b border-white/5 bg-[#0c0c18] flex-shrink-0">
         {[
           { id: 'overlay', label: 'OVERLAY', icon: Monitor },
+          { id: 'scenes', label: 'SCENES', icon: Radio },
           { id: 'match', label: 'MATCH', icon: Map },
           { id: 'standings', label: 'STANDINGS', icon: Trophy },
           { id: 'design', label: 'DESIGN', icon: Paintbrush },
@@ -440,6 +442,22 @@ export default function DirectorPanel() {
                       })}
                     </div>
                   </div>
+                </div>
+              </SectionBoundary>
+            )}
+
+            {/* MATCH TAB */}
+            {activeTab === 'scenes' && (
+              <SectionBoundary label="SCENE SWITCHER">
+                <div className="max-w-2xl mx-auto space-y-4">
+                  <div className="rounded-xl border border-[#FF6B00]/20 bg-white/[0.02] p-4">
+                    <p className="font-orbitron text-[10px] font-black text-[#FF6B00] tracking-wider mb-1 flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 bg-[#FF6B00] rounded-full animate-pulse" />
+                      LIVE SCREEN CONTROL
+                    </p>
+                    <p className="font-orbitron text-[9px] text-gray-500">Click a screen below to switch the live OBS overlay instantly. Current: <span className="text-[#FF6B00]">{currentScreen.replace(/_/g,' ').toUpperCase()}</span></p>
+                  </div>
+                  <ScreenSwitcher currentScreen={currentScreen} onAction={refresh} />
                 </div>
               </SectionBoundary>
             )}
