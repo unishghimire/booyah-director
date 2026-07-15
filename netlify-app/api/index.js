@@ -222,7 +222,7 @@ function getDefaultDb() {
  */
 
 const WEB_API_KEY = process.env.FIREBASE_WEB_API_KEY || 'AIzaSyBekqzqZv_iWvgAn9UCnpBGIw2675wr1gc';
-const OWNER_EMAILS = (process.env.OWNER_EMAILS || 'nex.unishghimire@gmail.com')
+const OWNER_EMAILS = (process.env.OWNER_EMAILS || 'nex.unishghimire@gmail.com,unishghimire2@gmail.com')
   .split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
 
 // Simple in-process token cache — avoids re-verifying the same token on every
