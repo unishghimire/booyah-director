@@ -298,7 +298,9 @@ const DEFAULT_DESIGN = {
     { name: 'CASTER TWO', role: 'ANALYST',     handle: '@caster2', photo: '' },
     { name: 'CASTER THREE', role: 'HOST',       handle: '@caster3', photo: '' },
   ],
-  organizerName: 'GARENA', sponsorLogoUrl: '',
+  organizerName: 'GARENA', sponsorLogoUrl: '', sponsorName: '',
+  backgrounds: { standings: '', champion: '', teams: '', scoreboard: '' },
+  playerPhotos: {}, teamLogos: {}, mapImages: {},
 };
 
 
@@ -622,23 +624,42 @@ module.exports = async (req, res) => {
         photo: sanitizeString(c.photo || '', 300)
       }));
 
+      // Sanitize backgrounds object
+      const sanitizedBackgrounds = {
+        standings: sanitizeUrl((body.backgrounds || db.design?.backgrounds || {}).standings || '', 500),
+        champion:  sanitizeUrl((body.backgrounds || db.design?.backgrounds || {}).champion  || '', 500),
+        teams:     sanitizeUrl((body.backgrounds || db.design?.backgrounds || {}).teams     || '', 500),
+        scoreboard:sanitizeUrl((body.backgrounds || db.design?.backgrounds || {}).scoreboard|| '', 500),
+      };
+      // Preserve and merge playerPhotos/teamLogos/mapImages (keyed by ID)
+      const existingPhotos = db.design?.playerPhotos || {};
+      const incomingPhotos = typeof body.playerPhotos === 'object' && body.playerPhotos ? body.playerPhotos : {};
+      const existingLogos  = db.design?.teamLogos    || {};
+      const incomingLogos  = typeof body.teamLogos   === 'object' && body.teamLogos   ? body.teamLogos   : {};
+      const existingMaps   = db.design?.mapImages    || {};
+      const incomingMaps   = typeof body.mapImages   === 'object' && body.mapImages   ? body.mapImages   : {};
+
       db.design = {
         ...DEFAULT_DESIGN,
         ...db.design,
-        ...body,
-        accentColor: sanitizeString(body.accentColor, 20),
-        accentColor2: sanitizeString(body.accentColor2, 20),
-        bgColor: sanitizeString(body.bgColor, 20),
-        textColor: sanitizeString(body.textColor, 20),
-        tournamentName: sanitizeString(body.tournamentName, 100),
-        tournamentSubtitle: sanitizeString(body.tournamentSubtitle, 100),
-        gameLabel: sanitizeString(body.gameLabel, 40),
-        logoUrl: sanitizeString(body.logoUrl, 300),
-        overlayStyle: sanitizeString(body.overlayStyle, 40),
-        fontStyle: sanitizeString(body.fontStyle, 40),
-        casters: sanitizedCasters,
-        organizerName: sanitizeString(body.organizerName, 100),
-        sponsorLogoUrl: sanitizeString(body.sponsorLogoUrl, 300)
+        accentColor:        sanitizeString(body.accentColor      || db.design?.accentColor, 20),
+        accentColor2:       sanitizeString(body.accentColor2     || db.design?.accentColor2, 20),
+        bgColor:            sanitizeString(body.bgColor          || db.design?.bgColor, 20),
+        textColor:          sanitizeString(body.textColor        || db.design?.textColor, 20),
+        tournamentName:     sanitizeString(body.tournamentName   !== undefined ? body.tournamentName   : db.design?.tournamentName, 100),
+        tournamentSubtitle: sanitizeString(body.tournamentSubtitle !== undefined ? body.tournamentSubtitle : db.design?.tournamentSubtitle, 100),
+        gameLabel:          sanitizeString(body.gameLabel        !== undefined ? body.gameLabel        : db.design?.gameLabel, 40),
+        logoUrl:            sanitizeUrl(body.logoUrl             !== undefined ? body.logoUrl          : db.design?.logoUrl, 300),
+        overlayStyle:       sanitizeString(body.overlayStyle     || db.design?.overlayStyle, 40),
+        fontStyle:          sanitizeString(body.fontStyle        || db.design?.fontStyle, 40),
+        casters:            sanitizedCasters,
+        organizerName:      sanitizeString(body.organizerName    !== undefined ? body.organizerName    : db.design?.organizerName, 100),
+        sponsorLogoUrl:     sanitizeUrl(body.sponsorLogoUrl      !== undefined ? body.sponsorLogoUrl   : db.design?.sponsorLogoUrl, 300),
+        sponsorName:        sanitizeString(body.sponsorName      !== undefined ? body.sponsorName      : db.design?.sponsorName, 100),
+        backgrounds:        sanitizedBackgrounds,
+        playerPhotos:       { ...existingPhotos, ...incomingPhotos },
+        teamLogos:          { ...existingLogos,  ...incomingLogos  },
+        mapImages:          { ...existingMaps,   ...incomingMaps   },
       };
 
       db.overlay_state.last_updated_at = new Date().toISOString();
@@ -1375,6 +1396,115 @@ module.exports = async (req, res) => {
         await saveDb(uid, db);
         return ok({ success:true, teams_added:teamsAdded, players_added:playersAdded, sheet_id:sheetId });
       } catch(e) { return err(500, `Sheet import failed: ${e.message}`); }
+    }
+
+    // ── DISCORD WEBHOOK — save ─────────────────────────────────────────────────
+    if (route === 'saveDiscordWebhook') {
+      const { tournament_id, webhook_url, channel_name } = body;
+      if (!tournament_id) return err(400, 'tournament_id is required');
+      const tIdx = db.tournaments.findIndex(t => t.id === tournament_id);
+      if (tIdx === -1) return err(404, 'Tournament not found');
+      // Clear webhook if url is empty string
+      db.tournaments[tIdx].discord_webhook_url  = webhook_url  ? sanitizeUrl(webhook_url, 300) : '';
+      db.tournaments[tIdx].discord_channel_name = channel_name ? sanitizeString(channel_name, 100) : '';
+      await saveDb(uid, db);
+      return ok({ success: true });
+    }
+
+    // ── DISCORD WEBHOOK — test ─────────────────────────────────────────────────
+    if (route === 'testDiscordWebhook') {
+      const { webhook_url, tournament_name } = body;
+      const url = sanitizeUrl(webhook_url || '', 300);
+      if (!url) return err(400, 'webhook_url is required');
+      try {
+        const payload = {
+          embeds: [{
+            title: '✅ Booyah Director Connected',
+            description: `Webhook verified for **${sanitizeString(tournament_name || 'Tournament', 100)}**. You're all set to post updates!`,
+            color: 0xFF6B00,
+            footer: { text: 'Booyah Director Overlay System' },
+            timestamp: new Date().toISOString(),
+          }]
+        };
+        const r = await fetch(url, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(8000),
+        });
+        if (!r.ok) {
+          const txt = await r.text();
+          return err(400, `Discord rejected the webhook: ${r.status} — ${txt.slice(0,200)}`);
+        }
+        return ok({ success: true });
+      } catch (e) {
+        return err(500, `Failed to reach Discord: ${e.message}`);
+      }
+    }
+
+    // ── DISCORD WEBHOOK — post update ─────────────────────────────────────────
+    if (route === 'postDiscord') {
+      const { tournament_id, type } = body;
+      if (!tournament_id) return err(400, 'tournament_id is required');
+      if (!type) return err(400, 'type is required (standings|mvp|champion|teams)');
+
+      const tournament = db.tournaments.find(t => t.id === tournament_id);
+      if (!tournament) return err(404, 'Tournament not found');
+      const webhookUrl = sanitizeUrl(tournament.discord_webhook_url || '', 300);
+      if (!webhookUrl) return err(400, 'No Discord webhook URL configured for this tournament');
+
+      const tName = sanitizeString(tournament.name, 100);
+      const teams = db.teams.filter(t => t.tournament_id === tournament_id);
+      const players = db.players.filter(p => p.tournament_id === tournament_id);
+      const overlayState = db.overlay_state || {};
+      const acc = 0xFF6B00;
+
+      let payload;
+      if (type === 'standings') {
+        const sorted = [...teams].sort((a,b)=>(b.total_tournament_points||0)-(a.total_tournament_points||0));
+        const rows = sorted.slice(0,12).map((t,i) =>
+          `\`${String(i+1).padStart(2,'0')}\` **${t.name}** — ${t.total_tournament_kills||0} kills · ${t.total_tournament_points||0} pts`
+        ).join('\n');
+        payload = { embeds:[{ title:`📊 Live Standings — ${tName}`, description: rows || 'No teams yet.', color: acc, footer:{ text:'Booyah Director' }, timestamp: new Date().toISOString() }] };
+
+      } else if (type === 'mvp') {
+        const name  = sanitizeString(overlayState.mvp_player_name || 'TBD', 60);
+        const team  = sanitizeString(overlayState.mvp_team_name   || 'TBD', 60);
+        const kills = overlayState.mvp_kills || 0;
+        payload = { embeds:[{ title:`⭐ Match MVP — ${tName}`, description:`**${name}** from **${team}**\n🎯 Kills: **${kills}**`, color: acc, footer:{ text:'Booyah Director' }, timestamp: new Date().toISOString() }] };
+
+      } else if (type === 'champion') {
+        const champ  = sanitizeString(overlayState.champion_team_name   || (teams[0]?.name) || 'TBD', 60);
+        const pts    = overlayState.champion_total_points || teams[0]?.total_tournament_points || 0;
+        const kills  = teams.find(t=>t.name===champ)?.total_tournament_kills || 0;
+        payload = { embeds:[{ title:`🏆 Champions — ${tName}`, description:`🥇 **${champ}**\n📊 Total Points: **${pts}**\n🎯 Total Kills: **${kills}**`, color: 0xFFD700, footer:{ text:'Booyah Director' }, timestamp: new Date().toISOString() }] };
+
+      } else if (type === 'teams') {
+        const lines = teams.map(t => {
+          const playerCount = players.filter(p=>p.team_id===t.id).length;
+          return `• **${t.name}** (${playerCount} players)`;
+        }).join('\n');
+        payload = { embeds:[{ title:`👥 Team Lineup — ${tName}`, description: lines || 'No teams registered.', color: acc, footer:{ text:'Booyah Director' }, timestamp: new Date().toISOString() }] };
+
+      } else {
+        return err(400, `Unknown type: ${type}. Use standings|mvp|champion|teams`);
+      }
+
+      try {
+        const r = await fetch(webhookUrl, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(payload),
+          signal: AbortSignal.timeout(8000),
+        });
+        if (!r.ok) {
+          const txt = await r.text();
+          return err(400, `Discord error: ${r.status} — ${txt.slice(0,200)}`);
+        }
+        return ok({ success: true, type });
+      } catch (e) {
+        return err(500, `Failed to reach Discord: ${e.message}`);
+      }
     }
 
     return err(404, `Unknown route: ${route}`);
