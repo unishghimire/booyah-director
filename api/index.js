@@ -1534,20 +1534,20 @@ module.exports = async (req, res) => {
         // Build sorted standings
         const sorted = [...teams].sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
         const rows = sorted.slice(0, 12).map((team, i) => {
-          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : \`\${i + 1}.\`;
+          const medal = i === 0 ? '🥇' : i === 1 ? '🥈' : i === 2 ? '🥉' : `\${i + 1}.`;
           const pts = team.total_tournament_points || 0;
           const kills = team.total_tournament_kills || 0;
-          return \`\${medal} **\${team.name}** — \${pts} pts · \${kills} kills\`;
+          return `\${medal} **\${team.name}** — \${pts} pts · \${kills} kills`;
         }).join('\n');
 
         embedPayload = {
           embeds: [{
-            title: \`📊 \${tournament.name} — LIVE STANDINGS\`,
+            title: `📊 \${tournament.name} — LIVE STANDINGS`,
             description: rows || 'No teams yet.',
             color: 0x00D4FF,
             fields: [
-              { name: 'Match', value: \`\${tournament.current_match_number || 0} / \${tournament.total_matches}\`, inline: true },
-              { name: 'Teams', value: \`\${teams.length}\`, inline: true },
+              { name: 'Match', value: `\${tournament.current_match_number || 0} / \${tournament.total_matches}`, inline: true },
+              { name: 'Teams', value: `\${teams.length}`, inline: true },
             ],
             footer: { text: 'Booyah Director • Live Standings Update' },
             timestamp: new Date().toISOString(),
@@ -1562,15 +1562,15 @@ module.exports = async (req, res) => {
 
         embedPayload = {
           embeds: [{
-            title: \`⭐ MATCH MVP — \${mvpName}\`,
-            description: \`**\${mvpName}** from **\${mvpTeam}** dominated the match!\n\n🔫 **\${mvpKills} kills** this match\`,
+            title: `⭐ MATCH MVP — \${mvpName}`,
+            description: `**\${mvpName}** from **\${mvpTeam}** dominated the match!\n\n🔫 **\${mvpKills} kills** this match`,
             color: 0xFFD700,
             thumbnail: mvpPhoto ? { url: mvpPhoto } : undefined,
             fields: [
               { name: 'Team', value: mvpTeam || '—', inline: true },
-              { name: 'Kills', value: \`\${mvpKills}\`, inline: true },
+              { name: 'Kills', value: `\${mvpKills}`, inline: true },
             ],
-            footer: { text: \`\${tournament.name} · Match MVP\` },
+            footer: { text: `\${tournament.name} · Match MVP` },
             timestamp: new Date().toISOString(),
           }]
         };
@@ -1582,13 +1582,13 @@ module.exports = async (req, res) => {
 
         embedPayload = {
           embeds: [{
-            title: \`🏆 BOOYAH! CHAMPIONS — \${tournament.name}\`,
-            description: \`🎉 **\${champName}** has won **\${tournament.name}**!\n\n🏅 **\${champPts} total points**\n\nCongratulations to the champions!\`,
+            title: `🏆 BOOYAH! CHAMPIONS — \${tournament.name}`,
+            description: `🎉 **\${champName}** has won **\${tournament.name}**!\n\n🏅 **\${champPts} total points**\n\nCongratulations to the champions!`,
             color: 0xFF6B00,
             thumbnail: champLogo ? { url: champLogo } : undefined,
             fields: [
               { name: 'Tournament', value: tournament.name, inline: true },
-              { name: 'Final Score', value: \`\${champPts} pts\`, inline: true },
+              { name: 'Final Score', value: `\${champPts} pts`, inline: true },
             ],
             footer: { text: 'Booyah Director • Tournament Complete' },
             timestamp: new Date().toISOString(),
@@ -1596,15 +1596,15 @@ module.exports = async (req, res) => {
         };
 
       } else if (type === 'teams') {
-        const rows = teams.map(t => \`• **\${t.name}**\`).join('\n');
+        const rows = teams.map(t => `• **\${t.name}**`).join('\n');
         embedPayload = {
           embeds: [{
-            title: \`👥 \${tournament.name} — REGISTERED TEAMS\`,
+            title: `👥 \${tournament.name} — REGISTERED TEAMS`,
             description: rows || 'No teams registered yet.',
             color: 0x9B59B6,
             fields: [
-              { name: 'Total Teams', value: \`\${teams.length}\`, inline: true },
-              { name: 'Total Players', value: \`\${players.length}\`, inline: true },
+              { name: 'Total Teams', value: `\${teams.length}`, inline: true },
+              { name: 'Total Players', value: `\${players.length}`, inline: true },
             ],
             footer: { text: 'Booyah Director • Team Lineup' },
             timestamp: new Date().toISOString(),
@@ -1612,7 +1612,7 @@ module.exports = async (req, res) => {
         };
 
       } else {
-        return err(400, \`Unknown post type: \${type}. Use: standings, mvp, champion, teams\`);
+        return err(400, `Unknown post type: \${type}. Use: standings, mvp, champion, teams`);
       }
 
       try {
@@ -1623,11 +1623,11 @@ module.exports = async (req, res) => {
         });
         if (!r.ok) {
           const txt = await r.text().catch(() => '');
-          return err(400, \`Discord rejected the post: \${r.status} \${txt}\`);
+          return err(400, `Discord rejected the post: \${r.status} \${txt}`);
         }
         return ok({ success: true, type, tournament: tournament.name });
       } catch (e) {
-        return err(500, \`Discord post failed: \${e.message}\`);
+        return err(500, `Discord post failed: \${e.message}`);
       }
     }
 
