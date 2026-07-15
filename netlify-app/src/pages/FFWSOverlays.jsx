@@ -4,7 +4,7 @@
  * Upgrades: FFBoardV2, MatchInfoChip
  */
 import { motion, AnimatePresence } from 'framer-motion';
-import { useMemo, useState, useEffect } from 'react';
+import { useMemo, useState, useEffect, useRef } from 'react';
 import { safeArray } from '@/components/ErrorBoundary';
 import { MAPS, getMapImages } from '@/lib/maps';
 
@@ -14,14 +14,18 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
   const primary = t.p;
   const secondary = t.s;
 
+  // Track previous alive states to detect newly-eliminated players
+  const prevAliveRef = useRef({});
+  const [elimFlash, setElimFlash] = useState({}); // { teamId: { slotIdx: timestamp } }
+
   const rows = useMemo(() => {
     return [...safeArray(teams)]
       .map(team => {
         const tp = safeArray(players).filter(p => p.team_id === team.id);
         const slots = [];
         for (let i = 0; i < 4; i++) {
-          if (tp[i]) slots.push({ name: tp[i].name, alive: tp[i].is_alive });
-          else slots.push({ name: null, alive: false });
+          if (tp[i]) slots.push({ name: tp[i].name, alive: tp[i].is_alive, playerId: tp[i].id });
+          else slots.push({ name: null, alive: false, playerId: null });
         }
         const aliveCount = tp.filter(p => p.is_alive).length;
         return { ...team, slots, aliveCount, totalPlayers: tp.length };
@@ -33,15 +37,38 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       .slice(0, 12);
   }, [teams, players]);
 
+  // Detect newly eliminated players and trigger flash animation
+  useEffect(() => {
+    const flashes = {};
+    let hasNewElim = false;
+    safeArray(rows).forEach(team => {
+      team.slots.forEach((slot, si) => {
+        const key = `${team.id}_${si}`;
+        const wasAlive = prevAliveRef.current[key];
+        if (wasAlive === true && !slot.alive && slot.name) {
+          flashes[`${team.id}`] = { ...flashes[`${team.id}`], [si]: Date.now() };
+          hasNewElim = true;
+        }
+        prevAliveRef.current[key] = slot.alive;
+      });
+    });
+    if (hasNewElim) {
+      setElimFlash(flashes);
+      // Clear flashes after animation
+      const timer = setTimeout(() => setElimFlash({}), 2000);
+      return () => clearTimeout(timer);
+    }
+  }, [rows]);
+
   const matchNum = currentMatch?.match_number
     ? `GAME ${String(currentMatch.match_number).padStart(2, '0')}`
     : 'STANDBY';
 
   return (
     <motion.div
-      initial={{ x: 120, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.5 }}
+      initial={{ y: -1080, opacity: 0 }}
+      animate={{ y: 0, opacity: 1 }}
+      transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: 300, zIndex: 10 }}
     >
       {/* Panel with no left border-radius */}
@@ -52,58 +79,77 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
         borderLeft: `1px solid ${primary}33`,
         display: 'flex', flexDirection: 'column',
       }}>
-        {/* Header */}
-        <div style={{
-          height: 44, background: 'rgba(0,0,0,0.95)',
-          borderBottom: `1px solid ${primary}33`,
-          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 16px', flexShrink: 0,
-        }}>
+        {/* Header — drops down first */}
+        <motion.div
+          initial={{ y: -50, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.4, delay: 0.3 }}
+          style={{
+            height: 44, background: 'rgba(0,0,0,0.95)',
+            borderBottom: `1px solid ${primary}33`,
+            display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+            padding: '0 16px', flexShrink: 0,
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
             <div style={{ width: 6, height: 6, borderRadius: '50%', background: primary, boxShadow: `0 0 8px ${primary}` }} />
             <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: '#fff', letterSpacing: '0.18em' }}>SCOREBOARD</span>
           </div>
           <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: secondary, letterSpacing: '0.15em' }}>{matchNum}</span>
-        </div>
+        </motion.div>
 
-        {/* Column Headers */}
-        <div style={{
-          display: 'flex', alignItems: 'center', height: 22,
-          background: 'rgba(0,0,0,0.7)',
-          borderBottom: '1px solid rgba(255,255,255,0.04)',
-          padding: '0 8px',
-          flexShrink: 0,
-        }}>
+        {/* Column Headers — drops down second */}
+        <motion.div
+          initial={{ y: -30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.45 }}
+          style={{
+            display: 'flex', alignItems: 'center', height: 22,
+            background: 'rgba(0,0,0,0.7)',
+            borderBottom: '1px solid rgba(255,255,255,0.04)',
+            padding: '0 8px',
+            flexShrink: 0,
+          }}
+        >
           <div style={{ width: 32, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.1em' }}>RANK</div>
           <div style={{ width: 26 }} />
           <div style={{ flex: 1, fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: 'rgba(255,255,255,0.35)', paddingLeft: 4, letterSpacing: '0.1em' }}>TEAMS</div>
           <div style={{ width: 68, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em' }}>ALIVE</div>
           <div style={{ width: 32, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: primary, letterSpacing: '0.08em' }}>ELIMS</div>
           <div style={{ width: 38, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: secondary, letterSpacing: '0.08em' }}>TOTAL</div>
-        </div>
+        </motion.div>
 
-        {/* Rows */}
+        {/* Rows — stagger drop-down */}
         <div style={{ display: 'flex', flexDirection: 'column', flex: 1, overflow: 'hidden' }}>
           {safeArray(rows).map((team, idx) => {
             const rank = idx + 1;
             const rankColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
             const rankColor = rank <= 3 ? rankColors[rank - 1] : 'rgba(255,255,255,0.5)';
             const isElim = team.aliveCount === 0 && team.totalPlayers > 0;
+            const teamFlash = elimFlash[team.id] || {};
+            const hasFlash = Object.keys(teamFlash).length > 0;
             const rowBg = rank === 1
               ? 'rgba(255,215,0,0.06)'
               : idx % 2 === 0 ? 'rgba(255,255,255,0.015)' : 'transparent';
 
             return (
-              <div key={team.id || idx} style={{
-                display: 'flex', alignItems: 'center', height: 36,
-                background: rowBg,
-                borderBottom: '1px solid rgba(255,255,255,0.03)',
-                borderLeft: rank <= 3 ? `2px solid ${rankColors[rank - 1]}` : '2px solid transparent',
-                padding: '0 8px',
-                opacity: isElim ? 0.35 : 1,
-                transition: 'opacity 0.4s ease',
-                flexShrink: 0,
-              }}>
+              <motion.div
+                key={team.id || idx}
+                initial={{ y: -40, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ duration: 0.3, delay: 0.5 + idx * 0.05, ease: 'easeOut' }}
+                style={{
+                  display: 'flex', alignItems: 'center', height: 36,
+                  background: hasFlash ? 'rgba(255,0,0,0.12)' : rowBg,
+                  borderBottom: '1px solid rgba(255,255,255,0.03)',
+                  borderLeft: rank <= 3 ? `2px solid ${rankColors[rank - 1]}` : '2px solid transparent',
+                  padding: '0 8px',
+                  opacity: isElim ? 0.35 : 1,
+                  transition: 'opacity 0.4s ease, background 0.5s ease',
+                  flexShrink: 0,
+                  position: 'relative',
+                }}
+              >
                 {/* Rank */}
                 <div style={{ width: 32, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: rankColor }}>
                   {String(rank).padStart(2, '0')}
@@ -119,21 +165,59 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                     </div>
                   )}
                 </div>
-                {/* Name */}
-                <div style={{ flex: 1, paddingLeft: 4, fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: isElim ? 'rgba(255,255,255,0.25)' : '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.03em' }}>
+                {/* Name — with eliminated strike-through */}
+                <div style={{ flex: 1, paddingLeft: 4, fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: isElim ? 'rgba(255,255,255,0.25)' : '#fff', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap', textTransform: 'uppercase', letterSpacing: '0.03em', position: 'relative' }}>
                   {team.name || 'TEAM'}
+                  {isElim && (
+                    <motion.div
+                      initial={{ scaleX: 0 }}
+                      animate={{ scaleX: 1 }}
+                      transition={{ duration: 0.4, ease: 'easeInOut' }}
+                      style={{
+                        position: 'absolute', left: 0, right: 0, top: '50%',
+                        height: 1, background: '#ff4444',
+                        transformOrigin: 'left',
+                        opacity: 0.7,
+                      }}
+                    />
+                  )}
                 </div>
-                {/* Alive bars */}
+                {/* Alive bars — with elimination flash */}
                 <div style={{ width: 68, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 }}>
                   {team.slots.map((slot, si) => {
+                    const isFlashing = teamFlash[si] !== undefined;
+                    const wasAlive = prevAliveRef.current[`${team.id}_${si}`] === true;
+                    const justEliminated = isFlashing && wasAlive && !slot.alive;
+
+                    if (isFlashing) {
+                      // Red flash animation on elimination
+                      return (
+                        <motion.div
+                          key={si}
+                          initial={{ backgroundColor: '#ff3333', boxShadow: '0 0 12px #ff3333' }}
+                          animate={{ backgroundColor: '#333333', boxShadow: 'none' }}
+                          transition={{ duration: 1.2, ease: 'easeOut' }}
+                          style={{
+                            width: 8, height: 18, borderRadius: 2,
+                          }}
+                        />
+                      );
+                    }
+
                     const barColor = slot.alive ? '#00FF55' : slot.name === null ? 'rgba(255,255,255,0.06)' : '#333333';
                     return (
-                      <div key={si} style={{
-                        width: 8, height: 18, borderRadius: 2,
-                        background: barColor,
-                        boxShadow: slot.alive ? '0 0 6px #00FF5588' : 'none',
-                        transition: 'background 0.35s ease',
-                      }} />
+                      <motion.div
+                        key={si}
+                        initial={false}
+                        animate={{
+                          backgroundColor: barColor,
+                          boxShadow: slot.alive ? '0 0 6px #00FF5588' : '0 0 0px transparent',
+                        }}
+                        transition={{ duration: 0.35 }}
+                        style={{
+                          width: 8, height: 18, borderRadius: 2,
+                        }}
+                      />
                     );
                   })}
                 </div>
@@ -145,7 +229,23 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                 <div style={{ width: 38, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 13, fontWeight: 900, color: isElim ? 'rgba(255,215,0,0.3)' : '#FFD700' }}>
                   {team.total_tournament_points || 0}
                 </div>
-              </div>
+
+                {/* Eliminated flash overlay — brief red sweep across row */}
+                {hasFlash && (
+                  <motion.div
+                    initial={{ x: -300, opacity: 0.6 }}
+                    animate={{ x: 300, opacity: 0 }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                    style={{
+                      position: 'absolute', top: 0, bottom: 0, left: 0,
+                      width: 100,
+                      background: 'linear-gradient(90deg, transparent, rgba(255,50,50,0.3), transparent)',
+                      pointerEvents: 'none',
+                      zIndex: 5,
+                    }}
+                  />
+                )}
+              </motion.div>
             );
           })}
           {rows.length === 0 && (
@@ -155,13 +255,18 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
           )}
         </div>
 
-        {/* Legend bar */}
-        <div style={{
-          height: 22, background: 'rgba(0,0,0,0.9)',
-          borderTop: '1px solid rgba(255,255,255,0.04)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14,
-          flexShrink: 0,
-        }}>
+        {/* Legend bar — drops in last */}
+        <motion.div
+          initial={{ y: 30, opacity: 0 }}
+          animate={{ y: 0, opacity: 1 }}
+          transition={{ duration: 0.3, delay: 0.5 + rows.length * 0.05 + 0.1 }}
+          style={{
+            height: 22, background: 'rgba(0,0,0,0.9)',
+            borderTop: '1px solid rgba(255,255,255,0.04)',
+            display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14,
+            flexShrink: 0,
+          }}
+        >
           <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
             <div style={{ width: 8, height: 14, borderRadius: 2, background: '#00FF55', boxShadow: '0 0 4px #00FF5566' }} />
             <span style={{ fontFamily: 'Orbitron', fontSize: 6, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>ALIVE</span>
@@ -174,7 +279,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
             <div style={{ width: 8, height: 14, borderRadius: 2, background: '#333' }} />
             <span style={{ fontFamily: 'Orbitron', fontSize: 6, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>ELIMINATED</span>
           </div>
-        </div>
+        </motion.div>
       </div>
     </motion.div>
   );
