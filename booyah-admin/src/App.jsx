@@ -10,6 +10,7 @@ import PromoCodes from './pages/PromoCodes';
 import Settings from './pages/Settings';
 import PaymentRequests from './pages/PaymentRequests';
 import Bootstrap from './pages/Bootstrap';
+import Logs from './pages/Logs';
 import Sidebar from './components/Sidebar';
 import Header from './components/Header';
 import { Toaster } from 'react-hot-toast';
@@ -88,6 +89,7 @@ export default function App() {
             <Route path="/settings"      element={<Settings />} />
             <Route path="/payment-requests" element={<PaymentRequests />} />
             <Route path="/bootstrap"     element={<Bootstrap />} />
+            <Route path="/logs"          element={<Logs />} />
             <Route path="*"              element={<Navigate to="/dashboard" replace />} />
           </Routes>
         </main>

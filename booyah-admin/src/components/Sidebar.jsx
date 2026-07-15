@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { NavLink } from 'react-router-dom';
-import { LayoutDashboard, Users, CreditCard, Tag, Settings, Zap, Bell, Receipt } from 'lucide-react';
+import { LayoutDashboard, Users, CreditCard, Tag, Settings, Zap, Bell, Receipt, ScrollText } from 'lucide-react';
 import { adminFetch } from '../pages/Dashboard';
 
 const nav = [
@@ -10,6 +10,7 @@ const nav = [
   { to: '/promo-codes',   icon: Tag,             label: 'PROMO CODES' },
   { to: '/settings',      icon: Settings,        label: 'SETTINGS' },
   { to: '/payment-requests', icon: Receipt,        label: 'PAYMENTS', badge: 'pendingPayments' },
+  { to: '/logs',          icon: ScrollText,      label: 'ERROR LOGS' }
 ];
 
 export default function Sidebar() {

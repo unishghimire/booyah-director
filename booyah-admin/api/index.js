@@ -626,6 +626,11 @@ module.exports = async (req, res) => {
             branch: s.bankBranch || '',
             qrUrl: s.bankQrUrl || '',
           },
+          khalti: {
+            number: s.khaltiNumber || '',
+            name: s.khaltiName || '',
+            qrUrl: s.khaltiQrUrl || '',
+          },
           imgbbApiKey: '', // never expose
         });
       }

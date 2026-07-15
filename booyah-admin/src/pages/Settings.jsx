@@ -29,6 +29,9 @@ export default function Settings() {
     bankAccountNumber: '',
     bankBranch: '',
     bankQrUrl: '',
+    khaltiNumber: '',
+    khaltiName: '',
+    khaltiQrUrl: '',
     imgbbApiKey: '',
   });
   const [saving, setSaving] = useState(false);
@@ -40,9 +43,11 @@ export default function Settings() {
 
   const [uploadingEsewa, setUploadingEsewa] = useState(false);
   const [uploadingBank, setUploadingBank] = useState(false);
+  const [uploadingKhalti, setUploadingKhalti] = useState(false);
 
   const esewaFileInputRef = useRef(null);
   const bankFileInputRef = useRef(null);
+  const khaltiFileInputRef = useRef(null);
 
   const loadSettings = async () => {
     try {
@@ -129,7 +134,18 @@ export default function Settings() {
       return;
     }
 
-    if (type === 'esewa') {
+        if (type === 'khalti') {
+      setUploadingKhalti(true);
+      try {
+        const url = await uploadToImgBB(file, settings.imgbbApiKey);
+        setSettings(s => ({ ...s, khaltiQrUrl: url }));
+        toast.success('Khalti QR Code updated. Click "Save Settings" below to store permanently.');
+      } catch (err) {
+        toast.error(err.message || 'Upload failed');
+      } finally {
+        setUploadingKhalti(false);
+      }
+    } else if (type === 'esewa') {
       setUploadingEsewa(true);
       try {
         const url = await uploadToImgBB(file, settings.imgbbApiKey);
@@ -196,9 +212,71 @@ export default function Settings() {
             >
               <Landmark className="w-3.5 h-3.5" /> BANK TRANSFER
             </button>
+            <button
+              onClick={() => setPaymentTab('khalti')}
+              className={`flex items-center gap-2 px-4 py-2.5 font-orbitron text-[10px] font-black tracking-wider transition-all border-b-2 -mb-[1px] ${
+                paymentTab === 'khalti'
+                  ? 'border-[#a855f7] text-white bg-[#a855f7]/5'
+                  : 'border-transparent text-gray-500 hover:text-gray-300'
+              }`}
+            >
+              <CreditCard className="w-3.5 h-3.5" /> KHALTI
+            </button>
           </div>
 
           {/* Tab Content */}
+                    {paymentTab === 'khalti' && (
+            <div className="space-y-4">
+              <Field label="KHALTI ID / NUMBER" field="khaltiNumber" placeholder="98XXXXXXXX" />
+              <Field label="ACCOUNT HOLDER NAME" field="khaltiName" placeholder="e.g. John Doe" />
+              
+              <div>
+                <label className="font-orbitron text-[9px] text-gray-500 tracking-wider block mb-1.5">KHALTI QR CODE</label>
+                {!settings.imgbbApiKey && (
+                  <div className="flex items-center gap-2 text-yellow-500/80 bg-yellow-500/5 border border-yellow-500/10 rounded-lg p-3 mb-3">
+                    <AlertTriangle className="w-4 h-4 flex-shrink-0" />
+                    <span className="font-orbitron text-[9px] tracking-wider font-bold">Set ImgBB API key below to enable QR uploads</span>
+                  </div>
+                )}
+                <div className="flex items-start gap-4">
+                  {settings.khaltiQrUrl ? (
+                    <div className="relative group w-24 h-24 bg-black/40 border border-white/10 rounded-lg overflow-hidden flex items-center justify-center">
+                      <img src={settings.khaltiQrUrl} alt="Khalti QR" className="w-full h-full object-contain" />
+                      <button 
+                        onClick={() => setSettings(s => ({...s, khaltiQrUrl: ''}))}
+                        className="absolute inset-0 bg-black/80 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity text-red-500 font-orbitron text-[9px] font-black"
+                      >
+                        REMOVE
+                      </button>
+                    </div>
+                  ) : (
+                    <div className="w-24 h-24 bg-black/40 border border-dashed border-white/10 rounded-lg flex flex-col items-center justify-center text-gray-500">
+                      <CreditCard className="w-6 h-6 mb-1 opacity-40" />
+                      <span className="font-orbitron text-[8px] tracking-widest text-center">NO QR</span>
+                    </div>
+                  )}
+                  <div className="flex-1 space-y-2">
+                    <input 
+                      type="file" 
+                      ref={khaltiFileInputRef} 
+                      onChange={(e) => handleQrUpload(e, 'khalti')} 
+                      accept="image/png, image/jpeg" 
+                      className="hidden" 
+                    />
+                    <button
+                      onClick={() => khaltiFileInputRef.current?.click()}
+                      disabled={uploadingKhalti || !settings.imgbbApiKey}
+                      className="flex items-center gap-2 px-3 py-2 border border-white/10 hover:border-white/20 text-white rounded-lg font-orbitron text-[9px] font-black tracking-wider transition-all disabled:opacity-40"
+                    >
+                      <Upload className="w-3.5 h-3.5" /> {uploadingKhalti ? 'UPLOADING...' : 'UPLOAD QR IMAGE'}
+                    </button>
+                    <p className="font-orbitron text-[8px] text-gray-600">Supports PNG, JPG. Max 32MB.</p>
+                  </div>
+                </div>
+              </div>
+            </div>
+          )}
+
           {paymentTab === 'esewa' && (
             <div className="space-y-4">
               <Field label="ESEWA NUMBER" field="esewaNumber" placeholder="98XXXXXXXX" />
