@@ -108,7 +108,7 @@ async function loadDb(uid) {
     return _memStore.get(uid) || getDefaultDb();
   }
   try {
-    const res = await fetch(fbUrl(uid), { signal: AbortSignal.timeout(8000) });
+    const res = await fetch(fbUrl(uid), { signal: AbortSignal.timeout(5000) });
     if (!res.ok) {
       console.error(`[db] Firebase read HTTP ${res.status} for uid=${uid}`);
       return _memStore.get(uid) || getDefaultDb();
@@ -148,7 +148,7 @@ async function saveDb(uid, db) {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(db),
-      signal: AbortSignal.timeout(8000),
+      signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) {
       console.error(`[db] Firebase write HTTP ${res.status} for uid=${uid}`);
@@ -248,7 +248,7 @@ async function verifyToken(authHeader) {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({ idToken: token }),
-        signal: AbortSignal.timeout(6000), // 6s timeout
+        signal: AbortSignal.timeout(4000), // 4s timeout
       }
     );
 
@@ -1430,7 +1430,7 @@ module.exports = async (req, res) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-          signal: AbortSignal.timeout(8000),
+          signal: AbortSignal.timeout(5000),
         });
         if (!r.ok) {
           const txt = await r.text();
@@ -1495,7 +1495,7 @@ module.exports = async (req, res) => {
           method: 'POST',
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(payload),
-          signal: AbortSignal.timeout(8000),
+          signal: AbortSignal.timeout(5000),
         });
         if (!r.ok) {
           const txt = await r.text();
