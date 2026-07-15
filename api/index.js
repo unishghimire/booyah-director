@@ -347,7 +347,15 @@ module.exports = async (req, res) => {
     const urlObj = new URL(req.url || '', `http://${req.headers.host || 'localhost'}`);
     const route = urlObj.pathname.replace(/^\/api\/?/, '').split('/')[0];
     const query = Object.fromEntries(urlObj.searchParams.entries());
-    const body = req.body || {};
+
+    // ── BODY PARSING — Vercel auto-parses JSON, but add fallback for safety ──
+    let body = req.body;
+    if (body == null || typeof body === 'string') {
+      try {
+        body = body ? JSON.parse(body) : {};
+      } catch (_) { body = {}; }
+    }
+    if (typeof body !== 'object' || Array.isArray(body)) body = {};
 
     const ok  = (data) => res.status(200).json(data);
     const err = (code, msg) => res.status(code).json({ error: msg });
@@ -605,7 +613,9 @@ module.exports = async (req, res) => {
       const secret = process.env.FIREBASE_DATABASE_SECRET;
       if (!secret || !dbBaseUrl) return err(500, 'Database not configured');
 
-      const body = req.body || {};
+      let body = req.body;
+      if (body == null || typeof body === 'string') { try { body = body ? JSON.parse(body) : {}; } catch (_) { body = {}; } }
+      if (typeof body !== 'object') body = {};
       const plan = sanitizeString(body.plan);
       const paymentMethod = sanitizeString(body.paymentMethod);
       const transactionId = sanitizeString(body.transactionId);
@@ -889,7 +899,9 @@ module.exports = async (req, res) => {
         name,
         total_matches,
         points_per_kill,
-        placement_points_config: JSON.stringify(body.placement_points_config || defaultConfig),
+        placement_points_config: typeof body.placement_points_config === 'string'
+          ? body.placement_points_config
+          : JSON.stringify(body.placement_points_config || defaultConfig),
         current_match_number: 0,
         status: 'active',
         created_at: new Date().toISOString()
@@ -1743,6 +1755,7 @@ module.exports = async (req, res) => {
 
     return err(404, `Unknown route: ${route}`);
   } catch (e) {
-    return err(500, 'Internal Server Error');
+    console.error('[FATAL]', e?.message || e);
+    return err(500, e?.message || 'Internal Server Error');
   }
 };
