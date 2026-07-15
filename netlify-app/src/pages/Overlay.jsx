@@ -20,6 +20,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Skull, Star, Crown, Zap, Calendar, Users, MapPin, Award, XCircle, Mic2, Shield, Flame } from 'lucide-react';
 import { MAP_IMAGES, getMapImages, setCustomMapImages } from '@/lib/maps';
 import { safeArray } from '@/components/ErrorBoundary';
+import { FFBoardV2, MatchInfoChip, GameIntroBanner, MatchScheduleGrid, PointRushStandings } from '@/pages/FFWSOverlays';
 
 /* ══════════════════════════════════════════════════
    DATA POLLING — calls public overlay API with optional shareToken
@@ -1526,6 +1527,24 @@ export default function Overlay() {
     booyah:          <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
     team_roster:     <TeamRosterScreen teams={teams} players={players} design={design} />,
     teamroster:      <TeamRosterScreen teams={teams} players={players} design={design} />,
+    'game-intro':    <GameIntroBanner currentMatch={currentMatch} design={design} />,
+    game_intro:      <GameIntroBanner currentMatch={currentMatch} design={design} />,
+    schedule:        <MatchScheduleGrid design={design} />,
+    match_schedule:  <MatchScheduleGrid design={design} />,
+    'point-rush':    <PointRushStandings teams={teams} design={design} />,
+    point_rush:      <PointRushStandings teams={teams} design={design} />,
+    'ffws-scoreboard': (
+      <>
+        <FFBoardV2 teams={teams} players={players} currentMatch={currentMatch} design={design} />
+        <MatchInfoChip currentMatch={currentMatch} design={design} />
+      </>
+    ),
+    ffws_scoreboard: (
+      <>
+        <FFBoardV2 teams={teams} players={players} currentMatch={currentMatch} design={design} />
+        <MatchInfoChip currentMatch={currentMatch} design={design} />
+      </>
+    ),
   };
 
   const component = screens[screen] ?? screens[screen?.replace(/-/g,'_')] ?? null;
