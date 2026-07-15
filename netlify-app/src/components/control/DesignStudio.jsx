@@ -683,6 +683,91 @@ export default function DesignStudio(props) {
         </div>
       </Section>
 
+
+      {/* ── POINT RUSH STANDINGS ── */}
+      <Section title="POINT RUSH GFX" icon={Trophy}>
+        <div className="space-y-4">
+          <p className="text-[10px] text-gray-500 leading-normal">
+            Customize the Point Rush Standings overlay screen. All changes push live to OBS instantly.
+          </p>
+
+          {/* Header text */}
+          <div>
+            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Header Title</label>
+            <input value={design?.pointRush?.headerText || ''} onChange={e => upd("pointRush", { ...design?.pointRush, headerText: e.target.value })}
+              placeholder="POINT RUSH STANDINGS"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/40 transition-colors" />
+          </div>
+
+          {/* Footer text */}
+          <div>
+            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Footer Text</label>
+            <input value={design?.pointRush?.footerText || ''} onChange={e => upd("pointRush", { ...design?.pointRush, footerText: e.target.value })}
+              placeholder="#Rise to THE SUMMIT"
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/40 transition-colors" />
+          </div>
+
+          {/* Gradient colors */}
+          <div className="rounded-xl border border-white/8 bg-black/20 p-3 space-y-3">
+            <p className="text-[9px] font-orbitron font-black tracking-widest text-gray-400 uppercase border-b border-white/5 pb-1.5">Background Gradient</p>
+            <div className="grid grid-cols-3 gap-2">
+              <div>
+                <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Start</label>
+                <div className="flex items-center gap-2">
+                  <input type="color" value={design?.pointRush?.gradientStart || '#1e3a8a'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientStart: e.target.value })}
+                    className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
+                  <input value={design?.pointRush?.gradientStart || '#1e3a8a'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientStart: e.target.value })}
+                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-orange-500/30" />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Mid</label>
+                <div className="flex items-center gap-2">
+                  <input type="color" value={design?.pointRush?.gradientMid || '#7c3aed'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientMid: e.target.value })}
+                    className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
+                  <input value={design?.pointRush?.gradientMid || '#7c3aed'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientMid: e.target.value })}
+                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-orange-500/30" />
+                </div>
+              </div>
+              <div>
+                <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">End</label>
+                <div className="flex items-center gap-2">
+                  <input type="color" value={design?.pointRush?.gradientEnd || '#ec4899'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientEnd: e.target.value })}
+                    className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
+                  <input value={design?.pointRush?.gradientEnd || '#ec4899'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientEnd: e.target.value })}
+                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-orange-500/30" />
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Hazard tape toggle */}
+          <div className="flex items-center justify-between rounded-xl border border-white/8 bg-black/20 p-3">
+            <div>
+              <label className="block text-[9px] font-black uppercase tracking-wider text-gray-600">Hazard Tape Corners</label>
+              <p className="text-[9px] text-gray-600 mt-0.5">Yellow/black diagonal stripes in screen corners</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => upd("pointRush", { ...design?.pointRush, hazardTape: !(design?.pointRush?.hazardTape !== false) })}
+              className={`relative w-12 h-6 rounded-full transition-colors ${(design?.pointRush?.hazardTape !== false) ? 'bg-orange-500' : 'bg-gray-700'}`}>
+              <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${(design?.pointRush?.hazardTape !== false) ? 'translate-x-6' : 'translate-x-0.5'}`} />
+            </button>
+          </div>
+
+          {/* Reset button */}
+          <button
+            type="button"
+            onClick={() => {
+              upd("pointRush", { gradientStart: '#1e3a8a', gradientMid: '#7c3aed', gradientEnd: '#ec4899', footerText: '#Rise to THE SUMMIT', headerText: 'POINT RUSH STANDINGS', hazardTape: true });
+              toast.success('Point Rush GFX reset to defaults');
+            }}
+            className="rounded-lg px-3 py-2 text-[10px] font-orbitron font-black bg-red-600/20 hover:bg-red-600 text-red-400 hover:text-white transition-all tracking-wider">
+            RESET TO DEFAULTS
+          </button>
+        </div>
+      </Section>
+
       {/* ── CASTERS ── */}
       <Section title="CASTERS" icon={Mic2}>
         <div className="space-y-3">

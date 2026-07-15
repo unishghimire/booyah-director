@@ -927,112 +927,272 @@ export function PointRushStandings({ teams = [], design }) {
   const tLogo = design?.logoUrl || null;
   const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
   const sponsorLogo = design?.sponsorLogoUrl || null;
-  const rankColors = ['#FFD700', '#E5E4E2', '#CD7F32'];
+  const rankColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
+
+  // Editable from Director panel — design.pointRush object
+  const pr = design?.pointRush || {};
+  const gradStart = pr.gradientStart || '#1e3a8a';
+  const gradMid   = pr.gradientMid   || '#7c3aed';
+  const gradEnd   = pr.gradientEnd   || '#ec4899';
+  const footerText = pr.footerText || '#Rise to THE SUMMIT';
+  const showHazard = pr.hazardTape !== false; // default true
+  const headerText = pr.headerText || 'POINT RUSH STANDINGS';
+
+  // Hazard tape corner component
+  const HazardCorner = ({ position }) => {
+    const posStyles = {
+      topLeft:     { top: -40, left: -40, transform: 'rotate(-45deg)' },
+      topRight:    { top: -40, right: -40, transform: 'rotate(45deg)' },
+      bottomLeft:  { bottom: -40, left: -40, transform: 'rotate(45deg)' },
+      bottomRight: { bottom: -40, right: -40, transform: 'rotate(-45deg)' },
+    };
+    return (
+      <div style={{
+        position: 'absolute', width: 180, height: 180, zIndex: 5,
+        ...posStyles[position],
+        backgroundImage: 'repeating-linear-gradient(-45deg, #FFC700, #FFC700 15px, #000 15px, #000 30px)',
+        boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255,199,0,0.2)',
+        borderBottom: position.includes('top') ? '4px solid #fff' : 'none',
+        borderTop: position.includes('bottom') ? '4px solid #fff' : 'none',
+      }} />
+    );
+  };
 
   const renderRow = (team, idx, globalRank) => {
     const rank = globalRank;
     const isTop = rank <= 3;
     const rankColor = isTop ? rankColors[rank - 1] : '#fff';
-    const rowBg = rank === 1 ? 'rgba(255,215,0,0.08)' : idx % 2 === 0 ? 'rgba(255,255,255,0.015)' : 'transparent';
+    const rowBg = rank === 1
+      ? 'linear-gradient(90deg, rgba(255,215,0,0.12), rgba(255,215,0,0.03))'
+      : idx % 2 === 0
+        ? 'rgba(255,255,255,0.04)'
+        : 'rgba(255,255,255,0.01)';
 
     return (
-      <div key={team.id || idx} style={{
-        display: 'flex', alignItems: 'center', height: 48,
-        background: rowBg, borderBottom: '1px solid rgba(255,255,255,0.03)',
-        padding: '0 12px',
-      }}>
+      <motion.div
+        key={team.id || idx}
+        initial={{ opacity: 0, x: -20 }}
+        animate={{ opacity: 1, x: 0 }}
+        transition={{ duration: 0.4, delay: idx * 0.05 }}
+        style={{
+          display: 'flex', alignItems: 'center', height: 56,
+          background: rowBg,
+          borderBottom: '1px solid rgba(255,255,255,0.06)',
+          borderRadius: 6,
+          padding: '0 14px',
+          marginBottom: 4,
+          backdropFilter: 'blur(4px)',
+        }}>
         {/* Rank badge */}
         <div style={{
-          width: 32, height: 32, borderRadius: 6,
-          background: rank === 1 ? 'rgba(255,215,0,0.15)' : 'rgba(0,0,0,0.4)',
-          border: rank <= 3 ? `1px solid ${rankColors[rank-1]}44` : '1px solid rgba(255,255,255,0.08)',
+          width: 36, height: 36, borderRadius: 8,
+          background: rank === 1
+            ? 'linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,215,0,0.05))'
+            : 'rgba(0,0,0,0.5)',
+          border: rank <= 3
+            ? `1px solid ${rankColors[rank-1]}66`
+            : '1px solid rgba(255,255,255,0.1)',
           display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Orbitron', fontSize: 13, fontWeight: 900, color: rankColor,
+          fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: rankColor,
           flexShrink: 0,
+          boxShadow: rank <= 3 ? `0 0 10px ${rankColors[rank-1]}33` : 'none',
         }}>
           {rank}
         </div>
         {/* Team logo */}
-        <div style={{ width: 36, display: 'flex', justifyContent: 'center' }}>
+        <div style={{ width: 40, display: 'flex', justifyContent: 'center' }}>
           {team.logo_url ? (
-            <img src={team.logo_url} alt="" style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: '50%', border: rank === 1 ? '2px solid #FFD700' : 'none' }}
+            <img src={team.logo_url} alt="" style={{
+              width: 32, height: 32, objectFit: 'contain', borderRadius: '50%',
+              border: rank === 1 ? '2px solid #FFD700' : '1px solid rgba(255,255,255,0.15)',
+            }}
               onError={e => { e.target.style.display = 'none'; }} />
           ) : (
-            <div style={{ width: 28, height: 28, borderRadius: '50%', background: 'rgba(255,107,0,0.15)', border: '1px solid rgba(255,107,0,0.3)', display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 900, color: '#FF6B00' }}>{(team.name || 'T').charAt(0)}</span>
+            <div style={{
+              width: 32, height: 32, borderRadius: '50%',
+              background: 'rgba(255,255,255,0.08)',
+              border: '1px solid rgba(255,255,255,0.15)',
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.6)' }}>
+                {(team.name || 'T').charAt(0)}
+              </span>
             </div>
           )}
         </div>
         {/* Team name */}
-        <div style={{ flex: 1, paddingLeft: 10, fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#FFD700', textTransform: 'uppercase', letterSpacing: '0.05em', overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap' }}>
+        <div style={{
+          flex: 1, paddingLeft: 12,
+          fontFamily: 'Orbitron', fontSize: 15, fontWeight: 900,
+          color: rank === 1 ? '#FFD700' : '#fff',
+          textTransform: 'uppercase', letterSpacing: '0.04em',
+          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+        }}>
           {team.name || 'TEAM'}
         </div>
-        {/* Points */}
-        <div style={{ fontFamily: 'Rajdhani', fontSize: 22, fontWeight: 900, color: '#fff', minWidth: 50, textAlign: 'right' }}>
+        {/* Kills */}
+        <div style={{
+          fontFamily: 'Rajdhani', fontSize: 14, fontWeight: 700,
+          color: 'rgba(255,255,255,0.4)', minWidth: 36, textAlign: 'right',
+        }}>
+          {team.total_tournament_kills || 0}
+        </div>
+        {/* Divider */}
+        <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.1)', margin: '0 10px' }} />
+        {/* Total points */}
+        <div style={{
+          fontFamily: 'Rajdhani', fontSize: 24, fontWeight: 900,
+          color: rank === 1 ? '#FFD700' : '#fff',
+          minWidth: 56, textAlign: 'right',
+          textShadow: rank === 1 ? '0 0 12px rgba(255,215,0,0.4)' : 'none',
+        }}>
           {team.total_tournament_points || 0}
         </div>
-      </div>
+      </motion.div>
     );
   };
 
   return (
     <div style={{
       width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
-      background: 'linear-gradient(135deg, #06060f 0%, #0a0a1e 50%, #06060f 100%)',
+      background: `linear-gradient(135deg, ${gradStart} 0%, ${gradMid} 50%, ${gradEnd} 100%)`,
     }}>
-      {/* Subtle blue-purple glow */}
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 1200px 600px at 50% 20%, rgba(100,80,255,0.08), transparent 70%)' }} />
+      {/* Dark overlay for readability */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: 'rgba(0,0,0,0.35)',
+      }} />
+      {/* Subtle grid pattern */}
+      <div style={{
+        position: 'absolute', inset: 0, opacity: 0.04,
+        backgroundImage: `
+          linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
+          linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
+        `,
+        backgroundSize: '40px 40px',
+      }} />
+      {/* Ambient glow */}
+      <div style={{
+        position: 'absolute', inset: 0,
+        background: `radial-gradient(ellipse 800px 400px at 50% 30%, ${gradMid}33, transparent 70%)`,
+      }} />
 
-      <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', padding: '48px 64px', display: 'flex', flexDirection: 'column' }}>
+      {/* Hazard tape corners */}
+      {showHazard && (
+        <>
+          <HazardCorner position="topLeft" />
+          <HazardCorner position="topRight" />
+          <HazardCorner position="bottomLeft" />
+          <HazardCorner position="bottomRight" />
+        </>
+      )}
+
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        style={{
+          position: 'relative', zIndex: 10, width: '100%', height: '100%',
+          padding: '56px 72px', display: 'flex', flexDirection: 'column',
+        }}>
         {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 28 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
             {tLogo && (
-              <img src={tLogo} alt="" style={{ height: 44, objectFit: 'contain' }}
+              <img src={tLogo} alt="" style={{ height: 48, objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))' }}
                 onError={e => { e.target.style.display = 'none'; }} />
             )}
             <div>
-              <div style={{ fontFamily: 'Orbitron', fontSize: 48, fontWeight: 900, color: '#fff', letterSpacing: '0.15em', lineHeight: 1 }}>
-                POINT RUSH STANDINGS
+              <div style={{
+                fontFamily: 'Orbitron', fontSize: 52, fontWeight: 900, color: '#fff',
+                letterSpacing: '0.12em', lineHeight: 1,
+                textShadow: '0 4px 20px rgba(0,0,0,0.5)',
+              }}>
+                {headerText}
               </div>
-              <div style={{ fontFamily: 'Orbitron', fontSize: 13, fontWeight: 700, color: '#FFD700', letterSpacing: '0.25em', marginTop: 6 }}>
-                {tName} // CHAMPION RUSH // GRAND FINALS
+              <div style={{
+                fontFamily: 'Orbitron', fontSize: 14, fontWeight: 700,
+                color: 'rgba(255,255,255,0.6)', letterSpacing: '0.25em', marginTop: 8,
+              }}>
+                {tName} // GRAND FINALS
               </div>
             </div>
           </div>
           {sponsorLogo && (
-            <img src={sponsorLogo} alt="" style={{ height: 44, objectFit: 'contain', opacity: 0.8 }}
+            <img src={sponsorLogo} alt="" style={{
+              height: 48, objectFit: 'contain', opacity: 0.85,
+              filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))',
+            }}
               onError={e => { e.target.style.display = 'none'; }} />
+          )}
+        </div>
+
+        {/* Column headers */}
+        <div style={{ display: 'flex', gap: 40, marginBottom: 8 }}>
+          {col2.length > 0 ? (
+            <>
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0 14px 8px 62px', borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>TEAM</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>KILLS</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>PTS</span>
+              </div>
+              <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0 14px 8px 62px', borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>TEAM</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>KILLS</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>PTS</span>
+              </div>
+            </>
+          ) : (
+            <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0 14px 8px 62px', borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>TEAM</span>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>KILLS</span>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>PTS</span>
+            </div>
           )}
         </div>
 
         {/* Two columns */}
         <div style={{ display: 'flex', gap: 40, flex: 1 }}>
-          {/* Column 1 */}
           <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
             {col1.map((team, idx) => renderRow(team, idx, idx + 1))}
           </div>
-          {/* Divider */}
           {col2.length > 0 && (
-            <div style={{ width: 1, background: 'linear-gradient(transparent, rgba(255,255,255,0.1), transparent)' }} />
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              {col2.map((team, idx) => renderRow(team, idx, idx + 7))}
+            </div>
           )}
-          {/* Column 2 */}
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            {col2.map((team, idx) => renderRow(team, idx, idx + 7))}
-          </div>
         </div>
 
-        {/* Bottom bar */}
-        <div style={{ display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 16, marginTop: 24 }}>
+        {/* Footer — "#Rise to THE SUMMIT" */}
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{ duration: 0.5, delay: 0.8 }}
+          style={{
+            display: 'flex', alignItems: 'center', justifyContent: 'center',
+            gap: 20, marginTop: 28,
+          }}>
+          {/* Left accent line */}
+          <div style={{ width: 80, height: 2, background: 'linear-gradient(90deg, transparent, rgba(255,199,0,0.6))' }} />
           {tLogo && (
-            <img src={tLogo} alt="" style={{ height: 24, objectFit: 'contain', opacity: 0.4 }}
+            <img src={tLogo} alt="" style={{ height: 28, objectFit: 'contain', opacity: 0.5 }}
               onError={e => { e.target.style.display = 'none'; }} />
           )}
-          <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em' }}>
-            OFFICIAL BROADCAST STANDINGS
+          <span style={{
+            fontFamily: 'Orbitron', fontSize: 18, fontWeight: 900,
+            color: '#FFC700', letterSpacing: '0.15em',
+            textShadow: '0 2px 12px rgba(255,199,0,0.4)',
+          }}>
+            {footerText}
           </span>
-        </div>
-      </div>
+          {sponsorLogo && (
+            <img src={sponsorLogo} alt="" style={{ height: 28, objectFit: 'contain', opacity: 0.5 }}
+              onError={e => { e.target.style.display = 'none'; }} />
+          )}
+          {/* Right accent line */}
+          <div style={{ width: 80, height: 2, background: 'linear-gradient(90deg, rgba(255,199,0,0.6), transparent)' }} />
+        </motion.div>
+      </motion.div>
     </div>
   );
 }

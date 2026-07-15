@@ -1834,7 +1834,6 @@ export default function Overlay() {
 
   const screens = {
     scoreboard:      <FFBoard       teams={teams} players={players} currentMatch={currentMatch} design={design} />,
-    ff_scoreboard:   <FFBoard       teams={teams} players={players} currentMatch={currentMatch} design={design} />,
     standings:       <FullStandings teams={teams} design={design} />,
     full_standings:  <FullStandings teams={teams} design={design} />,
     maplabel:        <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
