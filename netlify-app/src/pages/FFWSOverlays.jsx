@@ -229,78 +229,239 @@ export function GameIntroBanner({ currentMatch, design }) {
   const sponsorLogo = design?.sponsorLogoUrl || null;
 
   return (
-    <div style={{ width: '100%', height: '100%', position: 'relative', background: 'transparent', overflow: 'hidden' }}>
-      {/* Centered banner */}
+    <div style={{
+      width: 1920,
+      height: 1080,
+      position: 'relative',
+      background: '#04050a',
+      backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(20, 24, 40, 0.9) 0%, rgba(5, 6, 12, 0.98) 100%)',
+      overflow: 'hidden',
+      color: '#fff',
+      display: 'flex',
+      flexDirection: 'column',
+      justifyContent: 'center',
+      alignItems: 'center'
+    }}>
+      {/* Subtle particle / grid background layer */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        opacity: 0.08,
+        backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+        backgroundSize: '24px 24px',
+        pointerEvents: 'none'
+      }} />
+
+      {/* Red ambient background glows */}
+      <div style={{
+        position: 'absolute',
+        top: '25%',
+        left: '50%',
+        transform: 'translate(-50%, -50%)',
+        width: 800,
+        height: 350,
+        background: 'radial-gradient(ellipse at center, rgba(197, 15, 33, 0.15) 0%, rgba(0, 0, 0, 0) 70%)',
+        filter: 'blur(40px)',
+        pointerEvents: 'none',
+        zIndex: 1
+      }} />
+
+      {/* Main Diagonal-Cut Banner with Framer Motion Entrance */}
       <motion.div
-        initial={{ y: -30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.6, ease: 'easeOut' }}
+        initial={{ scaleY: 0, opacity: 0 }}
+        animate={{ scaleY: 1, opacity: 1 }}
+        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
         style={{
-          position: 'absolute', top: '18%', left: '50%', transform: 'translateX(-50%)',
-          width: 820, height: 112,
-          display: 'flex', boxShadow: '0 0 50px rgba(200,0,0,0.4)',
+          width: 950,
+          height: 140,
+          display: 'flex',
+          position: 'relative',
+          zIndex: 2,
+          filter: 'drop-shadow(0px 15px 35px rgba(0, 0, 0, 0.65))',
+          transformOrigin: 'center'
         }}
       >
-        {/* LEFT — black section (65%) */}
+        {/* LEFT PANEL: Black/Dark Diagonal Panel (~65% width) */}
         <div style={{
-          width: '65%', height: '100%',
-          background: '#0a0a0a',
-          display: 'flex', flexDirection: 'column', justifyContent: 'center',
-          padding: '0 40px',
-          clipPath: 'polygon(0 0, 100% 0, calc(100% - 40px) 100%, 0 100%)',
+          width: '65%',
+          height: '100%',
+          background: 'linear-gradient(90deg, #090a0f 0%, #11131a 100%)',
+          borderLeft: '4px solid #f0a818',
+          clipPath: 'polygon(0% 0%, 100% 0%, 88% 100%, 0% 100%)',
+          display: 'flex',
+          flexDirection: 'column',
+          justifyContent: 'center',
+          paddingLeft: 60,
+          boxSizing: 'border-box',
+          position: 'relative'
         }}>
-          <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#fff', letterSpacing: '0.3em', opacity: 0.7 }}>
+          {/* Top small letter-spaced uppercase subtitle */}
+          <span style={{
+            fontFamily: 'Orbitron',
+            fontSize: 12,
+            fontWeight: 800,
+            color: '#b0b6c2',
+            letterSpacing: '0.45em',
+            textTransform: 'uppercase',
+            marginBottom: 4
+          }}>
             CHAMPION RUSH — GRAND
           </span>
-          <span style={{ fontFamily: 'Orbitron', fontSize: 52, fontWeight: 900, color: '#FFD700', letterSpacing: '0.04em', lineHeight: 1.1 }}>
+          {/* Massive Gold GAME X Title */}
+          <span style={{
+            fontFamily: 'Orbitron',
+            fontSize: 64,
+            fontWeight: 900,
+            color: '#f0a818',
+            backgroundImage: 'linear-gradient(to bottom, #ffe680 0%, #f0a818 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            letterSpacing: '0.05em',
+            lineHeight: 1,
+            textShadow: '0 0 15px rgba(240, 168, 24, 0.2)'
+          }}>
             GAME {matchNum}
           </span>
         </div>
-        {/* RIGHT — red gradient section */}
+
+        {/* RIGHT PANEL: Red/Crimson Gradient Panel (~35% width) */}
         <div style={{
-          width: '35%', height: '100%',
-          background: 'linear-gradient(135deg, #CC0000, #FF3A3A)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          clipPath: 'polygon(-40px 0, 100% 0, 100% 100%, 0 100%)',
+          width: '35%',
+          height: '100%',
+          background: 'linear-gradient(135deg, #a8101a 0%, #e61c2b 100%)',
+          clipPath: 'polygon(22.5% 0%, 100% 0%, 100% 100%, 0% 100%)',
+          marginLeft: '-10%', // overlap/align clip paths perfectly
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'center',
+          paddingLeft: '12%',
+          boxSizing: 'border-box'
         }}>
           {tLogo ? (
-            <img src={tLogo} alt="" style={{ height: 56, objectFit: 'contain', filter: 'brightness(1.2)' }}
-              onError={e => { e.target.style.display = 'none'; }} />
+            <img 
+              src={tLogo} 
+              alt="" 
+              style={{ 
+                maxHeight: 75, 
+                maxWidth: '85%', 
+                objectFit: 'contain',
+                filter: 'drop-shadow(0px 4px 8px rgba(0,0,0,0.4))'
+              }}
+              onError={e => { e.target.style.display = 'none'; }} 
+            />
           ) : (
-            <span style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#fff' }}>{tName}</span>
+            <span style={{ 
+              fontFamily: 'Orbitron', 
+              fontSize: 26, 
+              fontWeight: 900, 
+              color: '#fff',
+              letterSpacing: '0.1em',
+              textTransform: 'uppercase',
+              textShadow: '0 2px 4px rgba(0,0,0,0.5)'
+            }}>
+              {tName}
+            </span>
           )}
         </div>
       </motion.div>
 
-      {/* Map name pill below banner */}
+      {/* Map Badge Pill below the banner */}
       <motion.div
-        initial={{ y: 20, opacity: 0 }}
+        initial={{ y: 30, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.3 }}
+        transition={{ duration: 0.5, delay: 0.4, ease: 'easeOut' }}
         style={{
-          position: 'absolute', top: 'calc(18% + 130px)', left: '50%', transform: 'translateX(-50%)',
-          background: 'rgba(0,0,0,0.8)', border: '1px solid rgba(255,215,0,0.3)',
-          borderRadius: 20, padding: '8px 28px',
-          display: 'flex', alignItems: 'center', gap: 10,
+          background: 'rgba(9, 10, 15, 0.85)',
+          border: '2px solid rgba(240, 168, 24, 0.45)',
+          borderRadius: 30,
+          padding: '10px 45px',
+          display: 'flex',
+          alignItems: 'center',
+          gap: 12,
+          marginTop: 35,
+          zIndex: 2,
+          boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+          backdropFilter: 'blur(8px)'
         }}
       >
-        <div style={{ width: 8, height: 8, borderRadius: '50%', background: '#FFD700', boxShadow: '0 0 8px #FFD700' }} />
-        <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', textTransform: 'uppercase' }}>
+        <div style={{
+          width: 10,
+          height: 10,
+          borderRadius: '50%',
+          background: '#f0a818',
+          boxShadow: '0 0 12px #f0a818'
+        }} />
+        <span style={{
+          fontFamily: 'Orbitron',
+          fontSize: 16,
+          fontWeight: 900,
+          color: '#ffffff',
+          letterSpacing: '0.2em',
+          textTransform: 'uppercase'
+        }}>
           {mapName}
         </span>
       </motion.div>
 
+      {/* Tournament Branding Logo/Name in Top Left Corner */}
+      <motion.div
+        initial={{ x: -30, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.6, delay: 0.2 }}
+        style={{
+          position: 'absolute',
+          top: 50,
+          left: 60,
+          display: 'flex',
+          alignItems: 'center',
+          gap: 15,
+          zIndex: 2
+        }}
+      >
+        {tLogo ? (
+          <img 
+            src={tLogo} 
+            alt="" 
+            style={{ height: 50, objectFit: 'contain' }}
+            onError={e => { e.target.style.display = 'none'; }} 
+          />
+        ) : (
+          <span style={{ 
+            fontFamily: 'Orbitron', 
+            fontSize: 22, 
+            fontWeight: 900, 
+            color: '#fff',
+            letterSpacing: '0.05em' 
+          }}>
+            {tName}
+          </span>
+        )}
+      </motion.div>
+
       {/* Sponsor logo bottom-right */}
       {sponsorLogo && (
-        <img src={sponsorLogo} alt="" style={{
-          position: 'absolute', bottom: 40, right: 40, height: 36, objectFit: 'contain', opacity: 0.7,
-        }} onError={e => { e.target.style.display = 'none'; }} />
+        <motion.img 
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 0.85 }}
+          transition={{ duration: 0.6, delay: 0.5 }}
+          src={sponsorLogo} 
+          alt="" 
+          style={{
+            position: 'absolute', 
+            bottom: 50, 
+            right: 60, 
+            height: 40, 
+            objectFit: 'contain', 
+            zIndex: 2,
+            filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.3))'
+          }} 
+          onError={e => { e.target.style.display = 'none'; }} 
+        />
       )}
     </div>
   );
 }
 
-/* ═══ MATCH SCHEDULE GRID — full-scene, 6 map cards ═══ */
 export function MatchScheduleGrid({ design }) {
   const tLogo = design?.logoUrl || null;
   const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
