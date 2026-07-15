@@ -5,3 +5,4 @@ data/*.db
 # Local Netlify folder
 .netlify
 .vercel
+.env*
