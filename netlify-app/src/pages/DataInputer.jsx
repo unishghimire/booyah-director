@@ -1,13 +1,12 @@
 import ImageUpload from '@/components/ImageUpload';
-import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
+import { SectionBoundary, safeArray } from '@/components/ErrorBoundary';
 import React, { useState, useMemo } from 'react';
 import SheetImport from '@/components/control/SheetImport';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
 import {
-  Crosshair, Users, Clock, RefreshCw, Search, Plus,
-  ChevronDown, AlertTriangle, XCircle, Heart, Skull,
-  Shield, Trash2, RotateCcw, CheckCircle2, MapPin
+  Crosshair, Users, Clock, RefreshCw, Search, AlertTriangle,
+  Skull, Shield, Trash2
 } from 'lucide-react';
 
 /* ─── Team colour palette ─── */
@@ -36,7 +35,6 @@ export default function DataInputer() {
   const [playerAdding, setPlayerAdding] = useState(false);
 
   // General busy state
-  const [busyState, setBusyState] = useState(null);
 
   const state = data?.overlayState || {};
   const currentMatch = data?.currentMatch;
