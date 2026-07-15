@@ -45,15 +45,43 @@ const FONTS = [
 ];
 
 const OVERLAY_STYLES = [
-  { key:'ff_classic', label:'FF Classic',   desc:'Free Fire Official tournament style with Garena header, bracket corners, grid bg' },
-  { key:'default',    label:'Minimal Dark', desc:'Clean dark overlay without decorative elements' },
+  {
+    key: 'default',
+    label: 'Dual Border (Default)',
+    desc: 'Orange & cyan dual-corner glass panels. The original AAA esports style.',
+    preview: { p:'#FF6B00', s:'#00D4FF', corner:'dual' },
+  },
+  {
+    key: 'neon',
+    label: 'Neon Cyber',
+    desc: 'Neon green & purple glowing edges on a deep-black cyber grid.',
+    preview: { p:'#00FF88', s:'#BF00FF', corner:'glow' },
+  },
+  {
+    key: 'military',
+    label: 'Military Tactical',
+    desc: 'Olive & gold tactical HUD with rangefinder tick marks.',
+    preview: { p:'#9ABF30', s:'#C8A850', corner:'tick' },
+  },
+  {
+    key: 'minimal',
+    label: 'Minimal Editorial',
+    desc: 'Clean white-on-black typographic layout. No decorative elements.',
+    preview: { p:'#FFFFFF', s:'#888888', corner:'none' },
+  },
+  {
+    key: 'retro',
+    label: 'Retro Arcade',
+    desc: 'Red & gold CRT scanline aesthetic with bold solid borders.',
+    preview: { p:'#FF3030', s:'#FFD700', corner:'rect' },
+  },
 ];
 
 const DEFAULT_DESIGN = {
   accentColor:'#f97316', accentColor2:'#00d4ff',
   bgColor:'#060915',     textColor:'#ffffff',
   tournamentName:'FF OFFICIAL', tournamentSubtitle:'GRAND FINALS',
-  gameLabel:'MATCH', logoUrl:'', overlayStyle:'ff_classic', fontStyle:'orbitron',
+  gameLabel:'MATCH', logoUrl:'', overlayStyle:'default', fontStyle:'orbitron',
   sponsorLogoUrl:'',
   mapImages:{},
   backgrounds: { standings: '', champion: '', teams: '', scoreboard: '' },
@@ -510,20 +538,83 @@ export default function DesignStudio(props) {
       </Section>
 
       {/* ── OVERLAY STYLE ── */}
-      <Section title="OVERLAY STYLE" icon={Layers}>
-        <div className="space-y-2">
-          {OVERLAY_STYLES.map(s => (
-            <button key={s.key} onClick={() => upd('overlayStyle', s.key)}
-              className={`flex w-full items-start gap-3 rounded-xl border px-4 py-3 text-left transition-all ${design?.overlayStyle === s.key ? 'border-orange-500/50 bg-orange-500/10' : 'border-white/10 bg-white/5 hover:bg-white/10'}`}>
-              <div className={`mt-0.5 h-3.5 w-3.5 flex-shrink-0 rounded-full border-2 ${design?.overlayStyle === s.key ? 'border-orange-500 bg-orange-500' : 'border-gray-600'}`} />
-              <div>
-                <p className="font-orbitron text-xs font-black text-white">{s.label}</p>
-                <p className="mt-0.5 text-[10px] text-gray-500">{s.desc}</p>
-              </div>
-              {design?.overlayStyle === s.key && <Check className="ml-auto h-4 w-4 text-orange-400" />}
-            </button>
-          ))}
+      <Section title="OVERLAY LAYOUT THEME" icon={Layers}>
+        <p className="mb-3 text-[10px] text-gray-500 leading-relaxed">
+          Choose a visual layout for all overlays. Same data & structure — completely different look.
+        </p>
+        <div className="grid grid-cols-1 gap-2">
+          {OVERLAY_STYLES.map(s => {
+            const isActive = (design?.overlayStyle || 'default') === s.key;
+            return (
+              <button key={s.key} onClick={() => upd('overlayStyle', s.key)}
+                className="w-full text-left transition-all"
+                style={{
+                  border: isActive ? `1px solid ${s.preview.p}88` : '1px solid rgba(255,255,255,0.07)',
+                  borderRadius: 12,
+                  background: isActive ? `${s.preview.p}10` : 'rgba(255,255,255,0.02)',
+                  padding: '12px 14px',
+                }}>
+                <div className="flex items-center gap-3">
+                  {/* Mini preview panel */}
+                  <div style={{
+                    width: 52, height: 36, borderRadius: 6, flexShrink: 0, position: 'relative', overflow: 'hidden',
+                    background: '#060912',
+                    border: `1px solid ${s.preview.p}44`,
+                  }}>
+                    {/* Corner decorations per style */}
+                    {s.preview.corner === 'dual' && <>
+                      <div style={{ position:'absolute', top:0, left:0, width:7, height:7, borderTop:`2px solid ${s.preview.p}`, borderLeft:`2px solid ${s.preview.p}` }} />
+                      <div style={{ position:'absolute', top:0, right:0, width:7, height:7, borderTop:`2px solid ${s.preview.s}`, borderRight:`2px solid ${s.preview.s}` }} />
+                      <div style={{ position:'absolute', bottom:0, left:0, width:7, height:7, borderBottom:`2px solid ${s.preview.s}`, borderLeft:`2px solid ${s.preview.s}` }} />
+                      <div style={{ position:'absolute', bottom:0, right:0, width:7, height:7, borderBottom:`2px solid ${s.preview.p}`, borderRight:`2px solid ${s.preview.p}` }} />
+                    </>}
+                    {s.preview.corner === 'glow' && <>
+                      <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg,transparent,${s.preview.p},${s.preview.s},transparent)` }} />
+                      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:1, background:`linear-gradient(90deg,transparent,${s.preview.p}66,transparent)` }} />
+                    </>}
+                    {s.preview.corner === 'tick' && <>
+                      <div style={{ position:'absolute', top:0, left:0, width:10, height:2, background:s.preview.p }} />
+                      <div style={{ position:'absolute', top:0, left:0, width:2, height:10, background:s.preview.p }} />
+                      <div style={{ position:'absolute', bottom:0, right:0, width:10, height:2, background:s.preview.s }} />
+                      <div style={{ position:'absolute', bottom:0, right:0, width:2, height:10, background:s.preview.s }} />
+                    </>}
+                    {s.preview.corner === 'none' && <>
+                      <div style={{ position:'absolute', top:0, left:0, right:0, height:1, background:'rgba(255,255,255,0.15)' }} />
+                      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:1, background:'rgba(255,255,255,0.08)' }} />
+                    </>}
+                    {s.preview.corner === 'rect' && <>
+                      <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:s.preview.p }} />
+                      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:2, background:s.preview.s }} />
+                    </>}
+                    {/* Mini fake rows */}
+                    <div style={{ position:'absolute', top:6, left:6, right:6, height:3, background:`${s.preview.p}55`, borderRadius:1 }} />
+                    <div style={{ position:'absolute', top:13, left:6, right:10, height:2, background:'rgba(255,255,255,0.12)', borderRadius:1 }} />
+                    <div style={{ position:'absolute', top:18, left:6, right:14, height:2, background:'rgba(255,255,255,0.08)', borderRadius:1 }} />
+                    <div style={{ position:'absolute', top:23, left:6, right:10, height:2, background:'rgba(255,255,255,0.06)', borderRadius:1 }} />
+                  </div>
+
+                  {/* Text */}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex items-center gap-2">
+                      <span className="font-orbitron text-[10px] font-black" style={{ color: isActive ? s.preview.p : '#fff' }}>{s.label}</span>
+                      {isActive && <Check size={10} style={{ color: s.preview.p, flexShrink: 0 }} />}
+                    </div>
+                    <p className="mt-0.5 text-[9px] text-gray-500 leading-tight">{s.desc}</p>
+                  </div>
+
+                  {/* Color swatches */}
+                  <div className="flex gap-1 flex-shrink-0">
+                    <div style={{ width:12, height:20, borderRadius:2, background:s.preview.p }} />
+                    <div style={{ width:12, height:20, borderRadius:2, background:s.preview.s }} />
+                  </div>
+                </div>
+              </button>
+            );
+          })}
         </div>
+        <p className="mt-3 text-[9px] text-gray-600 leading-relaxed">
+          ℹ️ Custom Colours below override accent colors for the Default theme only.
+        </p>
       </Section>
 
       {/* ── MAP IMAGES ── */}

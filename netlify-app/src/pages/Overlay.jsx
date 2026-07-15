@@ -658,7 +658,7 @@ function KillFeedScreen({ killFeed = [], design }) {
 
   return (
     <div style={{ position:'absolute', left:40, top:80, width:420, zIndex:10 }}>
-      <FFPanel>
+      <ThemedPanel design={design}>
         <div style={{ height: 48, background: 'rgba(0,0,0,0.8)', borderBottom: `1px solid ${primary}44`, display: 'flex', alignItems: 'center', padding: '0 16px' }}>
           <Skull size={18} style={{ color: primary, marginRight: 8 }} />
           <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>BATTLE FEED</span>
@@ -707,7 +707,7 @@ function KillFeedScreen({ killFeed = [], design }) {
             </div>
           )}
         </div>
-      </FFPanel>
+      </ThemedPanel>
     </div>
   );
 }
@@ -833,7 +833,7 @@ function TodaysMatches({ matches = [], design }) {
             const isLive = m.status==='LIVE';
             const isDone = m.status==='COMPLETED';
             return (
-              <FFPanel key={idx} style={{ width:280, height:380, background: isLive ? 'rgba(255,107,0,0.06)' : 'rgba(6,9,18,0.85)' }}>
+              <ThemedPanel design={design} key={idx} style={{ width:280, height:380, background: isLive ? 'rgba(255,107,0,0.06)' : 'rgba(6,9,18,0.85)' }}>
                 <div style={{ padding:24, flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                     <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>{m.matchNumber||`MATCH 0${idx+1}`}</span>
@@ -850,7 +850,7 @@ function TodaysMatches({ matches = [], design }) {
                     <span style={{ fontFamily:'Rajdhani', fontSize:20, fontWeight:900, color: isLive ? primary : '#fff' }}>{m.time||'18:00'}</span>
                   </div>
                 </div>
-              </FFPanel>
+              </ThemedPanel>
             );
           })}
         </div>
@@ -906,7 +906,7 @@ function TeamsToday({ teams = [], design }) {
         {/* Grid */}
         <div style={{ display:'grid', gridTemplateColumns:'repeat(6,1fr)', gap:20, flex:1, margin:'40px 0', alignItems:'center' }}>
           {safeArray(displayTeams).map((team, idx) => (
-            <FFPanel key={idx} style={{ height:180 }}>
+            <ThemedPanel design={design} key={idx} style={{ height:180 }}>
               <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', padding:16, textAlign:'center', gap:12 }}>
                 {/* Logo ring */}
                 <div style={{ width:72, height:72, borderRadius:'50%', border:`2px solid ${primary}`, boxShadow:`0 0 20px ${primary}33`, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.5)' }}>
@@ -917,7 +917,7 @@ function TeamsToday({ teams = [], design }) {
                 </span>
                 <span style={{ fontFamily:'Orbitron', fontSize:8, color:secondary, letterSpacing:'0.15em' }}>QUALIFIED</span>
               </div>
-            </FFPanel>
+            </ThemedPanel>
           ))}
         </div>
 
@@ -939,8 +939,9 @@ function CastersScreen({ design }) {
     { name:'CASTER TWO',   role:'COLOR CASTER',  handle:'@caster2', photo:'' },
     { name:'HOST',         role:'TOURNAMENT HOST', handle:'@host',  photo:'' },
   ];
-  const primary   = tok.acc(design);
-  const secondary = tok.acc2(design);
+  const t = getTheme(design);
+  const primary = t.p;
+  const secondary = t.s;
   const tLogo     = tok.logo(design);
   const sponsorLogo = tok.sponsorLogo(design);
 
@@ -964,7 +965,7 @@ function CastersScreen({ design }) {
         {/* Caster cards */}
         <div style={{ display:'flex', gap:32, justifyContent:'center', flex:1, alignItems:'center', margin:'40px 0' }}>
           {safeArray(casters).map((c, i) => (
-            <FFPanel key={i} style={{ width:400, height:480 }}>
+            <ThemedPanel design={design} key={i} style={{ width:400, height:480 }}>
               <div style={{ padding:'40px 32px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', flex:1, justifyContent:'center' }}>
                 {/* Photo or initials */}
                 {(() => {
@@ -988,7 +989,7 @@ function CastersScreen({ design }) {
                 <span style={{ fontFamily:'Orbitron', fontSize:26, fontWeight:900, color:'#fff', marginBottom:12, textTransform:'uppercase', letterSpacing:'0.05em' }}>{c.name||'—'}</span>
                 <span style={{ fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em' }}>{c.handle||''}</span>
               </div>
-            </FFPanel>
+            </ThemedPanel>
           ))}
         </div>
 
@@ -1014,7 +1015,7 @@ function UpcomingMap({ match, design }) {
 
   return (
     <div style={{ position:'absolute', left:'50%', bottom:50, transform:'translateX(-50%)', width:800, zIndex:10 }}>
-      <FFPanel>
+      <ThemedPanel design={design}>
         <div style={{ display:'flex', alignItems:'center', padding:'0 24px', height:90, gap:24 }}>
           <div style={{ width:110, height:64, borderRadius:8, overflow:'hidden', border:`1px solid ${primary}44`, flexShrink:0, background:'#0a1220' }}>
             <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)', position:'relative', background:'#0a1220' }}>
@@ -1036,7 +1037,7 @@ function UpcomingMap({ match, design }) {
             <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:primary, letterSpacing:'0.1em' }}>WAITING IN LOBBY</span>
           </div>
         </div>
-      </FFPanel>
+      </ThemedPanel>
     </div>
   );
 }
@@ -1050,9 +1051,9 @@ function EliminationAlert({ eliminations = [], design }) {
 
   if (!latest) return (
     <div style={{ position:'absolute', bottom:60, left:'50%', transform:'translateX(-50%)' }}>
-      <FFPanel style={{ padding:'12px 32px' }}>
+      <ThemedPanel design={design} style={{ padding:'12px 32px' }}>
         <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>MONITORING COMBAT...</span>
-      </FFPanel>
+      </ThemedPanel>
     </div>
   );
 
@@ -1065,7 +1066,7 @@ function EliminationAlert({ eliminations = [], design }) {
           exit={{ y:-20, opacity:0, scale:1.02 }}
           transition={{ duration:0.3, type:'spring' }}
         >
-          <FFPanel>
+          <ThemedPanel design={design}>
             <div style={{ display:'flex', alignItems:'center', padding:'12px 24px', gap:20 }}>
               <div style={{ width:40, height:40, borderRadius:'50%', background:'rgba(239,68,68,0.1)', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid #ef4444' }}>
                 <Flame size={20} style={{ color:'#ef4444' }} />
@@ -1084,7 +1085,7 @@ function EliminationAlert({ eliminations = [], design }) {
                 <div style={{ fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:'#ef4444', letterSpacing:'0.15em' }}>OUT</div>
               </div>
             </div>
-          </FFPanel>
+          </ThemedPanel>
         </motion.div>
       </AnimatePresence>
     </div>
@@ -1191,6 +1192,7 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
 
   return (
     <ScreenBackground bgUrl={design?.backgrounds?.champion||''} accent={primary} accent2={secondary}>
+      <ThemedBackground design={design}>
       <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
       <style>{`
         @keyframes confettiFall{0%{transform:translateY(-60px) rotate(0deg);opacity:1}100%{transform:translateY(1120px) rotate(360deg);opacity:0}}
@@ -1233,7 +1235,7 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.4 }}
         >
-          <FFPanel style={{ width:620, padding:0 }}>
+          <ThemedPanel design={design} style={{ width:620, padding:0 }}>
             <div style={{ padding:'32px 40px', display:'flex', flexDirection:'column', alignItems:'center' }}>
               {/* Champion Logo Circle */}
               <div style={{ width:110, height:110, borderRadius:'50%', border:`3px solid #FFD700`, boxShadow:'0 0 35px rgba(255,215,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.6)', marginBottom:18 }}>
@@ -1254,7 +1256,7 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
                 </div>
               </div>
             </div>
-          </FFPanel>
+          </ThemedPanel>
         </motion.div>
 
         <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8, marginTop:8 }}>
@@ -1272,6 +1274,7 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
         </span>
       </div>
       </div>
+      </ThemedBackground>
     </ScreenBackground>
   );
 }
@@ -1297,7 +1300,7 @@ function OverlayLoading() {
 function ScreenBackground({ bgUrl, accent, accent2, children }) {
   return (
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
-      {bgUrl ? (
+      {bgUrl && (
         <div style={{
           position:'absolute', inset:0,
           backgroundImage:`url(${bgUrl})`,
@@ -1305,14 +1308,11 @@ function ScreenBackground({ bgUrl, accent, accent2, children }) {
           filter:'brightness(0.45) saturate(1.1)',
           zIndex:0,
         }} />
-      ) : (
-        /* GamingBackground inlined by ThemedBackground */
       )}
       <div style={{ position:'relative', zIndex:1, width:'100%', height:'100%' }}>
         {children}
       </div>
     </div>
-    </ThemedBackground>
   );
 }
 
@@ -1422,6 +1422,7 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
 
   return (
     <ScreenBackground bgUrl={bgUrl} accent={primary} accent2={secondary}>
+      <ThemedBackground design={design}>
       <div style={{ width:'100%', height:'100%', display:'flex', flexDirection:'column', padding:'48px 64px', boxSizing:'border-box' }}>
         {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:28 }}>
@@ -1469,6 +1470,7 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
           ))}
         </motion.div>
       </div>
+      </ThemedBackground>
     </ScreenBackground>
   );
 }
