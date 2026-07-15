@@ -22,7 +22,7 @@ const queryClient = new QueryClient({
   },
 });
 
-const OWNER_EMAILS = (import.meta.env.VITE_OWNER_EMAILS || 'nex.unishghimire@gmail.com')
+const OWNER_EMAILS = (import.meta.env.VITE_OWNER_EMAILS || 'nex.unishghimire@gmail.com,unishghimire2@gmail.com')
   .split(',').map(e => e.trim().toLowerCase());
 
 /* ── Helpers ───────────────────────────────────────────────────────────────── */

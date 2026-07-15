@@ -4,7 +4,7 @@ import { auth } from './firebase';
 
 const AuthContext = createContext(null);
 
-const OWNER_EMAILS = (import.meta.env.VITE_OWNER_EMAILS || 'nex.unishghimire@gmail.com')
+const OWNER_EMAILS = (import.meta.env.VITE_OWNER_EMAILS || 'nex.unishghimire@gmail.com,unishghimire2@gmail.com')
   .split(',').map(e => e.trim().toLowerCase());
 
 const OWNER_SUB = { plan: 'yearly', status: 'active', expiresAt: Date.now() + 315360000000 };
