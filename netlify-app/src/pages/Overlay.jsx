@@ -18,7 +18,7 @@ import { useParams, useSearchParams } from 'react-router-dom';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 import { AnimatePresence, motion } from 'framer-motion';
 import { Skull, Star, Crown, Zap, Calendar, Users, MapPin, Award, XCircle, Mic2, Shield, Flame } from 'lucide-react';
-import { MAP_IMAGES, getMapImages } from '@/lib/maps';
+import { MAP_IMAGES, getMapImages, setCustomMapImages } from '@/lib/maps';
 import { safeArray } from '@/components/ErrorBoundary';
 
 /* ══════════════════════════════════════════════════
@@ -55,7 +55,7 @@ function useOverlayPoll(shareToken) {
         // Push custom map images to the maps module for overlay rendering
         if (json.design?.mapImages) {
           // maps.js is already statically imported — call directly, no dynamic import needed
-          import('@/lib/maps').then(({ setCustomMapImages }) => setCustomMapImages(json.design.mapImages)).catch(() => {});
+          try { setCustomMapImages(json.design.mapImages); } catch (_) {}
         }
         setData({
           tournament:   json.tournament    ?? null,
