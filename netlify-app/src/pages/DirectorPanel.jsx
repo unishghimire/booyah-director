@@ -128,7 +128,7 @@ export default function DirectorPanel() {
 
   // Champions Reveal actions
   const [champBusy, setChampBusy] = useState(null);
-  const sortedTeams = [...teams].sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
+  const sortedTeams = [...(teams || [])].sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
 
   const revealChampions = async (team) => {
     setChampBusy(team.id);

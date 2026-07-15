@@ -74,7 +74,7 @@ export default function MatchControls({ tournament, currentMatch, onAction }) {
         <label className="mb-1 block text-xs font-medium text-gray-400">Map Name</label>
         <div className="relative">
           <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          <input value={mapName} onChange={e => setMapName(e.target.value)} placeholder="e.g. Bermuda, Purgatory, Kalahari"
+          <input value={mapName || ''} onChange={e => setMapName(e.target.value)} placeholder="e.g. Bermuda, Purgatory, Kalahari"
             className="w-full rounded-lg border border-white/10 bg-black/40 py-2 pl-9 pr-3 text-sm text-white outline-none focus:border-orange-500" />
         </div>
       </div>

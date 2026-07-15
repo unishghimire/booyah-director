@@ -95,7 +95,7 @@ function TeamCard({ team, players, currentMatch, tournament, onAction }) {
       </div>
       <div className="mt-2 flex items-center gap-1.5 border-t border-white/5 pt-2">
         <div className="relative flex-1">
-          <select value={placement} onChange={e => setPlacement(e.target.value)}
+          <select value={placement} onChange={e => setPlacement(Number(e.target.value))}
             className="w-full appearance-none rounded-md border border-white/10 bg-black/50 px-2 py-1 text-xs text-white outline-none focus:border-orange-500">
             {Array.from({ length: 12 }, (_, i) => i + 1).map(n => <option key={n} value={n}>#{n}</option>)}
           </select>

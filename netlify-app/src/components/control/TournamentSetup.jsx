@@ -86,7 +86,7 @@ export default function TournamentSetup({ onCreated }) {
               {Array.from({ length: 12 }, (_, i) => i + 1).map(pos => (
                 <div key={pos}>
                   <label className="font-orbitron text-[9px] text-gray-500 block mb-0.5">#{pos}</label>
-                  <input type="number" min={0} value={placements[pos]}
+                  <input type="number" min={0} value={placements[pos] ?? 0}
                     onChange={e => setPlacements(prev => ({ ...prev, [pos]: Number(e.target.value) || 0 }))}
                     className="w-full rounded border border-white/10 bg-black/50 px-1.5 py-1 text-xs text-white outline-none focus:border-[#FF6B00]/50" />
                 </div>

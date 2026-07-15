@@ -61,7 +61,7 @@ export default function ScreenSwitcher({ currentScreen, onAction }) {
             return (
               <button
                 key={s.key}
-                onClick={() => handleSwitch(s.key)}
+                onClick={() => !busy && handleSwitch(s.key)}
                 disabled={busy !== null}
                 title={s.desc}
                 className="flex flex-col items-start rounded-lg px-2.5 py-2 text-left transition-all disabled:opacity-40"
