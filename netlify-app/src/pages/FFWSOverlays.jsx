@@ -469,123 +469,452 @@ export function MatchScheduleGrid({ design }) {
   const mapImages = getMapImages();
   const scheduleMaps = ['Bermuda', 'Purgatory', 'Kalahari', 'Nexterra', 'Solara', 'RANDOM'];
 
+  // Stagger animation container
+  const containerVariants = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.12,
+        delayChildren: 0.2
+      }
+    }
+  };
+
+  const cardVariants = {
+    hidden: { opacity: 0, y: 50, scale: 0.92 },
+    show: { 
+      opacity: 1, 
+      y: 0, 
+      scale: 1,
+      transition: {
+        type: 'spring',
+        stiffness: 80,
+        damping: 15
+      }
+    }
+  };
+
   return (
     <div style={{
-      width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
-      background: 'linear-gradient(135deg, #0a0a2e 0%, #1a0a3e 50%, #0a1a3e 100%)',
+      width: 1920,
+      height: 1080,
+      position: 'relative',
+      overflow: 'hidden',
+      background: 'radial-gradient(circle at 50% 40%, #150f3b 0%, #070514 80%, #030208 100%)',
+      boxSizing: 'border-box',
     }}>
-      {/* Diagonal stripe texture */}
+      {/* Hazard diagonal warning stripes in the corners */}
+      {/* Top Left Corner */}
       <div style={{
-        position: 'absolute', inset: 0, opacity: 0.03,
-        backgroundImage: 'repeating-linear-gradient(45deg, transparent, transparent 40px, rgba(255,255,255,0.05) 40px, rgba(255,255,255,0.05) 41px)',
+        position: 'absolute',
+        top: -40,
+        left: -40,
+        width: 180,
+        height: 180,
+        transform: 'rotate(-45deg)',
+        zIndex: 5,
+        backgroundImage: 'repeating-linear-gradient(-45deg, #FFC700, #FFC700 15px, #000 15px, #000 30px)',
+        boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
+        borderBottom: '4px solid #fff'
       }} />
-      {/* Radial glow */}
-      <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(ellipse 1000px 600px at 50% 30%, rgba(255,215,0,0.08), transparent 70%)' }} />
 
-      <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', padding: '48px 64px', display: 'flex', flexDirection: 'column' }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 16 }}>
-            {tLogo && (
-              <img src={tLogo} alt="" style={{ height: 48, objectFit: 'contain' }}
+      {/* Top Right Corner */}
+      <div style={{
+        position: 'absolute',
+        top: -40,
+        right: -40,
+        width: 180,
+        height: 180,
+        transform: 'rotate(45deg)',
+        zIndex: 5,
+        backgroundImage: 'repeating-linear-gradient(45deg, #FFC700, #FFC700 15px, #000 15px, #000 30px)',
+        boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
+        borderBottom: '4px solid #fff'
+      }} />
+
+      {/* Bottom Left Corner */}
+      <div style={{
+        position: 'absolute',
+        bottom: -40,
+        left: -40,
+        width: 180,
+        height: 180,
+        transform: 'rotate(45deg)',
+        zIndex: 5,
+        backgroundImage: 'repeating-linear-gradient(45deg, #FFC700, #FFC700 15px, #000 15px, #000 30px)',
+        boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
+        borderTop: '4px solid #fff'
+      }} />
+
+      {/* Bottom Right Corner */}
+      <div style={{
+        position: 'absolute',
+        bottom: -40,
+        right: -40,
+        width: 180,
+        height: 180,
+        transform: 'rotate(-45deg)',
+        zIndex: 5,
+        backgroundImage: 'repeating-linear-gradient(-45deg, #FFC700, #FFC700 15px, #000 15px, #000 30px)',
+        boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
+        borderTop: '4px solid #fff'
+      }} />
+
+      {/* Technical Grid/Stripes Background Overlay */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px)',
+        opacity: 0.5,
+        pointerEvents: 'none',
+      }} />
+
+      {/* Hexagon/Radial HUD patterns */}
+      <div style={{
+        position: 'absolute',
+        left: '10%',
+        top: '15%',
+        width: 600,
+        height: 600,
+        background: 'radial-gradient(circle, rgba(255, 199, 0, 0.03) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+      <div style={{
+        position: 'absolute',
+        right: '10%',
+        bottom: '15%',
+        width: 600,
+        height: 600,
+        background: 'radial-gradient(circle, rgba(0, 150, 255, 0.03) 0%, transparent 70%)',
+        pointerEvents: 'none',
+      }} />
+
+      <div style={{
+        position: 'relative',
+        zIndex: 1,
+        width: '100%',
+        height: '100%',
+        padding: '80px 100px',
+        display: 'flex',
+        flexDirection: 'column',
+        justifyContent: 'space-between',
+        boxSizing: 'border-box',
+      }}>
+        {/* Header Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: -30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6 }}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderBottom: '3px solid rgba(255, 255, 255, 0.08)',
+            paddingBottom: 24,
+            marginBottom: 20
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            {tLogo ? (
+              <img src={tLogo} alt="" style={{ height: 80, objectFit: 'contain', filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.2))' }}
                 onError={e => { e.target.style.display = 'none'; }} />
+            ) : (
+              <div style={{
+                height: 80,
+                width: 80,
+                background: 'linear-gradient(135deg, #FFC700, #FF5500)',
+                clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                boxShadow: '0 0 15px rgba(255,85,0,0.5)'
+              }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#000' }}>FF</span>
+              </div>
             )}
             <div>
-              <div style={{ fontFamily: 'Orbitron', fontSize: 52, fontWeight: 900, color: '#fff', letterSpacing: '0.15em', lineHeight: 1 }}>
+              <div style={{
+                fontFamily: 'Orbitron',
+                fontSize: 54,
+                fontWeight: 900,
+                color: '#fff',
+                letterSpacing: '0.12em',
+                lineHeight: 1.1,
+                textShadow: '0 0 20px rgba(255,255,255,0.1), 0 0 40px rgba(255,255,255,0.05)'
+              }}>
                 GAME SCHEDULE
               </div>
-              <div style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 700, color: '#FFD700', letterSpacing: '0.25em', marginTop: 8 }}>
-                {tName} // CHAMPION RUSH // GRAND FINALS
+              <div style={{
+                fontFamily: 'Orbitron',
+                fontSize: 14,
+                fontWeight: 700,
+                color: '#FFC700',
+                letterSpacing: '0.3em',
+                marginTop: 6,
+                textTransform: 'uppercase',
+                display: 'flex',
+                alignItems: 'center',
+                gap: 12
+              }}>
+                <span>{tName}</span>
+                <span style={{ color: 'rgba(255,255,255,0.3)' }}>//</span>
+                <span style={{ color: '#fff' }}>MATCH SCHEDULING GRID</span>
               </div>
             </div>
           </div>
+          
           {sponsorLogo && (
-            <img src={sponsorLogo} alt="" style={{ height: 48, objectFit: 'contain', opacity: 0.8 }}
-              onError={e => { e.target.style.display = 'none'; }} />
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 6 }}>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.2em' }}>OFFICIAL SPONSOR</span>
+              <img src={sponsorLogo} alt="" style={{ height: 50, objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.15))' }}
+                onError={e => { e.target.style.display = 'none'; }} />
+            </div>
           )}
-        </div>
+        </motion.div>
 
-        {/* 6-card grid */}
-        <div style={{ display: 'grid', gridTemplateColumns: 'repeat(6, 1fr)', gap: 18, flex: 1, alignItems: 'center' }}>
+        {/* 6 Map Cards Horizontal Grid */}
+        <motion.div 
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
+          style={{
+            display: 'grid',
+            gridTemplateColumns: 'repeat(6, 1fr)',
+            gap: 20,
+            flex: 1,
+            alignItems: 'center',
+            padding: '20px 0'
+          }}
+        >
           {scheduleMaps.map((mapName, idx) => {
             const gameNum = idx + 1;
             const isRandom = mapName === 'RANDOM';
             const mapImg = mapImages?.[mapName] || null;
 
             return (
-              <div key={idx} style={{
-                borderRadius: 12, overflow: 'hidden', height: 280,
-                border: '1px solid rgba(255,255,255,0.15)',
-                position: 'relative',
-                boxShadow: '0 8px 24px rgba(0,0,0,0.4)',
-                transition: 'transform 0.3s ease',
-              }}>
-                {/* Background */}
+              <motion.div
+                key={idx}
+                variants={cardVariants}
+                whileHover={{ 
+                  scale: 1.04, 
+                  y: -8, 
+                  boxShadow: '0 15px 35px rgba(255, 199, 0, 0.25), 0 0 15px rgba(255, 255, 255, 0.1)',
+                  borderColor: 'rgba(255, 199, 0, 0.8)'
+                }}
+                style={{
+                  height: 480,
+                  borderRadius: 16,
+                  overflow: 'hidden',
+                  position: 'relative',
+                  border: '1.5px solid rgba(255,255,255,0.12)',
+                  background: 'rgba(10, 8, 28, 0.6)',
+                  backdropFilter: 'blur(8px)',
+                  boxShadow: '0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.03)',
+                  transition: 'border-color 0.3s ease, box-shadow 0.3s ease',
+                  cursor: 'pointer',
+                  display: 'flex',
+                  flexDirection: 'column',
+                  justifyContent: 'space-between',
+                }}
+              >
+                {/* Background Image / Pattern */}
                 {isRandom ? (
                   <div style={{
-                    position: 'absolute', inset: 0,
-                    background: 'repeating-linear-gradient(45deg, #1a1a2e, #1a1a2e 20px, #2a2a4e 20px, #2a2a4e 40px)',
-                  }} />
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 0,
+                    background: 'radial-gradient(circle at center, #1a153b 0%, #0d0a1f 100%)',
+                  }}>
+                    {/* Animated grid overlay inside Random card */}
+                    <div style={{
+                      position: 'absolute',
+                      inset: 0,
+                      backgroundImage: 'repeating-linear-gradient(45deg, rgba(255, 199, 0, 0.05) 0px, rgba(255, 199, 0, 0.05) 10px, transparent 10px, transparent 20px)',
+                      opacity: 0.8
+                    }} />
+                    {/* Futuristic glowing crosshair or emblem center */}
+                    <div style={{
+                      position: 'absolute',
+                      left: '50%',
+                      top: '50%',
+                      transform: 'translate(-50%, -50%)',
+                      width: 80,
+                      height: 80,
+                      border: '2px dashed rgba(255, 199, 0, 0.3)',
+                      borderRadius: '50%',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      boxShadow: '0 0 20px rgba(255, 199, 0, 0.1)'
+                    }}>
+                      <span style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#FFC700', opacity: 0.6 }}>?</span>
+                    </div>
+                  </div>
                 ) : mapImg ? (
                   <div style={{
-                    position: 'absolute', inset: 0,
-                    backgroundImage: `url(${mapImg})`, backgroundSize: 'cover', backgroundPosition: 'center',
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 0,
+                    backgroundImage: "url(" + mapImg + ")",
+                    backgroundSize: 'cover',
+                    backgroundPosition: 'center',
                   }} />
                 ) : (
                   <div style={{
-                    position: 'absolute', inset: 0,
-                    background: `linear-gradient(135deg, #1a1a3e, #2a1a4e)`,
+                    position: 'absolute',
+                    inset: 0,
+                    zIndex: 0,
+                    background: 'linear-gradient(135deg, #1b163d, #0d0a21)',
                   }} />
                 )}
-                {/* Dark overlay */}
-                <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(transparent 40%, rgba(0,0,0,0.85))' }} />
 
-                {/* Game number badge top */}
+                {/* Cyberpunk grid overlay for premium visual texture */}
                 <div style={{
-                  position: 'absolute', top: 12, left: 12,
-                  background: 'rgba(0,0,0,0.7)', borderRadius: 6,
-                  padding: '4px 12px',
-                  fontFamily: 'Orbitron', fontSize: 10, fontWeight: 900,
-                  color: '#FFD700', letterSpacing: '0.1em',
-                }}>
-                  GAME {gameNum}
-                </div>
+                  position: 'absolute',
+                  inset: 0,
+                  zIndex: 1,
+                  backgroundImage: 'linear-gradient(rgba(18, 16, 35, 0) 60%, rgba(6, 4, 15, 0.95) 95%)',
+                  pointerEvents: 'none',
+                }} />
 
-                {/* Bottom label */}
+                {/* Subtle top edge highlighting glow */}
                 <div style={{
-                  position: 'absolute', bottom: 0, left: 0, right: 0,
-                  background: 'rgba(0,0,0,0.88)',
-                  padding: '12px 16px',
-                  textAlign: 'center',
+                  position: 'absolute',
+                  top: 0,
+                  left: 0,
+                  right: 0,
+                  height: 2,
+                  background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+                  zIndex: 2,
+                }} />
+
+                {/* Header Badge */}
+                <div style={{
+                  position: 'relative',
+                  zIndex: 2,
+                  padding: '16px 16px 0 16px',
+                  display: 'flex',
+                  justifyContent: 'flex-start',
                 }}>
-                  <div style={{ fontFamily: 'Orbitron', fontSize: 13, fontWeight: 900, color: '#fff', textTransform: 'uppercase', letterSpacing: '0.08em' }}>
-                    {isRandom ? 'TBA' : mapName}
+                  <div style={{
+                    background: 'linear-gradient(135deg, #FFC700 0%, #FF8800 100%)',
+                    borderRadius: 4,
+                    padding: '6px 14px',
+                    boxShadow: '0 4px 12px rgba(255, 136, 0, 0.4)',
+                    border: '1px solid rgba(255, 255, 255, 0.2)',
+                  }}>
+                    <span style={{
+                      fontFamily: 'Orbitron',
+                      fontSize: 12,
+                      fontWeight: 900,
+                      color: '#000',
+                      letterSpacing: '0.12em',
+                    }}>
+                      GAME 0{gameNum}
+                    </span>
                   </div>
                 </div>
-              </div>
+
+                {/* Bottom Text Label */}
+                <div style={{
+                  position: 'relative',
+                  zIndex: 2,
+                  padding: '0 16px 24px 16px',
+                  textAlign: 'center',
+                }}>
+                  <div style={{
+                    fontFamily: 'Orbitron',
+                    fontSize: 20,
+                    fontWeight: 900,
+                    color: '#fff',
+                    textTransform: 'uppercase',
+                    letterSpacing: '0.1em',
+                    textShadow: '0 2px 10px rgba(0,0,0,0.9)',
+                  }}>
+                    {isRandom ? 'DECIDING' : mapName}
+                  </div>
+                  
+                  {/* Active Match status or Mode */}
+                  <div style={{
+                    fontFamily: 'Orbitron',
+                    fontSize: 10,
+                    fontWeight: 700,
+                    color: isRandom ? '#FF8800' : '#00FFCC',
+                    letterSpacing: '0.2em',
+                    marginTop: 6,
+                    textTransform: 'uppercase',
+                    textShadow: '0 2px 5px rgba(0,0,0,0.9)',
+                  }}>
+                    {isRandom ? 'RANDOM SELECT' : 'CLASSIC MODE'}
+                  </div>
+                </div>
+              </motion.div>
             );
           })}
-        </div>
+        </motion.div>
 
-        {/* Bottom bar */}
-        <div style={{
-          display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 12,
-          marginTop: 32,
-        }}>
-          <span style={{ fontFamily: 'Orbitron', fontSize: 14, color: 'rgba(255,255,255,0.4)', fontStyle: 'italic', letterSpacing: '0.1em' }}>
-            #RiseToTheSummit
+        {/* Footer Section */}
+        <motion.div 
+          initial={{ opacity: 0, y: 30 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+            paddingTop: 18,
+            marginTop: 10
+          }}
+        >
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <div style={{
+              width: 12,
+              height: 12,
+              background: '#FFC700',
+              clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
+              boxShadow: '0 0 8px #FFC700'
+            }} />
+            <span style={{
+              fontFamily: 'Orbitron',
+              fontSize: 12,
+              fontWeight: 700,
+              color: 'rgba(255,255,255,0.4)',
+              letterSpacing: '0.25em'
+            }}>
+              FREE FIRE WORLD SERIES
+            </span>
+          </div>
+
+          <span style={{
+            fontFamily: 'Orbitron',
+            fontSize: 13,
+            fontWeight: 800,
+            color: '#FFC700',
+            letterSpacing: '0.15em',
+            textTransform: 'uppercase'
+          }}>
+            #RISETOTHESUMMIT
           </span>
-          {tLogo && (
-            <img src={tLogo} alt="" style={{ height: 24, objectFit: 'contain', opacity: 0.4 }}
-              onError={e => { e.target.style.display = 'none'; }} />
-          )}
-        </div>
+
+          <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+            <span style={{
+              fontFamily: 'Orbitron',
+              fontSize: 11,
+              fontWeight: 700,
+              color: 'rgba(255,255,255,0.3)',
+              letterSpacing: '0.15em'
+            }}>
+              LIVE OVERLAY V2.0
+            </span>
+          </div>
+        </motion.div>
       </div>
     </div>
   );
 }
 
-/* ═══ POINT RUSH STANDINGS — dual column, FFWS style ═══ */
 export function PointRushStandings({ teams = [], design }) {
   const sorted = useMemo(() =>
     [...safeArray(teams)].sort((a, b) =>
