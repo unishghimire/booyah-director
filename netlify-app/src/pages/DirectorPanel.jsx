@@ -632,13 +632,22 @@ export default function DirectorPanel() {
             {/* STANDINGS TAB */}
             {activeTab === 'standings' && (
               <SectionBoundary label="STANDINGS & LEADERBOARD">
-                <div className="max-w-4xl mx-auto rounded-xl border border-white/5 bg-[#0f0f1a] overflow-hidden">
+                <div className="max-w-5xl mx-auto rounded-xl border border-white/5 bg-[#0f0f1a] overflow-hidden">
                   <div className="p-6 border-b border-white/5 flex justify-between items-center bg-black/10">
                     <div>
                       <h2 className="font-orbitron text-xs font-black tracking-[0.25em] text-white">
                         LIVE LEADERBOARD
                       </h2>
                       <p className="font-orbitron text-[9px] text-gray-500 mt-1">REAL-TIME TOURNAMENT STANDINGS</p>
+                    </div>
+                    <div className="flex items-center gap-3">
+                      <span className="text-[9px] font-mono text-gray-500">PPK: {tournament?.points_per_kill || 1}</span>
+                      <div className="flex items-center gap-1.5 rounded-lg border border-[#FF6B00]/20 bg-[#FF6B00]/5 px-2.5 py-1.5">
+                        <span className="text-[9px] font-black uppercase tracking-wider text-[#FF6B00]">AUTO CALC</span>
+                        <span className="text-[10px] font-mono text-gray-400">
+                          <span className="text-cyan-400">PPT</span> + <span className="text-green-400">Kills×PPK</span> = <span className="text-orange-400">Total</span>
+                        </span>
+                      </div>
                     </div>
                   </div>
 
@@ -650,13 +659,20 @@ export default function DirectorPanel() {
                           <th className="py-3 px-4">TEAM</th>
                           <th className="py-3 px-4 text-center">MATCHES</th>
                           <th className="py-3 px-4 text-center">BOOYAH</th>
-                          <th className="py-3 px-4 text-center">KILLS</th>
-                          <th className="py-3 px-4 text-center">POINTS</th>
+                          <th className="py-3 px-4 text-center text-cyan-400" title="Placement Points">PPT</th>
+                          <th className="py-3 px-4 text-center text-green-400" title="Kills × Points Per Kill">KILL PTS</th>
+                          <th className="py-3 px-4 text-center text-orange-400">TOTAL</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5 text-xs">
-                        {sortedTeams.map((team, index) => (
-                          <tr key={team.id} className="hover:bg-white/[0.02]">
+                        {sortedTeams.map((team, index) => {
+                          const ppk = tournament?.points_per_kill || 1;
+                          const totalKills = team.total_tournament_kills || 0;
+                          const killPts = totalKills * ppk;
+                          const totalPts = team.total_tournament_points || 0;
+                          const placementPts = totalPts - killPts;
+                          return (
+                          <tr key={team.id} className={`hover:bg-white/[0.02] ${index === 0 ? 'bg-orange-500/5' : ''}`}>
                             <td className="py-3 px-4 text-center font-orbitron font-black text-gray-400">
                               {index + 1}
                             </td>
@@ -669,14 +685,18 @@ export default function DirectorPanel() {
                             <td className="py-3 px-4 text-center font-mono font-bold text-[#FF6B00]">
                               {standings.filter(s => s.team_id === team.id && s.placement === 1).length || 0}
                             </td>
-                            <td className="py-3 px-4 text-center text-gray-400 font-mono">
-                              {team.total_tournament_kills || 0}
+                            <td className="py-3 px-4 text-center font-mono text-cyan-400" title="Placement points from match standings">
+                              {placementPts}
                             </td>
-                            <td className="py-3 px-4 text-center font-mono font-black text-[#00D4FF]">
-                              {team.total_tournament_points || 0}
+                            <td className="py-3 px-4 text-center font-mono text-green-400" title={`${totalKills} kills × ${ppk} PPK`}>
+                              {totalKills}×{ppk}={killPts}
+                            </td>
+                            <td className="py-3 px-4 text-center font-orbitron font-black text-orange-400" title={`${placementPts}PPT + ${killPts} Kill Pts = ${totalPts}`}>
+                              {totalPts}
                             </td>
                           </tr>
-                        ))}
+                          );
+                        })}
                       </tbody>
                     </table>
                   </div>

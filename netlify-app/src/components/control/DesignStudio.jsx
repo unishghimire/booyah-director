@@ -690,13 +690,26 @@ export default function DesignStudio(props) {
             Customize all text labels across your broadcast overlays. Changes push live to OBS instantly.
           </p>
           {[
-            { key:'gameIntroSubtitle', label:'Game Intro Subtitle',    placeholder:'CHAMPION RUSH — GRAND' },
-            { key:'scheduleSubtitle',   label:'Schedule Subtitle',      placeholder:'MATCH SCHEDULING GRID' },
-            { key:'scheduleFooter',     label:'Schedule Footer Text',   placeholder:'#RISETOTHESUMMIT' },
-            { key:'scheduleBrandText',  label:'Schedule Brand Label',   placeholder:'FREE FIRE WORLD SERIES' },
-            { key:'scoreboardSubtitle', label:'Scoreboard Subtitle',    placeholder:'STANDBY' },
-            { key:'matchInfoLabel',     label:'Match Info Chip Label',  placeholder:'MATCH' },
-            { key:'mapLabel',           label:'Map Label',              placeholder:'MAP' },
+            { key:'gameIntroSubtitle',  label:'Game Intro Subtitle',     placeholder:'CHAMPION RUSH — GRAND' },
+            { key:'scheduleSubtitle',    label:'Schedule Subtitle',       placeholder:'MATCH SCHEDULING GRID' },
+            { key:'scheduleFooter',      label:'Schedule Footer Text',   placeholder:'#RISETOTHESUMMIT' },
+            { key:'scheduleBrandText',   label:'Schedule Brand Label',   placeholder:'FREE FIRE WORLD SERIES' },
+            { key:'scoreboardSubtitle',  label:'Scoreboard Subtitle',    placeholder:'STANDBY' },
+            { key:'matchInfoLabel',      label:'Match Info Chip Label',  placeholder:'MATCH' },
+            { key:'mapLabel',            label:'Map Label',              placeholder:'MAP' },
+            { key:'standingsTitle',      label:'Full Standings Title',   placeholder:'OVERALL STANDINGS' },
+            { key:'standingsSubtitle',   label:'Standings Subtitle',     placeholder:'LEADERBOARD' },
+            { key:'mvpTitle',            label:'MVP Screen Title',       placeholder:'MATCH MVP' },
+            { key:'championTitle',       label:'Champion Big Text',      placeholder:'BOOYAH!' },
+            { key:'championSubtitle',    label:'Champion Subtitle',      placeholder:'GRAND TOURNAMENT CHAMPION' },
+            { key:'championSquadLabel',   label:'Champion Squad Label',  placeholder:'CHAMPIONSHIP SQUAD' },
+            { key:'castersTitle',        label:'Casters Screen Title',   placeholder:'ON THE ANALYST DESK' },
+            { key:'castersSubtitle',     label:'Casters Subtitle',       placeholder:'OFFICIAL BROADCAST CREW' },
+            { key:'rosterTitle',         label:'Team Roster Title',      placeholder:'TEAMS ROSTER' },
+            { key:'upcomingMapLabel',    label:'Upcoming Map Label',     placeholder:'UPCOMING BATTLEGROUND' },
+            { key:'elimAlertLabel',      label:'Elimination Alert Text', placeholder:'TEAM SQUAD ELIMINATED' },
+            { key:'preMatchMapLabel',    label:'Pre-Match Map Label',   placeholder:'FREE FIRE MAP' },
+            { key:'todayScheduleTitle',  label:"Today's Schedule Title", placeholder:"TODAY'S SCHEDULE" },
           ].map(({ key, label, placeholder }) => (
             <div key={key}>
               <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">{label}</label>

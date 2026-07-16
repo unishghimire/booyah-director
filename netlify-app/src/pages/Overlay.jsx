@@ -587,8 +587,8 @@ function FullStandings({ teams = [], design }) {
           <div style={{ display:'flex', alignItems:'center', gap:16 }}>
             {tLogo2 && <img src={tLogo2} alt="logo" style={{ height:52, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />}
             <div>
-              <div style={{ fontFamily:'Orbitron', fontSize:14, color:primary, letterSpacing:'0.4em', fontWeight:900, textShadow:t.glow?`0 0 20px ${primary}`:'none' }}>LEADERBOARD</div>
-              <div style={{ fontFamily:'Orbitron', fontSize:42, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>OVERALL STANDINGS</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:14, color:primary, letterSpacing:'0.4em', fontWeight:900, textShadow:t.glow?`0 0 20px ${primary}`:'none' }}>{(design?.standingsSubtitle || 'LEADERBOARD').toUpperCase()}</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:42, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>{(design?.standingsTitle || 'OVERALL STANDINGS').toUpperCase()}</div>
             </div>
           </div>
           <div style={{ textAlign:'right', fontFamily:'Orbitron', display:'flex', flexDirection:'column', alignItems:'flex-end', gap:6 }}>
@@ -614,7 +614,9 @@ function FullStandings({ teams = [], design }) {
               <div style={{ width:60, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', textAlign:'center', letterSpacing:'0.15em' }}>RANK</div>
               <div style={{ width:40 }} />
               <div style={{ flex:1, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', paddingLeft:16, letterSpacing:'0.15em' }}>TEAM NAME</div>
-              <div style={{ width:120, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>KILLS</div>
+              <div style={{ width:100, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#00D4FF', letterSpacing:'0.15em' }}>PPT</div>
+              <div style={{ width:100, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>KILLS</div>
+              <div style={{ width:120, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#22c55e', letterSpacing:'0.15em' }}>KILL PTS</div>
               <div style={{ width:150, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:secondary, letterSpacing:'0.15em' }}>TOTAL PTS</div>
             </div>
 
@@ -631,8 +633,21 @@ function FullStandings({ teams = [], design }) {
                       <TeamLogo team={team} size={28} />
                     </div>
                     <div style={{ flex:1, paddingLeft:16, fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:'#fff', textTransform:'uppercase', letterSpacing:'0.1em' }}>{team.name||'—'}</div>
-                    <div style={{ width:120, textAlign:'center', fontFamily:'Rajdhani', fontSize:20, color:primary, fontWeight:900 }}>{team.total_tournament_kills||0}</div>
-                    <div style={{ width:150, textAlign:'center', fontFamily:'Rajdhani', fontSize:24, fontWeight:900, color:secondary }}>{team.total_tournament_points||0}</div>
+                    {(() => {
+                      const ppk = 1; // default; overlay doesn't have tournament config
+                      const totalKills = team.total_tournament_kills || 0;
+                      const totalPts = team.total_tournament_points || 0;
+                      const killPts = totalKills * ppk;
+                      const ppt = totalPts - killPts;
+                      return (
+                        <>
+                          <div style={{ width:100, textAlign:'center', fontFamily:'Rajdhani', fontSize:18, fontWeight:900, color:'#00D4FF' }}>{ppt}</div>
+                          <div style={{ width:100, textAlign:'center', fontFamily:'Rajdhani', fontSize:20, color:primary, fontWeight:900 }}>{totalKills}</div>
+                          <div style={{ width:120, textAlign:'center', fontFamily:'Rajdhani', fontSize:18, fontWeight:900, color:'#22c55e' }}>{killPts}</div>
+                          <div style={{ width:150, textAlign:'center', fontFamily:'Rajdhani', fontSize:24, fontWeight:900, color:secondary }}>{totalPts}</div>
+                        </>
+                      );
+                    })()}
                   </div>
                 );
               })}
@@ -784,7 +799,7 @@ function PreMatchMap({ match, teams = [], design }) {
                 )}
                 <div style={{ position:'relative', zIndex:1, textAlign:'center', pointerEvents:'none' }}>
                   <div style={{ fontFamily:'Orbitron', fontSize:54, fontWeight:900, color:`${primary}30`, textTransform:'uppercase', letterSpacing:'0.05em' }}>{mapName}</div>
-                  <div style={{ fontFamily:'Orbitron', fontSize:11, color:`${primary}50`, letterSpacing:'0.4em', marginTop:10 }}>FREE FIRE MAP</div>
+                  <div style={{ fontFamily:'Orbitron', fontSize:11, color:`${primary}50`, letterSpacing:'0.4em', marginTop:10 }}>{(design?.preMatchMapLabel || 'FREE FIRE MAP').toUpperCase()}</div>
                 </div>
               </div>
               <div style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${primary}15,transparent)` }} />
@@ -823,7 +838,7 @@ function TodaysMatches({ matches = [], design }) {
       <div style={{ position:'relative', zIndex:1, padding:'60px 80px', flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between', height:'100%' }}>
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
-            <div style={{ fontFamily:'Orbitron', fontSize:32, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>TODAY'S SCHEDULE</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:32, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>{(design?.todayScheduleTitle || "TODAY'S SCHEDULE").toUpperCase()}</div>
             <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:700, color:secondary, letterSpacing:'0.25em', marginTop:4 }}>{tok.name(design)}</div>
           </div>
           <Calendar style={{ color:primary }} size={36} />
@@ -953,8 +968,8 @@ function CastersScreen({ design }) {
         {/* Header */}
         <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
           <div>
-            <div style={{ fontFamily:'Orbitron', fontSize:32, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>ON THE ANALYST DESK</div>
-            <div style={{ fontFamily:'Orbitron', fontSize:11, color:secondary, letterSpacing:'0.3em', marginTop:4 }}>OFFICIAL BROADCAST CREW</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:32, fontWeight:900, color:'#fff', letterSpacing:'0.15em' }}>{(design?.castersTitle || 'ON THE ANALYST DESK').toUpperCase()}</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:11, color:secondary, letterSpacing:'0.3em', marginTop:4 }}>{(design?.castersSubtitle || 'OFFICIAL BROADCAST CREW').toUpperCase()}</div>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:20 }}>
             {sponsorLogo && <img src={sponsorLogo} alt="sponsor" style={{ height:44, objectFit:'contain', opacity:0.9 }} onError={e=>e.target.style.display='none'} />}
@@ -1030,7 +1045,7 @@ function UpcomingMap({ match, design }) {
             </div>
           </div>
           <div style={{ flex:1 }}>
-            <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.25em', marginBottom:2 }}>UPCOMING BATTLEGROUND</div>
+            <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.25em', marginBottom:2 }}>{(design?.upcomingMapLabel || 'UPCOMING BATTLEGROUND').toUpperCase()}</div>
             <div style={{ fontFamily:'Orbitron', fontSize:32, fontWeight:900, color:'#fff', textTransform:'uppercase', lineHeight:1, letterSpacing:'0.05em' }}>{mapName}</div>
           </div>
           <div style={{ display:'flex', flexDirection:'column', alignItems:'flex-end', gap:4 }}>
@@ -1073,7 +1088,7 @@ function EliminationAlert({ eliminations = [], design }) {
                 <Flame size={20} style={{ color:'#ef4444' }} />
               </div>
               <div>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)', letterSpacing:'0.25em', marginBottom:2 }}>TEAM SQUAD ELIMINATED</div>
+                <div style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)', letterSpacing:'0.25em', marginBottom:2 }}>{(design?.elimAlertLabel || 'TEAM SQUAD ELIMINATED').toUpperCase()}</div>
                 <div style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', textTransform:'uppercase' }}>
                   {latest.eliminated_player_name || latest.player_name || 'SQUAD'}
                 </div>
@@ -1123,7 +1138,7 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
           <div style={{ animation:'starPulse 2.5s infinite ease-in-out' }}>
             <Award size={80} style={{ color: primary }} />
           </div>
-          <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:secondary, letterSpacing:'0.6em' }}>MATCH MVP</span>
+          <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:secondary, letterSpacing:'0.6em' }}>{(design?.mvpTitle || 'MATCH MVP').toUpperCase()}</span>
         </div>
 
         {/* MVP Card */}
@@ -1224,11 +1239,11 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
         </div>
 
         <h1 style={{ fontFamily:'Orbitron', fontSize:120, fontWeight:900, background:'linear-gradient(135deg,#FFD700,#FF6B00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', lineHeight:0.9, margin:0, letterSpacing:'0.06em', filter:'drop-shadow(0 0 40px rgba(255,107,0,0.5))' }}>
-          BOOYAH!
+          {(design?.championTitle || 'BOOYAH!').toUpperCase()}
         </h1>
 
         <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:secondary, letterSpacing:'0.6em', textTransform:'uppercase' }}>
-          GRAND TOURNAMENT CHAMPION
+          {(design?.championSubtitle || 'GRAND TOURNAMENT CHAMPION').toUpperCase()}
         </span>
 
         <motion.div
@@ -1242,7 +1257,7 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
               <div style={{ width:110, height:110, borderRadius:'50%', border:`3px solid #FFD700`, boxShadow:'0 0 35px rgba(255,215,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.6)', marginBottom:18 }}>
                 <TeamLogo team={winnerTeamObj} size={80} />
               </div>
-              <span style={{ fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em', marginBottom:6 }}>CHAMPIONSHIP SQUAD</span>
+              <span style={{ fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em', marginBottom:6 }}>{(design?.championSquadLabel || 'CHAMPIONSHIP SQUAD').toUpperCase()}</span>
               <span style={{ fontFamily:'Orbitron', fontSize:36, fontWeight:900, color:'#fff', letterSpacing:'0.05em', textTransform:'uppercase' }}>{winnerName}</span>
               
               <div style={{ display:'flex', width:'100%', marginTop:24, paddingTop:20, borderTop:'1px solid rgba(255,255,255,0.08)', justifyContent:'space-around' }}>
@@ -1693,7 +1708,7 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
                 textTransform: 'uppercase',
                 textShadow: '0 2px 4px rgba(0,0,0,0.4)',
               }}>
-                TEAMS ROSTER
+                {(design?.rosterTitle || 'TEAMS ROSTER').toUpperCase()}
               </div>
             </div>
           </div>

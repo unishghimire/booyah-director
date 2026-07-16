@@ -1232,10 +1232,24 @@ export function PointRushStandings({ teams = [], design }) {
         }}>
           {team.name || 'TEAM'}
         </div>
+        {/* Placement Points (PPT) */}
+        <div style={{
+          fontFamily: 'Rajdhani', fontSize: 14, fontWeight: 700,
+          color: '#00D4FF', minWidth: 36, textAlign: 'right',
+        }}>
+          {(() => { const kk=(team.total_tournament_kills||0); const tp=(team.total_tournament_points||0); return tp-kk; })()}
+        </div>
         {/* Kills */}
         <div style={{
           fontFamily: 'Rajdhani', fontSize: 14, fontWeight: 700,
           color: 'rgba(255,255,255,0.4)', minWidth: 36, textAlign: 'right',
+        }}>
+          {team.total_tournament_kills || 0}
+        </div>
+        {/* Kill Points */}
+        <div style={{
+          fontFamily: 'Rajdhani', fontSize: 14, fontWeight: 700,
+          color: '#22c55e', minWidth: 42, textAlign: 'right',
         }}>
           {team.total_tournament_kills || 0}
         </div>
@@ -1335,19 +1349,25 @@ export function PointRushStandings({ teams = [], design }) {
             <>
               <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0 14px 8px 62px', borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
                 <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>TEAM</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.15em' }}>PPT</span>
                 <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>KILLS</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#22c55e', letterSpacing: '0.15em' }}>K.PTS</span>
                 <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>PTS</span>
               </div>
               <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0 14px 8px 62px', borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
                 <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>TEAM</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.15em' }}>PPT</span>
                 <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>KILLS</span>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#22c55e', letterSpacing: '0.15em' }}>K.PTS</span>
                 <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>PTS</span>
               </div>
             </>
           ) : (
             <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0 14px 8px 62px', borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
               <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>TEAM</span>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.15em' }}>PPT</span>
               <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>KILLS</span>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#22c55e', letterSpacing: '0.15em' }}>K.PTS</span>
               <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>PTS</span>
             </div>
           )}
