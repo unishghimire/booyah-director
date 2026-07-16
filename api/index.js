@@ -491,6 +491,9 @@ module.exports = async (req, res) => {
           eliminations = db.elimination_events.filter(e => e.match_id === currentMatch.id).sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp)).slice(0, 5);
           standings    = db.match_standings.filter(s => s.match_id === currentMatch.id);
         }
+        // Include next scheduled match for the schedule display
+        const nextScheduled = db.matches.find(m => m.tournament_id === tid && m.state === 'scheduled') || null;
+
         return ok({
           tournament,
           overlay_state: db.overlay_state,
@@ -501,7 +504,14 @@ module.exports = async (req, res) => {
           match_standings: db.match_standings.filter(s => s.tournament_id === tid),
           kill_events: db.kill_events.filter(k => k.tournament_id === tid),
           elimination_events: db.elimination_events.filter(e => e.tournament_id === tid),
-          current_match: currentMatch,
+          current_match: currentMatch ? {
+            ...currentMatch,
+            stage_name: currentMatch.stage_name || null,
+            stage_order: currentMatch.stage_order ?? null,
+            day_number: currentMatch.day_number ?? null,
+            day_label: currentMatch.day_label || null
+          } : null,
+          next_scheduled_match: nextScheduled,
           kill_feed: killFeed,
           eliminations,
           standings
@@ -894,20 +904,64 @@ module.exports = async (req, res) => {
         return t;
       });
 
+      // ── Format config: multi-stage, multi-day, multi-map schedule ──
+      const formatConfig = body.format_config || null;
+      let formatConfigStr = null;
+      let autoMatches = [];
+
+      if (formatConfig && Array.isArray(formatConfig.stages)) {
+        formatConfigStr = JSON.stringify(formatConfig);
+        let matchNum = 0;
+        for (let si = 0; si < formatConfig.stages.length; si++) {
+          const stage = formatConfig.stages[si];
+          const stageName = stage.name || (si === 0 ? 'Group Stage' : 'Stage ' + (si + 1));
+          if (!Array.isArray(stage.days)) continue;
+          for (const dayObj of stage.days) {
+            const dayNum = dayObj.day || 1;
+            const dayLabel = dayObj.label || ('Day ' + dayNum);
+            if (!Array.isArray(dayObj.matches)) continue;
+            for (const m of dayObj.matches) {
+              matchNum++;
+              autoMatches.push({
+                id: genId(),
+                tournament_id: null, // will be set after tournament is pushed
+                match_number: matchNum,
+                state: 'scheduled',
+                map_name: sanitizeString(m.map || 'Bermuda', 50),
+                stage_name: stageName,
+                stage_order: si,
+                day_number: dayNum,
+                day_label: dayLabel,
+                started_at: null,
+                ended_at: null
+              });
+            }
+          }
+        }
+      }
+
       const tournament = {
         id: genId(),
         name,
-        total_matches,
+        total_matches: formatConfig ? autoMatches.length : total_matches,
         points_per_kill,
         placement_points_config: typeof body.placement_points_config === 'string'
           ? body.placement_points_config
           : JSON.stringify(body.placement_points_config || defaultConfig),
+        format_config: formatConfigStr,
         current_match_number: 0,
+        current_stage: null,
         status: 'active',
         created_at: new Date().toISOString()
       };
 
       db.tournaments.push(tournament);
+
+      // Set tournament_id on auto-generated matches and push them
+      for (const m of autoMatches) {
+        m.tournament_id = tournament.id;
+        db.matches.push(m);
+      }
       db.overlay_state.tournament_id = tournament.id;
       db.overlay_state.current_screen = 'setup_blank';
       db.overlay_state.last_updated_at = new Date().toISOString();
@@ -936,11 +990,30 @@ module.exports = async (req, res) => {
           };
         }).sort((a, b) => b.total_points - a.total_points);
 
+        // Parse format_config for UI
+        let formatConfig = null;
+        try { if (t.format_config) formatConfig = JSON.parse(t.format_config); } catch (_) {}
+
+        // Build schedule summary
+        const scheduledMatches = tournamentMatches
+          .filter(m => m.state === 'scheduled')
+          .sort((a, b) => (a.match_number || 0) - (b.match_number || 0))
+          .map(m => ({
+            match_number: m.match_number,
+            map_name: m.map_name,
+            stage_name: m.stage_name,
+            day_number: m.day_number,
+            day_label: m.day_label
+          }));
+
         return {
           ...t,
           team_count: tournamentTeams.length,
-          match_count: tournamentMatches.length,
-          standings: teamsWithPoints.slice(0, 3) // Top 3 teams
+          match_count: tournamentMatches.filter(m => m.state !== 'scheduled').length,
+          total_matches: t.total_matches || tournamentMatches.length,
+          standings: teamsWithPoints.slice(0, 3),
+          format_config: formatConfig,
+          scheduled_matches: scheduledMatches
         };
       });
 
@@ -1083,20 +1156,43 @@ module.exports = async (req, res) => {
       if (tIdx === -1) return err(404, 'Tournament not found');
 
       const newMatchNumber = (db.tournaments[tIdx].current_match_number || 0) + 1;
+
+      // Check if there's a pre-scheduled match from format_config
+      let match;
+      const scheduledMatch = db.matches.find(m =>
+        m.tournament_id === body.tournament_id &&
+        m.match_number === newMatchNumber &&
+        m.state === 'scheduled'
+      );
+
+      if (scheduledMatch) {
+        // Use pre-scheduled match (has map, day, stage info)
+        scheduledMatch.state = 'pre_match';
+        scheduledMatch.started_at = new Date().toISOString();
+        match = scheduledMatch;
+        // Update tournament stage tracking
+        db.tournaments[tIdx].current_stage = match.stage_name || null;
+      } else {
+        // No pre-scheduled match — create one (legacy/manual mode)
+        match = {
+          id: genId(),
+          tournament_id: db.tournaments[tIdx].id,
+          match_number: newMatchNumber,
+          state: 'pre_match',
+          map_name: sanitizeString(body.map_name, 50) || 'Bermuda',
+          stage_name: null,
+          stage_order: null,
+          day_number: null,
+          day_label: null,
+          started_at: new Date().toISOString(),
+          ended_at: null
+        };
+        db.matches.push(match);
+      }
+
       db.tournaments[tIdx].current_match_number = newMatchNumber;
       db.tournaments[tIdx].status = 'active';
 
-      const match = {
-        id: genId(),
-        tournament_id: db.tournaments[tIdx].id,
-        match_number: newMatchNumber,
-        state: 'pre_match',
-        map_name: sanitizeString(body.map_name, 50) || 'Bermuda',
-        started_at: new Date().toISOString(),
-        ended_at: null
-      };
-
-      db.matches.push(match);
       db.players = db.players.map(p => p.tournament_id === match.tournament_id ? { ...p, is_alive: true, current_match_kills: 0 } : p);
       db.overlay_state.current_screen = 'maplabel';
       db.overlay_state.last_updated_at = new Date().toISOString();

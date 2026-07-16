@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useState, useMemo } from 'react';
 import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
-import { MapPin, Flag, Play, Square, SkipForward, Trophy } from 'lucide-react';
+import { MapPin, Flag, Play, Square, SkipForward, Trophy, Calendar, Layers, Clock } from 'lucide-react';
 import { overlayApi } from '@/lib/overlayApi';
+import { MAPS } from '@/lib/maps';
 import toast from 'react-hot-toast';
 
 export default function MatchControls({ tournament, currentMatch, onAction }) {
@@ -13,11 +14,26 @@ export default function MatchControls({ tournament, currentMatch, onAction }) {
   const matchState = currentMatch?.state || 'idle';
   const matchNumber = currentMatch?.match_number || tournament?.current_match_number || 0;
 
+  // Stage/Day context from match
+  const stageName = currentMatch?.stage_name || null;
+  const dayLabel = currentMatch?.day_label || null;
+  const dayNumber = currentMatch?.day_number || null;
+  const scheduledMap = currentMatch?.map_name || null;
+
+  // Next scheduled match (for "up next" preview)
+  const formatConfig = useMemo(() => {
+    try { return tournament?.format_config ? (typeof tournament.format_config === 'string' ? JSON.parse(tournament.format_config) : tournament.format_config) : null; }
+    catch { return null; }
+  }, [tournament]);
+
+  const nextMatchNumber = matchNumber + 1;
+  const nextScheduled = formatConfig?.stages?.flatMap(s => s.days?.flatMap(d => d.matches?.map(m => ({ ...m, stage: s.name, day: d.label }))) || [])?.[nextMatchNumber - 1] || null;
+
   const handleStart = async () => {
     if (!tid) { toast.error('No tournament'); return; }
     setBusy('start');
     try {
-      await overlayApi.startNextMatch({ tournament_id: tid, map_name: mapName.trim() || 'Bermuda' });
+      await overlayApi.startNextMatch({ tournament_id: tid, map_name: mapName.trim() || scheduledMap || 'Bermuda' });
       setMapName('');
       toast.success('Match started!');
       onAction?.();
@@ -49,6 +65,7 @@ export default function MatchControls({ tournament, currentMatch, onAction }) {
       in_game: 'bg-green-500/20 text-green-400',
       post_match: 'bg-orange-500/20 text-orange-400',
       pre_match: 'bg-blue-500/20 text-blue-400',
+      scheduled: 'bg-gray-500/20 text-gray-400',
       mvp: 'bg-purple-500/20 text-purple-400',
     };
     return colors[state] || 'bg-white/5 text-gray-500';
@@ -63,21 +80,67 @@ export default function MatchControls({ tournament, currentMatch, onAction }) {
 
   return (
     <div className="rounded-xl border border-white/10 bg-[#11111a] p-4">
-      <div className="mb-3 flex items-center justify-between">
+      {/* Header with stage + day context */}
+      <div className="mb-3 flex items-center justify-between flex-wrap gap-2">
         <h2 className="font-orbitron text-sm font-bold text-white">MATCH CONTROL</h2>
-        <div className="flex items-center gap-2">
+        <div className="flex items-center gap-2 flex-wrap">
           <span className="rounded-md bg-white/5 px-2 py-0.5 text-xs text-gray-400">Match #{matchNumber}</span>
           <span className={`rounded-md px-2 py-0.5 text-xs font-bold uppercase ${stateColor(matchState)}`}>{matchState}</span>
         </div>
       </div>
+
+      {/* Stage / Day / Map context bar */}
+      {(stageName || dayLabel) && (
+        <div className="mb-3 flex items-center gap-2 flex-wrap rounded-lg border border-[#FF6B00]/15 bg-[#FF6B00]/5 px-3 py-2">
+          {stageName && (
+            <div className="flex items-center gap-1.5">
+              <Layers className="h-3 w-3 text-[#FF6B00]" />
+              <span className="font-orbitron text-[10px] font-bold text-[#FF6B00] tracking-wider">{stageName.toUpperCase()}</span>
+            </div>
+          )}
+          {dayLabel && (
+            <div className="flex items-center gap-1.5">
+              <Calendar className="h-3 w-3 text-gray-400" />
+              <span className="font-orbitron text-[10px] font-bold text-gray-300 tracking-wider">{dayLabel.toUpperCase()}</span>
+            </div>
+          )}
+          {scheduledMap && (
+            <div className="flex items-center gap-1.5">
+              <MapPin className="h-3 w-3 text-gray-400" />
+              <span className="font-orbitron text-[10px] font-bold text-gray-300">{scheduledMap}</span>
+            </div>
+          )}
+        </div>
+      )}
+
+      {/* Up next preview */}
+      {nextScheduled && (
+        <div className="mb-3 flex items-center gap-2 rounded-lg border border-white/8 bg-black/30 px-3 py-1.5">
+          <Clock className="h-3 w-3 text-gray-500 flex-shrink-0" />
+          <span className="text-[10px] font-orbitron font-bold text-gray-500 tracking-wider">UP NEXT:</span>
+          <span className="text-[10px] font-bold text-gray-300">M{nextMatchNumber}</span>
+          <span className="text-[10px] text-gray-500">·</span>
+          <span className="text-[10px] font-bold text-gray-400">{nextScheduled.map}</span>
+          {nextScheduled.stage && <><span className="text-[10px] text-gray-600">·</span><span className="text-[10px] text-gray-500">{nextScheduled.stage}</span></>}
+          {nextScheduled.day && <><span className="text-[10px] text-gray-600">·</span><span className="text-[10px] text-gray-500">{nextScheduled.day}</span></>}
+        </div>
+      )}
+
+      {/* Map override input */}
       <div className="mb-3">
-        <label className="mb-1 block text-xs font-medium text-gray-400">Map Name</label>
-        <div className="relative">
-          <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
-          <input value={mapName || ''} onChange={e => setMapName(e.target.value)} placeholder="e.g. Bermuda, Purgatory, Kalahari"
-            className="w-full rounded-lg border border-white/10 bg-black/40 py-2 pl-9 pr-3 text-sm text-white outline-none focus:border-orange-500" />
+        <label className="mb-1 block text-xs font-medium text-gray-400">Map Override (leave empty to use schedule)</label>
+        <div className="flex items-center gap-2">
+          <div className="relative flex-1">
+            <MapPin className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+            <select value={mapName || scheduledMap || ''} onChange={e => setMapName(e.target.value)}
+              className="w-full appearance-none rounded-lg border border-white/10 bg-black/40 py-2 pl-9 pr-8 text-sm text-white outline-none focus:border-orange-500">
+              <option value="">Use scheduled map</option>
+              {MAPS.map(m => <option key={m} value={m}>{m}</option>)}
+            </select>
+          </div>
         </div>
       </div>
+
       <div className="flex flex-wrap gap-2">
         {buttons.map(btn => {
           const Icon = btn.icon;
