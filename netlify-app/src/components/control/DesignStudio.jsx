@@ -21,7 +21,7 @@ import toast from 'react-hot-toast';
 import {
   Paintbrush, Check, Layers, Type, Eye, Mic2,
   Lock, RefreshCw, Save, RotateCcw, Map,
-  Image, FolderOpen, BotMessageSquare, Send, TestTube2, Link, CheckCircle2, Trash2, Trophy, Users, BarChart3, Star
+  Image, FolderOpen, BotMessageSquare, Send, TestTube2, Link, CheckCircle2, Trash2, Trophy, Users, BarChart3, Star, Zap
 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import { MAPS } from '@/lib/maps';
@@ -909,6 +909,149 @@ export default function DesignStudio(props) {
           style={{ background: saving ? (design?.accentColor || '#f97316') + 'aa' : (design?.accentColor || '#f97316') }}>
           {saving ? <><RefreshCw className="h-4 w-4 animate-spin" /> Saving…</> : <><Save className="h-4 w-4" /> Apply Design to Overlay</>}
         </button>
+      </div>
+    </div>
+  );
+}
+
+/* ─── Tournament Settings Section (Champion Rush + Headstart) ─────────────── */
+function TournamentSettingsSection({ tournament, onAction }) {
+  const [threshold, setThreshold] = useState(tournament?.champion_rush_threshold || 0);
+  const [saving, setSaving] = useState(false);
+  const [showHeadstart, setShowHeadstart] = useState(false);
+  const [headstartTeams, setHeadstartTeams] = useState([]);
+
+  useEffect(() => {
+    if (tournament?.id) {
+      let hsMap = {};
+      try {
+        if (tournament.headstart_points) {
+          hsMap = typeof tournament.headstart_points === 'string'
+            ? JSON.parse(tournament.headstart_points)
+            : tournament.headstart_points;
+        }
+      } catch (_) {}
+
+      const teams = tournament?.standings || [];
+      setHeadstartTeams(teams.map((t, i) => ({
+        teamId: t.id || t.teamId,
+        teamName: t.name || t.team,
+        points: hsMap[t.id || t.teamId] || 0,
+        rank: i + 1
+      })));
+    }
+  }, [tournament]);
+
+  const saveThreshold = async () => {
+    if (!tournament?.id) { toast.error('No active tournament'); return; }
+    setSaving(true);
+    try {
+      await overlayApi.updateTournamentSettings({
+        tournament_id: tournament.id,
+        champion_rush_threshold: Number(threshold) || 0
+      });
+      toast.success('Champion Rush threshold updated!');
+      onAction?.();
+    } catch (e) { toast.error(e.message); } finally { setSaving(false); }
+  };
+
+  const applyHeadstart = async () => {
+    if (!tournament?.id) { toast.error('No active tournament'); return; }
+    setSaving(true);
+    try {
+      const headstartMap = {};
+      for (const t of headstartTeams) {
+        if (t.points > 0) headstartMap[t.teamId] = Number(t.points);
+      }
+      await overlayApi.applyHeadstartPoints({
+        tournament_id: tournament.id,
+        headstart_points: headstartMap
+      });
+      toast.success('Headstart points applied to standings!');
+      onAction?.();
+    } catch (e) { toast.error(e.message); } finally { setSaving(false); }
+  };
+
+  const autoCalcHeadstart = () => {
+    const GARENA_MAP = { 1: 10, 2: 7, 3: 5, 4: 3, 5: 2, 6: 1 };
+    setHeadstartTeams(prev => prev.map(t => ({
+      ...t,
+      points: GARENA_MAP[t.rank] || 0
+    })));
+    toast.success('Auto-calculated: 1st=10, 2nd=7, 3rd=5, 4th=3, 5th=2, 6th=1');
+  };
+
+  const updateHeadstartPoint = (i, val) => {
+    setHeadstartTeams(prev => prev.map((t, idx) => idx === i ? { ...t, points: Number(val) || 0 } : t));
+  };
+
+  return (
+    <div className="space-y-4">
+      {/* Champion Rush Threshold */}
+      <div className="rounded-lg border border-white/8 bg-black/20 p-3 space-y-3">
+        <div className="flex items-center gap-2">
+          <Trophy className="h-3.5 w-3.5 text-[#FFC700]" />
+          <span className="font-orbitron text-[10px] font-bold text-[#FFC700] tracking-wider">CHAMPION RUSH THRESHOLD</span>
+        </div>
+        <div className="flex gap-2">
+          <select value={threshold} onChange={e => setThreshold(Number(e.target.value))}
+            className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#FF6B00]/50">
+            <option value={0}>Disabled</option>
+            <option value={80}>80 Points</option>
+            <option value={90}>90 Points</option>
+            <option value={100}>100 Points</option>
+          </select>
+          <button onClick={saveThreshold} disabled={saving}
+            className="rounded-lg bg-[#FFC700]/15 border border-[#FFC700]/30 px-4 py-2 text-[10px] font-orbitron font-black text-[#FFC700] hover:bg-[#FFC700]/25 transition-all disabled:opacity-50">
+            {saving ? '...' : 'SAVE'}
+          </button>
+        </div>
+        <p className="text-[9px] text-gray-500 leading-normal">
+          Once a team crosses {threshold > 0 ? threshold : 'the threshold'} pts, they must win a Booyah (1st place) in a subsequent match to be crowned champions. Gold highlight appears on eligible teams in overlays.
+        </p>
+      </div>
+
+      {/* Headstart / Carryover Points */}
+      <div className="rounded-lg border border-white/8 bg-black/20 p-3 space-y-3">
+        <button onClick={() => setShowHeadstart(!showHeadstart)} className="flex w-full items-center justify-between">
+          <div className="flex items-center gap-2">
+            <Zap className="h-3.5 w-3.5 text-[#00D4FF]" />
+            <span className="font-orbitron text-[10px] font-bold text-[#00D4FF] tracking-wider">POINT RUSH CARRYOVERS</span>
+          </div>
+          <span className="text-[10px] text-gray-500">{showHeadstart ? '▲' : '▼'}</span>
+        </button>
+
+        {showHeadstart && (
+          <div className="space-y-2">
+            <p className="text-[9px] text-gray-500 leading-normal">
+              Assign bonus starting points to teams based on their previous stage placement. These are added to each team's total tournament points.
+            </p>
+            <button onClick={autoCalcHeadstart}
+              className="w-full rounded-lg border border-[#00D4FF]/20 bg-[#00D4FF]/5 py-1.5 text-[10px] font-orbitron font-bold text-[#00D4FF] hover:bg-[#00D4FF]/10 transition-all">
+              AUTO-CALC FROM RANK (Garena Rules)
+            </button>
+            {headstartTeams.length > 0 ? (
+              <div className="space-y-1.5 max-h-48 overflow-y-auto">
+                {headstartTeams.map((t, i) => (
+                  <div key={i} className="flex items-center gap-2">
+                    <span className="font-orbitron text-[9px] font-bold text-gray-500 w-6 text-right">#{t.rank}</span>
+                    <span className="flex-1 text-[10px] text-gray-300 truncate">{t.teamName}</span>
+                    <input type="number" min={0} value={t.points}
+                      onChange={e => updateHeadstartPoint(i, e.target.value)}
+                      className="w-16 rounded border border-white/10 bg-black/40 px-2 py-1 text-[10px] text-white text-center outline-none focus:border-[#00D4FF]/50" />
+                    <span className="text-[8px] text-gray-600 w-6">pts</span>
+                  </div>
+                ))}
+              </div>
+            ) : (
+              <p className="text-[10px] text-gray-600 italic">No teams or standings available. Create teams and play matches first.</p>
+            )}
+            <button onClick={applyHeadstart} disabled={saving}
+              className="w-full rounded-lg bg-[#00D4FF]/15 border border-[#00D4FF]/30 py-2 text-[10px] font-orbitron font-black text-[#00D4FF] hover:bg-[#00D4FF]/25 transition-all disabled:opacity-50">
+              {saving ? 'APPLYING...' : 'APPLY HEADSTART POINTS'}
+            </button>
+          </div>
+        )}
       </div>
     </div>
   );
