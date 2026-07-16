@@ -1592,3 +1592,442 @@ function getThemeInline(design) {
   if (userAcc2 && style === 'default') t.s = userAcc2;
   return t;
 }
+
+// ─────────────────────────────────────────────────────────────────────────────
+// ROADMAP OVERLAY — Full tournament schedule roadmap (stages → days → matches)
+// Shows the entire tournament journey with progress indicators
+// ─────────────────────────────────────────────────────────────────────────────
+export function RoadmapOverlay({ tournament, matches = [], currentMatch, design }) {
+  const tLogo = design?.logoUrl || null;
+  const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
+  const sponsorLogo = design?.sponsorLogoUrl || null;
+  const sponsorLabel = design?.sponsorLabel || 'OFFICIAL SPONSOR';
+  const accent = '#00C8FF';
+  const accent2 = '#0055FF';
+  const gold = '#FFC700';
+
+  // Parse format_config to build the roadmap
+  let formatConfig = null;
+  try {
+    if (tournament?.format_config) {
+      formatConfig = typeof tournament.format_config === 'string'
+        ? JSON.parse(tournament.format_config)
+        : tournament.format_config;
+    }
+  } catch (_) {}
+
+  // If no format_config, build from matches
+  const stages = useMemo(() => {
+    if (formatConfig?.stages) {
+      return formatConfig.stages.map((stage, si) => {
+        const stageMatches = [];
+        for (const day of (stage.days || [])) {
+          for (const m of (day.matches || [])) {
+            stageMatches.push({
+              map: m.map,
+              day: day.label,
+              dayNumber: day.day
+            });
+          }
+        }
+        // Find which of these matches are completed
+        const matchNumOffset = formatConfig.stages.slice(0, si).reduce((acc, s) => {
+          return acc + (s.days || []).reduce((a, d) => a + (d.matches || []).length, 0);
+        }, 0);
+        return {
+          name: stage.name || 'Stage ' + (si + 1),
+          order: si,
+          matches: stageMatches.map((m, mi) => {
+            const globalNum = matchNumOffset + mi + 1;
+            const dbMatch = matches.find(dm => dm.match_number === globalNum);
+            return {
+              ...m,
+              matchNumber: globalNum,
+              state: dbMatch?.state || 'scheduled',
+              isCurrent: currentMatch?.match_number === globalNum
+            };
+          })
+        };
+      });
+    }
+    // Fallback: build from matches array
+    const byStage = {};
+    for (const m of matches) {
+      const sn = m.stage_name || 'Tournament';
+      if (!byStage[sn]) byStage[sn] = { name: sn, order: m.stage_order || 0, matches: [] };
+      byStage[sn].matches.push({
+        map: m.map_name || 'Bermuda',
+        day: m.day_label || '',
+        matchNumber: m.match_number,
+        state: m.state || 'scheduled',
+        isCurrent: currentMatch?.match_number === m.match_number
+      });
+    }
+    return Object.values(byStage).sort((a, b) => a.order - b.order);
+  }, [formatConfig, matches, currentMatch]);
+
+  const totalMatches = stages.reduce((a, s) => a + s.matches.length, 0);
+  const completedMatches = stages.reduce((a, s) => a + s.matches.filter(m => m.state === 'post_match' || m.state === 'completed').length, 0);
+  const progressPct = totalMatches > 0 ? Math.round((completedMatches / totalMatches) * 100) : 0;
+
+  return (
+    <div style={{
+      width: 1920, height: 1080, position: 'relative', overflow: 'hidden',
+      background: 'radial-gradient(ellipse at 50% 30%, #0a1130 0%, #04060E 70%, #02030a 100%)',
+      boxSizing: 'border-box', color: '#fff'
+    }}>
+      {/* Ambient glows */}
+      <div style={{ position: 'absolute', top: '10%', left: '50%', transform: 'translateX(-50%)', width: 1200, height: 400, background: `radial-gradient(ellipse, ${accent}15 0%, transparent 70%)`, filter: 'blur(60px)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '5%', left: '20%', width: 600, height: 300, background: `radial-gradient(ellipse, ${accent2}10 0%, transparent 70%)`, filter: 'blur(50px)', pointerEvents: 'none' }} />
+
+      {/* Grid texture */}
+      <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.3) 0px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.3) 0px, transparent 1px, transparent 80px)', pointerEvents: 'none' }} />
+
+      {/* Content */}
+      <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', padding: '60px 80px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+        {/* Header */}
+        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+          style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `2px solid ${accent}30`, paddingBottom: 20, marginBottom: 30 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
+            {tLogo ? (
+              <img src={tLogo} alt="" style={{ height: 64, objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.2))' }} onError={e => { e.target.style.display = 'none'; }} />
+            ) : (
+              <div style={{ height: 64, width: 64, background: `linear-gradient(135deg, ${accent}, ${accent2})`, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 20px ${accent}40` }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 20, fontWeight: 900, color: '#fff' }}>FF</span>
+              </div>
+            )}
+            <div>
+              <div style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 800, color: accent, letterSpacing: '0.4em', textTransform: 'uppercase' }}>TOURNAMENT ROADMAP</div>
+              <div style={{ fontFamily: 'Orbitron', fontSize: 42, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', lineHeight: 1.1, marginTop: 4 }}>{tName.toUpperCase()}</div>
+            </div>
+          </div>
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+            {sponsorLogo && (
+              <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.2em' }}>{sponsorLabel.toUpperCase()}</span>
+                <img src={sponsorLogo} alt="" style={{ height: 40, objectFit: 'contain' }} onError={e => { e.target.style.display = 'none'; }} />
+              </div>
+            )}
+            {/* Progress bar */}
+            <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+              <div style={{ width: 200, height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+                <motion.div initial={{ width: 0 }} animate={{ width: `${progressPct}%` }} transition={{ duration: 1, delay: 0.5 }}
+                  style={{ height: '100%', background: `linear-gradient(90deg, ${accent}, ${accent2})`, borderRadius: 4, boxShadow: `0 0 10px ${accent}80` }} />
+              </div>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 800, color: accent }}>{completedMatches}/{totalMatches}</span>
+            </div>
+          </div>
+        </motion.div>
+
+        {/* Stage columns */}
+        <div style={{ flex: 1, display: 'flex', gap: 24, alignItems: 'stretch' }}>
+          {stages.map((stage, si) => (
+            <motion.div key={si}
+              initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 + si * 0.15 }}
+              style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
+              {/* Stage header */}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 10, marginBottom: 16,
+                paddingBottom: 12, borderBottom: `2px solid ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}40`
+              }}>
+                <div style={{
+                  width: 36, height: 36, borderRadius: '50%',
+                  background: `linear-gradient(135deg, ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}, ${si === 0 ? accent2 : si === stages.length - 1 ? '#ff8800' : accent})`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#fff',
+                  boxShadow: `0 0 15px ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}60`
+                }}>{si + 1}</div>
+                <div>
+                  <div style={{ fontFamily: 'Orbitron', fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '0.08em', textTransform: 'uppercase' }}>{stage.name}</div>
+                  <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.2em' }}>{stage.matches.length} MATCHES</div>
+                </div>
+              </div>
+
+              {/* Day groups */}
+              <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 12 }}>
+                {(() => {
+                  const dayGroups = {};
+                  for (const m of stage.matches) {
+                    const dk = m.day || 'Day 1';
+                    if (!dayGroups[dk]) dayGroups[dk] = [];
+                    dayGroups[dk].push(m);
+                  }
+                  return Object.entries(dayGroups).map(([dayName, dayMatches], di) => (
+                    <div key={di} style={{ borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 12 }}>
+                      <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: 10 }}>{dayName}</div>
+                      <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+                        {dayMatches.map((m, mi) => {
+                          const isDone = m.state === 'post_match' || m.state === 'completed';
+                          const isCurrent = m.isCurrent;
+                          const isScheduled = m.state === 'scheduled';
+                          return (
+                            <div key={mi} style={{
+                              display: 'flex', alignItems: 'center', gap: 10, padding: '8px 12px', borderRadius: 8,
+                              background: isCurrent ? `${accent}15` : isDone ? 'rgba(0,255,100,0.05)' : 'rgba(255,255,255,0.01)',
+                              border: isCurrent ? `1px solid ${accent}80` : isDone ? '1px solid rgba(0,255,100,0.2)' : '1px solid rgba(255,255,255,0.06)',
+                              boxShadow: isCurrent ? `0 0 15px ${accent}30` : 'none',
+                            }}>
+                              {/* Status dot */}
+                              <div style={{
+                                width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
+                                background: isDone ? '#00ff64' : isCurrent ? accent : 'rgba(255,255,255,0.15)',
+                                boxShadow: isDone ? '0 0 8px #00ff6480' : isCurrent ? `0 0 8px ${accent}80` : 'none',
+                              }} />
+                              {/* Match number */}
+                              <span style={{
+                                fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900,
+                                color: isDone ? 'rgba(255,255,255,0.4)' : isCurrent ? accent : '#fff',
+                                width: 32, flexShrink: 0
+                              }}>M{m.matchNumber}</span>
+                              {/* Map name */}
+                              <span style={{
+                                fontFamily: 'Orbitron', fontSize: 12, fontWeight: 700,
+                                color: isDone ? 'rgba(255,255,255,0.3)' : isCurrent ? '#fff' : 'rgba(255,255,255,0.7)',
+                                flex: 1, letterSpacing: '0.05em'
+                              }}>{m.map}</span>
+                              {/* State badge */}
+                              {isCurrent && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: accent, letterSpacing: '0.15em', background: `${accent}15`, padding: '2px 8px', borderRadius: 4 }}>LIVE</span>}
+                              {isDone && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#00ff64', letterSpacing: '0.15em' }}>DONE</span>}
+                              {isScheduled && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.15em' }}>—</span>}
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  ));
+                })()}
+              </div>
+            </motion.div>
+          ))}
+        </div>
+
+        {/* Footer */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em' }}>
+            {stages.length} STAGES · {totalMatches} MATCHES · {completedMatches} COMPLETED
+          </span>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: accent, letterSpacing: '0.2em' }}>
+            BOOYAH DIRECTOR · TOURNAMENT ROADMAP
+          </span>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+// ─────────────────────────────────────────────────────────────────────────────
+// EVENT DETAILS OVERLAY — Shows tournament info, current/next match, format
+// A full-screen "info card" overlay for breaks between matches
+// ─────────────────────────────────────────────────────────────────────────────
+export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMatch, design }) {
+  const tLogo = design?.logoUrl || null;
+  const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
+  const tSubtitle = design?.tournamentSubtitle || 'FREE FIRE ESPORTS';
+  const sponsorLogo = design?.sponsorLogoUrl || null;
+  const sponsorLabel = design?.sponsorLabel || 'OFFICIAL SPONSOR';
+  const accent = '#00C8FF';
+  const accent2 = '#0055FF';
+  const gold = '#FFC700';
+
+  // Parse format config for stats
+  let formatConfig = null;
+  let totalMatches = 0;
+  let totalStages = 0;
+  let totalDays = 0;
+  let ppk = 1;
+  try {
+    if (tournament?.format_config) {
+      formatConfig = typeof tournament.format_config === 'string'
+        ? JSON.parse(tournament.format_config)
+        : tournament.format_config;
+      totalStages = formatConfig.stages?.length || 0;
+      for (const s of (formatConfig.stages || [])) {
+        totalDays += (s.days || []).length;
+        for (const d of (s.days || [])) totalMatches += (d.matches || []).length;
+      }
+    }
+    ppk = tournament?.points_per_kill || 1;
+  } catch (_) {}
+
+  // Current match info
+  const currentMatchNum = currentMatch?.match_number || tournament?.current_match_number || 0;
+  const currentStage = currentMatch?.stage_name || '';
+  const currentDay = currentMatch?.day_label || '';
+  const currentMap = currentMatch?.map_name || '';
+  const currentState = currentMatch?.state || 'idle';
+
+  // Next match info
+  const nextNum = nextScheduledMatch?.match_number || (currentMatchNum + 1);
+  const nextMap = nextScheduledMatch?.map_name || '';
+  const nextStage = nextScheduledMatch?.stage_name || '';
+  const nextDay = nextScheduledMatch?.day_label || '';
+
+  // Parse placement points config
+  let placementConfig = {};
+  try {
+    if (tournament?.placement_points_config) {
+      placementConfig = typeof tournament.placement_points_config === 'string'
+        ? JSON.parse(tournament.placement_points_config)
+        : tournament.placement_points_config;
+    }
+  } catch (_) {}
+
+  const topPlacements = Object.entries(placementConfig).sort((a, b) => Number(a[0]) - Number(b[0])).slice(0, 4);
+
+  return (
+    <div style={{
+      width: 1920, height: 1080, position: 'relative', overflow: 'hidden',
+      background: 'radial-gradient(ellipse at 30% 20%, #0a1130 0%, #04060E 60%, #02030a 100%)',
+      boxSizing: 'border-box', color: '#fff'
+    }}>
+      {/* Ambient glows */}
+      <div style={{ position: 'absolute', top: '15%', right: '10%', width: 500, height: 500, background: `radial-gradient(circle, ${accent}12 0%, transparent 70%)`, filter: 'blur(80px)', pointerEvents: 'none' }} />
+      <div style={{ position: 'absolute', bottom: '10%', left: '5%', width: 400, height: 400, background: `radial-gradient(circle, ${accent2}10 0%, transparent 70%)`, filter: 'blur(60px)', pointerEvents: 'none' }} />
+
+      {/* Diagonal accent line */}
+      <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 6, background: `linear-gradient(90deg, ${accent}, ${accent2}, ${gold})`, boxShadow: `0 0 20px ${accent}50` }} />
+
+      {/* Content */}
+      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+        style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', padding: '80px 100px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
+
+        {/* Top section: Logo + Tournament name + Sponsor */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: 50 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 24 }}>
+            {tLogo ? (
+              <img src={tLogo} alt="" style={{ height: 90, objectFit: 'contain', filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.25))' }} onError={e => { e.target.style.display = 'none'; }} />
+            ) : (
+              <div style={{ height: 90, width: 90, background: `linear-gradient(135deg, ${accent}, ${accent2})`, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 25px ${accent}40` }}>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 28, fontWeight: 900, color: '#fff' }}>FF</span>
+              </div>
+            )}
+            <div>
+              <div style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 800, color: accent, letterSpacing: '0.5em', textTransform: 'uppercase', marginBottom: 6 }}>{tSubtitle.toUpperCase()}</div>
+              <div style={{ fontFamily: 'Orbitron', fontSize: 56, fontWeight: 900, color: '#fff', letterSpacing: '0.08em', lineHeight: 1, textShadow: '0 0 30px rgba(255,255,255,0.1)' }}>{tName.toUpperCase()}</div>
+            </div>
+          </div>
+          {sponsorLogo && (
+            <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', gap: 8 }}>
+              <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em' }}>{sponsorLabel.toUpperCase()}</span>
+              <img src={sponsorLogo} alt="" style={{ height: 55, objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.15))' }} onError={e => { e.target.style.display = 'none'; }} />
+            </div>
+          )}
+        </div>
+
+        {/* Main content grid: Left = Current match, Right = Tournament format stats */}
+        <div style={{ display: 'flex', gap: 40, flex: 1 }}>
+          {/* Left: Current match card */}
+          <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: 24 }}>
+            {/* Current Match Card */}
+            <div style={{
+              borderRadius: 20, border: `1px solid ${accent}30`, background: 'rgba(0, 200, 255, 0.04)',
+              padding: 32, position: 'relative', overflow: 'hidden',
+            }}>
+              {/* Glow effect */}
+              <div style={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, background: `radial-gradient(circle, ${accent}10 0%, transparent 70%)`, pointerEvents: 'none' }} />
+
+              <div style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 800, color: accent, letterSpacing: '0.4em', marginBottom: 16, textTransform: 'uppercase' }}>
+                {currentState === 'in_game' ? '🔴 LIVE NOW' : 'CURRENT MATCH'}
+              </div>
+
+              {currentMatch ? (
+                <>
+                  <div style={{ display: 'flex', alignItems: 'baseline', gap: 16, marginBottom: 20 }}>
+                    <span style={{ fontFamily: 'Orbitron', fontSize: 64, fontWeight: 900, color: '#fff', lineHeight: 1 }}>M{currentMatchNum}</span>
+                    {currentStage && <span style={{ fontFamily: 'Orbitron', fontSize: 18, fontWeight: 800, color: accent, letterSpacing: '0.15em', textTransform: 'uppercase' }}>{currentStage}</span>}
+                  </div>
+                  <div style={{ display: 'flex', gap: 32, marginBottom: 24 }}>
+                    <div>
+                      <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', marginBottom: 6 }}>MAP</div>
+                      <div style={{ fontFamily: 'Orbitron', fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '0.05em' }}>{currentMap}</div>
+                    </div>
+                    {currentDay && (
+                      <div>
+                        <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', marginBottom: 6 }}>DAY</div>
+                        <div style={{ fontFamily: 'Orbitron', fontSize: 28, fontWeight: 900, color: '#fff', letterSpacing: '0.05em' }}>{currentDay}</div>
+                      </div>
+                    )}
+                    <div>
+                      <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', marginBottom: 6 }}>STATUS</div>
+                      <div style={{ fontFamily: 'Orbitron', fontSize: 28, fontWeight: 900, color: currentState === 'in_game' ? '#00ff64' : accent, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{currentState.replace('_', ' ')}</div>
+                    </div>
+                  </div>
+                </>
+              ) : (
+                <div style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em' }}>No active match</div>
+              )}
+
+              {/* Up Next */}
+              {nextScheduledMatch && (
+                <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+                  <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.3em', marginBottom: 8 }}>UP NEXT</div>
+                  <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
+                    <span style={{ fontFamily: 'Orbitron', fontSize: 16, fontWeight: 900, color: accent2 }}>M{nextNum}</span>
+                    <span style={{ fontFamily: 'Orbitron', fontSize: 18, fontWeight: 800, color: 'rgba(255,255,255,0.7)' }}>{nextMap}</span>
+                    {nextStage && <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>· {nextStage}</span>}
+                    {nextDay && <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>· {nextDay}</span>}
+                  </div>
+                </div>
+              )}
+            </div>
+          </div>
+
+          {/* Right: Tournament stats */}
+          <div style={{ flex: 1, display: 'flex', flexDirection: 'column', gap: 16 }}>
+            {/* Format stats grid */}
+            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16 }}>
+              <StatCard label="STAGES" value={totalStages || '—'} accent={accent} />
+              <StatCard label="DAYS" value={totalDays || '—'} accent={accent2} />
+              <StatCard label="TOTAL MATCHES" value={totalMatches || tournament?.total_matches || '—'} accent={gold} />
+              <StatCard label="POINTS PER KILL" value={ppk} accent={accent} />
+            </div>
+
+            {/* Top placement points */}
+            {topPlacements.length > 0 && (
+              <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 24 }}>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 800, color: accent, letterSpacing: '0.3em', marginBottom: 16 }}>PLACEMENT POINTS</div>
+                <div style={{ display: 'flex', gap: 12 }}>
+                  {topPlacements.map(([pos, pts]) => (
+                    <div key={pos} style={{ flex: 1, textAlign: 'center', borderRadius: 10, padding: '12px 8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+                      <div style={{ fontFamily: 'Orbitron', fontSize: 22, fontWeight: 900, color: pos === '1' ? gold : pos === '2' ? '#c0c0c0' : pos === '3' ? '#cd7f32' : '#fff' }}>#{pos}</div>
+                      <div style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>{pts} PTS</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Progress indicator */}
+            <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 24, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+              <div style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 800, color: accent, letterSpacing: '0.3em', marginBottom: 12 }}>TOURNAMENT PROGRESS</div>
+              <div style={{ fontSize: 56, fontFamily: 'Orbitron', fontWeight: 900, color: '#fff' }}>
+                {currentMatchNum}<span style={{ fontSize: 24, color: 'rgba(255,255,255,0.3)' }}> / {totalMatches || tournament?.total_matches || '?'}</span>
+              </div>
+              <div style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.2em', marginTop: 6 }}>MATCHES PLAYED</div>
+            </div>
+          </div>
+        </div>
+
+        {/* Footer */}
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 24, marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.3em' }}>
+            BOOYAH DIRECTOR · EVENT DETAILS
+          </span>
+          <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: accent, letterSpacing: '0.3em' }}>
+            FREE FIRE ESPORTS BROADCAST
+          </span>
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+
+// Small stat card helper for EventDetails
+function StatCard({ label, value, accent }) {
+  return (
+    <div style={{ borderRadius: 14, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 20, textAlign: 'center' }}>
+      <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', marginBottom: 8 }}>{label}</div>
+      <div style={{ fontFamily: 'Orbitron', fontSize: 32, fontWeight: 900, color: accent }}>{value}</div>
+    </div>
+  );
+}

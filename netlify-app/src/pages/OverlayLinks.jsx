@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
-import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3, Eye } from 'lucide-react';
+import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3, Eye, Map, Info } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -49,6 +49,8 @@ export const OVERLAYS = [
   { id: 'champions',     label: 'BOOYAH! CHAMPION',  icon: Crown,      transparent: false, desc: 'Tournament winner reveal' },
   { id: 'maplabel',      label: 'MAP INTRO',         icon: Zap,        transparent: false, desc: 'Map name + teams pre-match' },
   { id: 'team_roster',   label: 'TEAM ROSTER',       icon: Users,      transparent: false, desc: 'Full team + player photo roster, auto-slides every 6s' },
+  { id: 'roadmap',      label: 'TOURNAMENT ROADMAP', icon: Map,        transparent: false, desc: 'Full tournament schedule — stages, days, matches with live progress' },
+  { id: 'event-details', label: 'EVENT DETAILS',     icon: Info,      transparent: false, desc: 'Tournament info card — current match, format stats, placement points' },
 ];
 
 export function CopyBtn({ text, id, copied, onCopy }) {

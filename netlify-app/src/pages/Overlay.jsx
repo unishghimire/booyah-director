@@ -8,7 +8,8 @@
  * Available screens:
  *   blank | scoreboard | standings | killfeed | maplabel |
  *   today-matches | teams | casters | upcoming-map |
- *   elim-alert | mvp | champions
+ *   elim-alert | mvp | champions | game-intro | schedule |
+ *   ff-scoreboard | team-roster | roadmap | event-details
  *
  * OBS setup: 1920×1080, \"Shutdown source when not visible\" OFF,
  *            Check \"Transparent background\" for overlay-type screens.
@@ -20,7 +21,7 @@ import { AnimatePresence, motion } from 'framer-motion';
 import { Skull, Star, Crown, Zap, Calendar, Users, MapPin, Award, XCircle, Mic2, Shield, Flame } from 'lucide-react';
 import { MAP_IMAGES, getMapImages, setCustomMapImages } from '@/lib/maps';
 import { safeArray } from '@/components/ErrorBoundary';
-import { FFBoardV2, MatchInfoChip, GameIntroBanner, MatchScheduleGrid, PointRushStandings } from '@/pages/FFWSOverlays';
+import { FFBoardV2, MatchInfoChip, GameIntroBanner, MatchScheduleGrid, PointRushStandings, RoadmapOverlay, EventDetailsOverlay } from '@/pages/FFWSOverlays';
 
 /* ══════════════════════════════════════════════════
    DATA POLLING — calls public overlay API with optional shareToken
@@ -68,6 +69,8 @@ function useOverlayPoll(shareToken) {
           killFeed:     Array.isArray(json.kill_feed)    ? json.kill_feed    : [],
           eliminations: Array.isArray(json.eliminations) ? json.eliminations : [],
           standings:    Array.isArray(json.standings)    ? json.standings    : [],
+          matches:      Array.isArray(json.matches)      ? json.matches      : [],
+          nextScheduledMatch: json.next_scheduled_match ?? null,
         });
       } catch (e) {
         if (e?.name === 'AbortError' || !mounted.current) return;
@@ -1950,12 +1953,16 @@ export default function Overlay() {
     currentMatch,
     overlayState,
     design,
+    tournament,
+    matches:      _matches      = [],
+    nextScheduledMatch,
   } = data || {};
 
   const teams        = safeArray(_teams);
   const players      = safeArray(_players);
   const killFeed     = safeArray(_killFeed);
   const eliminations = safeArray(_eliminations);
+  const matches      = safeArray(_matches);
 
   if (!ready) return <div style={{ width:1920, height:1080, position:'relative', overflow:'hidden' }}><OverlayLoading /></div>;
 
@@ -2006,6 +2013,9 @@ export default function Overlay() {
         <MatchInfoChip currentMatch={currentMatch} design={design} />
       </>
     ),
+    roadmap:         <RoadmapOverlay tournament={tournament} matches={matches} currentMatch={currentMatch} design={design} />,
+    'event-details': <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} />,
+    event_details:   <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} />,
   };
 
   const component = screens[screen] ?? screens[screen?.replace(/-/g,'_')] ?? null;
