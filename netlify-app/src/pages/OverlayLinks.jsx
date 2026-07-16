@@ -1,19 +1,21 @@
 import React, { useState } from 'react';
 import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
-import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users } from 'lucide-react';
+import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import toast from 'react-hot-toast';
 
 export const OVERLAYS = [
   // Transparent overlays — sit on top of gameplay
-  { id: 'scoreboard',    label: 'FF SCOREBOARD',    icon: Monitor,    transparent: true,  desc: 'Live ranked board during match' },
-  { id: 'standings',     label: 'FULL STANDINGS',    icon: Layers,     transparent: true,  desc: 'Full tournament points table' },
+  { id: 'ff-scoreboard', label: 'FF SCOREBOARD',    icon: Monitor,    transparent: true,  desc: 'FFWS scoreboard + match info chip (dropdown + elim animations)' },
+  { id: 'standings',     label: 'FULL STANDINGS',   icon: Layers,     transparent: true,  desc: 'Full tournament points table' },
   // Full-scene replacements — solid background
+  { id: 'game-intro',    label: 'GAME INTRO',       icon: Gamepad2,   transparent: false, desc: 'FFWS game intro banner with map + match number' },
+  { id: 'schedule',      label: 'MAP SCHEDULE',     icon: Grid3x3,    transparent: false, desc: 'FFWS match schedule grid with all maps' },
+  { id: 'teams',         label: 'TEAMS TODAY',      icon: Layers,     transparent: false, desc: 'Point Rush standings — dual column' },
   { id: 'casters',       label: 'CASTERS',           icon: Mic2,       transparent: false, desc: 'Caster & analyst profiles' },
   { id: 'mvp',           label: 'MVP REVEAL',        icon: Star,       transparent: false, desc: 'Match MVP player full-screen' },
   { id: 'champions',     label: 'BOOYAH! CHAMPION',  icon: Crown,      transparent: false, desc: 'Tournament winner reveal' },
   { id: 'maplabel',      label: 'MAP INTRO',         icon: Zap,        transparent: false, desc: 'Map name + teams pre-match' },
-  { id: 'teams',         label: 'TEAMS TODAY',       icon: Layers,     transparent: false, desc: 'All competing teams display' },
   { id: 'team_roster',   label: 'TEAM ROSTER',       icon: Users,      transparent: false, desc: 'Full team + player photo roster, auto-slides every 6s' },
 ];
 

@@ -1833,7 +1833,12 @@ export default function Overlay() {
   if (!ready) return <div style={{ width:1920, height:1080, position:'relative', overflow:'hidden' }}><OverlayLoading /></div>;
 
   const screens = {
-    scoreboard:      <FFBoard       teams={teams} players={players} currentMatch={currentMatch} design={design} />,
+    scoreboard: (
+      <>
+        <FFBoardV2 teams={teams} players={players} currentMatch={currentMatch} design={design} />
+        <MatchInfoChip currentMatch={currentMatch} design={design} />
+      </>
+    ),
     standings:       <FullStandings teams={teams} design={design} />,
     full_standings:  <FullStandings teams={teams} design={design} />,
     maplabel:        <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
