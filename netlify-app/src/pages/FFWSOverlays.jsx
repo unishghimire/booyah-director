@@ -62,7 +62,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
 
   const matchNum = currentMatch?.match_number
     ? `GAME ${String(currentMatch.match_number).padStart(2, '0')}`
-    : 'STANDBY';
+    : (design?.scoreboardSubtitle || 'STANDBY').toUpperCase();
 
   return (
     <motion.div
@@ -367,7 +367,7 @@ export function MatchInfoChip({ currentMatch, design }) {
           {/* Game number — gold bold */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
             <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.2em' }}>
-              MATCH
+              {(design?.matchInfoLabel || 'MATCH').toUpperCase()}
             </span>
             <span style={{ fontFamily: 'Orbitron', fontSize: 16, fontWeight: 900, color: '#f0a818', letterSpacing: '0.06em', lineHeight: 1 }}>
               {String(matchNum).padStart(2, '0')}
@@ -380,7 +380,7 @@ export function MatchInfoChip({ currentMatch, design }) {
           {/* Map name */}
           <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
             <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.2em' }}>
-              MAP
+              {(design?.mapLabel || 'MAP').toUpperCase()}
             </span>
             <span style={{ fontFamily: 'Rajdhani', fontSize: 18, fontWeight: 700, color: '#fff', lineHeight: 1, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
               {mapName}
@@ -507,7 +507,7 @@ export function GameIntroBanner({ currentMatch, design }) {
             textTransform: 'uppercase',
             marginBottom: 4
           }}>
-            CHAMPION RUSH — GRAND
+            {(design?.gameIntroSubtitle || 'CHAMPION RUSH — GRAND').toUpperCase()}
           </span>
           {/* Massive Gold GAME X Title */}
           <span style={{
@@ -861,7 +861,7 @@ export function MatchScheduleGrid({ design }) {
               }}>
                 <span>{tName}</span>
                 <span style={{ color: 'rgba(255,255,255,0.3)' }}>//</span>
-                <span style={{ color: '#fff' }}>MATCH SCHEDULING GRID</span>
+                <span style={{ color: '#fff' }}>{(design?.scheduleSubtitle || 'MATCH SCHEDULING GRID').toUpperCase()}</span>
               </div>
             </div>
           </div>
@@ -1085,7 +1085,7 @@ export function MatchScheduleGrid({ design }) {
               color: 'rgba(255,255,255,0.4)',
               letterSpacing: '0.25em'
             }}>
-              FREE FIRE WORLD SERIES
+              {(design?.scheduleBrandText || 'FREE FIRE WORLD SERIES').toUpperCase()}
             </span>
           </div>
 
@@ -1097,7 +1097,7 @@ export function MatchScheduleGrid({ design }) {
             letterSpacing: '0.15em',
             textTransform: 'uppercase'
           }}>
-            #RISETOTHESUMMIT
+            {(design?.scheduleFooter || '#RISETOTHESUMMIT').toUpperCase()}
           </span>
 
           <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>

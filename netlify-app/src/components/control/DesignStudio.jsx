@@ -683,6 +683,29 @@ export default function DesignStudio(props) {
         </div>
       </Section>
 
+      {/* ── OVERLAY TEXT (Game Intro / Schedule / Match Info) ── */}
+      <Section title="OVERLAY TEXT" icon={Eye}>
+        <div className="space-y-3">
+          <p className="text-[10px] text-gray-500 leading-normal">
+            Customize all text labels across your broadcast overlays. Changes push live to OBS instantly.
+          </p>
+          {[
+            { key:'gameIntroSubtitle', label:'Game Intro Subtitle',    placeholder:'CHAMPION RUSH — GRAND' },
+            { key:'scheduleSubtitle',   label:'Schedule Subtitle',      placeholder:'MATCH SCHEDULING GRID' },
+            { key:'scheduleFooter',     label:'Schedule Footer Text',   placeholder:'#RISETOTHESUMMIT' },
+            { key:'scheduleBrandText',  label:'Schedule Brand Label',   placeholder:'FREE FIRE WORLD SERIES' },
+            { key:'scoreboardSubtitle', label:'Scoreboard Subtitle',    placeholder:'STANDBY' },
+            { key:'matchInfoLabel',     label:'Match Info Chip Label',  placeholder:'MATCH' },
+            { key:'mapLabel',           label:'Map Label',              placeholder:'MAP' },
+          ].map(({ key, label, placeholder }) => (
+            <div key={key}>
+              <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">{label}</label>
+              <input value={design?.[key] || ''} onChange={e => upd(key, e.target.value)} placeholder={placeholder}
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/40 transition-colors" />
+            </div>
+          ))}
+        </div>
+      </Section>
 
       {/* ── POINT RUSH STANDINGS ── */}
       <Section title="POINT RUSH GFX" icon={Trophy}>

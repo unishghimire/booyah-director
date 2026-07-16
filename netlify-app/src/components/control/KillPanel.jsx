@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
-import { Skull, Crosshair, ChevronDown } from 'lucide-react';
+import { Skull, Crosshair, ChevronDown, Calculator } from 'lucide-react';
 import { overlayApi } from '@/lib/overlayApi';
 import toast from 'react-hot-toast';
 
@@ -67,6 +67,21 @@ function TeamCard({ team, players, currentMatch, tournament, onAction }) {
   const [busy, setBusy] = useState(false);
   const teamPlayers = players.filter(p => p.team_id === team.id);
 
+  // Auto-calculate: placement points + kills × ppk = total
+  const ppk = tournament?.points_per_kill || 1;
+  let placementConfig = { 1:15, 2:12, 3:10, 4:8, 5:6, 6:4, 7:2, 8:1, 9:1, 10:1, 11:1, 12:1 };
+  try {
+    if (tournament?.placement_points_config) {
+      placementConfig = typeof tournament.placement_points_config === 'string'
+        ? JSON.parse(tournament.placement_points_config)
+        : tournament.placement_points_config;
+    }
+  } catch (_) {}
+  const placementPts = placementConfig[placement] || 0;
+  const totalKills = teamPlayers.reduce((sum, p) => sum + (p.current_match_kills || 0), 0);
+  const killPts = totalKills * ppk;
+  const autoTotal = placementPts + killPts;
+
   const handlePlacement = async () => {
     if (!currentMatch?.id) { toast.error('No active match'); return; }
     setBusy(true);
@@ -78,7 +93,7 @@ function TeamCard({ team, players, currentMatch, tournament, onAction }) {
         placement:     Number(placement),
         tournament_id: tournament?.id || currentMatch.tournament_id || '',
       });
-      toast.success(`${team.name}: #${placement}`);
+      toast.success(`${team.name}: #${placement} → ${autoTotal} pts`);
       onAction?.();
     } catch (err) { toast.error(`Placement: ${err.message}`); } finally { setBusy(false); }
   };
@@ -93,6 +108,22 @@ function TeamCard({ team, players, currentMatch, tournament, onAction }) {
         {teamPlayers.length === 0 && <p className="text-xs text-gray-600">No players</p>}
         {safeArray(teamPlayers).map(p => <PlayerRow key={p.id} player={p} team={team} currentMatch={currentMatch} onAction={onAction} />)}
       </div>
+
+      {/* Auto-calc preview: PPT + Kills×PPK = Total */}
+      <div className="mt-2 rounded-md border border-[#FF6B00]/20 bg-[#FF6B00]/5 px-2.5 py-2">
+        <div className="mb-1.5 flex items-center gap-1.5">
+          <Calculator className="h-3 w-3 text-[#FF6B00]" />
+          <span className="font-orbitron text-[8px] font-black uppercase tracking-wider text-[#FF6B00]">AUTO CALC</span>
+        </div>
+        <div className="flex items-center justify-between gap-1 text-[10px] font-mono">
+          <span className="text-cyan-400" title="Placement points">{placementPts}P</span>
+          <span className="text-gray-500">+</span>
+          <span className="text-green-400" title="Kills × points per kill">{totalKills}×{ppk}={killPts}K</span>
+          <span className="text-gray-500">=</span>
+          <span className="font-bold text-[#FFD700] text-xs">{autoTotal}</span>
+        </div>
+      </div>
+
       <div className="mt-2 flex items-center gap-1.5 border-t border-white/5 pt-2">
         <div className="relative flex-1">
           <select value={placement} onChange={e => setPlacement(Number(e.target.value))}
