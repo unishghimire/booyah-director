@@ -9,10 +9,93 @@ import { safeArray } from '@/components/ErrorBoundary';
 import { MAPS, getMapImages } from '@/lib/maps';
 
 /* ═══ FFWS SCOREBOARD — right panel, rebuilt from reference ═══ */
+
+/* ─── Eliminated Team Banner ─── */
+export function EliminatedTeamBanner({ team }) {
+  // Shows for 5 seconds then disappears. team = { name, logo_url }
+  const orange = '#FF6B00';
+  return (
+    <AnimatePresence>
+      {team && (
+        <motion.div
+          key={team.name}
+          initial={{ x: -120, opacity: 0, skewX: -6 }}
+          animate={{ x: 0,    opacity: 1, skewX: -6 }}
+          exit={{   x: -120, opacity: 0, skewX: -6 }}
+          transition={{ duration: 0.42, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            position: 'absolute',
+            bottom: 90,
+            left: 0,
+            zIndex: 40,
+            width: 620,
+            height: 130,
+            overflow: 'hidden',
+            pointerEvents: 'none',
+          }}
+        >
+          {/* diagonal slash background */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(102deg, #FF6B00 0%, #FF6B00 38%, #111214 38%, #111214 100%)',
+            clipPath: 'polygon(0 0, 90% 0, 100% 100%, 0 100%)',
+          }} />
+          {/* dark right block */}
+          <div style={{
+            position: 'absolute', inset: 0,
+            background: 'linear-gradient(102deg, transparent 0%, transparent 36%, #0D0E10 36%, #0D0E10 100%)',
+          }} />
+          {/* left: ELIMINATED TEAM text */}
+          <div style={{
+            position: 'absolute', left: 28, top: 0, bottom: 0,
+            display: 'flex', flexDirection: 'column', justifyContent: 'center',
+            width: 220,
+            transform: 'skewX(6deg)',
+          }}>
+            <div style={{
+              fontFamily: 'Orbitron, sans-serif', fontSize: 28, fontWeight: 900,
+              color: '#000', lineHeight: 1.05, letterSpacing: '0.04em',
+              textTransform: 'uppercase',
+              textShadow: '0 2px 8px rgba(0,0,0,0.3)',
+            }}>
+              ELIMINATED<br/>TEAM
+            </div>
+          </div>
+          {/* divider */}
+          <div style={{
+            position: 'absolute', left: 254, top: 16, bottom: 16,
+            width: 2, background: 'rgba(255,255,255,0.15)',
+          }} />
+          {/* right: team name + logo */}
+          <div style={{
+            position: 'absolute', left: 268, top: 0, bottom: 0,
+            display: 'flex', flexDirection: 'column', justifyContent: 'center', gap: 8,
+            transform: 'skewX(6deg)',
+          }}>
+            {team.logo_url && (
+              <img src={team.logo_url} alt=""
+                style={{ width: 40, height: 40, objectFit: 'contain', borderRadius: 4 }}
+                onError={e => { e.target.style.display = 'none'; }}
+              />
+            )}
+            <div style={{
+              fontFamily: 'Rajdhani, sans-serif', fontSize: 22, fontWeight: 700,
+              color: '#FFFFFF', textTransform: 'uppercase', letterSpacing: '0.08em',
+            }}>
+              {team.name}
+            </div>
+          </div>
+        </motion.div>
+      )}
+    </AnimatePresence>
+  );
+}
+
 export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
 
-  const prevAliveRef = useRef({});
-  const [elimFlash, setElimFlash] = useState({});
+  const prevElimRef   = useRef({});   // tracks which teams were already eliminated
+  const [elimBanner, setElimBanner] = useState(null);   // { name, logo_url }
+  const elimTimerRef  = useRef(null);
 
   const rows = useMemo(() => {
     return [...safeArray(teams)]
@@ -33,270 +116,213 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       .slice(0, 12);
   }, [teams, players]);
 
+  // Detect newly eliminated teams → show banner for 5s
   useEffect(() => {
-    const flashes = {};
-    let hasNew = false;
-    safeArray(rows).forEach(team => {
-      team.slots.forEach((slot, si) => {
-        const key = team.id + '_' + si;
-        const wasAlive = prevAliveRef.current[key];
-        if (wasAlive === true && !slot.alive && slot.name) {
-          flashes[team.id] = { ...(flashes[team.id] || {}), [si]: Date.now() };
-          hasNew = true;
-        }
-        prevAliveRef.current[key] = slot.alive;
-      });
+    const queue = [];
+    rows.forEach(team => {
+      const wasElim = prevElimRef.current[team.id];
+      const isElim  = team.aliveCount === 0 && team.totalPlayers > 0;
+      if (!wasElim && isElim) queue.push({ name: team.name, logo_url: team.logo_url });
+      prevElimRef.current[team.id] = isElim;
     });
-    if (hasNew) {
-      setElimFlash(flashes);
-      const timer = setTimeout(() => setElimFlash({}), 2000);
-      return () => clearTimeout(timer);
+    if (queue.length > 0) {
+      if (elimTimerRef.current) clearTimeout(elimTimerRef.current);
+      setElimBanner(queue[queue.length - 1]);
+      elimTimerRef.current = setTimeout(() => setElimBanner(null), 5000);
     }
   }, [rows]);
 
-  const matchLabel = currentMatch?.match_number
-    ? 'MATCH ' + currentMatch.match_number
-    : (design?.matchLabel || 'MATCH 1');
-  const dayLabel = (design?.dayLabel || 'DAY 1').toUpperCase();
-  const brandLabel = (design?.scoreboardBrand || 'EWC').toUpperCase();
-  const stageLabel = (design?.stageLabel || 'GROUP STAGE').toUpperCase();
+  const matchLabel  = currentMatch?.match_number ? 'MATCH ' + currentMatch.match_number : (design?.matchLabel || 'MATCH 1');
+  const dayLabel    = (design?.dayLabel || 'DAY 1').toUpperCase();
+  const brandLabel  = (design?.scoreboardBrand || 'EWC').toUpperCase();
+  const stageLabel  = (design?.stageLabel || 'GROUP STAGE').toUpperCase();
 
   const orange    = '#FF6B00';
   const green     = '#7BC043';
   const greenGlow = '#7BC04388';
 
-  // Fixed dimensions — matches reference exactly
-  const HEADER_H = 30;   // orange header
-  const ROW_H    = 70;   // each team row  (12 rows × 70 = 840px, fits in ~960px body area)
-  const FOOTER_H = 32;   // EWC footer
-  const PANEL_W  = 245;  // panel width
-  // Total = 30 + 12×70 + 32 = 902px — sits inside the 1080 canvas with margins
+  // ── FIXED DIMENSIONS matching the reference ──
+  // Reference: right-side panel, ~240px wide, rows ~38px each, 12 rows = 456px
+  const HEADER_H = 28;
+  const ROW_H    = 38;   // compact — 12 × 38 = 456px
+  const FOOTER_H = 28;
+  const PANEL_W  = 242;
 
-  const displayRows = rows.length > 0 ? rows : [...Array(12)].map((_, i) => ({
-    id: 'ghost_' + i, name: null, logo_url: null,
-    slots: [{name:null,alive:false},{name:null,alive:false},{name:null,alive:false},{name:null,alive:false}],
-    aliveCount: 0, totalPlayers: 0,
-    total_tournament_points: null, total_tournament_kills: null,
-    _isGhost: true,
-  }));
+  const displayRows = rows.length > 0
+    ? rows
+    : [...Array(12)].map((_, i) => ({
+        id: 'ghost_' + i, name: null, logo_url: null,
+        slots: [{name:null,alive:false},{name:null,alive:false},{name:null,alive:false},{name:null,alive:false}],
+        aliveCount: 0, totalPlayers: 0,
+        total_tournament_points: null, total_tournament_kills: null,
+        _isGhost: true,
+      }));
 
   return (
-    <motion.div
-      initial={{ x: PANEL_W + 20, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
-      style={{
-        position: 'absolute',
-        right: 0,
-        top: 60,
-        width: PANEL_W,
-        /* total height = header + 12 rows + footer */
-        height: HEADER_H + ROW_H * 12 + FOOTER_H,
-        zIndex: 10,
-        display: 'flex',
-        flexDirection: 'column',
-      }}
-    >
-      {/* ══ ORANGE HEADER ══ */}
-      <div style={{
-        width: '100%',
-        height: HEADER_H,
-        background: orange,
-        display: 'flex',
-        alignItems: 'center',
-        flexShrink: 0,
-        padding: '0 8px 0 6px',
-        boxSizing: 'border-box',
-      }}>
-        {/* rank placeholder */}
-        <div style={{ width: 22, flexShrink: 0 }} />
-        {/* logo placeholder */}
-        <div style={{ width: 22, flexShrink: 0 }} />
-        {/* TEAM label */}
-        <div style={{ flex: 1, fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#000', letterSpacing: '0.12em' }}>TEAM</div>
-        {/* ALIVE label */}
-        <div style={{ width: 60, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#000', letterSpacing: '0.1em' }}>ALIVE</div>
-        {/* PTS label */}
-        <div style={{ width: 28, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#000', letterSpacing: '0.1em' }}>PTS</div>
-        {/* ELIMS label */}
-        <div style={{ width: 28, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#000', letterSpacing: '0.08em' }}>ELMS</div>
-      </div>
+    <>
+      {/* Eliminated team banner — rendered outside the panel, centred */}
+      <EliminatedTeamBanner team={elimBanner} />
 
-      {/* ══ ROWS ══ */}
-      {displayRows.map((team, idx) => {
-        const rank = idx + 1;
-        const isGhost = !!team._isGhost;
-        const isElim = !isGhost && team.aliveCount === 0 && team.totalPlayers > 0;
-        const teamFlash = elimFlash[team.id] || {};
-        const hasFlash = Object.keys(teamFlash).length > 0;
-        const rankColor = rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'rgba(255,255,255,0.35)';
+      <motion.div
+        initial={{ x: PANEL_W + 20, opacity: 0 }}
+        animate={{ x: 0, opacity: 1 }}
+        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          position: 'absolute',
+          right: 0,
+          top: 60,
+          width: PANEL_W,
+          height: HEADER_H + ROW_H * 12 + FOOTER_H,  // 28+456+28 = 512px
+          zIndex: 10,
+          display: 'flex',
+          flexDirection: 'column',
+        }}
+      >
+        {/* ══ ORANGE HEADER ══ */}
+        <div style={{
+          width: '100%', height: HEADER_H, background: orange,
+          display: 'flex', alignItems: 'center', flexShrink: 0,
+          padding: '0 8px 0 6px', boxSizing: 'border-box',
+        }}>
+          <div style={{ width: 20, flexShrink: 0 }} />
+          <div style={{ width: 20, flexShrink: 0 }} />
+          <div style={{ flex: 1, fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: '#000', letterSpacing: '0.1em' }}>TEAM</div>
+          <div style={{ width: 58, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: '#000', letterSpacing: '0.09em' }}>ALIVE</div>
+          <div style={{ width: 26, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: '#000', letterSpacing: '0.09em' }}>PTS</div>
+          <div style={{ width: 26, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: '#000', letterSpacing: '0.07em' }}>ELMS</div>
+        </div>
 
-        return (
-          <motion.div
-            key={team.id || idx}
-            initial={!isGhost ? { x: 60, opacity: 0 } : false}
-            animate={!isGhost ? { x: 0, opacity: 1 } : {}}
-            transition={{ duration: 0.28, delay: 0.06 + idx * 0.03, ease: 'easeOut' }}
-            style={{
-              width: '100%',
-              height: ROW_H,
-              flexShrink: 0,
-              display: 'flex',
-              alignItems: 'center',
-              background: hasFlash ? 'rgba(255,40,40,0.12)' : '#0A0B0F',
-              borderBottom: '1px solid rgba(255,255,255,0.055)',
-              borderLeft: rank <= 3 ? '3px solid ' + rankColor : '3px solid transparent',
-              padding: '0 8px 0 6px',
-              boxSizing: 'border-box',
-              opacity: isElim ? 0.32 : isGhost ? 0.25 : 1,
-              transition: 'opacity 0.4s ease, background 0.3s ease',
-              position: 'relative',
-              overflow: 'hidden',
-            }}
-          >
-            {/* Rank */}
-            <div style={{
-              width: 22, flexShrink: 0, textAlign: 'center',
-              fontFamily: 'Rajdhani, sans-serif', fontSize: 14, fontWeight: 700,
-              color: isGhost ? 'rgba(255,255,255,0.15)' : rankColor,
-            }}>
-              {isGhost ? (rank) : rank}
-            </div>
+        {/* ══ ROWS ══ */}
+        {displayRows.map((team, idx) => {
+          const rank      = idx + 1;
+          const isGhost   = !!team._isGhost;
+          const isElim    = !isGhost && team.aliveCount === 0 && team.totalPlayers > 0;
+          const rankColor = rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'rgba(255,255,255,0.3)';
 
-            {/* Logo */}
-            <div style={{ width: 22, flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
-              {!isGhost && team.logo_url ? (
-                <img src={team.logo_url} alt="" style={{ width: 18, height: 18, objectFit: 'contain', borderRadius: 2 }}
-                  onError={e => { e.target.style.display = 'none'; }} />
-              ) : (
-                <div style={{
-                  width: 18, height: 18, borderRadius: 2,
-                  background: isGhost ? 'rgba(255,255,255,0.04)' : 'rgba(255,255,255,0.07)',
-                  border: '1px solid rgba(255,255,255,0.08)',
-                  display: 'flex', alignItems: 'center', justifyContent: 'center',
-                }}>
-                  {!isGhost && (
-                    <span style={{ fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: 'rgba(255,255,255,0.3)' }}>
-                      {(team.name || 'T').charAt(0)}
-                    </span>
-                  )}
-                </div>
-              )}
-            </div>
+          return (
+            <motion.div
+              key={team.id || idx}
+              initial={!isGhost ? { x: 50, opacity: 0 } : false}
+              animate={!isGhost ? { x: 0, opacity: 1 } : {}}
+              transition={{ duration: 0.25, delay: 0.05 + idx * 0.025, ease: 'easeOut' }}
+              style={{
+                width: '100%', height: ROW_H, flexShrink: 0,
+                display: 'flex', alignItems: 'center',
+                background: '#0A0B0F',
+                borderBottom: '1px solid rgba(255,255,255,0.05)',
+                borderLeft: rank <= 3 ? '3px solid ' + rankColor : '3px solid transparent',
+                padding: '0 8px 0 5px', boxSizing: 'border-box',
+                opacity: isElim ? 0.28 : isGhost ? 0.2 : 1,
+                transition: 'opacity 0.4s ease',
+                position: 'relative', overflow: 'hidden',
+              }}
+            >
+              {/* Rank */}
+              <div style={{
+                width: 20, flexShrink: 0, textAlign: 'center',
+                fontFamily: 'Rajdhani, sans-serif', fontSize: 12, fontWeight: 700,
+                color: isGhost ? 'rgba(255,255,255,0.1)' : rankColor,
+              }}>{rank}</div>
 
-            {/* Team name */}
-            <div style={{
-              flex: 1,
-              fontFamily: 'Rajdhani, sans-serif', fontSize: 13, fontWeight: 700,
-              color: isGhost ? 'transparent' : isElim ? 'rgba(255,255,255,0.2)' : '#D8E4F5',
-              textTransform: 'uppercase',
-              letterSpacing: '0.04em',
-              overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-              paddingLeft: 3,
-              position: 'relative',
-            }}>
-              {isGhost ? '—' : (team.name || 'TEAM')}
-              {isElim && !isGhost && (
-                <motion.div
-                  initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
-                  transition={{ duration: 0.35 }}
-                  style={{
-                    position: 'absolute', left: 3, right: 0, top: '50%',
-                    height: 1, background: '#ff4444', transformOrigin: 'left', opacity: 0.5,
-                  }}
-                />
-              )}
-            </div>
+              {/* Logo */}
+              <div style={{ width: 20, flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
+                {!isGhost && team.logo_url ? (
+                  <img src={team.logo_url} alt="" style={{ width: 16, height: 16, objectFit: 'contain', borderRadius: 2 }}
+                    onError={e => { e.target.style.display = 'none'; }} />
+                ) : (
+                  <div style={{
+                    width: 16, height: 16, borderRadius: 2,
+                    background: 'rgba(255,255,255,0.05)',
+                    border: '1px solid rgba(255,255,255,0.07)',
+                    display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  }}>
+                    {!isGhost && (
+                      <span style={{ fontFamily: 'Orbitron', fontSize: 6, fontWeight: 900, color: 'rgba(255,255,255,0.25)' }}>
+                        {(team.name || 'T').charAt(0)}
+                      </span>
+                    )}
+                  </div>
+                )}
+              </div>
 
-            {/* Alive bars — 4 vertical green bars */}
-            <div style={{ width: 60, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 4, flexShrink: 0 }}>
-              {team.slots.map((slot, si) => {
-                const flash = teamFlash[si] !== undefined;
-                const bg = isGhost
-                  ? 'rgba(255,255,255,0.05)'
-                  : flash
-                    ? '#FF3333'
+              {/* Team name */}
+              <div style={{
+                flex: 1, paddingLeft: 3,
+                fontFamily: 'Rajdhani, sans-serif', fontSize: 12, fontWeight: 700,
+                color: isGhost ? 'transparent' : isElim ? 'rgba(255,255,255,0.18)' : '#D8E4F5',
+                textTransform: 'uppercase', letterSpacing: '0.04em',
+                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                position: 'relative',
+              }}>
+                {isGhost ? '' : (team.name || 'TEAM')}
+                {isElim && !isGhost && (
+                  <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.3 }}
+                    style={{ position: 'absolute', left: 3, right: 0, top: '50%', height: 1, background: '#ff4444', transformOrigin: 'left', opacity: 0.45 }} />
+                )}
+              </div>
+
+              {/* Alive bars */}
+              <div style={{ width: 58, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 3, flexShrink: 0 }}>
+                {team.slots.map((slot, si) => {
+                  const bg = isGhost
+                    ? 'rgba(255,255,255,0.04)'
                     : slot.alive
                       ? green
                       : slot.name === null
-                        ? 'rgba(255,255,255,0.05)'
-                        : 'rgba(255,255,255,0.1)';
-                return (
-                  <motion.div
-                    key={si}
-                    animate={{ backgroundColor: bg }}
-                    transition={{ duration: 0.25 }}
-                    style={{
-                      width: 10, height: 20, borderRadius: 2, flexShrink: 0,
-                      boxShadow: !isGhost && slot.alive && !flash ? '0 0 5px ' + greenGlow : 'none',
-                    }}
-                  />
-                );
-              })}
-            </div>
+                        ? 'rgba(255,255,255,0.04)'
+                        : 'rgba(255,255,255,0.09)';
+                  return (
+                    <motion.div key={si} animate={{ backgroundColor: bg }} transition={{ duration: 0.25 }}
+                      style={{
+                        width: 9, height: 18, borderRadius: 2, flexShrink: 0,
+                        boxShadow: !isGhost && slot.alive ? '0 0 4px ' + greenGlow : 'none',
+                      }}
+                    />
+                  );
+                })}
+              </div>
 
-            {/* PTS */}
-            <div style={{
-              width: 28, textAlign: 'center', flexShrink: 0,
-              fontFamily: 'Rajdhani, sans-serif', fontSize: 15, fontWeight: 700,
-              color: isGhost ? 'rgba(255,255,255,0.08)' : isElim ? 'rgba(255,255,255,0.2)' : '#FFFFFF',
-            }}>
-              {isGhost ? '' : (team.total_tournament_points ?? 0)}
-            </div>
+              {/* PTS */}
+              <div style={{
+                width: 26, textAlign: 'center', flexShrink: 0,
+                fontFamily: 'Rajdhani, sans-serif', fontSize: 14, fontWeight: 700,
+                color: isGhost ? 'rgba(255,255,255,0.06)' : isElim ? 'rgba(255,255,255,0.15)' : '#FFFFFF',
+              }}>
+                {isGhost ? '' : (team.total_tournament_points ?? 0)}
+              </div>
 
-            {/* ELIMS */}
-            <div style={{
-              width: 28, textAlign: 'center', flexShrink: 0,
-              fontFamily: 'Rajdhani, sans-serif', fontSize: 14, fontWeight: 700,
-              color: isGhost ? 'rgba(255,255,255,0.06)' : isElim ? 'rgba(255,107,0,0.2)' : orange,
-            }}>
-              {isGhost ? '' : (team.total_tournament_kills ?? 0)}
-            </div>
+              {/* ELIMS */}
+              <div style={{
+                width: 26, textAlign: 'center', flexShrink: 0,
+                fontFamily: 'Rajdhani, sans-serif', fontSize: 13, fontWeight: 700,
+                color: isGhost ? 'rgba(255,255,255,0.04)' : isElim ? 'rgba(255,107,0,0.18)' : orange,
+              }}>
+                {isGhost ? '' : (team.total_tournament_kills ?? 0)}
+              </div>
+            </motion.div>
+          );
+        })}
 
-            {/* Elimination flash sweep */}
-            {hasFlash && (
-              <motion.div
-                initial={{ x: -PANEL_W, opacity: 0.5 }}
-                animate={{ x: PANEL_W, opacity: 0 }}
-                transition={{ duration: 0.65, ease: 'easeOut' }}
-                style={{
-                  position: 'absolute', top: 0, bottom: 0, left: 0, width: 120,
-                  background: 'linear-gradient(90deg, transparent, rgba(255,60,60,0.3), transparent)',
-                  pointerEvents: 'none',
-                }}
-              />
-            )}
-          </motion.div>
-        );
-      })}
-
-      {/* ══ FOOTER ══ */}
-      <div style={{
-        width: '100%',
-        height: FOOTER_H,
-        background: '#06070A',
-        flexShrink: 0,
-        display: 'flex',
-        alignItems: 'center',
-        justifyContent: 'space-between',
-        padding: '0 10px',
-        boxSizing: 'border-box',
-        borderTop: '2px solid ' + orange,
-      }}>
-        <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
-          {design?.logoUrl ? (
-            <img src={design.logoUrl} alt="" style={{ height: 18, objectFit: 'contain' }}
-              onError={e => { e.target.style.display = 'none'; }} />
-          ) : (
-            <span style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: orange, letterSpacing: '0.12em' }}>{brandLabel}</span>
-          )}
-          <span style={{ fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: 'rgba(255,255,255,0.45)', letterSpacing: '0.14em' }}>{stageLabel}</span>
+        {/* ══ FOOTER ══ */}
+        <div style={{
+          width: '100%', height: FOOTER_H, background: '#06070A', flexShrink: 0,
+          display: 'flex', alignItems: 'center', justifyContent: 'space-between',
+          padding: '0 10px', boxSizing: 'border-box',
+          borderTop: '2px solid ' + orange,
+        }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+            {design?.logoUrl
+              ? <img src={design.logoUrl} alt="" style={{ height: 16, objectFit: 'contain' }} onError={e => { e.target.style.display = 'none'; }} />
+              : <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: orange, letterSpacing: '0.12em' }}>{brandLabel}</span>
+            }
+            <span style={{ fontFamily: 'Orbitron', fontSize: 6, fontWeight: 900, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.14em' }}>{stageLabel}</span>
+          </div>
+          <span style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em' }}>
+            {dayLabel} · {matchLabel.toUpperCase()}
+          </span>
         </div>
-        <span style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em' }}>
-          {dayLabel} · {matchLabel.toUpperCase()}
-        </span>
-      </div>
-    </motion.div>
+      </motion.div>
+    </>
   );
 }
 
