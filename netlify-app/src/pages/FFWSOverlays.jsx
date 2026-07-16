@@ -26,7 +26,7 @@ export function EliminatedTeamBanner({ team, design }) {
     <AnimatePresence>
       {team && (
         <motion.div
-          key={team.name + '_' + Date.now()}
+          key={team.name}
           initial={{ x: -200, opacity: 0 }}
           animate={{ x: 0,    opacity: 1 }}
           exit={{   x: -200, opacity: 0 }}
@@ -199,6 +199,7 @@ export function EliminatedTeamBanner({ team, design }) {
 export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
 
   const prevElimRef   = useRef({});
+  const shownElimRef  = useRef(new Set());  // team IDs that already showed banner this match
   const [elimBanner, setElimBanner] = useState(null);
   const elimTimerRef  = useRef(null);
 
@@ -229,13 +230,22 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       .slice(0, 12);
   }, [teams, players]);
 
-  // Detect newly eliminated teams → show banner for 5s
+  // Reset elim tracking when match changes
+  const matchId = currentMatch?.id;
+  useEffect(() => {
+    shownElimRef.current = new Set();
+    prevElimRef.current = {};
+    setElimBanner(null);
+  }, [matchId]);
+
+  // Detect newly eliminated teams → show banner ONCE per team per match
   useEffect(() => {
     const queue = [];
     rows.forEach(team => {
       const wasElim = prevElimRef.current[team.id];
       const isElim  = team.aliveCount === 0 && team.totalPlayers > 0;
-      if (!wasElim && isElim) {
+      if (!wasElim && isElim && !shownElimRef.current.has(team.id)) {
+        shownElimRef.current.add(team.id);
         queue.push({
           name: team.name,
           logo_url: team.logo_url,
