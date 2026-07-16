@@ -1195,7 +1195,7 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
 /* ══════════════════════════════════════════════════
    SCREEN 12: CHAMPIONS (WINNER REVEAL SCREEN)
 ══════════════════════════════════════════════════ */
-function ChampionsScreen({ teams = [], design, overlayState }) {
+function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
   const t = getTheme(design);
   const primary = t.p;
   const secondary = t.s;
@@ -1204,232 +1204,201 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
   const bgUrl = design?.backgrounds?.champion || '';
 
   const allTeams = safeArray(teams);
+  const allPlayers = safeArray(players);
   const sorted = [...allTeams].sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
-  const winnerName   = overlayState?.champion_team_name || sorted[0]?.name || 'CHAMPIONS';
-  const totalPoints  = overlayState?.champion_total_points || sorted[0]?.total_tournament_points || 0;
+  const winnerName = overlayState?.champion_team_name || sorted[0]?.name || 'CHAMPIONS';
+  const totalPoints = overlayState?.champion_total_points || sorted[0]?.total_tournament_points || 0;
   const winnerTeamObj = allTeams.find(t => t.name === winnerName) || sorted[0] || null;
-  const totalKills   = winnerTeamObj?.total_tournament_kills || 0;
-  const ppk = 1;
+  const totalKills = winnerTeamObj?.total_tournament_kills || 0;
+  const ppk = design?.pointsPerKill || 1;
   const killPts = totalKills * ppk;
-  const placementPts = totalPoints - killPts;
+  const placementPts = Math.max(0, totalPoints - killPts);
 
-  // Podium: 2nd, 1st, 3rd
-  const podium = [sorted[1], sorted[0], sorted[2]].filter(Boolean);
-  const podiumHeights = [140, 200, 100];
-  const podiumRanks = [2, 1, 3];
-  const medalColors = ['#C0C0C0', '#FFD700', '#CD7F32'];
-  const medalLabels = ['SILVER', 'GOLD', 'BRONZE'];
+  // Champion's players (up to 5 for the panel display)
+  const champPlayers = winnerTeamObj
+    ? allPlayers.filter(p => p.team_id === winnerTeamObj.id).slice(0, 5)
+    : [];
+  // Pad to 5 slots
+  const panels = Array.from({ length: 5 }, (_, i) => champPlayers[i] || null);
+
+  // Panel layout: heights and tilts for the W-fan shape (2nd, 4th shorter; 1st,5th angled; 3rd tallest)
+  const panelConfig = [
+    { height: 340, tilt: -8, zIdx: 1, delay: 0.4 },
+    { height: 380, tilt: -4, zIdx: 2, delay: 0.25 },
+    { height: 420, tilt:  0, zIdx: 3, delay: 0.1 },
+    { height: 380, tilt:  4, zIdx: 2, delay: 0.25 },
+    { height: 340, tilt:  8, zIdx: 1, delay: 0.4 },
+  ];
 
   return (
     <ScreenBackground bgUrl={bgUrl} accent={primary} accent2={secondary}>
     <ThemedBackground design={design}>
     <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
       <style>{`
-        @keyframes champConfetti{0%{transform:translateY(-60px) rotate(0deg);opacity:1}100%{transform:translateY(1120px) rotate(720deg);opacity:0}}
-        @keyframes champCrownPulse{0%,100%{transform:scale(1) rotate(-2deg);filter:drop-shadow(0 0 25px #FFD700CC)}50%{transform:scale(1.15) rotate(2deg);filter:drop-shadow(0 0 55px #FFD700)}}
-        @keyframes champRayRotate{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
-        @keyframes champGlowPulse{0%,100%{opacity:0.3}50%{opacity:0.6}}
-        @keyframes champSlideIn{0%{transform:translateY(60px);opacity:0}100%{transform:translateY(0);opacity:1}}
-        @keyframes champShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
-        @keyframes champScaleIn{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.05);opacity:1}100%{transform:scale(1);opacity:1}}
-        @keyframes champPodiumRise{0%{transform:translateY(40px);opacity:0}100%{transform:translateY(0);opacity:1}}
+        @keyframes cFall{0%{transform:translateY(-40px) rotate(0deg);opacity:1}100%{transform:translateY(1120px) rotate(720deg);opacity:0}}
+        @keyframes cPanelUp{0%{transform:translateY(80px) rotate(var(--tilt));opacity:0}100%{transform:translateY(0) rotate(var(--tilt));opacity:1}}
+        @keyframes cTitleIn{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}
+        @keyframes cGlow{0%,100%{text-shadow:0 0 30px #00C8FF88,0 0 60px #00C8FF44}50%{text-shadow:0 0 50px #00C8FFCC,0 0 100px #00C8FF66}}
+        @keyframes cLogoIn{0%{transform:scale(0.5);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
+        @keyframes cShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
       `}</style>
 
-      {/* === BACKGROUND EFFECTS === */}
-      {/* Deep golden ambient bloom */}
-      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 1200px 900px at 50% 45%, rgba(255,215,0,0.18) 0%, rgba(255,107,0,0.06) 30%, transparent 70%)', zIndex:0 }} />
+      {/* Deep navy base with blue radial bloom */}
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, #010810 0%, #020C1A 50%, #010810 100%)', zIndex:0 }} />
+      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 1400px 800px at 50% 35%, rgba(0,120,255,0.22) 0%, rgba(0,60,180,0.08) 40%, transparent 70%)', zIndex:0 }} />
+      {/* Subtle bottom vignette */}
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, height:300, background:'linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%)', zIndex:0 }} />
 
-      {/* Animated rotating light rays from center */}
-      <div style={{
-        position:'absolute', top:'50%', left:'50%', width:'1600px', height:'1600px',
-        transform:'translate(-50%,-50%)', zIndex:0, opacity:0.15,
-        background:'conic-gradient(from 0deg, transparent 0deg, #FFD700 10deg, transparent 20deg, transparent 50deg, #FF6B00 60deg, transparent 70deg, transparent 100deg, #FFD700 110deg, transparent 120deg, transparent 150deg, #FF6B00 160deg, transparent 170deg, transparent 200deg, #FFD700 210deg, transparent 220deg, transparent 250deg, #FF6B00 260deg, transparent 270deg, transparent 300deg, #FFD700 310deg, transparent 320deg, transparent 360deg)',
-        animation:'champRayRotate 30s linear infinite',
-        borderRadius:'50%',
-      }} />
-
-      {/* Confetti */}
+      {/* Confetti — blue/cyan/white */}
       {Array.from({length:50}).map((_,i) => {
-        const colors = ['#FFD700','#FF6B00','#00D4FF','#ffffff','#4ade80','#FFD700'];
+        const cols = ['#00C8FF','#1E90FF','#ffffff','#00C8FF','#7EC8FF','#ffffff'];
         return (
           <div key={i} style={{
-            position:'absolute', top:-30, left:`${(i * 3.7) % 100}%`,
-            width: 6 + i % 8, height: 6 + i % 8,
-            background: colors[i % colors.length],
-            borderRadius: i % 2 === 0 ? '50%' : 2, opacity: 0.85, zIndex:1,
-            animation:`champConfetti ${4 + i % 6}s linear infinite`,
-            animationDelay:`${i * 0.12}s`,
+            position:'absolute', top:-30, left:`${(i*3.7)%100}%`,
+            width:5+i%7, height:5+i%7,
+            background:cols[i%cols.length],
+            borderRadius:i%2===0?'50%':2, opacity:0.8, zIndex:1,
+            animation:`cFall ${3.5+i%5}s linear infinite`,
+            animationDelay:`${i*0.13}s`,
           }} />
         );
       })}
 
-      {/* === MAIN CONTENT === */}
-      <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-start', paddingTop:70, gap:0 }}>
+      {/* TOP LOGOS BAR */}
+      <div style={{ position:'absolute', top:32, left:48, right:48, display:'flex', justifyContent:'space-between', alignItems:'center', zIndex:10 }}>
+        {tLogo
+          ? <img src={tLogo} alt="logo" style={{ height:44, objectFit:'contain', filter:'drop-shadow(0 2px 8px rgba(0,0,0,0.6))' }} onError={e=>e.target.style.display='none'} />
+          : <div style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:'#00C8FF', letterSpacing:'0.2em' }}>{(design?.tournamentName||'BOOYAH').toUpperCase()}</div>
+        }
+        {sponsorLogo
+          ? <img src={sponsorLogo} alt="sponsor" style={{ height:44, objectFit:'contain', filter:'drop-shadow(0 2px 8px rgba(0,0,0,0.6))' }} onError={e=>e.target.style.display='none'} />
+          : <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'0.15em' }}>{(design?.tournamentSubtitle||'GRAND FINALS').toUpperCase()}</div>
+        }
+      </div>
 
-        {/* === TOP: CROWN + TITLE === */}
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8, animation:'champScaleIn 0.8s ease-out' }}>
-          <div style={{ animation:'champCrownPulse 2.5s infinite ease-in-out' }}>
-            <Crown size={72} style={{ color:'#FFD700' }} />
+      {/* MAIN CONTENT */}
+      <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:0, paddingTop:60 }}>
+
+        {/* ── PLAYER PANELS ── */}
+        <div style={{ display:'flex', alignItems:'flex-end', justifyContent:'center', gap:14, marginBottom:28 }}>
+          {panels.map((player, i) => {
+            const cfg = panelConfig[i];
+            return (
+              <div key={i} style={{
+                width:164, height:cfg.height,
+                position:'relative', zIndex:cfg.zIdx,
+                '--tilt': `${cfg.tilt}deg`,
+                animation:`cPanelUp 0.7s cubic-bezier(0.22,1,0.36,1) ${cfg.delay}s both`,
+                transform:`rotate(${cfg.tilt}deg)`,
+                borderRadius:'10px 10px 6px 6px',
+                overflow:'hidden',
+                background:'linear-gradient(180deg, rgba(0,100,220,0.18) 0%, rgba(0,50,140,0.08) 60%, rgba(0,0,0,0.6) 100%)',
+                backdropFilter:'blur(8px)',
+                border:'1px solid rgba(0,200,255,0.30)',
+                boxShadow:`0 0 30px rgba(0,120,255,0.15), inset 0 1px 0 rgba(0,200,255,0.25)`,
+              }}>
+                {/* Top blue accent bar */}
+                <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:'linear-gradient(90deg, #00C8FF, #1E90FF)', borderRadius:'10px 10px 0 0' }} />
+                {/* Corner accents */}
+                <div style={{ position:'absolute', top:0, left:0, width:12, height:12, borderTop:'2px solid #00C8FF', borderLeft:'2px solid #00C8FF', borderRadius:'10px 0 0 0' }} />
+                <div style={{ position:'absolute', top:0, right:0, width:12, height:12, borderTop:'2px solid #1E90FF', borderRight:'2px solid #1E90FF', borderRadius:'0 10px 0 0' }} />
+
+                {/* Player photo or team logo fill */}
+                {player?.photo_url ? (
+                  <img src={player.photo_url} alt={player.name}
+                    style={{ position:'absolute', top:0, left:0, right:0, bottom:48, width:'100%', objectFit:'cover', objectPosition:'top' }}
+                    onError={e=>{ e.target.style.display='none'; }}
+                  />
+                ) : (
+                  <div style={{ position:'absolute', top:0, left:0, right:0, bottom:48, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,40,120,0.2)' }}>
+                    {winnerTeamObj?.logo_url
+                      ? <img src={winnerTeamObj.logo_url} alt="" style={{ width:64, height:64, objectFit:'contain', opacity:0.6 }} onError={e=>e.target.style.display='none'} />
+                      : <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(0,200,255,0.15)', border:'1px solid rgba(0,200,255,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#00C8FF' }}>{(winnerName||'C').charAt(0)}</span></div>
+                    }
+                  </div>
+                )}
+
+                {/* Photo gradient overlay */}
+                <div style={{ position:'absolute', bottom:0, left:0, right:0, height:100, background:'linear-gradient(0deg, rgba(0,5,20,0.95) 0%, transparent 100%)' }} />
+
+                {/* Bottom label */}
+                <div style={{ position:'absolute', bottom:0, left:0, right:0, padding:'8px 10px', textAlign:'center' }}>
+                  <div style={{ fontFamily:'Orbitron', fontSize:10, fontWeight:900, color:'#fff', textTransform:'uppercase', letterSpacing:'0.08em', lineHeight:1.2,
+                    textShadow:'0 1px 4px rgba(0,0,0,0.8)' }}>
+                    {player ? player.name : (winnerName||'').split(' ').slice(0,1).join('')}
+                  </div>
+                  <div style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'#00C8FF', letterSpacing:'0.1em', marginTop:2, opacity:0.85 }}>
+                    {(winnerName||'SQUAD').toUpperCase()}
+                  </div>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+
+        {/* ── TEAM LOGO (below panels) ── */}
+        <div style={{ animation:'cLogoIn 0.6s cubic-bezier(0.22,1,0.36,1) 0.6s both', marginBottom:18 }}>
+          <div style={{
+            width:80, height:80, borderRadius:'50%',
+            border:'3px solid #00C8FF',
+            boxShadow:'0 0 40px rgba(0,200,255,0.5), 0 0 80px rgba(0,100,255,0.25)',
+            display:'flex', alignItems:'center', justifyContent:'center',
+            background:'rgba(0,20,60,0.8)',
+          }}>
+            {winnerTeamObj?.logo_url
+              ? <img src={winnerTeamObj.logo_url} alt="" style={{ width:56, height:56, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
+              : <span style={{ fontFamily:'Orbitron', fontSize:26, fontWeight:900, color:'#00C8FF' }}>{(winnerName||'C').charAt(0)}</span>
+            }
           </div>
+        </div>
+
+        {/* ── CHAMPIONS TITLE ── */}
+        <div style={{ animation:'cTitleIn 0.8s cubic-bezier(0.22,1,0.36,1) 0.55s both', textAlign:'center' }}>
           <h1 style={{
-            fontFamily:'Orbitron', fontSize:96, fontWeight:900,
-            background:'linear-gradient(135deg, #FFD700 0%, #FFF5C0 25%, #FF6B00 50%, #FFD700 75%, #FF6B00 100%)',
+            fontFamily:'Orbitron', fontSize:100, fontWeight:900,
+            margin:0, lineHeight:0.9, letterSpacing:'0.07em',
+            background:'linear-gradient(90deg, #7EC8FF 0%, #00C8FF 30%, #ffffff 50%, #00C8FF 70%, #1E90FF 100%)',
             backgroundSize:'200% auto',
             WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
-            lineHeight:0.9, margin:0, letterSpacing:'0.08em',
-            filter:'drop-shadow(0 0 35px rgba(255,215,0,0.5))',
-            animation:'champShimmer 4s linear infinite',
+            animation:'cShimmer 5s linear infinite, cGlow 3s ease-in-out infinite',
           }}>
-            {(design?.championTitle || 'BOOYAH!').toUpperCase()}
+            {(design?.championTitle || 'CHAMPIONS').toUpperCase()}
           </h1>
-          <div style={{
-            fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:secondary,
-            letterSpacing:'0.6em', textTransform:'uppercase',
-            animation:'champGlowPulse 3s infinite ease-in-out',
-          }}>
+          <div style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:700, color:'rgba(0,200,255,0.7)', letterSpacing:'0.5em', marginTop:10, textTransform:'uppercase' }}>
             {(design?.championSubtitle || 'GRAND TOURNAMENT CHAMPION').toUpperCase()}
           </div>
         </div>
 
-        {/* === CENTER: CHAMPION CARD + PODIUM === */}
-        <motion.div
-          initial={{ y: 40, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
-          style={{ marginTop:30 }}
-        >
-          {/* Champion team card */}
-          <div style={{
-            position:'relative',
-            width:580, padding:'28px 40px',
-            display:'flex', flexDirection:'column', alignItems:'center',
-            background:'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,107,0,0.04) 50%, rgba(0,0,0,0.5) 100%)',
-            backdropFilter:'blur(16px) saturate(160%)',
-            border:'2px solid rgba(255,215,0,0.35)',
-            borderRadius:16,
-            boxShadow:'0 0 50px rgba(255,215,0,0.2), 0 12px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08)',
-          }}>
-            {/* Gold top accent line */}
-            <div style={{ position:'absolute', top:-2, left:0, right:0, height:3, background:'linear-gradient(90deg,transparent,#FFD700 20%,#FF6B00 50%,#FFD700 80%,transparent)', borderRadius:'16px 16px 0 0' }} />
-
-            {/* Champion logo with gold ring */}
-            <div style={{
-              width:120, height:120, borderRadius:'50%',
-              border:'4px solid #FFD700',
-              boxShadow:'0 0 40px rgba(255,215,0,0.5), inset 0 0 20px rgba(255,215,0,0.1)',
-              display:'flex', alignItems:'center', justifyContent:'center',
-              background:'rgba(0,0,0,0.6)', marginBottom:16,
-            }}>
-              <TeamLogo team={winnerTeamObj} size={88} />
+        {/* ── STATS ROW ── */}
+        <div style={{ display:'flex', gap:40, marginTop:22, paddingTop:18, borderTop:'1px solid rgba(0,200,255,0.18)', animation:'cTitleIn 0.6s ease 0.8s both' }}>
+          {[
+            { label:'PPT',       value:placementPts, color:'#00C8FF' },
+            { label:'KILLS',     value:totalKills,   color:'#1E90FF' },
+            { label:'KILL PTS',  value:killPts,      color:'#7EC8FF' },
+            { label:'TOTAL',     value:totalPoints,  color:'#ffffff', big:true },
+          ].map(s => (
+            <div key={s.label} style={{ textAlign:'center' }}>
+              <div style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:s.color, letterSpacing:'0.2em', opacity:0.85 }}>{s.label}</div>
+              <div style={{ fontFamily:'Rajdhani', fontSize:s.big?34:26, fontWeight:900, color:s.color, marginTop:2, textShadow:s.big?`0 0 20px ${s.color}88`:'' }}>{s.value}</div>
             </div>
+          ))}
+        </div>
+      </div>
 
-            {/* Champion squad label */}
-            <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:700, color:'rgba(255,215,0,0.6)', letterSpacing:'0.25em', marginBottom:4, textTransform:'uppercase' }}>
-              {(design?.championSquadLabel || 'CHAMPIONSHIP SQUAD').toUpperCase()}
+      {/* ── BOTTOM SPONSOR BAR ── */}
+      <div style={{ position:'absolute', bottom:0, left:0, right:0, zIndex:10 }}>
+        <div style={{ height:1, background:'linear-gradient(90deg, transparent, rgba(0,200,255,0.4), transparent)' }} />
+        <div style={{ display:'flex', justifyContent:'space-around', alignItems:'center', padding:'14px 60px', background:'rgba(1,5,16,0.85)', backdropFilter:'blur(8px)' }}>
+          {[
+            { label:'HOSTED BY',    value: design?.hostedBy     || tok.name(design) },
+            { label:'SCHEDULED BY', value: design?.scheduledBy  || tok.sub(design)  },
+            { label:'VISUALS BY',   value: design?.visualsBy    || 'BOOYAH DIRECTOR' },
+          ].map(item => (
+            <div key={item.label} style={{ textAlign:'center' }}>
+              <div style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'rgba(0,200,255,0.5)', letterSpacing:'0.2em' }}>{item.label}</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', letterSpacing:'0.1em', marginTop:3, textTransform:'uppercase' }}>{(item.value||'').toUpperCase()}</div>
             </div>
-
-            {/* Champion team name */}
-            <div style={{ fontFamily:'Orbitron', fontSize:38, fontWeight:900, color:'#fff', letterSpacing:'0.04em', textTransform:'uppercase', textShadow:'0 2px 20px rgba(255,215,0,0.3)', marginBottom:20 }}>
-              {winnerName}
-            </div>
-
-            {/* Stats breakdown */}
-            <div style={{ display:'flex', width:'100%', borderTop:'1px solid rgba(255,215,0,0.15)', paddingTop:18, justifyContent:'space-around' }}>
-              <div style={{ textAlign:'center' }}>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:'#00D4FF', letterSpacing:'0.15em' }}>PPT</div>
-                <div style={{ fontFamily:'Rajdhani', fontSize:26, fontWeight:900, color:'#fff', marginTop:2 }}>{placementPts}</div>
-              </div>
-              <div style={{ width:1, background:'rgba(255,215,0,0.12)' }} />
-              <div style={{ textAlign:'center' }}>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:'#FF6B00', letterSpacing:'0.15em' }}>KILLS</div>
-                <div style={{ fontFamily:'Rajdhani', fontSize:26, fontWeight:900, color:'#fff', marginTop:2 }}>{totalKills}</div>
-              </div>
-              <div style={{ width:1, background:'rgba(255,215,0,0.12)' }} />
-              <div style={{ textAlign:'center' }}>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:'#22c55e', letterSpacing:'0.15em' }}>KILL PTS</div>
-                <div style={{ fontFamily:'Rajdhani', fontSize:26, fontWeight:900, color:'#fff', marginTop:2 }}>{killPts}</div>
-              </div>
-              <div style={{ width:1, background:'rgba(255,215,0,0.12)' }} />
-              <div style={{ textAlign:'center' }}>
-                <div style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:'#FFD700', letterSpacing:'0.15em' }}>TOTAL</div>
-                <div style={{ fontFamily:'Rajdhani', fontSize:30, fontWeight:900, color:'#FFD700', marginTop:2, textShadow:'0 0 15px rgba(255,215,0,0.4)' }}>{totalPoints}</div>
-              </div>
-            </div>
-          </div>
-
-          {/* === PODIUM (Top 3) === */}
-          {sorted.length >= 2 && (
-            <div style={{ display:'flex', justifyContent:'center', alignItems:'flex-end', gap:16, marginTop:24, height:220 }}>
-              {podium.map((team, i) => {
-                const rank = podiumRanks[i];
-                const height = podiumHeights[i];
-                const medalColor = medalColors[i];
-                const medalLabel = medalLabels[i];
-                const isWinner = rank === 1;
-                return (
-                  <div key={i} style={{
-                    display:'flex', flexDirection:'column', alignItems:'center',
-                    animation:`champPodiumRise 0.5s ease-out ${0.6 + i * 0.15}s both`,
-                  }}>
-                    {/* Team logo */}
-                    <div style={{
-                      width:56, height:56, borderRadius:'50%',
-                      border:`2px solid ${medalColor}`,
-                      boxShadow:`0 0 20px ${medalColor}44`,
-                      display:'flex', alignItems:'center', justifyContent:'center',
-                      background:'rgba(0,0,0,0.6)', marginBottom:8,
-                    }}>
-                      <TeamLogo team={team} size={40} />
-                    </div>
-                    {/* Team name + points */}
-                    <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', textTransform:'uppercase', marginBottom:2, maxWidth:120, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
-                      {team.name}
-                    </div>
-                    <div style={{ fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color:medalColor, marginBottom:6 }}>
-                      {team.total_tournament_points || 0} PTS
-                    </div>
-                    {/* Pedestal */}
-                    <div style={{
-                      width:140, height:height,
-                      background:`linear-gradient(180deg, ${medalColor}22 0%, ${medalColor}08 50%, rgba(0,0,0,0.5) 100%)`,
-                      border:`1px solid ${medalColor}44`,
-                      borderTop:`3px solid ${medalColor}`,
-                      borderRadius:'4px 4px 0 0',
-                      display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end',
-                      paddingBottom:12, position:'relative',
-                    }}>
-                      <div style={{
-                        fontFamily:'Orbitron', fontSize:28, fontWeight:900,
-                        color:medalColor, opacity:0.9,
-                        textShadow:`0 0 15px ${medalColor}66`,
-                      }}>
-                        #{rank}
-                      </div>
-                      <div style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:medalColor, opacity:0.5, letterSpacing:'0.15em' }}>
-                        {medalLabel}
-                      </div>
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          )}
-        </motion.div>
-
-        {/* === BOTTOM: BRANDING === */}
-        <div style={{ position:'absolute', bottom:30, left:0, right:0, display:'flex', flexDirection:'column', alignItems:'center', gap:8 }}>
-          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
-            {tLogo && <img src={tLogo} alt="logo" style={{ height:38, objectFit:'contain', opacity:0.85 }} onError={e=>e.target.style.display='none'} />}
-            {sponsorLogo && (
-              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
-                <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>SPONSORED BY</span>
-                <img src={sponsorLogo} alt="sponsor" style={{ height:28, objectFit:'contain', opacity:0.8 }} onError={e=>e.target.style.display='none'} />
-              </div>
-            )}
-          </div>
-          <span style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.25)', letterSpacing:'0.2em' }}>
-            CONGRATULATIONS TO ALL TEAMS — {tok.name(design)}
-          </span>
+          ))}
         </div>
       </div>
     </div>

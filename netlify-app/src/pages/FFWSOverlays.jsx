@@ -1133,9 +1133,9 @@ export function PointRushStandings({ teams = [], design }) {
 
   // Editable from Director panel — design.pointRush object
   const pr = design?.pointRush || {};
-  const gradStart = pr.gradientStart || '#1e3a8a';
-  const gradMid   = pr.gradientMid   || '#7c3aed';
-  const gradEnd   = pr.gradientEnd   || '#ec4899';
+  const gradStart = pr.gradientStart || '#020B18';
+  const gradMid   = pr.gradientMid   || '#040F2A';
+  const gradEnd   = pr.gradientEnd   || '#061535';
   const footerText = pr.footerText || '#Rise to THE SUMMIT';
   const showHazard = pr.hazardTape !== false; // default true
   const headerText = pr.headerText || 'POINT RUSH STANDINGS';
@@ -1425,7 +1425,7 @@ function getThemeInline(design) {
   const userAcc = design?.accentColor || null;
   const userAcc2 = design?.accentColor2 || null;
   const presets = {
-    default:  { p: '#FF6B00', s: '#00D4FF', glow: true },
+    default:  { p: '#00C8FF', s: '#1E90FF', glow: true },
     neon:     { p: '#00FF88', s: '#BF00FF', glow: true },
     military: { p: '#9ABF30', s: '#C8A850', glow: false },
     minimal:  { p: '#FFFFFF', s: '#888888', glow: false },
