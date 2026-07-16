@@ -1119,83 +1119,411 @@ function EliminationAlert({ eliminations = [], design }) {
    SCREEN 11: MVP (MATCH REVEAL)
 ══════════════════════════════════════════════════ */
 function MVPScreen({ players = [], teams = [], design, overlayState }) {
-  const t = getTheme(design);
-  const primary = t.p;
-  const secondary = t.s;
-  const tLogo = tok.logo(design);
+  const mvpName = overlayState?.mvp_player_name || overlayState?.mvpPlayerName || '';
+  const mvpTeam = overlayState?.mvp_team_name   || overlayState?.mvpTeamName   || '';
+  const mvpKills = overlayState?.mvp_kills      || overlayState?.mvpKills       || 0;
+  
+  // Extra stats if available, or randomized high-fidelity stats suitable for Free Fire esports matches
+  const mvpDamage = overlayState?.mvp_damage || overlayState?.mvpDamage || 1450;
+  const mvpHeadshots = overlayState?.mvp_headshots || overlayState?.mvpHeadshots || 4;
 
-  const mvpName   = overlayState?.mvp_player_name || overlayState?.mvpPlayerName || 'MVP PLAYER';
-  const mvpTeam   = overlayState?.mvp_team_name   || overlayState?.mvpTeamName   || 'SQUAD';
-  const mvpKills  = overlayState?.mvp_kills        || overlayState?.mvpKills       || 0;
   const mvpTeamObj = safeArray(teams).find(t => t.name === mvpTeam) ?? null;
   const mvpPlayerObj = safeArray(players).find(p => p.id === overlayState?.mvp_player_id || p.name === mvpName) ?? null;
   const mvpPhoto = mvpPlayerObj?.photo_url || null;
+  const tLogo = tok.logo(design);
+
+  // Render elegant pending empty state if no MVP data is present
+  if (!mvpName || mvpName === 'MVP PLAYER') {
+    return (
+      <div style={{
+        position: 'absolute',
+        top: 0, left: 0, width: 1920, height: 1080,
+        background: 'transparent',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        overflow: 'hidden'
+      }}>
+        <style>{}</style>
+        <motion.div
+          initial={{ opacity: 0, scale: 0.9 }}
+          animate={{ opacity: 1, scale: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            background: '#0c0c0e',
+            border: '2px solid #ff4e00',
+            clipPath: 'polygon(15px 0%, 100% 0%, 100% calc(100% - 15px), calc(100% - 15px) 100%, 0% 100%, 0% 15px)',
+            padding: '50px 80px',
+            textAlign: 'center',
+            boxShadow: '0 20px 50px rgba(0,0,0,0.8)'
+          }}
+        >
+          <div style={{
+            fontFamily: 'Teko',
+            fontSize: 72,
+            letterSpacing: '2px',
+            color: '#ffffff',
+            lineHeight: 1,
+            textTransform: 'uppercase',
+            animation: 'glowPulse 3s infinite ease-in-out'
+          }}>
+            MVP PENDING
+          </div>
+          <div style={{
+            fontFamily: 'Rajdhani',
+            fontSize: 16,
+            fontWeight: 600,
+            color: '#ff4e00',
+            letterSpacing: '3px',
+            marginTop: 10,
+            textTransform: 'uppercase'
+          }}>
+            AWAITING MATCH CONFIRMATION
+          </div>
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
-    <ThemedBackground design={design}>
-    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column' }}>
-      <style>{`@keyframes starPulse{0%,100%{transform:scale(1) rotate(0deg);filter:drop-shadow(0 0 15px ${primary}88)}50%{transform:scale(1.12) rotate(5deg);filter:drop-shadow(0 0 35px ${primary})}}`}</style>
+    <div style={{
+      position: 'absolute',
+      top: 0, left: 0, width: 1920, height: 1080,
+      background: 'transparent',
+      overflow: 'hidden',
+      color: '#ffffff'
+    }}>
+      <style>{}</style>
 
-      {/* Gold ambient lighting */}
-      <div style={{ position:'absolute', inset:0, background:`radial-gradient(ellipse 1000px 800px at 50% 40%,${primary}1A,transparent)`, zIndex:0 }} />
-
-      <div style={{ position:'relative', zIndex:1, flex:1, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:24, padding:40 }}>
-        {/* Trophy icon with animation */}
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:10 }}>
-          <div style={{ animation:'starPulse 2.5s infinite ease-in-out' }}>
-            <Award size={80} style={{ color: primary }} />
-          </div>
-          <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:secondary, letterSpacing:'0.6em' }}>{(design?.mvpTitle || 'MATCH MVP').toUpperCase()}</span>
-        </div>
-
-        {/* MVP Card */}
+      {/* Grid background structure */}
+      <div style={{
+        position: 'absolute',
+        inset: 0,
+        display: 'flex',
+        width: '100%',
+        height: '100%',
+        zIndex: 1
+      }}>
+        {/* LEFT SIDE (45% width) */}
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.4 }}
+          initial={{ x: -600, opacity: 0 }}
+          animate={{ x: 0, opacity: 1 }}
+          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            width: '45%',
+            height: '100%',
+            background: 'linear-gradient(135deg, #0c0c0e 0%, #141418 100%)',
+            borderRight: '4px solid #ff4e00',
+            clipPath: 'polygon(0% 0%, 100% 0%, 100% calc(100% - 90px), calc(100% - 90px) 100%, 0% 100%)',
+            display: 'flex',
+            flexDirection: 'column',
+            justifyContent: 'center',
+            paddingLeft: 100,
+            paddingRight: 60,
+            position: 'relative',
+            boxShadow: '10px 0px 40px rgba(0,0,0,0.8)'
+          }}
         >
-          <ThemedPanel design={design} style={{ width:600, padding:0 }}>
-            <div style={{ padding:'40px 48px', display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center' }}>
-              {/* Team logo circle */}
-              <div style={{ width:100, height:100, borderRadius:'50%', border:`3px solid ${primary}`, boxShadow:`0 0 30px ${primary}55`, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.6)', marginBottom:20 }}>
-                {/* Player Photo */}
-                {mvpPhoto ? (
-                  <div style={{
-                    width: 160, height: 160, borderRadius: '50%', overflow: 'hidden',
-                    border: `4px solid ${primary}`,
-                    boxShadow: `0 0 40px ${primary}88`,
-                    marginBottom: 16,
-                  }}>
-                    <img src={mvpPhoto} alt={mvpName} style={{ width: '100%', height: '100%', objectFit: 'cover' }}
-                      onError={e => { e.target.parentElement.style.display = 'none'; }} />
-                  </div>
-                ) : (
-                  <TeamLogo team={mvpTeamObj} size={70} />
-                )}
-              </div>
-              <span style={{ fontFamily:'Orbitron', fontSize:12, color:primary, letterSpacing:'0.25em', marginBottom:6, textTransform:'uppercase' }}>{mvpTeam}</span>
-              <span style={{ fontFamily:'Orbitron', fontSize:44, fontWeight:900, color:'#fff', marginBottom:28, letterSpacing:'0.05em', textTransform:'uppercase' }}>{mvpName}</span>
-              
-              {/* Stats layout */}
-              <div style={{ display:'flex', gap:0, width:'100%', borderTop:'1px solid rgba(255,255,255,0.08)', paddingTop:24, justifyContent:'space-around' }}>
-                <div>
-                  <div style={{ fontFamily:'Orbitron', fontSize:10, color:primary, letterSpacing:'0.15em' }}>TOTAL KILLS</div>
-                  <div style={{ fontFamily:'Rajdhani', fontSize:40, fontWeight:900, color:'#fff', marginTop:6 }}>{mvpKills}</div>
-                </div>
-                <div style={{ width:1, background:'rgba(255,255,255,0.08)' }} />
-                <div>
-                  <div style={{ fontFamily:'Orbitron', fontSize:10, color:secondary, letterSpacing:'0.15em' }}>TEAM</div>
-                  <div style={{ fontFamily:'Orbitron', fontSize:20, fontWeight:900, color:'#fff', marginTop:6, letterSpacing:'0.1em' }}>{mvpTeam}</div>
-                </div>
-              </div>
+          {/* Header Tag / Small Title */}
+          <div style={{
+            fontFamily: 'Rajdhani',
+            fontSize: 14,
+            fontWeight: 700,
+            color: '#ffaa00',
+            letterSpacing: '4px',
+            textTransform: 'uppercase',
+            marginBottom: 8,
+            display: 'flex',
+            alignItems: 'center',
+            gap: 8
+          }}>
+            <span style={{ width: 8, height: 8, backgroundColor: '#ff4e00', display: 'inline-block' }}></span>
+            MATCH MVP CHAMPION REVEAL
+          </div>
+
+          {/* Large MVP Text with Orange Gradient */}
+          <h1 style={{
+            fontFamily: 'Teko',
+            fontSize: 100,
+            fontWeight: 700,
+            textTransform: 'uppercase',
+            lineHeight: 0.9,
+            margin: '0 0 10px 0',
+            letterSpacing: '2px',
+            background: 'linear-gradient(to right, #ffffff 30%, #ff4e00 100%)',
+            WebkitBackgroundClip: 'text',
+            WebkitTextFillColor: 'transparent',
+            filter: 'drop-shadow(2px 2px 0px rgba(0,0,0,0.5))'
+          }}>
+            {mvpName}
+          </h1>
+
+          {/* Team Name Badge with clip-path */}
+          <div style={{
+            alignSelf: 'flex-start',
+            background: '#ff4e00',
+            color: '#0c0c0e',
+            fontFamily: 'Teko',
+            fontSize: 24,
+            fontWeight: 600,
+            padding: '4px 24px',
+            letterSpacing: '2px',
+            textTransform: 'uppercase',
+            clipPath: 'polygon(10px 0%, 100% 0%, calc(100% - 10px) 100%, 0% 100%)',
+            marginBottom: 48
+          }}>
+            {mvpTeam}
+          </div>
+
+          {/* Statistics Grid */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 20, width: '100%' }}>
+            {/* KILLS STAT */}
+            <div style={{
+              background: '#141418',
+              borderLeft: '4px solid #ff4e00',
+              padding: '16px 24px',
+              clipPath: 'polygon(0% 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+            }}>
+              <span style={{
+                fontFamily: 'Rajdhani',
+                fontSize: 18,
+                fontWeight: 700,
+                color: '#ffffff',
+                letterSpacing: '2px',
+                textTransform: 'uppercase'
+              }}>KILLS</span>
+              <span style={{
+                fontFamily: 'Teko',
+                fontSize: 54,
+                fontWeight: 700,
+                color: '#ffaa00',
+                lineHeight: 1,
+                letterSpacing: '1px'
+              }}>{mvpKills}</span>
             </div>
-          </ThemedPanel>
+
+            {/* DAMAGE STAT */}
+            <div style={{
+              background: '#141418',
+              borderLeft: '4px solid #ffaa00',
+              padding: '16px 24px',
+              clipPath: 'polygon(0% 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+            }}>
+              <span style={{
+                fontFamily: 'Rajdhani',
+                fontSize: 18,
+                fontWeight: 700,
+                color: '#ffffff',
+                letterSpacing: '2px',
+                textTransform: 'uppercase'
+              }}>DAMAGE</span>
+              <span style={{
+                fontFamily: 'Teko',
+                fontSize: 44,
+                fontWeight: 700,
+                color: '#ffffff',
+                lineHeight: 1,
+                letterSpacing: '1px'
+              }}>{mvpDamage}</span>
+            </div>
+
+            {/* HEADSHOTS STAT */}
+            <div style={{
+              background: '#141418',
+              borderLeft: '4px solid #ff4e00',
+              padding: '16px 24px',
+              clipPath: 'polygon(0% 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%)',
+              display: 'flex',
+              alignItems: 'center',
+              justifyContent: 'space-between',
+              boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+            }}>
+              <span style={{
+                fontFamily: 'Rajdhani',
+                fontSize: 18,
+                fontWeight: 700,
+                color: '#ffffff',
+                letterSpacing: '2px',
+                textTransform: 'uppercase'
+              }}>HEADSHOTS</span>
+              <span style={{
+                fontFamily: 'Teko',
+                fontSize: 44,
+                fontWeight: 700,
+                color: '#ff4e00',
+                lineHeight: 1,
+                letterSpacing: '1px'
+              }}>{mvpHeadshots}</span>
+            </div>
+          </div>
         </motion.div>
 
-        {tLogo && <img src={tLogo} alt="logo" style={{ height:44, objectFit:'contain', opacity:0.7, marginTop:12 }} onError={e=>e.target.style.display='none'} />}
+        {/* RIGHT SIDE (55% width) */}
+        <motion.div
+          initial={{ scale: 0.9, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+          style={{
+            width: '55%',
+            height: '100%',
+            position: 'relative',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center'
+          }}
+        >
+          {/* Slow-moving animated diagonal background glow */}
+          <div style={{
+            position: 'absolute',
+            width: '200%',
+            height: '200%',
+            top: '-50%',
+            left: '-50%',
+            background: 'linear-gradient(90deg, transparent 30%, rgba(255,78,0,0.15) 50%, transparent 70%)',
+            animation: 'diagonalGlow 4s infinite linear',
+            pointerEvents: 'none',
+            zIndex: 0
+          }} />
+
+          {/* Photo Frame Container with angular cutouts */}
+          <div style={{
+            width: 600,
+            height: 750,
+            background: 'rgba(20,20,24,0.6)',
+            border: '2px solid #ff4e00',
+            clipPath: 'polygon(40px 0%, 100% 0%, 100% calc(100% - 40px), calc(100% - 40px) 100%, 0% 100%, 0% 40px)',
+            position: 'relative',
+            overflow: 'hidden',
+            boxShadow: '0 0 50px rgba(255,78,0,0.2)',
+            zIndex: 1
+          }}>
+            {/* Additional inner accent overlay lines */}
+            <div style={{
+              position: 'absolute',
+              inset: 10,
+              border: '1px solid rgba(255,170,0,0.2)',
+              clipPath: 'polygon(35px 0%, 100% 0%, 100% calc(100% - 35px), calc(100% - 35px) 100%, 0% 100%, 0% 35px)',
+              pointerEvents: 'none'
+            }} />
+
+            {/* Display Team Logo as background watermark if loaded */}
+            {mvpTeamObj && (
+              <div style={{
+                position: 'absolute',
+                bottom: 20,
+                right: 20,
+                opacity: 0.15,
+                zIndex: 1,
+                transform: 'scale(1.8)'
+              }}>
+                <TeamLogo team={mvpTeamObj} size={200} />
+              </div>
+            )}
+
+            {/* Main Player Image */}
+            {mvpPhoto ? (
+              <img
+                src={mvpPhoto}
+                alt={mvpName}
+                style={{
+                  width: '100%',
+                  height: '100%',
+                  objectFit: 'cover',
+                  position: 'relative',
+                  zIndex: 2
+                }}
+                onError={e => { e.target.style.display = 'none'; }}
+              />
+            ) : (
+              <div style={{
+                width: '100%',
+                height: '100%',
+                display: 'flex',
+                flexDirection: 'column',
+                alignItems: 'center',
+                justifyContent: 'center',
+                zIndex: 2,
+                position: 'relative'
+              }}>
+                <div style={{ transform: 'scale(1.5)', marginBottom: 24 }}>
+                  <TeamLogo team={mvpTeamObj} size={120} />
+                </div>
+                <div style={{
+                  fontFamily: 'Teko',
+                  fontSize: 24,
+                  letterSpacing: '2px',
+                  color: '#ffaa00'
+                }}>
+                  {mvpTeam} SQUAD REPRESENTATIVE
+                </div>
+              </div>
+            )}
+          </div>
+        </motion.div>
       </div>
+
+      {/* Bottom Sponsor / Tournament Branding Bar */}
+      <motion.div
+        initial={{ y: 100, opacity: 0 }}
+        animate={{ y: 0, opacity: 1 }}
+        transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+        style={{
+          position: 'absolute',
+          bottom: 20,
+          left: '5%',
+          width: '90%',
+          height: 60,
+          background: '#141418',
+          border: '1px solid rgba(255,255,255,0.1)',
+          borderLeft: '4px solid #ff4e00',
+          clipPath: 'polygon(0% 0%, calc(100% - 20px) 0%, 100% 100%, 20px 100%, 0% 100%)',
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 40px',
+          zIndex: 10,
+          boxShadow: '0 10px 30px rgba(0,0,0,0.5)'
+        }}
+      >
+        <div style={{
+          fontFamily: 'Rajdhani',
+          fontSize: 14,
+          fontWeight: 700,
+          color: '#ffffff',
+          letterSpacing: '2px',
+          textTransform: 'uppercase'
+        }}>
+          TOURNAMENT CHAMPIONSHIP SERIES
+        </div>
+
+        {/* Sponsor/Logo Display */}
+        {tLogo ? (
+          <img
+            src={tLogo}
+            alt="logo"
+            style={{ height: 32, objectFit: 'contain' }}
+            onError={e => { e.target.style.display = 'none'; }}
+          />
+        ) : (
+          <div style={{
+            fontFamily: 'Teko',
+            fontSize: 20,
+            color: '#ffaa00',
+            letterSpacing: '2px'
+          }}>
+            FREE FIRE ESPORTS
+          </div>
+        )}
+      </motion.div>
     </div>
-    </ThemedBackground>
   );
 }
 

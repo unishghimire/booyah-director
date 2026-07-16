@@ -193,14 +193,14 @@ export default function DirectorPanel() {
   const solidOverlays = OVERLAYS.filter(o => !o.transparent);
 
   return (
-    <div className="flex h-full flex-col bg-[#09090f] text-white">
+    <div className="flex h-full flex-col bg-[#0c0c0e] text-white" style={{ fontFamily: "Rajdhani, sans-serif" }}>
       {/* ─────────────────────────────────────────
          TOP HEADER BAR — 64px
       ───────────────────────────────────────── */}
-      <header className="flex h-16 items-center justify-between border-b border-[rgba(255,107,0,0.2)] bg-[#0c0c18] px-5 flex-shrink-0 relative">
+      <header className="flex h-16 items-center justify-between border-b border-[rgba(255,78,0,0.15)] bg-[#141418] px-5 flex-shrink-0 relative">
         {/* Left: Tournament name */}
         <div className="flex items-center gap-3">
-          <div className="h-6 w-[4px] bg-[#FF6B00]" />
+          <div className="h-6 w-[4px] bg-[#ff4e00]" style={{ filter: "drop-shadow(0 0 4px rgba(255,78,0,0.6))" }} />
           <div className="leading-none">
             <h1 className="font-orbitron text-sm font-black uppercase tracking-wider text-white">
               {tournament?.name || 'CHAMPIONSHIP TOUR'}
@@ -212,12 +212,12 @@ export default function DirectorPanel() {
         </div>
 
         {/* Center: Live indicator pill */}
-        <div className="flex items-center gap-2 rounded-full border border-[rgba(255,107,0,0.4)] bg-[#09090f] px-4 py-1.5">
+        <div className="flex items-center gap-2 border border-[rgba(255,78,0,0.3)] bg-[#0c0c0e] px-4 py-1.5">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#FF6B00] opacity-75"></span>
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#FF6B00]"></span>
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff4e00] opacity-75"></span>
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff4e00]"></span>
           </span>
-          <span className="font-orbitron text-[10px] font-black tracking-widest text-[#FF6B00]">
+          <span className="font-orbitron text-[10px] font-black tracking-widest text-[#ff4e00]">
             LIVE: {currentScreen.replace(/_/g, ' ').toUpperCase()}
           </span>
         </div>
@@ -226,9 +226,9 @@ export default function DirectorPanel() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleCopyOBS}
-            className="flex items-center gap-1.5 rounded-md border border-white/10 bg-[#13131f] px-3.5 py-2 font-orbitron text-[10px] font-black tracking-widest text-white hover:border-[#FF6B00]/40 hover:bg-[#FF6B00]/10 transition-all"
+            className="flex items-center gap-1.5 rounded-md border border-white/10 bg-[#13131f] px-3.5 py-2 font-orbitron text-[10px] font-black tracking-widest text-white hover:border-[#ff4e00]/40 hover:bg-[#ff4e00]/10 transition-all"
           >
-            <Copy className="h-3.5 w-3.5 text-[#FF6B00]" />
+            <Copy className="h-3.5 w-3.5 text-[#ff4e00]" />
             COPY OBS SOURCE
           </button>
           <button
@@ -236,18 +236,18 @@ export default function DirectorPanel() {
             disabled={refreshing}
             className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-[#13131f] text-gray-400 hover:text-white transition-all disabled:opacity-50"
           >
-            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-[#FF6B00]' : ''}`} />
+            <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-[#ff4e00]' : ''}`} />
           </button>
         </div>
 
         {/* Bottom edge gradient line */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-[#FF6B00] via-transparent to-[#00D4FF]" />
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] " />
       </header>
 
       {/* ─────────────────────────────────────────
          TAB BAR — 44px
       ───────────────────────────────────────── */}
-      <nav className="flex h-11 border-b border-white/5 bg-[#0c0c18] flex-shrink-0">
+      <nav className="flex h-11 border-b border-white/5 bg-[#141418] flex-shrink-0">
         {[
           { id: 'overlay', label: 'OVERLAY', icon: Monitor },
           { id: 'match', label: 'MATCH', icon: Map },
@@ -265,8 +265,9 @@ export default function DirectorPanel() {
               style={
                 isActive
                   ? {
-                      color: '#FF6B00',
-                      background: 'rgba(255,107,0,0.05)',
+                      color: '#ff4e00',
+                      background: 'rgba(255,78,0,0.06)',
+                      textShadow: '0 0 8px rgba(255,78,0,0.4)',
                     }
                   : { color: 'rgba(255,255,255,0.4)' }
               }
@@ -274,7 +275,7 @@ export default function DirectorPanel() {
               <Icon className="h-4 w-4" />
               {t.label}
               {isActive && (
-                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#FF6B00]" />
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#ff4e00]" />
               )}
             </button>
           );
@@ -287,7 +288,7 @@ export default function DirectorPanel() {
       <main className="flex-1 overflow-y-auto p-6 min-h-0">
         {loading && (
           <div className="flex h-40 items-center justify-center">
-            <RefreshCw className="h-8 w-8 animate-spin text-[#FF6B00]" />
+            <RefreshCw className="h-8 w-8 animate-spin text-[#ff4e00]" />
           </div>
         )}
 
@@ -298,9 +299,9 @@ export default function DirectorPanel() {
               <SectionBoundary label="OVERLAY LINKS">
                 <div className="flex flex-col gap-6 max-w-6xl mx-auto">
                   {/* OBS Setup Tip */}
-                  <div className="rounded-xl border border-[#FF6B00]/20 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
-                    <p className="font-orbitron text-[10px] font-black text-[#FF6B00] tracking-wider mb-2 flex items-center gap-1.5">
-                      <span className="h-1.5 w-1.5 bg-[#FF6B00] rounded-full animate-pulse" />
+                  <div className="rounded-xl border border-[#ff4e00]/20 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
+                    <p className="font-orbitron text-[10px] font-black text-[#ff4e00] tracking-wider mb-2 flex items-center gap-1.5">
+                      <span className="h-1.5 w-1.5 bg-[#ff4e00] rounded-full animate-pulse" />
                       OBS SETUP — DO THIS ONCE PER SOURCE
                     </p>
                     <div className="space-y-1.5 text-xs text-gray-400">
@@ -384,8 +385,8 @@ export default function DirectorPanel() {
                   {/* Solid Scene Overlays */}
                   <div>
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="h-1.5 w-1.5 bg-[#FF6B00] rounded-full animate-pulse" />
-                      <span className="font-orbitron text-[10px] font-black text-[#FF6B00] tracking-widest">FULL SCENE — REPLACE ENTIRE SCREEN</span>
+                      <div className="h-1.5 w-1.5 bg-[#ff4e00] rounded-full animate-pulse" />
+                      <span className="font-orbitron text-[10px] font-black text-[#ff4e00] tracking-widest">FULL SCENE — REPLACE ENTIRE SCREEN</span>
                       <div className="h-px flex-1 bg-white/5" />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -395,19 +396,19 @@ export default function DirectorPanel() {
                         return (
                           <div
                             key={ov.id}
-                            className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#FF6B00]/30 hover:shadow-[0_0_15px_rgba(255,107,0,0.05)] transition-all group"
+                            className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#ff4e00]/30 hover:shadow-[0_0_15px_rgba(255,107,0,0.05)] transition-all group"
                           >
                             <div>
                               <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#FF6B00]/10 border border-[#FF6B00]/20 group-hover:bg-[#FF6B00]/20 transition-all">
-                                  <Icon className="h-4 w-4 text-[#FF6B00]" />
+                                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#ff4e00]/10 border border-[#ff4e00]/20 group-hover:bg-[#ff4e00]/20 transition-all">
+                                  <Icon className="h-4 w-4 text-[#ff4e00]" />
                                 </div>
                                 <div>
                                   <h3 className="font-orbitron text-xs font-black text-white tracking-wider">{ov.label}</h3>
                                   <p className="text-[10px] text-gray-400 mt-0.5">{ov.desc}</p>
                                 </div>
                               </div>
-                              <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#FF6B00]/80 truncate">
+                              <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#ff4e00]/80 truncate">
                                 {url}
                               </div>
                             </div>
@@ -419,7 +420,7 @@ export default function DirectorPanel() {
                                   href={url}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-[#FF6B00] hover:border-[#FF6B00]/30 transition-all"
+                                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-[#ff4e00] hover:border-[#ff4e00]/30 transition-all"
                                   title="Open Link"
                                 >
                                   <ExternalLink className="h-4 w-4" />
@@ -446,9 +447,9 @@ export default function DirectorPanel() {
             {activeTab === 'match' && (
               <SectionBoundary label="MATCH CONTROL">
               <div className="max-w-3xl mx-auto space-y-6">
-                <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-6">
+                <div className="rounded-xl border border-white/5 bg-[#141418] p-6">
                   <div className="mb-6 flex items-center gap-2 border-b border-white/5 pb-4">
-                    <Zap className="h-5 w-5 text-[#FF6B00]" />
+                    <Zap className="h-5 w-5 text-[#ff4e00]" />
                     <h2 className="font-orbitron text-xs font-black tracking-[0.25em] text-white">
                       MATCH CONTROL
                     </h2>
@@ -461,7 +462,7 @@ export default function DirectorPanel() {
                       <select
                         value={mapSelect}
                         onChange={(e) => setMapSelect(e.target.value)}
-                        className="w-full rounded-lg border border-white/10 bg-black/40 px-3.5 py-2.5 font-orbitron text-xs text-white focus:border-[#FF6B00] focus:outline-none"
+                        className="w-full rounded-lg border border-white/10 bg-black/40 px-3.5 py-2.5 font-orbitron text-xs text-white focus:border-[#ff4e00] focus:outline-none"
                       >
                         {MAPS.map((m) => (
                           <option key={m} value={m}>
@@ -475,7 +476,7 @@ export default function DirectorPanel() {
                       <button
                         disabled={busy === 'start_match'}
                         onClick={startMatch}
-                        className="flex w-full items-center justify-center gap-2 rounded-lg bg-[#FF6B00] px-4 py-3 font-orbitron text-[11px] font-black tracking-wider text-white hover:bg-[#ff8533] disabled:opacity-50 transition-all"
+                        className="flex w-full items-center justify-center gap-2 bg-[#ff4e00] px-4 py-3 font-orbitron text-[11px] font-black tracking-wider text-white hover:bg-[#ff8533] disabled:opacity-50 transition-all"
                       >
                         <Play className="h-4 w-4" />
                         START MATCH #{ (tournament?.current_match_number || 0) + 1 }
@@ -485,7 +486,7 @@ export default function DirectorPanel() {
                 </div>
 
                 {currentMatch && (
-                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-6">
+                  <div className="rounded-xl border border-white/5 bg-[#141418] p-6">
                     <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
                       <div className="flex items-center gap-2">
                         <Radio className="h-5 w-5 text-red-500 animate-pulse" />
@@ -505,7 +506,7 @@ export default function DirectorPanel() {
                       </div>
                       <div className="rounded-lg bg-black/20 p-4 border border-white/5">
                         <p className="font-orbitron text-[9px] font-bold text-gray-400 tracking-wider mb-1">STATUS</p>
-                        <p className="font-orbitron text-sm font-black text-[#FF6B00]">{currentMatch.state?.toUpperCase()}</p>
+                        <p className="font-orbitron text-sm font-black text-[#ff4e00]">{currentMatch.state?.toUpperCase()}</p>
                       </div>
                     </div>
 
@@ -521,9 +522,9 @@ export default function DirectorPanel() {
                             style={
                               isCurrent
                                 ? {
-                                    borderColor: '#FF6B00',
+                                    borderColor: '#ff4e00',
                                     backgroundColor: 'rgba(255,107,0,0.1)',
-                                    color: '#FF6B00',
+                                    color: '#ff4e00',
                                   }
                                 : {
                                     borderColor: 'rgba(255,255,255,0.1)',
@@ -541,9 +542,9 @@ export default function DirectorPanel() {
                 )}
 
                 {/* MVP CONTROL */}
-                <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-6">
+                <div className="rounded-xl border border-white/5 bg-[#141418] p-6">
                   <div className="mb-6 flex items-center gap-2 border-b border-white/5 pb-4">
-                    <Star className="h-5 w-5 text-[#FF6B00]" />
+                    <Star className="h-5 w-5 text-[#ff4e00]" />
                     <h2 className="font-orbitron text-xs font-black tracking-[0.25em] text-white">
                       MVP REVEAL CONTROL
                     </h2>
@@ -562,21 +563,21 @@ export default function DirectorPanel() {
                       <button
                         onClick={triggerMVPOverlay}
                         disabled={mvpBusy === 'show' || !mvp}
-                        className="flex-1 rounded-lg bg-[#FF6B00] px-4 py-3 font-orbitron text-[10px] font-black tracking-wider text-white hover:bg-[#ff8533] disabled:opacity-50"
+                        className="flex-1 rounded-lg bg-[#ff4e00] px-4 py-3 font-orbitron text-[10px] font-black tracking-wider text-white hover:bg-[#ff8533] disabled:opacity-50"
                       >
                         {mvpBusy === 'show' ? 'SENDING...' : '2. TRIGGER MVP OVERLAY'}
                       </button>
                     </div>
 
                     {mvp && (
-                      <div className="rounded-lg border border-[#FF6B00]/20 bg-[#FF6B00]/5 p-4 flex items-center justify-between">
+                      <div className="rounded-lg border border-[#ff4e00]/20 bg-[#ff4e00]/5 p-4 flex items-center justify-between">
                         <div>
-                          <p className="font-orbitron text-[9px] text-[#FF6B00] font-black tracking-widest">CALCULATED MVP</p>
+                          <p className="font-orbitron text-[9px] text-[#ff4e00] font-black tracking-widest">CALCULATED MVP</p>
                           <p className="font-orbitron text-base font-black text-white mt-1">{mvp.name}</p>
                           <p className="text-[11px] text-gray-400 mt-0.5">{mvp.team} — {mvp.kills} Total Kills</p>
                         </div>
-                        <div className="h-10 w-10 rounded-full bg-[#FF6B00]/10 flex items-center justify-center border border-[#FF6B00]/20">
-                          <Star className="h-5 w-5 text-[#FF6B00]" />
+                        <div className="h-10 w-10 rounded-full bg-[#ff4e00]/10 flex items-center justify-center border border-[#ff4e00]/20">
+                          <Star className="h-5 w-5 text-[#ff4e00]" />
                         </div>
                       </div>
                     )}
@@ -584,9 +585,9 @@ export default function DirectorPanel() {
                 </div>
 
                 {/* CHAMPIONS REVEAL */}
-                <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-6">
+                <div className="rounded-xl border border-white/5 bg-[#141418] p-6">
                   <div className="mb-6 flex items-center gap-2 border-b border-white/5 pb-4">
-                    <Crown className="h-5 w-5 text-[#FF6B00]" />
+                    <Crown className="h-5 w-5 text-[#ff4e00]" />
                     <h2 className="font-orbitron text-xs font-black tracking-[0.25em] text-white">
                       CHAMPION REVEAL
                     </h2>
@@ -606,7 +607,7 @@ export default function DirectorPanel() {
                         <button
                           disabled={champBusy === t.id}
                           onClick={() => revealChampions(t)}
-                          className="rounded bg-[#FF6B00] px-2.5 py-1.5 font-orbitron text-[9px] font-black tracking-wider text-white hover:bg-[#ff8533]"
+                          className="rounded bg-[#ff4e00] px-2.5 py-1.5 font-orbitron text-[9px] font-black tracking-wider text-white hover:bg-[#ff8533]"
                         >
                           {champBusy === t.id ? 'REVEALING...' : 'REVEAL'}
                         </button>
@@ -618,7 +619,7 @@ export default function DirectorPanel() {
                     <button
                       disabled={champBusy === 'declare'}
                       onClick={declareTournamentFinished}
-                      className="w-full rounded-lg border border-[#FF6B00]/40 bg-[#FF6B00]/10 py-3 font-orbitron text-[10px] font-black tracking-wider text-[#FF6B00] hover:bg-[#FF6B00]/20 transition-all"
+                      className="w-full rounded-lg border border-[#ff4e00]/40 bg-[#ff4e00]/10 py-3 font-orbitron text-[10px] font-black tracking-wider text-[#ff4e00] hover:bg-[#ff4e00]/20 transition-all"
                     >
                       {champBusy === 'declare' ? 'CALCULATING STANDINGS...' : 'OFFICIALLY DECLARE CHAMPIONS & LOCK STANDINGS'}
                     </button>
@@ -632,7 +633,7 @@ export default function DirectorPanel() {
             {/* STANDINGS TAB */}
             {activeTab === 'standings' && (
               <SectionBoundary label="STANDINGS & LEADERBOARD">
-                <div className="max-w-5xl mx-auto rounded-xl border border-white/5 bg-[#0f0f1a] overflow-hidden">
+                <div className="max-w-5xl mx-auto rounded-xl border border-white/5 bg-[#141418] overflow-hidden">
                   <div className="p-6 border-b border-white/5 flex justify-between items-center bg-black/10">
                     <div>
                       <h2 className="font-orbitron text-xs font-black tracking-[0.25em] text-white">
@@ -642,8 +643,8 @@ export default function DirectorPanel() {
                     </div>
                     <div className="flex items-center gap-3">
                       <span className="text-[9px] font-mono text-gray-500">PPK: {tournament?.points_per_kill || 1}</span>
-                      <div className="flex items-center gap-1.5 rounded-lg border border-[#FF6B00]/20 bg-[#FF6B00]/5 px-2.5 py-1.5">
-                        <span className="text-[9px] font-black uppercase tracking-wider text-[#FF6B00]">AUTO CALC</span>
+                      <div className="flex items-center gap-1.5 rounded-lg border border-[#ff4e00]/20 bg-[#ff4e00]/5 px-2.5 py-1.5">
+                        <span className="text-[9px] font-black uppercase tracking-wider text-[#ff4e00]">AUTO CALC</span>
                         <span className="text-[10px] font-mono text-gray-400">
                           <span className="text-cyan-400">PPT</span> + <span className="text-green-400">Kills×PPK</span> = <span className="text-orange-400">Total</span>
                         </span>
@@ -682,7 +683,7 @@ export default function DirectorPanel() {
                             <td className="py-3 px-4 text-center text-gray-400 font-mono">
                               {standings.filter(s => s.team_id === team.id).length || 0}
                             </td>
-                            <td className="py-3 px-4 text-center font-mono font-bold text-[#FF6B00]">
+                            <td className="py-3 px-4 text-center font-mono font-bold text-[#ff4e00]">
                               {standings.filter(s => s.team_id === team.id && s.placement === 1).length || 0}
                             </td>
                             <td className="py-3 px-4 text-center font-mono text-cyan-400" title="Placement points from match standings">
@@ -716,10 +717,10 @@ export default function DirectorPanel() {
               <SectionBoundary label="TOURNAMENT CONFIGURATION">
                 <div className="max-w-4xl mx-auto space-y-6">
                   {/* JSON Import/Export Actions */}
-                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-6">
+                  <div className="rounded-xl border border-white/5 bg-[#141418] p-6">
                     <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
                       <div className="flex items-center gap-2">
-                        <Download className="h-5 w-5 text-[#FF6B00]" />
+                        <Download className="h-5 w-5 text-[#ff4e00]" />
                         <h2 className="font-orbitron text-xs font-black tracking-[0.25em] text-white">
                           BACKUP & PORT DATA
                         </h2>
@@ -731,7 +732,7 @@ export default function DirectorPanel() {
                     <div className="flex flex-wrap gap-3">
                       <button
                         onClick={handleDownloadJSON}
-                        className="flex-1 min-w-[200px] flex items-center justify-center gap-2 rounded-lg bg-[#FF6B00] px-4 py-3 font-orbitron text-[11px] font-black tracking-wider text-white hover:bg-[#ff8533] transition-all"
+                        className="flex-1 min-w-[200px] flex items-center justify-center gap-2 rounded-lg bg-[#ff4e00] px-4 py-3 font-orbitron text-[11px] font-black tracking-wider text-white hover:bg-[#ff8533] transition-all"
                       >
                         <Download className="h-4 w-4" />
                         EXPORT TOURNAMENT JSON

@@ -8,16 +8,10 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import { safeArray } from '@/components/ErrorBoundary';
 import { MAPS, getMapImages } from '@/lib/maps';
 
-/* ═══ FFWS SCOREBOARD — right panel, rebuilt from reference ═══ */
 
 /* ─── Eliminated Team Banner — 4-player panel ─── */
 export function EliminatedTeamBanner({ team, design }) {
   // team = { name, logo_url, players: [{name, is_alive}, ...] }
-  // design tokens for color matching
-  const accent  = design?.accentColor  || '#FF6B00';
-  const accent2 = design?.accentColor2 || '#00D4FF';
-  const txtCol  = design?.textColor    || '#FFFFFF';
-
   const players = (team?.players || []).slice(0, 4);
   // pad to 4 slots
   while (players.length < 4) players.push({ name: null });
@@ -40,7 +34,7 @@ export function EliminatedTeamBanner({ team, design }) {
             pointerEvents: 'none',
           }}
         >
-          {/* ── LEFT: diagonal slash "ELIMINATED" ── */}
+          {/* ── LEFT panel: angular clip-path diagonal with 'ELIMINATED' on orange background ── */}
           <div style={{
             width: 180,
             height: 160,
@@ -48,50 +42,42 @@ export function EliminatedTeamBanner({ team, design }) {
             overflow: 'hidden',
             marginRight: -1,
           }}>
-            {/* background */}
             <div style={{
               position: 'absolute', inset: 0,
-              background: 'linear-gradient(135deg, ' + accent + ' 0%, ' + accent + ' 60%, ' + accent + 'CC 100%)',
+              background: '#ff4e00',
               clipPath: 'polygon(0 0, 100% 0, 75% 100%, 0 100%)',
             }} />
-            {/* diagonal dark accent line */}
-            <div style={{
-              position: 'absolute', top: '30%', left: '-10%', right: '-10%',
-              height: 2, background: 'rgba(0,0,0,0.25)', transform: 'rotate(-12deg)',
-            }} />
-            {/* text */}
             <div style={{
               position: 'absolute', inset: 0,
               display: 'flex', flexDirection: 'column', justifyContent: 'center',
               paddingLeft: 20, paddingRight: 40,
-              transform: 'skewX(0deg)',
             }}>
               <div style={{
-                fontFamily: 'Orbitron, sans-serif', fontSize: 26, fontWeight: 900,
-                color: '#000', lineHeight: 0.95, letterSpacing: '0.02em',
+                fontFamily: 'Teko, sans-serif', fontSize: 28, fontWeight: 900,
+                color: '#0c0c0e', lineHeight: 0.95, letterSpacing: '2px',
                 textTransform: 'uppercase',
               }}>
                 ELIMINATED
               </div>
               <div style={{
-                fontFamily: 'Orbitron, sans-serif', fontSize: 14, fontWeight: 700,
-                color: 'rgba(0,0,0,0.55)', marginTop: 2,
-                letterSpacing: '0.15em', textTransform: 'uppercase',
+                fontFamily: 'Teko, sans-serif', fontSize: 16, fontWeight: 700,
+                color: 'rgba(12,12,14,0.65)', marginTop: 2,
+                letterSpacing: '2px', textTransform: 'uppercase',
               }}>
                 TEAM
               </div>
             </div>
           </div>
 
-          {/* ── RIGHT: dark panel with team name + 4 players ── */}
+          {/* ── RIGHT panel: dark gunmetal panel with team name + 4 player cards in 2x2 grid ── */}
           <motion.div
             initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
-            transition={{ duration: 0.4, delay: 0.1, ease: 'easeOut' }}
+            transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
             style={{
               width: 380,
               height: 160,
-              background: 'linear-gradient(135deg, #0A0B12 0%, #0D0E16 100%)',
-              borderLeft: '3px solid ' + accent,
+              background: '#141418',
+              borderLeft: '3px solid #ff4e00',
               borderTop: '1px solid rgba(255,255,255,0.08)',
               borderBottom: '1px solid rgba(255,255,255,0.08)',
               boxSizing: 'border-box',
@@ -110,25 +96,25 @@ export function EliminatedTeamBanner({ team, design }) {
             }}>
               {team.logo_url && (
                 <img src={team.logo_url} alt=""
-                  style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 3, flexShrink: 0 }}
+                  style={{ width: 28, height: 28, objectFit: 'contain', borderRadius: 0, flexShrink: 0 }}
                   onError={e => { e.target.style.display = 'none'; }}
                 />
               )}
               {!team.logo_url && (
                 <div style={{
-                  width: 28, height: 28, borderRadius: 3, flexShrink: 0,
+                  width: 28, height: 28, borderRadius: 0, flexShrink: 0,
                   background: 'rgba(255,255,255,0.06)',
                   border: '1px solid rgba(255,255,255,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 900, color: accent }}>
-                    {(team.name || 'T').charAt(0)}
+                  <span style={{ fontFamily: 'Teko', fontSize: 14, fontWeight: 900, color: '#ff4e00' }}>
+                    {(team.name || 'T').charAt(0).toUpperCase()}
                   </span>
                 </div>
               )}
               <span style={{
                 fontFamily: 'Rajdhani, sans-serif', fontSize: 20, fontWeight: 700,
-                color: txtCol, textTransform: 'uppercase', letterSpacing: '0.06em',
+                color: '#FFFFFF', textTransform: 'uppercase', letterSpacing: '2px',
                 overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
               }}>
                 {team.name}
@@ -136,11 +122,11 @@ export function EliminatedTeamBanner({ team, design }) {
               {/* red elim dot */}
               <div style={{
                 marginLeft: 'auto', width: 8, height: 8, borderRadius: '50%',
-                background: '#FF3333', boxShadow: '0 0 8px #FF333388', flexShrink: 0,
+                background: '#ff4e00', boxShadow: '0 0 8px rgba(255,78,0,0.8)', flexShrink: 0,
               }} />
             </div>
 
-            {/* 4 player panels */}
+            {/* 4 player panels (2x2 grid) */}
             <div style={{
               display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '6px 12px',
               flex: 1,
@@ -157,14 +143,13 @@ export function EliminatedTeamBanner({ team, design }) {
                       display: 'flex', alignItems: 'center', gap: 6,
                       padding: '4px 8px',
                       background: hasName ? 'rgba(255,255,255,0.03)' : 'transparent',
-                      borderRadius: 3,
                       border: hasName ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
                     }}
                   >
                     {/* skull / cross icon */}
                     {hasName && (
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                        <path d="M12 2C7.6 2 4 5.6 4 10v4l-2 2v2h4v2h4v-2h4v2h4v-2h4v-2l-2-2v-4c0-4.4-3.6-8-8-8z" fill="#FF3333" opacity="0.7"/>
+                        <path d="M12 2C7.6 2 4 5.6 4 10v4l-2 2v2h4v2h4v-2h4v-2h4v-2l-2-2v-4c0-4.4-3.6-8-8-8z" fill="#ff4e00" opacity="0.9"/>
                         <circle cx="9" cy="10" r="1.5" fill="#000"/>
                         <circle cx="15" cy="10" r="1.5" fill="#000"/>
                       </svg>
@@ -172,7 +157,7 @@ export function EliminatedTeamBanner({ team, design }) {
                     <span style={{
                       fontFamily: 'Rajdhani, sans-serif', fontSize: 13, fontWeight: 600,
                       color: hasName ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.12)',
-                      textTransform: 'uppercase', letterSpacing: '0.03em',
+                      textTransform: 'uppercase', letterSpacing: '1px',
                       overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
                       textDecoration: hasName ? 'line-through' : 'none',
                     }}>
@@ -186,8 +171,7 @@ export function EliminatedTeamBanner({ team, design }) {
             {/* bottom accent bar */}
             <div style={{
               height: 2, marginTop: 6,
-              background: 'linear-gradient(90deg, ' + accent + ', ' + accent2 + ', transparent)',
-              borderRadius: 1,
+              background: 'linear-gradient(90deg, #ff4e00, #ffaa00, transparent)',
             }} />
           </motion.div>
         </motion.div>
@@ -203,10 +187,9 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
   const [elimBanner, setElimBanner] = useState(null);
   const elimTimerRef  = useRef(null);
 
-  // Design tokens
-  const accent  = design?.accentColor  || '#FF6B00';
-  const accent2 = design?.accentColor2 || '#00D4FF';
-  const txtCol  = design?.textColor    || '#FFFFFF';
+  // Design tokens (kept for safety / custom color matching where needed, but we follow spec exactly)
+  const accent  = '#ff4e00';
+  const txtCol  = '#FFFFFF';
 
   const rows = useMemo(() => {
     return [...safeArray(teams)]
@@ -267,13 +250,12 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
   const stageLabel  = (design?.stageLabel || 'GROUP STAGE').toUpperCase();
 
   const green     = '#7BC043';
-  const greenGlow = '#7BC04388';
 
-  // ── FIXED DIMENSIONS ──
-  const HEADER_H = 28;
-  const ROW_H    = 38;
+  // ── FIXED DIMENSIONS FROM SPEC ──
+  const HEADER_H = 34; // height of SCOREBOARD header banner
+  const ROW_H    = 38; // 38px row height
   const FOOTER_H = 28;
-  const PANEL_W  = 242;
+  const PANEL_W  = 280; // wider 280px
 
   const displayRows = rows.length > 0
     ? rows
@@ -293,160 +275,196 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       <motion.div
         initial={{ x: PANEL_W + 20, opacity: 0 }}
         animate={{ x: 0, opacity: 1 }}
+        exit={{ x: PANEL_W + 20, opacity: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
         style={{
           position: 'absolute',
-          right: 0,
+          right: 20,
           top: 60,
           width: PANEL_W,
           height: HEADER_H + ROW_H * 12 + FOOTER_H,
           zIndex: 10,
           display: 'flex',
           flexDirection: 'column',
+          background: 'transparent',
         }}
       >
-        {/* ══ ACCENT HEADER ══ */}
+        {/* ══ ACCENT HEADER: angular clip-path banner with SCOREBOARD ══ */}
         <div style={{
-          width: '100%', height: HEADER_H, background: accent,
-          display: 'flex', alignItems: 'center', flexShrink: 0,
-          padding: '0 8px 0 6px', boxSizing: 'border-box',
+          width: '100%',
+          height: HEADER_H,
+          background: '#ff4e00',
+          display: 'flex',
+          alignItems: 'center',
+          flexShrink: 0,
+          padding: '0 12px',
+          boxSizing: 'border-box',
+          clipPath: 'polygon(12px 0, 100% 0, 100% 100%, 0 100%)',
         }}>
-          <div style={{ width: 20, flexShrink: 0 }} />
-          <div style={{ width: 20, flexShrink: 0 }} />
-          <div style={{ flex: 1, fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: '#000', letterSpacing: '0.1em' }}>TEAM</div>
-          <div style={{ width: 58, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: '#000', letterSpacing: '0.09em' }}>ALIVE</div>
-          <div style={{ width: 26, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: '#000', letterSpacing: '0.09em' }}>PTS</div>
-          <div style={{ width: 26, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: '#000', letterSpacing: '0.07em' }}>ELMS</div>
+          <div style={{
+            flex: 1,
+            fontFamily: 'Teko, sans-serif',
+            fontSize: 22,
+            fontWeight: 800,
+            color: '#0c0c0e',
+            letterSpacing: '2px',
+            textTransform: 'uppercase',
+            paddingLeft: 10,
+          }}>
+            SCOREBOARD
+          </div>
+          <div style={{ width: 44, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>ALIVE</div>
+          <div style={{ width: 32, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>PTS</div>
+          <div style={{ width: 32, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>ELM</div>
         </div>
 
         {/* ══ ROWS ══ */}
-        {displayRows.map((team, idx) => {
-          const rank      = idx + 1;
-          const isGhost   = !!team._isGhost;
-          const isElim    = !isGhost && team.aliveCount === 0 && team.totalPlayers > 0;
-          const rankColor = rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'rgba(255,255,255,0.3)';
+        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+          {displayRows.map((team, idx) => {
+            const rank      = idx + 1;
+            const isGhost   = !!team._isGhost;
+            const isElim    = !isGhost && team.aliveCount === 0 && team.totalPlayers > 0;
 
-          return (
-            <motion.div
-              key={team.id || idx}
-              initial={!isGhost ? { x: 50, opacity: 0 } : false}
-              animate={!isGhost ? { x: 0, opacity: 1 } : {}}
-              transition={{ duration: 0.25, delay: 0.05 + idx * 0.025, ease: 'easeOut' }}
-              style={{
-                width: '100%', height: ROW_H, flexShrink: 0,
-                display: 'flex', alignItems: 'center',
-                background: '#0A0B0F',
-                borderBottom: '1px solid rgba(255,255,255,0.05)',
-                borderLeft: team.champion_rush_eligible ? '3px solid #FFC700' : rank <= 3 ? '3px solid ' + rankColor : '3px solid transparent',
-                padding: '0 8px 0 5px', boxSizing: 'border-box',
-                opacity: isElim ? 0.28 : isGhost ? 0.2 : 1,
-                transition: 'opacity 0.4s ease',
-                position: 'relative', overflow: 'hidden',
-                boxShadow: team.champion_rush_eligible && !isElim ? 'inset 0 0 8px rgba(255, 199, 0, 0.15)' : 'none',
-              }}
-            >
-              {/* Rank */}
-              <div style={{
-                width: 20, flexShrink: 0, textAlign: 'center',
-                fontFamily: 'Rajdhani, sans-serif', fontSize: 12, fontWeight: 700,
-                color: isGhost ? 'rgba(255,255,255,0.1)' : team.champion_rush_eligible ? '#FFC700' : rankColor,
-                textShadow: team.champion_rush_eligible && !isGhost ? '0 0 6px rgba(255, 199, 0, 0.6)' : 'none',
-              }}>{rank}</div>
+            // Rank 1-3 get gold/silver/bronze left accent border.
+            // Champion rush eligible teams get gold border with subtle glow.
+            const rankColor = rank === 1 ? '#ffaa00' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'transparent';
+            const isChampionRush = team.champion_rush_eligible === true;
+            
+            let borderLeftStyle = '3px solid transparent';
+            let boxShadowStyle = 'none';
+            if (isChampionRush && !isElim && !isGhost) {
+              borderLeftStyle = '4px solid #ffaa00';
+              boxShadowStyle = '0 0 10px rgba(255,170,0,0.25)';
+            } else if (rank <= 3 && !isGhost) {
+              borderLeftStyle = `3.5px solid ${rankColor}`;
+            }
 
-              {/* Logo */}
-              <div style={{ width: 20, flexShrink: 0, display: 'flex', justifyContent: 'center' }}>
-                {!isGhost && team.logo_url ? (
-                  <img src={team.logo_url} alt="" style={{ width: 16, height: 16, objectFit: 'contain', borderRadius: 2 }}
-                    onError={e => { e.target.style.display = 'none'; }} />
-                ) : (
-                  <div style={{
-                    width: 16, height: 16, borderRadius: 2,
-                    background: 'rgba(255,255,255,0.05)',
-                    border: '1px solid rgba(255,255,255,0.07)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                  }}>
-                    {!isGhost && (
-                      <span style={{ fontFamily: 'Orbitron', fontSize: 6, fontWeight: 900, color: 'rgba(255,255,255,0.25)' }}>
-                        {(team.name || 'T').charAt(0)}
-                      </span>
-                    )}
-                  </div>
-                )}
-              </div>
+            return (
+              <motion.div
+                key={team.id || idx}
+                initial={{ x: 50, opacity: 0 }}
+                animate={{ x: 0, opacity: isElim ? 0.28 : isGhost ? 0.15 : 1 }}
+                transition={{ duration: 0.35, delay: idx * 0.025, ease: [0.16, 1, 0.3, 1] }}
+                style={{
+                  width: '100%',
+                  height: ROW_H,
+                  flexShrink: 0,
+                  display: 'flex',
+                  alignItems: 'center',
+                  background: '#0c0c0e',
+                  borderBottom: '1px solid rgba(255,255,255,0.05)',
+                  borderLeft: borderLeftStyle,
+                  boxShadow: boxShadowStyle,
+                  padding: '0 12px 0 8px',
+                  boxSizing: 'border-box',
+                  clipPath: 'polygon(8px 0, 100% 0, 100% 100%, 0 100%)',
+                  position: 'relative',
+                  overflow: 'hidden',
+                }}
+              >
+                {/* Rank */}
+                <div style={{
+                  width: 20, flexShrink: 0, textAlign: 'center',
+                  fontFamily: 'Rajdhani, sans-serif', fontSize: 13, fontWeight: 700,
+                  color: isGhost ? 'rgba(255,255,255,0.15)' : isChampionRush ? '#ffaa00' : rank <= 3 ? rankColor : '#888888',
+                  textShadow: isChampionRush && !isGhost ? '0 0 6px rgba(255, 170, 0, 0.6)' : 'none',
+                }}>{rank}</div>
 
-              {/* Team name — uses design textColor */}
-              <div style={{
-                flex: 1, paddingLeft: 3,
-                fontFamily: 'Rajdhani, sans-serif', fontSize: 12, fontWeight: 700,
-                color: isGhost ? 'transparent' : isElim ? 'rgba(255,255,255,0.18)' : txtCol,
-                textTransform: 'uppercase', letterSpacing: '0.04em',
-                overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                position: 'relative',
-              }}>
-                {isGhost ? '' : (team.name || 'TEAM')}
-                {isElim && !isGhost && (
-                  <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.3 }}
-                    style={{ position: 'absolute', left: 3, right: 0, top: '50%', height: 1, background: '#ff4444', transformOrigin: 'left', opacity: 0.45 }} />
-                )}
-              </div>
+                {/* Logo */}
+                <div style={{ width: 26, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                  {!isGhost && team.logo_url ? (
+                    <img src={team.logo_url} alt="" style={{ width: 20, height: 20, objectFit: 'contain', borderRadius: 0 }}
+                      onError={e => { e.target.style.display = 'none'; }} />
+                  ) : (
+                    <div style={{
+                      width: 20, height: 20, borderRadius: 0,
+                      background: 'rgba(255,255,255,0.05)',
+                      border: '1px solid rgba(255,255,255,0.07)',
+                      display: 'flex', alignItems: 'center', justifyContent: 'center',
+                    }}>
+                      {!isGhost && (
+                        <span style={{ fontFamily: 'Teko', fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.25)' }}>
+                          {(team.name || 'T').charAt(0).toUpperCase()}
+                        </span>
+                      )}
+                    </div>
+                  )}
+                </div>
 
-              {/* Alive bars */}
-              <div style={{ width: 58, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 3, flexShrink: 0 }}>
-                {team.slots.map((slot, si) => {
-                  const bg = isGhost
-                    ? 'rgba(255,255,255,0.04)'
-                    : slot.alive
-                      ? green
-                      : slot.name === null
-                        ? 'rgba(255,255,255,0.04)'
-                        : 'rgba(255,255,255,0.09)';
-                  return (
-                    <motion.div key={si} animate={{ backgroundColor: bg }} transition={{ duration: 0.25 }}
-                      style={{
-                        width: 9, height: 18, borderRadius: 2, flexShrink: 0,
-                        boxShadow: !isGhost && slot.alive ? '0 0 4px ' + greenGlow : 'none',
-                      }}
-                    />
-                  );
-                })}
-              </div>
+                {/* Team name */}
+                <div style={{
+                  flex: 1, paddingLeft: 6,
+                  fontFamily: 'Rajdhani, sans-serif', fontSize: 12, fontWeight: 700,
+                  color: isGhost ? 'rgba(255,255,255,0.15)' : isElim ? 'rgba(255,255,255,0.3)' : txtCol,
+                  textTransform: 'uppercase', letterSpacing: '1px',
+                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
+                  position: 'relative',
+                }}>
+                  {isGhost ? 'GHOST TEAM' : (team.name || 'TEAM')}
+                  {isElim && !isGhost && (
+                    <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.3 }}
+                      style={{ position: 'absolute', left: 6, right: 0, top: '50%', height: 1.5, background: '#ff4e00', transformOrigin: 'left', opacity: 0.8 }} />
+                  )}
+                </div>
 
-              {/* PTS — uses design textColor */}
-              <div style={{
-                width: 26, textAlign: 'center', flexShrink: 0,
-                fontFamily: 'Rajdhani, sans-serif', fontSize: 14, fontWeight: 700,
-                color: isGhost ? 'rgba(255,255,255,0.06)' : isElim ? 'rgba(255,255,255,0.15)' : txtCol,
-              }}>
-                {isGhost ? '' : (team.total_tournament_points ?? 0)}
-              </div>
+                {/* Alive bars */}
+                <div style={{ width: 44, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+                  {team.slots.map((slot, si) => {
+                    const bg = isGhost
+                      ? 'rgba(255,255,255,0.04)'
+                      : slot.alive
+                        ? green
+                        : slot.name === null
+                          ? 'rgba(255,255,255,0.04)'
+                          : 'rgba(255,255,255,0.09)';
+                    return (
+                      <motion.div key={si} animate={{ backgroundColor: bg }} transition={{ duration: 0.25 }}
+                        style={{
+                          width: 8, height: 18, borderRadius: 0, flexShrink: 0,
+                          boxShadow: !isGhost && slot.alive ? '0 0 4px ' + green : 'none',
+                        }}
+                      />
+                    );
+                  })}
+                </div>
 
-              {/* ELIMS — uses design accent */}
-              <div style={{
-                width: 26, textAlign: 'center', flexShrink: 0,
-                fontFamily: 'Rajdhani, sans-serif', fontSize: 13, fontWeight: 700,
-                color: isGhost ? 'rgba(255,255,255,0.04)' : isElim ? 'rgba(' + parseInt(accent.slice(1,3),16) + ',' + parseInt(accent.slice(3,5),16) + ',' + parseInt(accent.slice(5,7),16) + ',0.2)' : accent,
-              }}>
-                {isGhost ? '' : (team.total_tournament_kills ?? 0)}
-              </div>
-            </motion.div>
-          );
-        })}
+                {/* PTS */}
+                <div style={{
+                  width: 32, textAlign: 'center', flexShrink: 0,
+                  fontFamily: 'Rajdhani, sans-serif', fontSize: 14, fontWeight: 700,
+                  color: isGhost ? 'rgba(255,255,255,0.1)' : isElim ? 'rgba(255,255,255,0.3)' : txtCol,
+                }}>
+                  {isGhost ? '0' : (team.total_tournament_points ?? 0)}
+                </div>
+
+                {/* ELIMS */}
+                <div style={{
+                  width: 32, textAlign: 'center', flexShrink: 0,
+                  fontFamily: 'Rajdhani, sans-serif', fontSize: 14, fontWeight: 700,
+                  color: isGhost ? 'rgba(255,255,255,0.1)' : isElim ? 'rgba(255,255,255,0.3)' : '#ff4e00',
+                }}>
+                  {isGhost ? '0' : (team.total_tournament_kills ?? 0)}
+                </div>
+              </motion.div>
+            );
+          })}
+        </div>
 
         {/* ══ FOOTER ══ */}
         <div style={{
-          width: '100%', height: FOOTER_H, background: '#06070A', flexShrink: 0,
+          width: '100%', height: FOOTER_H, background: '#141418', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 10px', boxSizing: 'border-box',
-          borderTop: '2px solid ' + accent,
+          padding: '0 12px', boxSizing: 'border-box',
+          borderTop: '2px solid #ff4e00',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
             {design?.logoUrl
               ? <img src={design.logoUrl} alt="" style={{ height: 16, objectFit: 'contain' }} onError={e => { e.target.style.display = 'none'; }} />
-              : <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: accent, letterSpacing: '0.12em' }}>{brandLabel}</span>
+              : <span style={{ fontFamily: 'Teko, sans-serif', fontSize: 16, fontWeight: 900, color: '#ff4e00', letterSpacing: '1px' }}>{brandLabel}</span>
             }
-            <span style={{ fontFamily: 'Orbitron', fontSize: 6, fontWeight: 900, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.14em' }}>{stageLabel}</span>
+            <span style={{ fontFamily: 'Teko, sans-serif', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>{stageLabel}</span>
           </div>
-          <span style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.08em' }}>
+          <span style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>
             {dayLabel} · {matchLabel.toUpperCase()}
           </span>
         </div>
@@ -1284,321 +1302,388 @@ export function PointRushStandings({ teams = [], design }) {
 
   const col1 = sorted.slice(0, 6);
   const col2 = sorted.slice(6, 12);
-  const tLogo = design?.logoUrl || null;
-  const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
-  const sponsorLogo = design?.sponsorLogoUrl || null;
-  const rankColors = ['#FFD700', '#C0C0C0', '#CD7F32'];
-
-  // Editable from Director panel — design.pointRush object
-  const pr = design?.pointRush || {};
-  const gradStart = pr.gradientStart || '#020B18';
-  const gradMid   = pr.gradientMid   || '#040F2A';
-  const gradEnd   = pr.gradientEnd   || '#061535';
-  const footerText = pr.footerText || '#Rise to THE SUMMIT';
-  const showHazard = pr.hazardTape !== false; // default true
-  const headerText = pr.headerText || 'POINT RUSH STANDINGS';
-
-  // Hazard tape corner component
-  const HazardCorner = ({ position }) => {
-    const posStyles = {
-      topLeft:     { top: -40, left: -40, transform: 'rotate(-45deg)' },
-      topRight:    { top: -40, right: -40, transform: 'rotate(45deg)' },
-      bottomLeft:  { bottom: -40, left: -40, transform: 'rotate(45deg)' },
-      bottomRight: { bottom: -40, right: -40, transform: 'rotate(-45deg)' },
-    };
-    return (
-      <div style={{
-        position: 'absolute', width: 180, height: 180, zIndex: 5,
-        ...posStyles[position],
-        backgroundImage: 'repeating-linear-gradient(-45deg, #FFC700, #FFC700 15px, #000 15px, #000 30px)',
-        boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255,199,0,0.2)',
-        borderBottom: position.includes('top') ? '4px solid #fff' : 'none',
-        borderTop: position.includes('bottom') ? '4px solid #fff' : 'none',
-      }} />
-    );
-  };
-
-  const renderRow = (team, idx, globalRank) => {
-    const rank = globalRank;
-    const isTop = rank <= 3;
-    const rankColor = isTop ? rankColors[rank - 1] : '#fff';
-    const rowBg = rank === 1
-      ? 'linear-gradient(90deg, rgba(255,215,0,0.12), rgba(255,215,0,0.03))'
-      : idx % 2 === 0
-        ? 'rgba(255,255,255,0.04)'
-        : 'rgba(255,255,255,0.01)';
-
-    return (
-      <motion.div
-        key={team.id || idx}
-        initial={{ opacity: 0, x: -20 }}
-        animate={{ opacity: 1, x: 0 }}
-        transition={{ duration: 0.4, delay: idx * 0.05 }}
-        style={{
-          display: 'flex', alignItems: 'center', height: 56,
-          background: rowBg,
-          borderBottom: '1px solid rgba(255,255,255,0.06)',
-          borderRadius: 6,
-          padding: '0 14px',
-          marginBottom: 4,
-          backdropFilter: 'blur(4px)',
-        }}>
-        {/* Rank badge */}
-        <div style={{
-          width: 36, height: 36, borderRadius: 8,
-          background: rank === 1
-            ? 'linear-gradient(135deg, rgba(255,215,0,0.25), rgba(255,215,0,0.05))'
-            : 'rgba(0,0,0,0.5)',
-          border: rank <= 3
-            ? `1px solid ${rankColors[rank-1]}66`
-            : '1px solid rgba(255,255,255,0.1)',
-          display: 'flex', alignItems: 'center', justifyContent: 'center',
-          fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: rankColor,
-          flexShrink: 0,
-          boxShadow: rank <= 3 ? `0 0 10px ${rankColors[rank-1]}33` : 'none',
-        }}>
-          {rank}
-        </div>
-        {/* Team logo */}
-        <div style={{ width: 40, display: 'flex', justifyContent: 'center' }}>
-          {team.logo_url ? (
-            <img src={team.logo_url} alt="" style={{
-              width: 32, height: 32, objectFit: 'contain', borderRadius: '50%',
-              border: rank === 1 ? '2px solid #FFD700' : '1px solid rgba(255,255,255,0.15)',
-            }}
-              onError={e => { e.target.style.display = 'none'; }} />
-          ) : (
-            <div style={{
-              width: 32, height: 32, borderRadius: '50%',
-              background: 'rgba(255,255,255,0.08)',
-              border: '1px solid rgba(255,255,255,0.15)',
-              display: 'flex', alignItems: 'center', justifyContent: 'center',
-            }}>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.6)' }}>
-                {(team.name || 'T').charAt(0)}
-              </span>
-            </div>
-          )}
-        </div>
-        {/* Team name */}
-        <div style={{
-          flex: 1, paddingLeft: 12,
-          fontFamily: 'Orbitron', fontSize: 15, fontWeight: 900,
-          color: rank === 1 ? '#FFD700' : '#fff',
-          textTransform: 'uppercase', letterSpacing: '0.04em',
-          overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-        }}>
-          {team.name || 'TEAM'}
-        </div>
-        {/* Placement Points (PPT) */}
-        <div style={{
-          fontFamily: 'Rajdhani', fontSize: 14, fontWeight: 700,
-          color: '#00D4FF', minWidth: 36, textAlign: 'right',
-        }}>
-          {(() => { const kk=(team.total_tournament_kills||0); const tp=(team.total_tournament_points||0); return tp-kk; })()}
-        </div>
-        {/* Kills */}
-        <div style={{
-          fontFamily: 'Rajdhani', fontSize: 14, fontWeight: 700,
-          color: 'rgba(255,255,255,0.4)', minWidth: 36, textAlign: 'right',
-        }}>
-          {team.total_tournament_kills || 0}
-        </div>
-        {/* Kill Points */}
-        <div style={{
-          fontFamily: 'Rajdhani', fontSize: 14, fontWeight: 700,
-          color: '#22c55e', minWidth: 42, textAlign: 'right',
-        }}>
-          {team.total_tournament_kills || 0}
-        </div>
-        {/* Divider */}
-        <div style={{ width: 1, height: 24, background: 'rgba(255,255,255,0.1)', margin: '0 10px' }} />
-        {/* Total points */}
-        <div style={{
-          fontFamily: 'Rajdhani', fontSize: 24, fontWeight: 900,
-          color: rank === 1 ? '#FFD700' : '#fff',
-          minWidth: 56, textAlign: 'right',
-          textShadow: rank === 1 ? '0 0 12px rgba(255,215,0,0.4)' : 'none',
-        }}>
-          {team.total_tournament_points || 0}
-        </div>
-      </motion.div>
-    );
-  };
 
   return (
     <div style={{
-      width: '100%', height: '100%', position: 'relative', overflow: 'hidden',
-      background: `linear-gradient(135deg, ${gradStart} 0%, ${gradMid} 50%, ${gradEnd} 100%)`,
+      width: '100%',
+      height: '100%',
+      display: 'flex',
+      alignItems: 'center',
+      justifyContent: 'center',
+      background: 'transparent',
+      pointerEvents: 'none',
+      position: 'relative'
     }}>
-      {/* Dark overlay for readability */}
+      {/* Outer Centered Board Container */}
       <div style={{
-        position: 'absolute', inset: 0,
-        background: 'rgba(0,0,0,0.35)',
-      }} />
-      {/* Subtle grid pattern */}
-      <div style={{
-        position: 'absolute', inset: 0, opacity: 0.04,
-        backgroundImage: `
-          linear-gradient(rgba(255,255,255,0.5) 1px, transparent 1px),
-          linear-gradient(90deg, rgba(255,255,255,0.5) 1px, transparent 1px)
-        `,
-        backgroundSize: '40px 40px',
-      }} />
-      {/* Ambient glow */}
-      <div style={{
-        position: 'absolute', inset: 0,
-        background: `radial-gradient(ellipse 800px 400px at 50% 30%, ${gradMid}33, transparent 70%)`,
-      }} />
-
-      {/* Hazard tape corners */}
-      {showHazard && (
-        <>
-          <HazardCorner position="topLeft" />
-          <HazardCorner position="topRight" />
-          <HazardCorner position="bottomLeft" />
-          <HazardCorner position="bottomRight" />
-        </>
-      )}
-
-      <motion.div
-        initial={{ opacity: 0, y: 20 }}
-        animate={{ opacity: 1, y: 0 }}
-        transition={{ duration: 0.5 }}
-        style={{
-          position: 'relative', zIndex: 10, width: '100%', height: '100%',
-          padding: '56px 72px', display: 'flex', flexDirection: 'column',
+        width: 740,
+        display: 'flex',
+        flexDirection: 'column',
+        gap: 12,
+        pointerEvents: 'auto'
+      }}>
+        
+        {/* Main Content: Dual-Column side-by-side */}
+        <div style={{
+          display: 'grid',
+          gridTemplateColumns: '1fr 1fr',
+          gap: 20
         }}>
-        {/* Header */}
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 32 }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 18 }}>
-            {tLogo && (
-              <img src={tLogo} alt="" style={{ height: 48, objectFit: 'contain', filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))' }}
-                onError={e => { e.target.style.display = 'none'; }} />
-            )}
-            <div>
-              <div style={{
-                fontFamily: 'Orbitron', fontSize: 52, fontWeight: 900, color: '#fff',
-                letterSpacing: '0.12em', lineHeight: 1,
-                textShadow: '0 4px 20px rgba(0,0,0,0.5)',
+          {/* LEFT COLUMN: STANDINGS */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {/* Left Header */}
+            <div style={{
+              background: '#ff4e00',
+              padding: '6px 16px',
+              clipPath: 'polygon(0% 0%, 100% 0%, 88% 100%, 0% 100%)',
+              height: 34,
+              display: 'flex',
+              alignItems: 'center',
+              boxSizing: 'border-box'
+            }}>
+              <span style={{
+                fontFamily: 'Teko, sans-serif',
+                fontSize: 22,
+                fontWeight: 600,
+                color: '#0c0c0e',
+                letterSpacing: '2px',
+                lineHeight: 1,
+                textTransform: 'uppercase'
               }}>
-                {headerText}
-              </div>
-              <div style={{
-                fontFamily: 'Orbitron', fontSize: 14, fontWeight: 700,
-                color: 'rgba(255,255,255,0.6)', letterSpacing: '0.25em', marginTop: 8,
-              }}>
-                {tName} // GRAND FINALS
-              </div>
+                STANDINGS
+              </span>
+            </div>
+
+            {/* Left Column Rows */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {col1.map((team, idx) => {
+                const rank = idx + 1;
+                const isRushEligible = team.champion_rush_eligible === true;
+                
+                // Rank Badges Styled Gradients
+                let rankBadgeBg = 'rgba(255, 255, 255, 0.05)';
+                let rankBadgeColor = '#ffffff';
+                let rankBadgeBorder = '1px solid rgba(255, 255, 255, 0.1)';
+                
+                if (rank === 1) {
+                  rankBadgeBg = 'linear-gradient(135deg, #ffaa00, #ff8800)';
+                  rankBadgeColor = '#0c0c0e';
+                  rankBadgeBorder = 'none';
+                } else if (rank === 2) {
+                  rankBadgeBg = 'linear-gradient(135deg, #C0C0C0, #909090)';
+                  rankBadgeColor = '#0c0c0e';
+                  rankBadgeBorder = 'none';
+                } else if (rank === 3) {
+                  rankBadgeBg = 'linear-gradient(135deg, #CD7F32, #8B4513)';
+                  rankBadgeColor = '#ffffff';
+                  rankBadgeBorder = 'none';
+                }
+
+                return (
+                  <motion.div
+                    key={team.id || idx}
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 100 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 120,
+                      damping: 18,
+                      delay: idx * 0.05
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      height: 46,
+                      background: '#141418',
+                      clipPath: 'polygon(6% 0%, 100% 0%, 100% 100%, 0% 100%)',
+                      border: isRushEligible ? '1.5px solid #ffaa00' : 'none',
+                      boxShadow: isRushEligible ? 'inset 0 0 8px rgba(255, 170, 0, 0.25)' : 'none',
+                      padding: '0 12px 0 16px',
+                      position: 'relative',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    {/* Rank Badge */}
+                    <div style={{
+                      width: 24,
+                      height: 24,
+                      background: rankBadgeBg,
+                      border: rankBadgeBorder,
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontFamily: 'Teko, sans-serif',
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: rankBadgeColor,
+                      marginRight: 10,
+                      flexShrink: 0
+                    }}>
+                      {rank}
+                    </div>
+
+                    {/* Team Logo */}
+                    {team.logo_url ? (
+                      <img src={team.logo_url} alt="" style={{
+                        width: 24,
+                        height: 24,
+                        objectFit: 'contain',
+                        marginRight: 10,
+                        flexShrink: 0
+                      }} onError={e => { e.target.style.display = 'none'; }} />
+                    ) : (
+                      <div style={{
+                        width: 24,
+                        height: 24,
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: 10,
+                        flexShrink: 0
+                      }}>
+                        <span style={{ fontFamily: 'Rajdhani', fontSize: 10, fontWeight: 700, color: '#fff' }}>
+                          {(team.name || 'T').charAt(0)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Team Name */}
+                    <div style={{
+                      flex: 1,
+                      fontFamily: 'Rajdhani, sans-serif',
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {team.name || 'TEAM'}
+                    </div>
+
+                    {/* Kills */}
+                    <div style={{
+                      fontFamily: 'Rajdhani, sans-serif',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'rgba(255,255,255,0.6)',
+                      marginRight: 16,
+                      textAlign: 'right',
+                      minWidth: 32
+                    }}>
+                      {team.total_tournament_kills || 0} K
+                    </div>
+
+                    {/* Total Points */}
+                    <div style={{
+                      fontFamily: 'Teko, sans-serif',
+                      fontSize: 26,
+                      fontWeight: 600,
+                      color: '#ff4e00',
+                      textAlign: 'right',
+                      minWidth: 36
+                    }}>
+                      {team.total_tournament_points || 0}
+                    </div>
+                  </motion.div>
+                );
+              })}
             </div>
           </div>
-          {sponsorLogo && (
-            <img src={sponsorLogo} alt="" style={{
-              height: 48, objectFit: 'contain', opacity: 0.85,
-              filter: 'drop-shadow(0 2px 8px rgba(0,0,0,0.5))',
-            }}
-              onError={e => { e.target.style.display = 'none'; }} />
-          )}
-        </div>
 
-        {/* Column headers */}
-        <div style={{ display: 'flex', gap: 40, marginBottom: 8 }}>
-          {col2.length > 0 ? (
-            <>
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0 14px 8px 62px', borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>TEAM</span>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.15em' }}>PPT</span>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>KILLS</span>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#22c55e', letterSpacing: '0.15em' }}>K.PTS</span>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>PTS</span>
-              </div>
-              <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0 14px 8px 62px', borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>TEAM</span>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.15em' }}>PPT</span>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>KILLS</span>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#22c55e', letterSpacing: '0.15em' }}>K.PTS</span>
-                <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>PTS</span>
-              </div>
-            </>
-          ) : (
-            <div style={{ flex: 1, display: 'flex', justifyContent: 'space-between', padding: '0 14px 8px 62px', borderBottom: '2px solid rgba(255,255,255,0.15)' }}>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>TEAM</span>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#00D4FF', letterSpacing: '0.15em' }}>PPT</span>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>KILLS</span>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: '#22c55e', letterSpacing: '0.15em' }}>K.PTS</span>
-              <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.15em' }}>PTS</span>
+          {/* RIGHT COLUMN: RANKS 7-12 */}
+          <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
+            {/* Right Header */}
+            <div style={{
+              background: '#0c0c0e',
+              padding: '6px 16px',
+              clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 12% 100%)',
+              height: 34,
+              display: 'flex',
+              alignItems: 'center',
+              boxSizing: 'border-box',
+              borderLeft: '2px solid #ff4e00'
+            }}>
+              <span style={{
+                fontFamily: 'Teko, sans-serif',
+                fontSize: 22,
+                fontWeight: 600,
+                color: '#ffffff',
+                letterSpacing: '2px',
+                lineHeight: 1,
+                textTransform: 'uppercase',
+                marginLeft: '12%'
+              }}>
+                LEADERBOARD
+              </span>
             </div>
-          )}
-        </div>
 
-        {/* Two columns */}
-        <div style={{ display: 'flex', gap: 40, flex: 1 }}>
-          <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-            {col1.map((team, idx) => renderRow(team, idx, idx + 1))}
+            {/* Right Column Rows */}
+            <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+              {col2.map((team, idx) => {
+                const rank = idx + 7;
+                const isRushEligible = team.champion_rush_eligible === true;
+                
+                return (
+                  <motion.div
+                    key={team.id || idx}
+                    initial={{ opacity: 0, x: 100 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    exit={{ opacity: 0, x: 100 }}
+                    transition={{
+                      type: 'spring',
+                      stiffness: 120,
+                      damping: 18,
+                      delay: (idx + 6) * 0.05
+                    }}
+                    style={{
+                      display: 'flex',
+                      alignItems: 'center',
+                      height: 46,
+                      background: '#141418',
+                      clipPath: 'polygon(6% 0%, 100% 0%, 100% 100%, 0% 100%)',
+                      border: isRushEligible ? '1.5px solid #ffaa00' : 'none',
+                      boxShadow: isRushEligible ? 'inset 0 0 8px rgba(255, 170, 0, 0.25)' : 'none',
+                      padding: '0 12px 0 16px',
+                      position: 'relative',
+                      boxSizing: 'border-box'
+                    }}
+                  >
+                    {/* Rank Badge */}
+                    <div style={{
+                      width: 24,
+                      height: 24,
+                      background: 'rgba(255, 255, 255, 0.05)',
+                      border: '1px solid rgba(255, 255, 255, 0.1)',
+                      display: 'flex',
+                      alignItems: 'center',
+                      justifyContent: 'center',
+                      fontFamily: 'Teko, sans-serif',
+                      fontSize: 16,
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      marginRight: 10,
+                      flexShrink: 0
+                    }}>
+                      {rank}
+                    </div>
+
+                    {/* Team Logo */}
+                    {team.logo_url ? (
+                      <img src={team.logo_url} alt="" style={{
+                        width: 24,
+                        height: 24,
+                        objectFit: 'contain',
+                        marginRight: 10,
+                        flexShrink: 0
+                      }} onError={e => { e.target.style.display = 'none'; }} />
+                    ) : (
+                      <div style={{
+                        width: 24,
+                        height: 24,
+                        background: 'rgba(255, 255, 255, 0.1)',
+                        display: 'flex',
+                        alignItems: 'center',
+                        justifyContent: 'center',
+                        marginRight: 10,
+                        flexShrink: 0
+                      }}>
+                        <span style={{ fontFamily: 'Rajdhani', fontSize: 10, fontWeight: 700, color: '#fff' }}>
+                          {(team.name || 'T').charAt(0)}
+                        </span>
+                      </div>
+                    )}
+
+                    {/* Team Name */}
+                    <div style={{
+                      flex: 1,
+                      fontFamily: 'Rajdhani, sans-serif',
+                      fontSize: 14,
+                      fontWeight: 700,
+                      color: '#ffffff',
+                      textTransform: 'uppercase',
+                      letterSpacing: '1px',
+                      overflow: 'hidden',
+                      textOverflow: 'ellipsis',
+                      whiteSpace: 'nowrap'
+                    }}>
+                      {team.name || 'TEAM'}
+                    </div>
+
+                    {/* Kills */}
+                    <div style={{
+                      fontFamily: 'Rajdhani, sans-serif',
+                      fontSize: 13,
+                      fontWeight: 600,
+                      color: 'rgba(255,255,255,0.6)',
+                      marginRight: 16,
+                      textAlign: 'right',
+                      minWidth: 32
+                    }}>
+                      {team.total_tournament_kills || 0} K
+                    </div>
+
+                    {/* Total Points */}
+                    <div style={{
+                      fontFamily: 'Teko, sans-serif',
+                      fontSize: 26,
+                      fontWeight: 600,
+                      color: '#ff4e00',
+                      textAlign: 'right',
+                      minWidth: 36
+                    }}>
+                      {team.total_tournament_points || 0}
+                    </div>
+                  </motion.div>
+                );
+              })}
+            </div>
           </div>
-          {col2.length > 0 && (
-            <div style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
-              {col2.map((team, idx) => renderRow(team, idx, idx + 7))}
-            </div>
-          )}
         </div>
 
-        {/* Footer — "#Rise to THE SUMMIT" */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ duration: 0.5, delay: 0.8 }}
-          style={{
-            display: 'flex', alignItems: 'center', justifyContent: 'center',
-            gap: 20, marginTop: 28,
-          }}>
-          {/* Left accent line */}
-          <div style={{ width: 80, height: 2, background: 'linear-gradient(90deg, transparent, rgba(255,199,0,0.6))' }} />
-          {tLogo && (
-            <img src={tLogo} alt="" style={{ height: 28, objectFit: 'contain', opacity: 0.5 }}
-              onError={e => { e.target.style.display = 'none'; }} />
-          )}
+        {/* BOTTOM BRANDING BAR with angular edges */}
+        <div style={{
+          background: '#0c0c0e',
+          height: 38,
+          display: 'flex',
+          alignItems: 'center',
+          justifyContent: 'space-between',
+          padding: '0 24px',
+          clipPath: 'polygon(2% 0%, 98% 0%, 100% 100%, 0% 100%)',
+          borderTop: '2px solid #ff4e00',
+          boxSizing: 'border-box'
+        }}>
           <span style={{
-            fontFamily: 'Orbitron', fontSize: 18, fontWeight: 900,
-            color: '#FFC700', letterSpacing: '0.15em',
-            textShadow: '0 2px 12px rgba(255,199,0,0.4)',
+            fontFamily: 'Rajdhani, sans-serif',
+            fontSize: 12,
+            fontWeight: 700,
+            color: '#ffaa00',
+            letterSpacing: '2px',
+            textTransform: 'uppercase'
           }}>
-            {footerText}
+            FREE FIRE WORLD SERIES
           </span>
-          {sponsorLogo && (
-            <img src={sponsorLogo} alt="" style={{ height: 28, objectFit: 'contain', opacity: 0.5 }}
-              onError={e => { e.target.style.display = 'none'; }} />
-          )}
-          {/* Right accent line */}
-          <div style={{ width: 80, height: 2, background: 'linear-gradient(90deg, rgba(255,199,0,0.6), transparent)' }} />
-        </motion.div>
-      </motion.div>
+          <span style={{
+            fontFamily: 'Rajdhani, sans-serif',
+            fontSize: 12,
+            fontWeight: 700,
+            color: 'rgba(255,255,255,0.6)',
+            letterSpacing: '2px',
+            textTransform: 'uppercase'
+          }}>
+            POINT RUSH STANDINGS
+          </span>
+        </div>
+
+      </div>
     </div>
   );
 }
 
-/* ═══ THEME HELPER (inline copy to avoid circular deps) ═══ */
-function getThemeInline(design) {
-  const style = design?.overlayStyle || 'default';
-  const userAcc = design?.accentColor || null;
-  const userAcc2 = design?.accentColor2 || null;
-  const presets = {
-    default:  { p: '#00C8FF', s: '#1E90FF', glow: true },
-    neon:     { p: '#00FF88', s: '#BF00FF', glow: true },
-    military: { p: '#9ABF30', s: '#C8A850', glow: false },
-    minimal:  { p: '#FFFFFF', s: '#888888', glow: false },
-    retro:    { p: '#FF3030', s: '#FFD700', glow: true },
-  };
-  const t = { ...(presets[style] || presets.default) };
-  if (userAcc && style === 'default') t.p = userAcc;
-  if (userAcc2 && style === 'default') t.s = userAcc2;
-  return t;
-}
-
-// ─────────────────────────────────────────────────────────────────────────────
-// ROADMAP OVERLAY — Full tournament schedule roadmap (stages → days → matches)
-// Shows the entire tournament journey with progress indicators
-// ─────────────────────────────────────────────────────────────────────────────
 export function RoadmapOverlay({ tournament, matches = [], currentMatch, design }) {
   const tLogo = design?.logoUrl || null;
   const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
