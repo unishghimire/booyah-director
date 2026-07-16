@@ -71,6 +71,7 @@ function useOverlayPoll(shareToken) {
           standings:    Array.isArray(json.standings)    ? json.standings    : [],
           matches:      Array.isArray(json.matches)      ? json.matches      : [],
           nextScheduledMatch: json.next_scheduled_match ?? null,
+          championRush: json.champion_rush ?? null,
         });
       } catch (e) {
         if (e?.name === 'AbortError' || !mounted.current) return;
@@ -629,9 +630,12 @@ function FullStandings({ teams = [], design }) {
                 const rank = idx+1;
                 const rc = rank<=3 ? rankColors[rank-1] : '#fff';
                 const rowBg = rank===1 ? 'rgba(255,107,0,0.06)' : rank===2 ? 'rgba(0,212,255,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
+                const crEligible = team.champion_rush_eligible;
+                const crBorder = crEligible ? '4px solid #FFC700' : `4px solid ${rank<=3?rankColors[rank-1]:'transparent'}`;
+                const crBg = crEligible ? 'rgba(255, 199, 0, 0.08)' : rowBg;
                 return (
-                  <div key={team.id||idx} style={{ display:'flex', alignItems:'center', height:52, background:rowBg, borderBottom:'1px solid rgba(255,255,255,0.03)', borderLeft:`4px solid ${rank<=3?rankColors[rank-1]:'transparent'}`, padding:'0 24px' }}>
-                    <div style={{ width:60, textAlign:'center', fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:rc }}>#{rank}</div>
+                  <div key={team.id||idx} style={{ display:'flex', alignItems:'center', height:52, background:crBg, borderBottom:'1px solid rgba(255,255,255,0.03)', borderLeft:crBorder, padding:'0 24px', boxShadow: crEligible ? 'inset 0 0 10px rgba(255, 199, 0, 0.1)' : 'none' }}>
+                    <div style={{ width:60, textAlign:'center', fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:crEligible ? '#FFC700' : rc, textShadow: crEligible ? '0 0 8px rgba(255, 199, 0, 0.5)' : 'none' }}>#{rank}{crEligible && <span style={{ fontSize: 9, marginLeft: 2 }}>🏆</span>}</div>
                     <div style={{ width:40, display:'flex', justifyContent:'center' }}>
                       <TeamLogo team={team} size={28} />
                     </div>
@@ -1956,6 +1960,7 @@ export default function Overlay() {
     tournament,
     matches:      _matches      = [],
     nextScheduledMatch,
+    championRush,
   } = data || {};
 
   const teams        = safeArray(_teams);
@@ -2014,8 +2019,8 @@ export default function Overlay() {
       </>
     ),
     roadmap:         <RoadmapOverlay tournament={tournament} matches={matches} currentMatch={currentMatch} design={design} />,
-    'event-details': <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} />,
-    event_details:   <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} />,
+    'event-details': <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} championRush={championRush} />,
+    event_details:   <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} championRush={championRush} />,
   };
 
   const component = screens[screen] ?? screens[screen?.replace(/-/g,'_')] ?? null;

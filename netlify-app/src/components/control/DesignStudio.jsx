@@ -866,6 +866,11 @@ export default function DesignStudio(props) {
         <DiscordSection tournament={tournament} />
       </Section>
 
+      {/* ── TOURNAMENT SETTINGS (Champion Rush + Headstart) ── */}
+      <Section title="TOURNAMENT SETTINGS" icon={Trophy}>
+        <TournamentSettingsSection tournament={tournament} onAction={onAction} />
+      </Section>
+
       {/* ── LIVE PREVIEW ── */}
       <div className="rounded-xl overflow-hidden border-2" style={{ borderColor: (design?.accentColor || '#f97316') + '55' }}>
         <div className="flex items-center justify-between px-4 py-2.5"

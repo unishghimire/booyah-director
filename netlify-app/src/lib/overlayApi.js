@@ -92,6 +92,8 @@ export const overlayApi = {
   setChampionAndShowScreen: (d) => call('setChampionAndShowScreen', d),
   switchOverlayScreen:      (d) => call('switchOverlayScreen', d),
   declareChampions:         (d) => call('declareChampions', d),
+  applyHeadstartPoints:     (d) => call('applyHeadstartPoints', d),
+  updateTournamentSettings: (d) => call('updateTournamentSettings', d),
   saveDesign:               (d) => call('saveDesign', d),
   getDesign:                ()  => call('getDesign', {}, 'GET'),
   resetMatch:               (d) => call('resetMatch', d),
@@ -120,6 +122,9 @@ function normalise(raw) {
     killFeed:     Array.isArray(raw.kill_feed)    ? raw.kill_feed    : [],
     eliminations: Array.isArray(raw.eliminations) ? raw.eliminations : [],
     standings:    Array.isArray(raw.standings)    ? raw.standings    : [],
+    championRush: raw.champion_rush ?? null,
+    matches:      Array.isArray(raw.matches)      ? raw.matches      : [],
+    nextScheduledMatch: raw.next_scheduled_match ?? null,
   };
 }
 

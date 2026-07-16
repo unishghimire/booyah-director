@@ -165,6 +165,7 @@ function FormatBuilder({ format, setFormat }) {
 export default function TournamentSetup({ onCreated }) {
   const [name, setName] = useState('');
   const [pointsPerKill, setPointsPerKill] = useState(1);
+  const [championRushThreshold, setChampionRushThreshold] = useState(80);
   const [placements, setPlacements] = useState(DEFAULT_PLACEMENTS);
   const [showPlacements, setShowPlacements] = useState(false);
   const [teams, setTeams] = useState([{ ...EMPTY_TEAM }]);
@@ -190,6 +191,7 @@ export default function TournamentSetup({ onCreated }) {
       const res = await overlayApi.initializeTournament({
         name: name.trim(), total_matches: totalMatches, points_per_kill: Number(pointsPerKill),
         placement_points_config: placements, format_config: format,
+        champion_rush_threshold: Number(championRushThreshold) || 0,
       });
       const tid = res?.tournament?.id;
       if (tid) {
@@ -215,7 +217,7 @@ export default function TournamentSetup({ onCreated }) {
           <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. BOOYAH CUP 2026"
             className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none focus:border-[#FF6B00]/60 font-orbitron tracking-wider" />
         </div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="font-orbitron text-[10px] text-gray-500 tracking-wider block mb-1.5">POINTS / KILL</label>
             <input type="number" min={0} value={pointsPerKill} onChange={e => setPointsPerKill(e.target.value)}
@@ -228,7 +230,22 @@ export default function TournamentSetup({ onCreated }) {
               <span className="text-[9px] font-orbitron text-gray-500 whitespace-nowrap">AUTO</span>
             </div>
           </div>
+          <div>
+            <label className="font-orbitron text-[10px] text-gray-500 tracking-wider block mb-1.5">CHAMPION RUSH 🏆</label>
+            <select value={championRushThreshold} onChange={e => setChampionRushThreshold(Number(e.target.value))}
+              className="w-full rounded-lg border border-[#FF6B00]/30 bg-[#FF6B00]/5 px-2 py-2 text-sm text-[#FF6B00] font-bold outline-none focus:border-[#FF6B00]/60">
+              <option value={0}>Disabled</option>
+              <option value={80}>80 Points</option>
+              <option value={90}>90 Points</option>
+              <option value={100}>100 Points</option>
+            </select>
+          </div>
         </div>
+        {championRushThreshold > 0 && (
+          <div className="rounded-lg border border-[#FFC700]/20 bg-[#FFC700]/5 p-2.5 text-[10px] text-gray-400">
+            <span className="font-orbitron font-bold text-[#FFC700] tracking-wider">CHAMPION RUSH ACTIVE:</span> Once a team crosses {championRushThreshold} pts, they must win a Booyah (1st place) to be crowned champions. Point Rush carryovers from previous stages are added to totals.
+          </div>
+        )}
         <div>
           <button type="button" onClick={() => setShowPlacements(!showPlacements)}
             className="flex w-full items-center justify-between rounded-lg border border-white/10 bg-black/30 px-3 py-2 text-xs font-orbitron font-black text-gray-400 hover:text-white tracking-wider">

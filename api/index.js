@@ -308,19 +308,80 @@ function recalcTeamTotals(db, tournament_id) {
     ? db.teams.filter(t => t.tournament_id === tournament_id)
     : db.teams;
 
+  // Get headstart points map for this tournament
+  let headstartMap = {};
+  const tournament = db.tournaments.find(t => t.id === tournament_id);
+  try {
+    if (tournament?.headstart_points) {
+      headstartMap = typeof tournament.headstart_points === 'string'
+        ? JSON.parse(tournament.headstart_points)
+        : tournament.headstart_points;
+    }
+  } catch (_) {}
+
   for (const team of teams) {
     const teamStandings = db.match_standings.filter(s => s.team_id === team.id);
     const teamPlayers   = db.players.filter(p => p.team_id === team.id);
 
-    const totalPoints = teamStandings.reduce((sum, s) => sum + (s.total_match_points || 0), 0);
+    const matchPoints = teamStandings.reduce((sum, s) => sum + (s.total_match_points || 0), 0);
+    const headstart   = headstartMap[team.id] || 0;
+    const totalPoints = matchPoints + headstart;
     const totalKills  = teamPlayers.reduce((sum, p) => sum + (p.total_tournament_kills || 0), 0);
 
     const idx = db.teams.findIndex(t => t.id === team.id);
     if (idx !== -1) {
       db.teams[idx].total_tournament_points = totalPoints;
       db.teams[idx].total_tournament_kills  = totalKills;
+      db.teams[idx].headstart_points = headstart;
     }
   }
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURE 1: Point Rush Carryovers (Headstart Points)
+// Official Garena rule: top finishers from previous stage get bonus starting pts
+// ═══════════════════════════════════════════════════════════════════════════
+const HEADSTART_POINTS_MAP = {
+  1: 10, // 1st place gets 10 headstart points
+  2: 7,  // 2nd gets 7
+  3: 5,  // 3rd gets 5
+  4: 3,  // 4th gets 3
+  5: 2,  // 5th gets 2
+  6: 1   // 6th gets 1
+};
+
+function assignHeadstartPoints(previousStageStandings) {
+  const headstart = {};
+  previousStageStandings.forEach((team, index) => {
+    const rank = index + 1;
+    headstart[team.teamId || team.id] = HEADSTART_POINTS_MAP[rank] || 0;
+  });
+  return headstart;
+}
+
+// ═══════════════════════════════════════════════════════════════════════════
+// FEATURE 2: Champion Rush Threshold (Garena Grand Finals Format)
+// Once a team crosses the threshold (80/90 pts), they must win a Booyah
+// (placement 1) in a subsequent match to be crowned champions.
+// ═══════════════════════════════════════════════════════════════════════════
+function evaluateChampionRush(standings, threshold, latestMatchStandings) {
+  // Identify the Booyah winner (placement 1) in the latest match
+  const booyahWinner = latestMatchStandings?.find(s => s.placement === 1);
+  const booyahWinnerId = booyahWinner ? (booyahWinner.team_id || booyahWinner.teamId) : null;
+
+  return standings.map(team => {
+    const teamId = team.id;
+    const totalPoints = team.total_tournament_points || 0;
+    // Eligible if they have crossed the threshold
+    const isEligible = totalPoints >= threshold;
+    // Tournament winner if they were eligible AND just won the Booyah
+    const isTournamentWinner = isEligible && (teamId === booyahWinnerId);
+    return {
+      ...team,
+      champion_rush_eligible: isEligible,
+      champion_rush_winner: isTournamentWinner
+    };
+  });
 }
 
 module.exports = async (req, res) => {
@@ -472,14 +533,53 @@ module.exports = async (req, res) => {
           });
         }
         const tid = tournament.id;
+        // Get headstart points map
+        let headstartMap = {};
+        try {
+          if (tournament.headstart_points) {
+            headstartMap = typeof tournament.headstart_points === 'string'
+              ? JSON.parse(tournament.headstart_points)
+              : tournament.headstart_points;
+          }
+        } catch (_) {}
+        const championRushThreshold = tournament.champion_rush_threshold || 0;
+
         const teams = db.teams.filter(t => t.tournament_id === tid).map(t => {
-          // total_match_points already includes placement + kills*ppk (set by setTeamPlacement)
           const standingsForTeam = db.match_standings.filter(s => s.tournament_id === tid && s.team_id === t.id);
-          const totalPoints      = standingsForTeam.reduce((sum, s) => sum + (s.total_match_points || 0), 0);
+          const matchPoints      = standingsForTeam.reduce((sum, s) => sum + (s.total_match_points || 0), 0);
+          const headstart        = headstartMap[t.id] || 0;
+          const totalPoints      = matchPoints + headstart;
           const teamPlayers      = db.players.filter(p => p.team_id === t.id);
           const totalKills       = teamPlayers.reduce((sum, p) => sum + (p.total_tournament_kills || 0), 0);
-          return { ...t, total_tournament_kills: totalKills, total_tournament_points: totalPoints };
+          // Champion Rush eligibility
+          const championRushEligible = championRushThreshold > 0 && totalPoints >= championRushThreshold;
+          return {
+            ...t,
+            total_tournament_kills: totalKills,
+            total_tournament_points: totalPoints,
+            headstart_points: headstart,
+            champion_rush_threshold: championRushThreshold,
+            champion_rush_eligible: championRushEligible
+          };
         }).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
+
+        // Check if any team just won the tournament via Champion Rush (Booyah + eligible)
+        let championRushWinner = null;
+        if (championRushThreshold > 0 && currentMatch) {
+          const currentMatchStandings = db.match_standings.filter(s => s.match_id === currentMatch.id);
+          const booyahWinner = currentMatchStandings.find(s => s.placement === 1);
+          if (booyahWinner) {
+            const winnerTeam = teams.find(t => t.id === booyahWinner.team_id);
+            if (winnerTeam && winnerTeam.champion_rush_eligible) {
+              championRushWinner = {
+                team_id: winnerTeam.id,
+                team_name: winnerTeam.name,
+                total_points: winnerTeam.total_tournament_points,
+                total_kills: winnerTeam.total_tournament_kills
+              };
+            }
+          }
+        }
         
         const players = db.players.filter(p => p.tournament_id === tid).map(p => ({ ...p, is_alive: p.is_alive !== undefined ? p.is_alive : true }));
         const matches = db.matches.filter(m => m.tournament_id === tid).sort((a, b) => (b.match_number || 0) - (a.match_number || 0));
@@ -512,6 +612,11 @@ module.exports = async (req, res) => {
             day_label: currentMatch.day_label || null
           } : null,
           next_scheduled_match: nextScheduled,
+          champion_rush: {
+            threshold: championRushThreshold,
+            eligible_teams: teams.filter(t => t.champion_rush_eligible).map(t => ({ id: t.id, name: t.name, points: t.total_tournament_points })),
+            winner: championRushWinner
+          },
           kill_feed: killFeed,
           eliminations,
           standings
@@ -949,6 +1054,8 @@ module.exports = async (req, res) => {
           ? body.placement_points_config
           : JSON.stringify(body.placement_points_config || defaultConfig),
         format_config: formatConfigStr,
+        champion_rush_threshold: parseInt(body.champion_rush_threshold) || 0, // 0 = disabled
+        headstart_points: null, // JSON string, set via applyHeadstartPoints route
         current_match_number: 0,
         current_stage: null,
         status: 'active',
@@ -1469,6 +1576,68 @@ module.exports = async (req, res) => {
       return ok({ success: true });
     }
 
+    // ── APPLY HEADSTART POINTS (Point Rush Carryover) ─────────────────────
+    // Assigns bonus starting points based on previous stage final standings
+    if (route === 'applyHeadstartPoints') {
+      const missing = requireFields(body, ['tournament_id']);
+      if (missing) return err(400, missing);
+
+      const tIdx = db.tournaments.findIndex(t => t.id === body.tournament_id);
+      if (tIdx === -1) return err(404, 'Tournament not found');
+
+      // Option A: Director provides explicit headstart map { teamId: points }
+      // Option B: Director provides previous stage standings and we auto-calculate
+      let headstartMap = {};
+
+      if (body.headstart_points && typeof body.headstart_points === 'object') {
+        // Explicit map provided
+        headstartMap = body.headstart_points;
+      } else if (body.previous_stage_standings && Array.isArray(body.previous_stage_standings)) {
+        // Auto-calculate from previous stage standings
+        headstartMap = assignHeadstartPoints(body.previous_stage_standings);
+      } else {
+        return err(400, 'Provide headstart_points map or previous_stage_standings array');
+      }
+
+      // Sanitize values
+      const cleanMap = {};
+      for (const [tid, pts] of Object.entries(headstartMap)) {
+        cleanMap[sanitizeString(tid)] = parseInt(pts) || 0;
+      }
+
+      db.tournaments[tIdx].headstart_points = JSON.stringify(cleanMap);
+
+      // Recalculate all team totals to include headstart
+      recalcTeamTotals(db, body.tournament_id);
+
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, headstart_points: cleanMap });
+    }
+
+    // ── UPDATE TOURNAMENT SETTINGS (champion rush threshold etc) ──────────
+    if (route === 'updateTournamentSettings') {
+      const missing = requireFields(body, ['tournament_id']);
+      if (missing) return err(400, missing);
+
+      const tIdx = db.tournaments.findIndex(t => t.id === body.tournament_id);
+      if (tIdx === -1) return err(404, 'Tournament not found');
+
+      if (body.champion_rush_threshold !== undefined) {
+        db.tournaments[tIdx].champion_rush_threshold = parseInt(body.champion_rush_threshold) || 0;
+      }
+      if (body.points_per_kill !== undefined) {
+        db.tournaments[tIdx].points_per_kill = parseInt(body.points_per_kill) || 1;
+      }
+      if (body.name !== undefined) {
+        db.tournaments[tIdx].name = sanitizeString(body.name, 100);
+      }
+
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, tournament: db.tournaments[tIdx] });
+    }
+
     // ── DECLARE CHAMPIONS ─────────────────────────────────────────────────
     if (route === 'declareChampions') {
       const missing = requireFields(body, ['tournament_id']);
@@ -1477,10 +1646,67 @@ module.exports = async (req, res) => {
       const tIdx = db.tournaments.findIndex(t => t.id === body.tournament_id);
       if (tIdx !== -1) db.tournaments[tIdx].status = 'completed';
 
+      // Recalc to ensure totals include headstart
+      recalcTeamTotals(db, body.tournament_id);
+
+      const tournament = db.tournaments[tIdx];
+      const championRushThreshold = tournament?.champion_rush_threshold || 0;
       const teams = db.teams.filter(t => t.tournament_id === body.tournament_id).sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
+
+      // Check for Champion Rush winner (team above threshold that got Booyah in last match)
+      let championRushWinner = null;
+      if (championRushThreshold > 0) {
+        const lastMatch = db.matches.filter(m => m.tournament_id === body.tournament_id)
+          .sort((a, b) => (b.match_number || 0) - (a.match_number || 0))[0];
+        if (lastMatch) {
+          const lastStandings = db.match_standings.filter(s => s.match_id === lastMatch.id);
+          const booyahWinner = lastStandings.find(s => s.placement === 1);
+          if (booyahWinner) {
+            const winnerTeam = teams.find(t => t.id === booyahWinner.team_id);
+            if (winnerTeam && (winnerTeam.total_tournament_points || 0) >= championRushThreshold) {
+              championRushWinner = { team_id: winnerTeam.id, team_name: winnerTeam.name, total_points: winnerTeam.total_tournament_points };
+              // Set overlay state to champion screen
+              db.overlay_state = {
+                ...db.overlay_state,
+                current_screen: 'champions',
+                champion_team_id: winnerTeam.id,
+                champion_team_name: winnerTeam.name,
+                champion_total_points: winnerTeam.total_tournament_points || 0,
+                champion_rush: true,
+                last_updated_at: new Date().toISOString()
+              };
+            }
+          }
+        }
+      }
+
+      // If no champion rush winner, declare top team as champion
+      if (!championRushWinner && teams.length > 0) {
+        db.overlay_state = {
+          ...db.overlay_state,
+          current_screen: 'champions',
+          champion_team_id: teams[0].id,
+          champion_team_name: teams[0].name,
+          champion_total_points: teams[0].total_tournament_points || 0,
+          champion_rush: false,
+          last_updated_at: new Date().toISOString()
+        };
+      }
+
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
-      return ok({ success: true, rankings: teams.map((t, i) => ({ rank: i + 1, team: t.name, total_points: t.total_tournament_points, total_kills: t.total_tournament_kills })) });
+      return ok({
+        success: true,
+        champion_rush_winner: championRushWinner,
+        champion_rush_threshold: championRushThreshold,
+        rankings: teams.map((t, i) => ({
+          rank: i + 1,
+          team: t.name,
+          total_points: t.total_tournament_points,
+          total_kills: t.total_tournament_kills,
+          champion_rush_eligible: championRushThreshold > 0 && (t.total_tournament_points || 0) >= championRushThreshold
+        }))
+      });
     }
 
     // ── DELETE TEAM ───────────────────────────────────────────────────────

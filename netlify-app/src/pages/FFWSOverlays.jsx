@@ -337,18 +337,20 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                 display: 'flex', alignItems: 'center',
                 background: '#0A0B0F',
                 borderBottom: '1px solid rgba(255,255,255,0.05)',
-                borderLeft: rank <= 3 ? '3px solid ' + rankColor : '3px solid transparent',
+                borderLeft: team.champion_rush_eligible ? '3px solid #FFC700' : rank <= 3 ? '3px solid ' + rankColor : '3px solid transparent',
                 padding: '0 8px 0 5px', boxSizing: 'border-box',
                 opacity: isElim ? 0.28 : isGhost ? 0.2 : 1,
                 transition: 'opacity 0.4s ease',
                 position: 'relative', overflow: 'hidden',
+                boxShadow: team.champion_rush_eligible && !isElim ? 'inset 0 0 8px rgba(255, 199, 0, 0.15)' : 'none',
               }}
             >
               {/* Rank */}
               <div style={{
                 width: 20, flexShrink: 0, textAlign: 'center',
                 fontFamily: 'Rajdhani, sans-serif', fontSize: 12, fontWeight: 700,
-                color: isGhost ? 'rgba(255,255,255,0.1)' : rankColor,
+                color: isGhost ? 'rgba(255,255,255,0.1)' : team.champion_rush_eligible ? '#FFC700' : rankColor,
+                textShadow: team.champion_rush_eligible && !isGhost ? '0 0 6px rgba(255, 199, 0, 0.6)' : 'none',
               }}>{rank}</div>
 
               {/* Logo */}
@@ -1819,7 +1821,7 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
 // EVENT DETAILS OVERLAY — Shows tournament info, current/next match, format
 // A full-screen "info card" overlay for breaks between matches
 // ─────────────────────────────────────────────────────────────────────────────
-export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMatch, design }) {
+export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMatch, design, championRush }) {
   const tLogo = design?.logoUrl || null;
   const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
   const tSubtitle = design?.tournamentSubtitle || 'FREE FIRE ESPORTS';
@@ -1980,6 +1982,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
               <StatCard label="DAYS" value={totalDays || '—'} accent={accent2} />
               <StatCard label="TOTAL MATCHES" value={totalMatches || tournament?.total_matches || '—'} accent={gold} />
               <StatCard label="POINTS PER KILL" value={ppk} accent={accent} />
+              <StatCard label="RUSH THRESHOLD" value={(tournament?.champion_rush_threshold || 0) > 0 ? tournament.champion_rush_threshold : 'OFF'} accent={gold} />
             </div>
 
             {/* Top placement points */}
@@ -1991,6 +1994,21 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
                     <div key={pos} style={{ flex: 1, textAlign: 'center', borderRadius: 10, padding: '12px 8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
                       <div style={{ fontFamily: 'Orbitron', fontSize: 22, fontWeight: 900, color: pos === '1' ? gold : pos === '2' ? '#c0c0c0' : pos === '3' ? '#cd7f32' : '#fff' }}>#{pos}</div>
                       <div style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>{pts} PTS</div>
+                    </div>
+                  ))}
+                </div>
+              </div>
+            )}
+
+            {/* Champion Rush eligible teams */}
+            {championRush?.eligible_teams?.length > 0 && (
+              <div style={{ borderRadius: 16, border: '1px solid rgba(255,199,0,0.2)', background: 'rgba(255,199,0,0.04)', padding: 20 }}>
+                <div style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 800, color: gold, letterSpacing: '0.3em', marginBottom: 12 }}>🏆 CHAMPION RUSH ELIGIBLE</div>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: 6 }}>
+                  {championRush.eligible_teams.map((t, i) => (
+                    <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', borderRadius: 8, background: 'rgba(255,199,0,0.05)', border: '1px solid rgba(255,199,0,0.1)' }}>
+                      <span style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 800, color: '#fff' }}>{t.name}</span>
+                      <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: gold }}>{t.points} PTS</span>
                     </div>
                   ))}
                 </div>
