@@ -69,13 +69,13 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       initial={{ y: -1080, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      style={{ position: 'absolute', right: 0, top: 40, height: 'calc(100% - 80px)', width: 300, zIndex: 10 }}
+      style={{ position: 'absolute', right: 0, top: 60, height: 'calc(100% - 120px)', width: 300, zIndex: 10 }}
     >
       {/* Panel with diagonal-cut top, glow lines, corner accents */}
       <div style={{
         width: '100%', height: '100%',
-        background: 'linear-gradient(180deg, rgba(8,10,18,0.95) 0%, rgba(6,8,16,0.92) 100%)',
-        backdropFilter: 'blur(16px) saturate(180%)',
+        background: 'transparent',
+        backdropFilter: 'none',
         borderLeft: `1px solid ${primary}33`,
         borderRadius: '8px 0 0 8px',
         boxShadow: `-8px 0 40px rgba(0,0,0,0.5)`,
@@ -97,7 +97,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.4, delay: 0.3 }}
           style={{
-            height: 44, background: 'rgba(0,0,0,0.95)',
+            height: 44, background: 'transparent',
             borderBottom: `1px solid ${primary}33`,
             display: 'flex', alignItems: 'center', justifyContent: 'space-between',
             padding: '0 16px', flexShrink: 0,
@@ -117,7 +117,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
           transition={{ duration: 0.3, delay: 0.45 }}
           style={{
             display: 'flex', alignItems: 'center', height: 22,
-            background: 'rgba(0,0,0,0.7)',
+            background: 'transparent',
             borderBottom: '1px solid rgba(255,255,255,0.04)',
             padding: '0 8px',
             flexShrink: 0,
@@ -261,8 +261,46 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
             );
           })}
           {rows.length === 0 && (
-            <div style={{ flex: 1, display: 'flex', alignItems: 'center', justifyContent: 'center', fontFamily: 'Orbitron', fontSize: 9, color: 'rgba(255,255,255,0.2)', letterSpacing: '0.15em' }}>
-              WAITING FOR DATA...
+            <div style={{ flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center', alignItems: 'center', gap: 6, padding: '12px 0' }}>
+              {[0, 1, 2, 3].map(i => (
+                <div key={i} style={{
+                  display: 'flex', alignItems: 'center', height: 36, width: '100%',
+                  borderBottom: '1px solid rgba(255,255,255,0.03)',
+                  borderLeft: '2px solid rgba(255,255,255,0.06)',
+                  padding: '0 8px', opacity: 0.3,
+                }}>
+                  <div style={{ width: 32, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.2)' }}>
+                    {String(i + 1).padStart(2, '0')}
+                  </div>
+                  <div style={{ width: 26, display: 'flex', justifyContent: 'center' }}>
+                    <div style={{ width: 18, height: 18, borderRadius: 3, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.08)' }} />
+                  </div>
+                  <div style={{ flex: 1, paddingLeft: 4, display: 'flex', alignItems: 'center', gap: 6 }}>
+                    <div style={{ width: 60, height: 8, borderRadius: 2, background: 'rgba(255,255,255,0.06)' }} />
+                  </div>
+                  <div style={{ width: 68, display: 'flex', justifyContent: 'center', gap: 3 }}>
+                    {[0,1,2,3].map(s => <div key={s} style={{ width: 8, height: 18, borderRadius: 2, background: 'rgba(255,255,255,0.04)' }} />)}
+                  </div>
+                  <div style={{ width: 32 }} />
+                  <div style={{ width: 38 }} />
+                </div>
+              ))}
+              <div style={{
+                display: 'flex', alignItems: 'center', gap: 8, marginTop: 10,
+                padding: '8px 16px', borderRadius: 6,
+                border: `1px dashed ${primary}44`,
+                background: `${primary}08`,
+              }}>
+                <div style={{
+                  width: 16, height: 16, borderRadius: '50%',
+                  border: `1.5px solid ${primary}66`,
+                  display: 'flex', alignItems: 'center', justifyContent: 'center',
+                  fontSize: 10, color: primary, fontWeight: 900, lineHeight: 1,
+                }}>+</div>
+                <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 700, color: `${primary}99`, letterSpacing: '0.12em' }}>
+                  ADD TEAMS FROM DIRECTOR
+                </span>
+              </div>
             </div>
           )}
         </div>
@@ -273,7 +311,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
           animate={{ y: 0, opacity: 1 }}
           transition={{ duration: 0.3, delay: 0.5 + rows.length * 0.05 + 0.1 }}
           style={{
-            height: 22, background: 'rgba(0,0,0,0.9)',
+            height: 22, background: 'transparent',
             borderTop: '1px solid rgba(255,255,255,0.04)',
             display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 14,
             flexShrink: 0,
