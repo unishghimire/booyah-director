@@ -28,13 +28,19 @@ function PlayerRow({ player, team, currentMatch, onAction }) {
     if (!currentMatch?.id) { toast.error('No active match'); return; }
     setBusy(true);
     try {
-      await overlayApi.eliminatePlayer({
+      const res = await overlayApi.eliminatePlayer({
         player_id:     player.id,
         match_id:      currentMatch.id,
         player_name:   player.name,
         team_name:     team?.name || '',
         tournament_id: currentMatch.tournament_id || '',
       });
+      // Check if auto-placement was triggered (team fully eliminated)
+      if (res?.auto_placement) {
+        toast.success(`${team?.name}: ELIMINATED → #${res.auto_placement} (${res.auto_standing?.placement_points_awarded || 0} pts)`);
+      } else {
+        toast.success(`${player.name} eliminated`);
+      }
       onAction?.();
     } catch (err) { toast.error(`Elim: ${err.message}`); } finally { setBusy(false); }
   };
@@ -98,11 +104,19 @@ function TeamCard({ team, players, currentMatch, tournament, onAction }) {
     } catch (err) { toast.error(`Placement: ${err.message}`); } finally { setBusy(false); }
   };
 
+  const allDead = teamPlayers.length > 0 && teamPlayers.every(p => p.is_alive === false);
+
   return (
-    <div className="rounded-lg border border-white/10 bg-black/30 p-3">
+    <div className={`rounded-lg border bg-black/30 p-3 ${allDead ? 'border-red-500/30' : 'border-white/10'}`}>
       <div className="mb-2 flex items-center justify-between">
-        <span className="text-sm font-bold text-orange-400">{team.name}</span>
-        <span className="text-[10px] text-gray-500">{teamPlayers.filter(p => p.is_alive).length} alive</span>
+        <span className={`text-sm font-bold ${allDead ? 'text-red-400' : 'text-orange-400'}`}>{team.name}</span>
+        <span className="text-[10px] text-gray-500">
+          {allDead ? (
+            <span className="font-orbitron font-black text-red-400">ELIMINATED #{placement}</span>
+          ) : (
+            <span>{teamPlayers.filter(p => p.is_alive).length} alive</span>
+          )}
+        </span>
       </div>
       <div className="space-y-0.5">
         {teamPlayers.length === 0 && <p className="text-xs text-gray-600">No players</p>}

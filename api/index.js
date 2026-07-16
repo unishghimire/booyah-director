@@ -1161,7 +1161,7 @@ module.exports = async (req, res) => {
       return ok({ success: true, kill });
     }
 
-    // ── ELIMINATE PLAYER ──────────────────────────────────────────────────
+    // ── ELIMINATE PLAYER (auto-placement on team wipe) ────────────────────
     if (route === 'eliminatePlayer') {
       const missing = requireFields(body, ['match_id', 'player_id']);
       if (missing) return err(400, missing);
@@ -1187,9 +1187,75 @@ module.exports = async (req, res) => {
       const pIdx = db.players.findIndex(p => p.id === elim.eliminated_player_id);
       if (pIdx !== -1) db.players[pIdx].is_alive = false;
 
+      // ── AUTO-PLACEMENT: check if team is fully eliminated ──
+      let autoPlacement = null;
+      let autoStanding = null;
+
+      // Find the team of the eliminated player
+      const eliminatedPlayer = pIdx !== -1 ? db.players[pIdx] : null;
+      const teamId = eliminatedPlayer?.team_id || body.team_id;
+
+      if (teamId && resolvedTid) {
+        const teamPlayers = db.players.filter(p => p.team_id === teamId);
+        const allDead = teamPlayers.length > 0 && teamPlayers.every(p => p.is_alive === false);
+
+        if (allDead) {
+          // Count total teams in this tournament
+          const totalTeams = db.teams.filter(t => t.tournament_id === resolvedTid).length;
+          // Count teams already eliminated in this match (already have a standing with placement)
+          const alreadyEliminated = db.match_standings.filter(s =>
+            s.match_id === body.match_id && s.team_id !== teamId
+          ).length;
+
+          // Placement = totalTeams - alreadyEliminated (first eliminated gets worst placement)
+          // e.g. 12 teams, 0 already eliminated → placement 12; 1 already out → placement 11
+          autoPlacement = totalTeams - alreadyEliminated;
+
+          // Get tournament config for placement points
+          const tournament = db.tournaments.find(t => t.id === resolvedTid);
+          let config = { 1:15, 2:12, 3:10, 4:8, 5:6, 6:4, 7:2, 8:1, 9:1, 10:1, 11:1, 12:1 };
+          try {
+            if (tournament?.placement_points_config) config = JSON.parse(tournament.placement_points_config);
+          } catch (_) {}
+
+          const placementPts = config[autoPlacement] || 0;
+          const teamKills = teamPlayers.reduce((sum, p) => sum + (p.current_match_kills || 0), 0);
+          const ppk = tournament?.points_per_kill || 1;
+          const totalMatchPoints = placementPts + (teamKills * ppk);
+
+          // Find the team name
+          const team = db.teams.find(t => t.id === teamId);
+
+          // Create or update the match standing
+          const existing = db.match_standings.findIndex(s => s.match_id === body.match_id && s.team_id === teamId);
+          autoStanding = {
+            id: existing !== -1 ? db.match_standings[existing].id : genId(),
+            match_id: sanitizeString(body.match_id),
+            tournament_id: sanitizeString(resolvedTid || ''),
+            team_id: sanitizeString(teamId),
+            team_name: sanitizeString(team?.name || body.team_name || '', 100),
+            placement: autoPlacement,
+            placement_points_awarded: placementPts,
+            team_kills_this_match: teamKills,
+            total_match_points: totalMatchPoints
+          };
+
+          if (existing !== -1) db.match_standings[existing] = autoStanding;
+          else db.match_standings.push(autoStanding);
+
+          // Roll up team totals
+          recalcTeamTotals(db, resolvedTid);
+        }
+      }
+
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
-      return ok({ success: true, elimination: elim });
+      return ok({
+        success: true,
+        elimination: elim,
+        auto_placement: autoPlacement,
+        auto_standing: autoStanding
+      });
     }
 
     // ── SET TEAM PLACEMENT ────────────────────────────────────────────────
@@ -1385,7 +1451,27 @@ module.exports = async (req, res) => {
       const pIdx = db.players.findIndex(p => p.id === body.player_id);
       if (pIdx === -1) return err(404, 'Player not found');
 
+      const playerId = db.players[pIdx].id;
+      const teamId = db.players[pIdx].team_id;
       db.players[pIdx].is_alive = true;
+
+      // If this team had an auto-placement standing (from elimination), remove it
+      // since the team is no longer fully eliminated
+      if (teamId) {
+        const teamPlayers = db.players.filter(p => p.team_id === teamId);
+        const anyAlive = teamPlayers.some(p => p.is_alive);
+        if (anyAlive) {
+          // Find and remove any match_standings for this team in the current match
+          // (the auto-placement is no longer valid)
+          db.match_standings = db.match_standings.filter(s =>
+            !(s.team_id === teamId && s.match_id === body.match_id)
+          );
+          // Recalculate totals
+          const tournamentId = db.players[pIdx].tournament_id;
+          if (tournamentId) recalcTeamTotals(db, tournamentId);
+        }
+      }
+
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true, player: db.players[pIdx] });
