@@ -356,7 +356,7 @@ export function MatchInfoChip({ currentMatch, design }) {
       <div style={{
         display: 'flex', alignItems: 'stretch',
         height: 52,
-        filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.6))',
+        filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
       }}>
         {/* Gold accent bar — left edge */}
         <div style={{
@@ -368,8 +368,8 @@ export function MatchInfoChip({ currentMatch, design }) {
         {/* Main glass panel */}
         <div style={{
           display: 'flex', alignItems: 'center',
-          background: 'linear-gradient(135deg, rgba(6,8,16,0.95) 0%, rgba(12,15,24,0.92) 100%)',
-          backdropFilter: 'blur(16px) saturate(180%)',
+          background: 'transparent',
+          backdropFilter: 'none',
           border: '1px solid rgba(255,255,255,0.08)',
           borderLeft: 'none',
           borderRadius: '0 8px 8px 0',

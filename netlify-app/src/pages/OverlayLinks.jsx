@@ -1,8 +1,40 @@
 import React, { useState } from 'react';
 import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
-import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3 } from 'lucide-react';
+import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3, Eye } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import toast from 'react-hot-toast';
+
+/* ═══ Overlay Preview Thumbnail ═══ */
+function OverlayPreview({ url, label }) {
+  const [showPreview, setShowPreview] = useState(false);
+  return (
+    <div className="relative">
+      <button
+        onClick={() => setShowPreview(!showPreview)}
+        className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 py-1.5 font-orbitron text-[9px] font-black text-gray-400 hover:text-[#00D4FF] hover:border-[#00D4FF]/30 transition-all"
+      >
+        <Eye className="h-3 w-3" />
+        {showPreview ? 'HIDE PREVIEW' : 'PREVIEW'}
+      </button>
+      {showPreview && (
+        <div className="mt-2 overflow-hidden rounded-lg border border-[#00D4FF]/20 bg-black" style={{ aspectRatio: '16/9' }}>
+          <iframe
+            src={url}
+            title={label}
+            className="pointer-events-none"
+            style={{
+              width: '1920px',
+              height: '1080px',
+              transform: 'scale(0.22)',
+              transformOrigin: 'top left',
+              border: 'none',
+            }}
+          />
+        </div>
+      )}
+    </div>
+  );
+}
 
 export const OVERLAYS = [
   // Transparent overlays — sit on top of gameplay
@@ -126,6 +158,9 @@ export default function OverlayLinks() {
                     {url}
                   </div>
                 </div>
+                <div className="mt-3">
+                  <OverlayPreview url={url} label={ov.label} />
+                </div>
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
                   <span className="font-orbitron text-[9px] font-bold text-gray-500 tracking-wider">1920×1080</span>
                   <div className="flex gap-2">
@@ -184,6 +219,9 @@ export default function OverlayLinks() {
                   <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#00D4FF]/80 truncate">
                     {url}
                   </div>
+                </div>
+                <div className="mt-3">
+                  <OverlayPreview url={url} label={ov.label} />
                 </div>
                 <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
                   <span className="font-orbitron text-[9px] font-bold text-gray-500 tracking-wider">1920×1080</span>
