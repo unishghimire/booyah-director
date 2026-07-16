@@ -109,7 +109,7 @@ function getTheme(design) {
   const userAcc2 = design?.accentColor2 || null;
 
   const presets = {
-    default:  { p:'#FF6B00', s:'#00D4FF', bg:'rgba(6,9,18,0.88)',  border:'rgba(255,107,0,0.30)',  headerBg:'rgba(0,0,0,0.85)',       rowEven:'rgba(255,255,255,0.01)', shine:'rgba(255,107,0,0.12)',  cornerStyle:'dual',     gridOpacity:0.06, scanlines:false, glow:true  },
+    default:  { p:'#00C8FF', s:'#1E90FF', bg:'rgba(4,6,14,0.92)',  border:'rgba(0,200,255,0.28)',  headerBg:'rgba(2,4,12,0.88)',       rowEven:'rgba(0,200,255,0.02)', shine:'rgba(0,200,255,0.10)',  cornerStyle:'dual',     gridOpacity:0.05, scanlines:false, glow:true  },
     neon:     { p:'#00FF88', s:'#BF00FF', bg:'rgba(2,4,12,0.92)',   border:'rgba(0,255,136,0.35)',  headerBg:'rgba(0,0,0,0.90)',       rowEven:'rgba(0,255,136,0.02)',  shine:'rgba(0,255,136,0.10)', cornerStyle:'glow',     gridOpacity:0.10, scanlines:false, glow:true  },
     military: { p:'#9ABF30', s:'#C8A850', bg:'rgba(8,12,6,0.92)',   border:'rgba(154,191,48,0.28)', headerBg:'rgba(5,8,3,0.90)',       rowEven:'rgba(154,191,48,0.02)', shine:'rgba(154,191,48,0.08)',cornerStyle:'tick',     gridOpacity:0.04, scanlines:false, glow:false },
     minimal:  { p:'#FFFFFF', s:'#888888', bg:'rgba(10,10,12,0.94)', border:'rgba(255,255,255,0.12)',headerBg:'rgba(255,255,255,0.04)', rowEven:'rgba(255,255,255,0.02)',shine:'rgba(255,255,255,0.06)',cornerStyle:'none',     gridOpacity:0.00, scanlines:false, glow:false },
