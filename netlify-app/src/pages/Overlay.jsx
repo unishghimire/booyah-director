@@ -1200,97 +1200,240 @@ function ChampionsScreen({ teams = [], design, overlayState }) {
   const primary = t.p;
   const secondary = t.s;
   const tLogo = tok.logo(design);
+  const sponsorLogo = tok.sponsorLogo(design);
+  const bgUrl = design?.backgrounds?.champion || '';
 
-  const winnerName   = overlayState?.champion_team_name   || teams[0]?.name || 'CHAMPIONS';
-  const totalPoints  = overlayState?.champion_total_points || teams[0]?.total_tournament_points || 0;
-  const winnerTeamObj = safeArray(teams).find(t=>t.name===winnerName) || safeArray(teams)[0] || null;
+  const allTeams = safeArray(teams);
+  const sorted = [...allTeams].sort((a, b) => (b.total_tournament_points || 0) - (a.total_tournament_points || 0));
+  const winnerName   = overlayState?.champion_team_name || sorted[0]?.name || 'CHAMPIONS';
+  const totalPoints  = overlayState?.champion_total_points || sorted[0]?.total_tournament_points || 0;
+  const winnerTeamObj = allTeams.find(t => t.name === winnerName) || sorted[0] || null;
   const totalKills   = winnerTeamObj?.total_tournament_kills || 0;
+  const ppk = 1;
+  const killPts = totalKills * ppk;
+  const placementPts = totalPoints - killPts;
+
+  // Podium: 2nd, 1st, 3rd
+  const podium = [sorted[1], sorted[0], sorted[2]].filter(Boolean);
+  const podiumHeights = [140, 200, 100];
+  const podiumRanks = [2, 1, 3];
+  const medalColors = ['#C0C0C0', '#FFD700', '#CD7F32'];
+  const medalLabels = ['SILVER', 'GOLD', 'BRONZE'];
 
   return (
-    <ScreenBackground bgUrl={design?.backgrounds?.champion||''} accent={primary} accent2={secondary}>
-      <ThemedBackground design={design}>
-      <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center' }}>
+    <ScreenBackground bgUrl={bgUrl} accent={primary} accent2={secondary}>
+    <ThemedBackground design={design}>
+    <div style={{ position:'relative', width:'100%', height:'100%', overflow:'hidden' }}>
       <style>{`
-        @keyframes confettiFall{0%{transform:translateY(-60px) rotate(0deg);opacity:1}100%{transform:translateY(1120px) rotate(360deg);opacity:0}}
-        @keyframes crownPulse{0%,100%{transform:scale(1);filter:drop-shadow(0 0 20px #FFD700BB)}50%{transform:scale(1.1);filter:drop-shadow(0 0 45px #FFD700)}}
+        @keyframes champConfetti{0%{transform:translateY(-60px) rotate(0deg);opacity:1}100%{transform:translateY(1120px) rotate(720deg);opacity:0}}
+        @keyframes champCrownPulse{0%,100%{transform:scale(1) rotate(-2deg);filter:drop-shadow(0 0 25px #FFD700CC)}50%{transform:scale(1.15) rotate(2deg);filter:drop-shadow(0 0 55px #FFD700)}}
+        @keyframes champRayRotate{0%{transform:rotate(0deg)}100%{transform:rotate(360deg)}}
+        @keyframes champGlowPulse{0%,100%{opacity:0.3}50%{opacity:0.6}}
+        @keyframes champSlideIn{0%{transform:translateY(60px);opacity:0}100%{transform:translateY(0);opacity:1}}
+        @keyframes champShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+        @keyframes champScaleIn{0%{transform:scale(0.7);opacity:0}60%{transform:scale(1.05);opacity:1}100%{transform:scale(1);opacity:1}}
+        @keyframes champPodiumRise{0%{transform:translateY(40px);opacity:0}100%{transform:translateY(0);opacity:1}}
       `}</style>
 
-      {/* Gold winner ambient bloom */}
-      <div style={{ position:'absolute', inset:0, background:'radial-gradient(circle, rgba(255,215,0,0.15) 0%, transparent 75%)', zIndex:0 }} />
+      {/* === BACKGROUND EFFECTS === */}
+      {/* Deep golden ambient bloom */}
+      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 1200px 900px at 50% 45%, rgba(255,215,0,0.18) 0%, rgba(255,107,0,0.06) 30%, transparent 70%)', zIndex:0 }} />
 
-      {/* Confetti Particle System using pure CSS */}
-      {Array.from({length:40}).map((_,i) => {
-        const colors = ['#FFD700','#FF6B00','#00D4FF','#ffffff','#4ade80'];
+      {/* Animated rotating light rays from center */}
+      <div style={{
+        position:'absolute', top:'50%', left:'50%', width:'1600px', height:'1600px',
+        transform:'translate(-50%,-50%)', zIndex:0, opacity:0.15,
+        background:'conic-gradient(from 0deg, transparent 0deg, #FFD700 10deg, transparent 20deg, transparent 50deg, #FF6B00 60deg, transparent 70deg, transparent 100deg, #FFD700 110deg, transparent 120deg, transparent 150deg, #FF6B00 160deg, transparent 170deg, transparent 200deg, #FFD700 210deg, transparent 220deg, transparent 250deg, #FF6B00 260deg, transparent 270deg, transparent 300deg, #FFD700 310deg, transparent 320deg, transparent 360deg)',
+        animation:'champRayRotate 30s linear infinite',
+        borderRadius:'50%',
+      }} />
+
+      {/* Confetti */}
+      {Array.from({length:50}).map((_,i) => {
+        const colors = ['#FFD700','#FF6B00','#00D4FF','#ffffff','#4ade80','#FFD700'];
         return (
           <div key={i} style={{
-            position:'absolute', top:-30, left:`${(i * 4.9) % 100}%`,
-            width: 8 + i % 6, height: 8 + i % 6,
+            position:'absolute', top:-30, left:`${(i * 3.7) % 100}%`,
+            width: 6 + i % 8, height: 6 + i % 8,
             background: colors[i % colors.length],
-            borderRadius: i % 2 === 0 ? '50%' : 2, opacity: 0.9, zIndex: 1,
-            animation:`confettiFall ${3.5 + i % 5}s linear infinite`,
-            animationDelay:`${i * 0.18}s`,
+            borderRadius: i % 2 === 0 ? '50%' : 2, opacity: 0.85, zIndex:1,
+            animation:`champConfetti ${4 + i % 6}s linear infinite`,
+            animationDelay:`${i * 0.12}s`,
           }} />
         );
       })}
 
-      <div style={{ position:'relative', zIndex:2, display:'flex', flexDirection:'column', alignItems:'center', textAlign:'center', gap:20, maxWidth:1000 }}>
-        <div style={{ animation:'crownPulse 2s infinite ease-in-out', marginBottom:6 }}>
-          <Crown size={90} style={{ color:'#FFD700' }} />
+      {/* === MAIN CONTENT === */}
+      <div style={{ position:'relative', zIndex:2, height:'100%', display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-start', paddingTop:70, gap:0 }}>
+
+        {/* === TOP: CROWN + TITLE === */}
+        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8, animation:'champScaleIn 0.8s ease-out' }}>
+          <div style={{ animation:'champCrownPulse 2.5s infinite ease-in-out' }}>
+            <Crown size={72} style={{ color:'#FFD700' }} />
+          </div>
+          <h1 style={{
+            fontFamily:'Orbitron', fontSize:96, fontWeight:900,
+            background:'linear-gradient(135deg, #FFD700 0%, #FFF5C0 25%, #FF6B00 50%, #FFD700 75%, #FF6B00 100%)',
+            backgroundSize:'200% auto',
+            WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
+            lineHeight:0.9, margin:0, letterSpacing:'0.08em',
+            filter:'drop-shadow(0 0 35px rgba(255,215,0,0.5))',
+            animation:'champShimmer 4s linear infinite',
+          }}>
+            {(design?.championTitle || 'BOOYAH!').toUpperCase()}
+          </h1>
+          <div style={{
+            fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:secondary,
+            letterSpacing:'0.6em', textTransform:'uppercase',
+            animation:'champGlowPulse 3s infinite ease-in-out',
+          }}>
+            {(design?.championSubtitle || 'GRAND TOURNAMENT CHAMPION').toUpperCase()}
+          </div>
         </div>
 
-        <h1 style={{ fontFamily:'Orbitron', fontSize:120, fontWeight:900, background:'linear-gradient(135deg,#FFD700,#FF6B00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent', lineHeight:0.9, margin:0, letterSpacing:'0.06em', filter:'drop-shadow(0 0 40px rgba(255,107,0,0.5))' }}>
-          {(design?.championTitle || 'BOOYAH!').toUpperCase()}
-        </h1>
-
-        <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:secondary, letterSpacing:'0.6em', textTransform:'uppercase' }}>
-          {(design?.championSubtitle || 'GRAND TOURNAMENT CHAMPION').toUpperCase()}
-        </span>
-
+        {/* === CENTER: CHAMPION CARD + PODIUM === */}
         <motion.div
-          initial={{ y: 20, opacity: 0 }}
+          initial={{ y: 40, opacity: 0 }}
           animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.4 }}
+          transition={{ duration: 0.6, delay: 0.3 }}
+          style={{ marginTop:30 }}
         >
-          <ThemedPanel design={design} style={{ width:620, padding:0 }}>
-            <div style={{ padding:'32px 40px', display:'flex', flexDirection:'column', alignItems:'center' }}>
-              {/* Champion Logo Circle */}
-              <div style={{ width:110, height:110, borderRadius:'50%', border:`3px solid #FFD700`, boxShadow:'0 0 35px rgba(255,215,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.6)', marginBottom:18 }}>
-                <TeamLogo team={winnerTeamObj} size={80} />
+          {/* Champion team card */}
+          <div style={{
+            position:'relative',
+            width:580, padding:'28px 40px',
+            display:'flex', flexDirection:'column', alignItems:'center',
+            background:'linear-gradient(135deg, rgba(255,215,0,0.08) 0%, rgba(255,107,0,0.04) 50%, rgba(0,0,0,0.5) 100%)',
+            backdropFilter:'blur(16px) saturate(160%)',
+            border:'2px solid rgba(255,215,0,0.35)',
+            borderRadius:16,
+            boxShadow:'0 0 50px rgba(255,215,0,0.2), 0 12px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.08)',
+          }}>
+            {/* Gold top accent line */}
+            <div style={{ position:'absolute', top:-2, left:0, right:0, height:3, background:'linear-gradient(90deg,transparent,#FFD700 20%,#FF6B00 50%,#FFD700 80%,transparent)', borderRadius:'16px 16px 0 0' }} />
+
+            {/* Champion logo with gold ring */}
+            <div style={{
+              width:120, height:120, borderRadius:'50%',
+              border:'4px solid #FFD700',
+              boxShadow:'0 0 40px rgba(255,215,0,0.5), inset 0 0 20px rgba(255,215,0,0.1)',
+              display:'flex', alignItems:'center', justifyContent:'center',
+              background:'rgba(0,0,0,0.6)', marginBottom:16,
+            }}>
+              <TeamLogo team={winnerTeamObj} size={88} />
+            </div>
+
+            {/* Champion squad label */}
+            <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:700, color:'rgba(255,215,0,0.6)', letterSpacing:'0.25em', marginBottom:4, textTransform:'uppercase' }}>
+              {(design?.championSquadLabel || 'CHAMPIONSHIP SQUAD').toUpperCase()}
+            </div>
+
+            {/* Champion team name */}
+            <div style={{ fontFamily:'Orbitron', fontSize:38, fontWeight:900, color:'#fff', letterSpacing:'0.04em', textTransform:'uppercase', textShadow:'0 2px 20px rgba(255,215,0,0.3)', marginBottom:20 }}>
+              {winnerName}
+            </div>
+
+            {/* Stats breakdown */}
+            <div style={{ display:'flex', width:'100%', borderTop:'1px solid rgba(255,215,0,0.15)', paddingTop:18, justifyContent:'space-around' }}>
+              <div style={{ textAlign:'center' }}>
+                <div style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:'#00D4FF', letterSpacing:'0.15em' }}>PPT</div>
+                <div style={{ fontFamily:'Rajdhani', fontSize:26, fontWeight:900, color:'#fff', marginTop:2 }}>{placementPts}</div>
               </div>
-              <span style={{ fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em', marginBottom:6 }}>{(design?.championSquadLabel || 'CHAMPIONSHIP SQUAD').toUpperCase()}</span>
-              <span style={{ fontFamily:'Orbitron', fontSize:36, fontWeight:900, color:'#fff', letterSpacing:'0.05em', textTransform:'uppercase' }}>{winnerName}</span>
-              
-              <div style={{ display:'flex', width:'100%', marginTop:24, paddingTop:20, borderTop:'1px solid rgba(255,255,255,0.08)', justifyContent:'space-around' }}>
-                <div>
-                  <div style={{ fontFamily:'Orbitron', fontSize:10, color:'#FF6B00', letterSpacing:'0.15em' }}>TOTAL KILLS</div>
-                  <div style={{ fontFamily:'Rajdhani', fontSize:28, fontWeight:900, color:'#fff', marginTop:4 }}>{totalKills}</div>
-                </div>
-                <div style={{ width:1, background:'rgba(255,255,255,0.08)' }} />
-                <div>
-                  <div style={{ fontFamily:'Orbitron', fontSize:10, color:'#00D4FF', letterSpacing:'0.15em' }}>TOTAL POINTS</div>
-                  <div style={{ fontFamily:'Rajdhani', fontSize:28, fontWeight:900, color:'#fff', marginTop:4 }}>{totalPoints}</div>
-                </div>
+              <div style={{ width:1, background:'rgba(255,215,0,0.12)' }} />
+              <div style={{ textAlign:'center' }}>
+                <div style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:'#FF6B00', letterSpacing:'0.15em' }}>KILLS</div>
+                <div style={{ fontFamily:'Rajdhani', fontSize:26, fontWeight:900, color:'#fff', marginTop:2 }}>{totalKills}</div>
+              </div>
+              <div style={{ width:1, background:'rgba(255,215,0,0.12)' }} />
+              <div style={{ textAlign:'center' }}>
+                <div style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:'#22c55e', letterSpacing:'0.15em' }}>KILL PTS</div>
+                <div style={{ fontFamily:'Rajdhani', fontSize:26, fontWeight:900, color:'#fff', marginTop:2 }}>{killPts}</div>
+              </div>
+              <div style={{ width:1, background:'rgba(255,215,0,0.12)' }} />
+              <div style={{ textAlign:'center' }}>
+                <div style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:700, color:'#FFD700', letterSpacing:'0.15em' }}>TOTAL</div>
+                <div style={{ fontFamily:'Rajdhani', fontSize:30, fontWeight:900, color:'#FFD700', marginTop:2, textShadow:'0 0 15px rgba(255,215,0,0.4)' }}>{totalPoints}</div>
               </div>
             </div>
-          </ThemedPanel>
-        </motion.div>
+          </div>
 
-        <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:8, marginTop:8 }}>
-          {tLogo && <img src={tLogo} alt="logo" style={{ height:44, objectFit:'contain', opacity:0.9 }} onError={e=>e.target.style.display='none'} />}
-          {tok.sponsorLogo(design) && (
-            <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:4 }}>
-              <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>SPONSORED BY</span>
-              <img src={tok.sponsorLogo(design)} alt="sponsor" style={{ height:32, objectFit:'contain', opacity:0.85 }} onError={e=>e.target.style.display='none'} />
+          {/* === PODIUM (Top 3) === */}
+          {sorted.length >= 2 && (
+            <div style={{ display:'flex', justifyContent:'center', alignItems:'flex-end', gap:16, marginTop:24, height:220 }}>
+              {podium.map((team, i) => {
+                const rank = podiumRanks[i];
+                const height = podiumHeights[i];
+                const medalColor = medalColors[i];
+                const medalLabel = medalLabels[i];
+                const isWinner = rank === 1;
+                return (
+                  <div key={i} style={{
+                    display:'flex', flexDirection:'column', alignItems:'center',
+                    animation:`champPodiumRise 0.5s ease-out ${0.6 + i * 0.15}s both`,
+                  }}>
+                    {/* Team logo */}
+                    <div style={{
+                      width:56, height:56, borderRadius:'50%',
+                      border:`2px solid ${medalColor}`,
+                      boxShadow:`0 0 20px ${medalColor}44`,
+                      display:'flex', alignItems:'center', justifyContent:'center',
+                      background:'rgba(0,0,0,0.6)', marginBottom:8,
+                    }}>
+                      <TeamLogo team={team} size={40} />
+                    </div>
+                    {/* Team name + points */}
+                    <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', textTransform:'uppercase', marginBottom:2, maxWidth:120, textAlign:'center', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap' }}>
+                      {team.name}
+                    </div>
+                    <div style={{ fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color:medalColor, marginBottom:6 }}>
+                      {team.total_tournament_points || 0} PTS
+                    </div>
+                    {/* Pedestal */}
+                    <div style={{
+                      width:140, height:height,
+                      background:`linear-gradient(180deg, ${medalColor}22 0%, ${medalColor}08 50%, rgba(0,0,0,0.5) 100%)`,
+                      border:`1px solid ${medalColor}44`,
+                      borderTop:`3px solid ${medalColor}`,
+                      borderRadius:'4px 4px 0 0',
+                      display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'flex-end',
+                      paddingBottom:12, position:'relative',
+                    }}>
+                      <div style={{
+                        fontFamily:'Orbitron', fontSize:28, fontWeight:900,
+                        color:medalColor, opacity:0.9,
+                        textShadow:`0 0 15px ${medalColor}66`,
+                      }}>
+                        #{rank}
+                      </div>
+                      <div style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:medalColor, opacity:0.5, letterSpacing:'0.15em' }}>
+                        {medalLabel}
+                      </div>
+                    </div>
+                  </div>
+                );
+              })}
             </div>
           )}
-        </div>
+        </motion.div>
 
-        <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em', marginTop:12 }}>
-          CONGRATULATIONS TO ALL TEAMS — {tok.name(design)}
-        </span>
+        {/* === BOTTOM: BRANDING === */}
+        <div style={{ position:'absolute', bottom:30, left:0, right:0, display:'flex', flexDirection:'column', alignItems:'center', gap:8 }}>
+          <div style={{ display:'flex', alignItems:'center', gap:16 }}>
+            {tLogo && <img src={tLogo} alt="logo" style={{ height:38, objectFit:'contain', opacity:0.85 }} onError={e=>e.target.style.display='none'} />}
+            {sponsorLogo && (
+              <div style={{ display:'flex', alignItems:'center', gap:8 }}>
+                <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>SPONSORED BY</span>
+                <img src={sponsorLogo} alt="sponsor" style={{ height:28, objectFit:'contain', opacity:0.8 }} onError={e=>e.target.style.display='none'} />
+              </div>
+            )}
+          </div>
+          <span style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.25)', letterSpacing:'0.2em' }}>
+            CONGRATULATIONS TO ALL TEAMS — {tok.name(design)}
+          </span>
+        </div>
       </div>
-      </div>
-      </ThemedBackground>
+    </div>
+    </ThemedBackground>
     </ScreenBackground>
   );
 }
