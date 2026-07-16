@@ -91,9 +91,98 @@
   }
 }
 
+/* ═══════════════════════════════════════════════════════════════════
+   FFWS BROADCAST DESIGN SYSTEM — Free Fire World Series Aesthetic
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* Google Fonts: Rajdhani (body/stats), Teko (headlines), Orbitron (labels) */
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Teko:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap');
+
 /* ===== Free Fire Overlay Fonts ===== */
 .font-orbitron { font-family: 'Orbitron', ui-sans-serif, system-ui, sans-serif; }
 .font-rajdhani { font-family: 'Rajdhani', ui-sans-serif, system-ui, sans-serif; }
+.font-teko     { font-family: 'Teko', ui-sans-serif, system-ui, sans-serif; }
+
+/* ===== FFWS Color System ===== */
+:root {
+  --ffws-carbon:    #0c0c0e;
+  --ffws-gunmetal:  #141418;
+  --ffws-orange:    #ff4e00;
+  --ffws-gold:      #ffaa00;
+  --ffws-cyan:      #00d4ff;
+  --ffws-green:     #7BC043;
+  --ffws-red:       #ff3333;
+  --ffws-text:      #ffffff;
+  --ffws-muted:     rgba(255,255,255,0.4);
+}
+
+/* ===== Clip-Path Utilities — Angular Cutouts ===== */
+.clip-angular-l    { clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%); }
+.clip-angular-r    { clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%); }
+.clip-angular-tl   { clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
+.clip-angular-tr   { clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%); }
+.clip-angular-both { clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
+.clip-arrow-r      { clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%); }
+.clip-arrow-l      { clip-path: polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 50%); }
+.clip-diagonal      { clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); }
+.clip-diagonal-r    { clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%); }
+.clip-hex           { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
+.clip-tag           { clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 0 100%); }
+
+/* ===== FFWS Glow Effects ===== */
+.glow-orange { filter: drop-shadow(0 0 8px rgba(255, 78, 0, 0.6)); }
+.glow-gold   { filter: drop-shadow(0 0 8px rgba(255, 170, 0, 0.6)); }
+.glow-cyan   { filter: drop-shadow(0 0 8px rgba(0, 212, 255, 0.5)); }
+.glow-green  { filter: drop-shadow(0 0 6px rgba(123, 192, 67, 0.5)); }
+
+/* ===== Broadcast Animation Classes ===== */
+@keyframes ffws-sweep {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(200%) skewX(-15deg); }
+}
+@keyframes ffws-pulse-border {
+  0%, 100% { box-shadow: 0 0 8px rgba(255, 78, 0, 0.3); }
+  50%      { box-shadow: 0 0 20px rgba(255, 78, 0, 0.7); }
+}
+@keyframes ffws-diagonal-glow {
+  0%   { transform: translate(-50%, -50%) rotate(-45deg) translateX(-200px); opacity: 0; }
+  50%  { opacity: 0.6; }
+  100% { transform: translate(-50%, -50%) rotate(-45deg) translateX(200px); opacity: 0; }
+}
+@keyframes ffws-hex-pulse {
+  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 78, 0, 0.4)); }
+  50%      { filter: drop-shadow(0 0 12px rgba(255, 78, 0, 0.8)); }
+}
+
+/* ===== FFWS Text Gradients ===== */
+.text-gradient-gold {
+  background: linear-gradient(135deg, #ffaa00 0%, #ff8800 50%, #ff6600 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.text-gradient-silver {
+  background: linear-gradient(135deg, #C0C0C0 0%, #909090 50%, #707070 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.text-gradient-bronze {
+  background: linear-gradient(135deg, #CD7F32 0%, #8B4513 50%, #6B3410 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
+.text-gradient-orange {
+  background: linear-gradient(135deg, #ff4e00 0%, #ff6e00 50%, #ff8e00 100%);
+  -webkit-background-clip: text;
+  background-clip: text;
+  -webkit-text-fill-color: transparent;
+  color: transparent;
+}
 
 /* ===== Overlay Animations ===== */
 @keyframes pulse-glow {
