@@ -69,7 +69,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       initial={{ y: -1080, opacity: 0 }}
       animate={{ y: 0, opacity: 1 }}
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
-      style={{ position: 'absolute', right: 0, top: 0, height: '100%', width: 300, zIndex: 10 }}
+      style={{ position: 'absolute', right: 0, top: 40, height: 'calc(100% - 80px)', width: 300, zIndex: 10 }}
     >
       {/* Panel with no left border-radius */}
       <div style={{
