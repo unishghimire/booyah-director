@@ -8,12 +8,11 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import { safeArray } from '@/components/ErrorBoundary';
 import { MAPS, getMapImages } from '@/lib/maps';
 
-/* ═══ EWC / FFWS SCOREBOARD — right panel, exact reference match ═══ */
+/* ═══ FFWS SCOREBOARD — right panel, rebuilt from reference ═══ */
 export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
   const t = getThemeInline(design);
   const primary = t.p;
 
-  // Elimination flash tracking
   const prevAliveRef = useRef({});
   const [elimFlash, setElimFlash] = useState({});
 
@@ -41,7 +40,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
     let hasNew = false;
     safeArray(rows).forEach(team => {
       team.slots.forEach((slot, si) => {
-        const key = `${team.id}_${si}`;
+        const key = team.id + '_' + si;
         const wasAlive = prevAliveRef.current[key];
         if (wasAlive === true && !slot.alive && slot.name) {
           flashes[team.id] = { ...(flashes[team.id] || {}), [si]: Date.now() };
@@ -52,219 +51,202 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
     });
     if (hasNew) {
       setElimFlash(flashes);
-      const t = setTimeout(() => setElimFlash({}), 2000);
-      return () => clearTimeout(t);
+      const timer = setTimeout(() => setElimFlash({}), 2000);
+      return () => clearTimeout(timer);
     }
   }, [rows]);
 
-  const dayLabel  = design?.dayLabel    || 'DAY 1';
   const matchLabel = currentMatch?.match_number
-    ? `MATCH ${currentMatch.match_number}`
+    ? 'MATCH ' + currentMatch.match_number
     : (design?.matchLabel || 'MATCH 1');
+  const dayLabel = (design?.dayLabel || 'DAY 1').toUpperCase();
   const brandLabel = (design?.scoreboardBrand || 'EWC').toUpperCase();
+  const stageLabel = (design?.stageLabel || 'GROUP STAGE').toUpperCase();
 
-  // Orange accent from design or hardcoded EWC orange
-  const orange = design?.scoreboardAccent || '#FF6B00';
+  // EWC orange header color
+  const orange = '#FF6B00';
+  // Alive bar green — matches reference
+  const greenAlive = '#7BC043';
+  const greenDim = '#3a4a2a';
 
-  // Slash-bar alive indicator — 4 diagonal lines like the reference
-  const SlashBars = ({ slots, teamFlash }) => (
-    <div style={{ display: 'flex', alignItems: 'center', gap: 2 }}>
-      {slots.map((slot, si) => {
-        const isFlashing = teamFlash && teamFlash[si] !== undefined;
-        const color = isFlashing
-          ? '#FF3333'
-          : slot.alive
-            ? orange
-            : slot.name === null
-              ? 'rgba(255,255,255,0.08)'
-              : 'rgba(255,255,255,0.15)';
-        return (
-          <motion.div
-            key={si}
-            animate={{ backgroundColor: color }}
-            transition={{ duration: 0.3 }}
-            style={{
-              width: 5,
-              height: 16,
-              borderRadius: 1,
-              transform: 'skewX(-12deg)',
-              flexShrink: 0,
-            }}
-          />
-        );
-      })}
-    </div>
-  );
+  const colW = { rank: 30, logo: 32, name: 'flex', alive: 72, pts: 44, elims: 44 };
 
   return (
     <motion.div
-      initial={{ x: 320, opacity: 0 }}
+      initial={{ x: 380, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.55, ease: [0.16, 1, 0.3, 1] }}
       style={{
         position: 'absolute',
         right: 0,
-        top: 60,
-        width: 310,
-        height: 'calc(100% - 120px)',
+        top: 50,
+        width: 360,
+        height: 'calc(100% - 100px)',
         zIndex: 10,
         display: 'flex',
         flexDirection: 'column',
+        fontFamily: 'Rajdhani, sans-serif',
       }}
     >
-      {/* ── ORANGE HEADER BAR ── */}
+      {/* ═══ ORANGE HEADER BAR ═══ */}
       <div style={{
         background: orange,
-        height: 32,
+        height: 34,
         display: 'flex',
         alignItems: 'center',
-        padding: '0 10px 0 8px',
         flexShrink: 0,
-        borderRadius: '4px 0 0 0',
+        padding: '0 12px 0 8px',
+        boxShadow: '0 2px 12px rgba(255,107,0,0.3)',
       }}>
-        {/* Column labels */}
-        <div style={{ width: 28, fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: 'rgba(0,0,0,0.55)', letterSpacing: '0.06em' }}></div>
-        {/* logo col */}
-        <div style={{ width: 26 }} />
-        <div style={{ flex: 1, fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#000', letterSpacing: '0.1em' }}>TEAM</div>
-        <div style={{ width: 50, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#000', letterSpacing: '0.08em' }}>ALIVE</div>
-        <div style={{ width: 40, textAlign: 'right', fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#000', letterSpacing: '0.08em' }}>PTS</div>
-        <div style={{ width: 36, textAlign: 'right', fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#000', letterSpacing: '0.06em', paddingRight: 2 }}>ELIMS</div>
+        <div style={{ width: colW.rank }} />
+        <div style={{ width: colW.logo }} />
+        <div style={{ flex: 1, fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: '#000', letterSpacing: '0.12em' }}>TEAM</div>
+        <div style={{ width: colW.alive, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: '#000', letterSpacing: '0.1em' }}>ALIVE</div>
+        <div style={{ width: colW.pts, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: '#000', letterSpacing: '0.1em' }}>PTS</div>
+        <div style={{ width: colW.elims, textAlign: 'center', fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: '#000', letterSpacing: '0.08em' }}>ELIMS</div>
       </div>
 
-      {/* ── ROWS ── */}
+      {/* ═══ ROWS ═══ */}
       <div style={{ flex: 1, display: 'flex', flexDirection: 'column', overflow: 'hidden' }}>
-        {rows.length > 0 ? safeArray(rows).map((team, idx) => {
+
+        {rows.length > 0 ? rows.map((team, idx) => {
           const rank = idx + 1;
           const isElim = team.aliveCount === 0 && team.totalPlayers > 0;
           const teamFlash = elimFlash[team.id] || {};
           const hasFlash = Object.keys(teamFlash).length > 0;
-
-          // Row background: alternating very subtly
-          const rowBg = hasFlash
-            ? 'rgba(255,50,50,0.18)'
-            : idx % 2 === 0
-              ? 'rgba(10,10,14,0.88)'
-              : 'rgba(18,18,24,0.88)';
-
-          // Left rank accent — gold for #1
-          const rankAccent = rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'transparent';
+          const rankColor = rank === 1 ? '#FFD700' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'rgba(255,255,255,0.4)';
 
           return (
             <motion.div
               key={team.id || idx}
-              initial={{ x: 80, opacity: 0 }}
+              initial={{ x: 100, opacity: 0 }}
               animate={{ x: 0, opacity: 1 }}
-              transition={{ duration: 0.3, delay: 0.1 + idx * 0.04, ease: 'easeOut' }}
+              transition={{ duration: 0.3, delay: 0.08 + idx * 0.035, ease: 'easeOut' }}
               style={{
                 display: 'flex',
                 alignItems: 'center',
                 flex: 1,
                 minHeight: 0,
-                background: rowBg,
-                borderBottom: '1px solid rgba(255,255,255,0.04)',
-                borderLeft: `3px solid ${rankAccent}`,
-                padding: '0 10px 0 6px',
-                opacity: isElim ? 0.4 : 1,
-                transition: 'opacity 0.4s, background 0.4s',
+                background: hasFlash ? 'rgba(255,40,40,0.15)' : '#0A0B0F',
+                borderBottom: '1px solid rgba(255,255,255,0.06)',
+                borderLeft: rank <= 3 ? '3px solid ' + rankColor : '3px solid transparent',
+                padding: '0 12px 0 8px',
+                opacity: isElim ? 0.35 : 1,
+                transition: 'opacity 0.4s ease',
                 position: 'relative',
                 overflow: 'hidden',
               }}
             >
               {/* Rank number */}
               <div style={{
-                width: 22,
+                width: colW.rank,
                 textAlign: 'center',
                 fontFamily: 'Rajdhani',
-                fontSize: 13,
+                fontSize: 16,
                 fontWeight: 700,
-                color: rank <= 3 ? rankAccent : 'rgba(255,255,255,0.45)',
+                color: rankColor,
                 flexShrink: 0,
               }}>
                 {rank}
               </div>
 
               {/* Team logo */}
-              <div style={{ width: 28, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
+              <div style={{ width: colW.logo, display: 'flex', justifyContent: 'center', flexShrink: 0 }}>
                 {team.logo_url ? (
-                  <img
-                    src={team.logo_url}
-                    alt=""
-                    style={{ width: 20, height: 20, objectFit: 'contain', borderRadius: 2 }}
-                    onError={e => { e.target.style.display = 'none'; }}
-                  />
+                  <img src={team.logo_url} alt="" style={{ width: 24, height: 24, objectFit: 'contain', borderRadius: 3 }}
+                    onError={e => { e.target.style.display = 'none'; }} />
                 ) : (
                   <div style={{
-                    width: 20, height: 20, borderRadius: 3,
-                    background: `${orange}22`,
-                    border: `1px solid ${orange}44`,
+                    width: 24, height: 24, borderRadius: 3,
+                    background: 'rgba(255,255,255,0.06)',
+                    border: '1px solid rgba(255,255,255,0.1)',
                     display: 'flex', alignItems: 'center', justifyContent: 'center',
                   }}>
-                    <span style={{ fontFamily: 'Orbitron', fontSize: 7, fontWeight: 900, color: orange }}>
+                    <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: 'rgba(255,255,255,0.4)' }}>
                       {(team.name || 'T').charAt(0)}
                     </span>
                   </div>
                 )}
               </div>
 
-              {/* Team name — abbreviated, uppercase */}
+              {/* Team name */}
               <div style={{
                 flex: 1,
                 fontFamily: 'Rajdhani',
-                fontSize: 14,
+                fontSize: 15,
                 fontWeight: 700,
-                color: isElim ? 'rgba(255,255,255,0.25)' : '#fff',
+                color: isElim ? 'rgba(255,255,255,0.2)' : '#E0E8F5',
                 textTransform: 'uppercase',
-                letterSpacing: '0.04em',
+                letterSpacing: '0.03em',
                 overflow: 'hidden',
                 textOverflow: 'ellipsis',
                 whiteSpace: 'nowrap',
                 position: 'relative',
+                paddingLeft: 4,
               }}>
-                {/* Show max 4 chars to keep it tight like reference */}
-                {(team.name || 'TEAM').slice(0, 5).toUpperCase()}
+                {team.name || 'TEAM'}
                 {isElim && (
                   <motion.div
                     initial={{ scaleX: 0 }}
                     animate={{ scaleX: 1 }}
                     transition={{ duration: 0.4 }}
                     style={{
-                      position: 'absolute', left: 0, right: 0, top: '50%',
+                      position: 'absolute', left: 4, right: 0, top: '50%',
                       height: 1, background: '#ff4444', transformOrigin: 'left', opacity: 0.6,
                     }}
                   />
                 )}
               </div>
 
-              {/* Alive slash bars */}
-              <div style={{ width: 50, display: 'flex', justifyContent: 'center' }}>
-                <SlashBars slots={team.slots} teamFlash={teamFlash} />
+              {/* Alive bars — GREEN vertical bars */}
+              <div style={{ width: colW.alive, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 5, flexShrink: 0 }}>
+                {team.slots.map((slot, si) => {
+                  const isFlashing = teamFlash[si] !== undefined;
+                  const color = isFlashing
+                    ? '#FF3333'
+                    : slot.alive
+                      ? greenAlive
+                      : slot.name === null
+                        ? 'rgba(255,255,255,0.06)'
+                        : 'rgba(255,255,255,0.12)';
+                  return (
+                    <motion.div
+                      key={si}
+                      animate={{ backgroundColor: color, opacity: isElim && !isFlashing ? 0.3 : 1 }}
+                      transition={{ duration: 0.3 }}
+                      style={{
+                        width: 12,
+                        height: 22,
+                        borderRadius: 2,
+                        flexShrink: 0,
+                        boxShadow: slot.alive && !isFlashing ? '0 0 6px ' + greenAlive + '88' : 'none',
+                      }}
+                    />
+                  );
+                })}
               </div>
 
               {/* Points */}
               <div style={{
-                width: 40,
-                textAlign: 'right',
+                width: colW.pts,
+                textAlign: 'center',
                 fontFamily: 'Rajdhani',
-                fontSize: 15,
+                fontSize: 17,
                 fontWeight: 700,
-                color: isElim ? 'rgba(255,255,255,0.25)' : '#fff',
+                color: isElim ? 'rgba(255,255,255,0.2)' : '#FFFFFF',
                 flexShrink: 0,
               }}>
                 {team.total_tournament_points || 0}
               </div>
 
-              {/* Separator */}
-              <div style={{ width: 8, textAlign: 'center', color: 'rgba(255,255,255,0.2)', fontSize: 10, flexShrink: 0 }}>/</div>
-
               {/* Elims */}
               <div style={{
-                width: 28,
-                textAlign: 'right',
+                width: colW.elims,
+                textAlign: 'center',
                 fontFamily: 'Rajdhani',
-                fontSize: 14,
+                fontSize: 16,
                 fontWeight: 700,
-                color: isElim ? 'rgba(255,255,255,0.2)' : orange,
+                color: isElim ? 'rgba(255,255,255,0.15)' : orange,
                 flexShrink: 0,
               }}>
                 {team.total_tournament_kills || 0}
@@ -273,11 +255,11 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
               {/* Elimination flash sweep */}
               {hasFlash && (
                 <motion.div
-                  initial={{ x: -310, opacity: 0.5 }}
-                  animate={{ x: 310, opacity: 0 }}
+                  initial={{ x: -360, opacity: 0.5 }}
+                  animate={{ x: 360, opacity: 0 }}
                   transition={{ duration: 0.7, ease: 'easeOut' }}
                   style={{
-                    position: 'absolute', top: 0, bottom: 0, left: 0, width: 120,
+                    position: 'absolute', top: 0, bottom: 0, left: 0, width: 140,
                     background: 'linear-gradient(90deg, transparent, rgba(255,60,60,0.35), transparent)',
                     pointerEvents: 'none',
                   }}
@@ -286,75 +268,66 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
             </motion.div>
           );
         }) : (
-          /* ── EMPTY STATE — ghost rows ── */
+          /* ═══ EMPTY STATE — ghost rows ═══ */
           [...Array(12)].map((_, i) => (
             <div key={i} style={{
               display: 'flex', alignItems: 'center', flex: 1, minHeight: 0,
-              background: i % 2 === 0 ? 'rgba(10,10,14,0.88)' : 'rgba(18,18,24,0.88)',
+              background: '#0A0B0F',
               borderBottom: '1px solid rgba(255,255,255,0.04)',
               borderLeft: '3px solid transparent',
-              padding: '0 10px 0 6px',
-              opacity: 0.35,
+              padding: '0 12px 0 8px',
+              opacity: 0.3,
             }}>
-              <div style={{ width: 22, textAlign: 'center', fontFamily: 'Rajdhani', fontSize: 13, fontWeight: 700, color: 'rgba(255,255,255,0.3)' }}>{i + 1}</div>
-              <div style={{ width: 28, display: 'flex', justifyContent: 'center' }}>
-                <div style={{ width: 20, height: 20, borderRadius: 3, background: 'rgba(255,255,255,0.05)', border: '1px solid rgba(255,255,255,0.08)' }} />
+              <div style={{ width: colW.rank, textAlign: 'center', fontFamily: 'Rajdhani', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.25)' }}>{i + 1}</div>
+              <div style={{ width: colW.logo, display: 'flex', justifyContent: 'center' }}>
+                <div style={{ width: 24, height: 24, borderRadius: 3, background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.06)' }} />
               </div>
-              <div style={{ flex: 1 }}>
-                <div style={{ width: 40, height: 8, borderRadius: 2, background: 'rgba(255,255,255,0.06)', marginLeft: 2 }} />
+              <div style={{ flex: 1, paddingLeft: 4 }}>
+                <div style={{ width: 50, height: 10, borderRadius: 2, background: 'rgba(255,255,255,0.05)' }} />
               </div>
-              <div style={{ width: 50, display: 'flex', justifyContent: 'center', gap: 2 }}>
-                {[0,1,2,3].map(s => <div key={s} style={{ width: 5, height: 16, borderRadius: 1, transform: 'skewX(-12deg)', background: 'rgba(255,255,255,0.06)' }} />)}
+              <div style={{ width: colW.alive, display: 'flex', justifyContent: 'center', gap: 5 }}>
+                {[0,1,2,3].map(s => <div key={s} style={{ width: 12, height: 22, borderRadius: 2, background: 'rgba(255,255,255,0.04)' }} />)}
               </div>
-              <div style={{ width: 40, textAlign: 'right', fontFamily: 'Rajdhani', fontSize: 15, fontWeight: 700, color: 'rgba(255,255,255,0.1)' }}>—</div>
-              <div style={{ width: 8, textAlign: 'center', color: 'rgba(255,255,255,0.08)', fontSize: 10 }}>/</div>
-              <div style={{ width: 28 }} />
+              <div style={{ width: colW.pts, textAlign: 'center', fontFamily: 'Rajdhani', fontSize: 17, fontWeight: 700, color: 'rgba(255,255,255,0.08)' }}>-</div>
+              <div style={{ width: colW.elims, textAlign: 'center', fontFamily: 'Rajdhani', fontSize: 16, fontWeight: 700, color: 'rgba(255,255,255,0.06)' }}>-</div>
             </div>
           ))
         )}
       </div>
 
-      {/* ── FOOTER — EWC BRAND + DAY/MATCH ── */}
+      {/* ═══ FOOTER ═══ */}
       <motion.div
         initial={{ y: 20, opacity: 0 }}
         animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.4, delay: 0.7 }}
+        transition={{ duration: 0.4, delay: 0.6 }}
         style={{
-          height: 36,
-          background: 'rgba(8,8,12,0.95)',
+          height: 40,
+          background: '#06070A',
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
-          padding: '0 12px',
+          padding: '0 14px',
           flexShrink: 0,
-          borderTop: `2px solid ${orange}`,
-          borderRadius: '0 0 0 4px',
+          borderTop: '2px solid ' + orange,
         }}
       >
         {/* Left: Brand */}
         <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
           {design?.logoUrl ? (
-            <img src={design.logoUrl} alt="" style={{ height: 20, objectFit: 'contain' }}
+            <img src={design.logoUrl} alt="" style={{ height: 22, objectFit: 'contain' }}
               onError={e => { e.target.style.display = 'none'; }} />
           ) : (
-            <span style={{
-              fontFamily: 'Orbitron', fontSize: 13, fontWeight: 900,
-              color: orange, letterSpacing: '0.1em',
-            }}>{brandLabel}</span>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: orange, letterSpacing: '0.12em' }}>{brandLabel}</span>
           )}
+          <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)' }} />
+          <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.14em' }}>{stageLabel}</span>
         </div>
 
-        {/* Divider */}
-        <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)' }} />
-
-        {/* Right: Stage / Day / Match */}
+        {/* Right: Day / Match */}
         <div style={{ textAlign: 'right' }}>
-          <div style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.14em' }}>
-            {(design?.stageLabel || 'GROUP STAGE').toUpperCase()}
-          </div>
-          <div style={{ fontFamily: 'Rajdhani', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.08em' }}>
-            {dayLabel.toUpperCase()} · {matchLabel.toUpperCase()}
-          </div>
+          <span style={{ fontFamily: 'Rajdhani', fontSize: 12, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.08em' }}>
+            {dayLabel} · {matchLabel.toUpperCase()}
+          </span>
         </div>
       </motion.div>
     </motion.div>
