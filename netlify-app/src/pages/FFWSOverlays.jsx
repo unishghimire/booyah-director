@@ -71,14 +71,26 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
       style={{ position: 'absolute', right: 0, top: 40, height: 'calc(100% - 80px)', width: 300, zIndex: 10 }}
     >
-      {/* Panel with no left border-radius */}
+      {/* Panel with diagonal-cut top, glow lines, corner accents */}
       <div style={{
         width: '100%', height: '100%',
-        background: 'rgba(6,8,16,0.92)',
+        background: 'linear-gradient(180deg, rgba(8,10,18,0.95) 0%, rgba(6,8,16,0.92) 100%)',
         backdropFilter: 'blur(16px) saturate(180%)',
         borderLeft: `1px solid ${primary}33`,
+        borderRadius: '8px 0 0 8px',
+        boxShadow: `-8px 0 40px rgba(0,0,0,0.5)`,
         display: 'flex', flexDirection: 'column',
+        position: 'relative',
+        overflow: 'hidden',
       }}>
+        {/* Top accent line */}
+        <div style={{ position:'absolute', top:0, left:0, right:0, height:2, background:`linear-gradient(90deg, transparent, ${primary}, ${secondary}, ${primary}, transparent)`, boxShadow:`0 0 10px ${primary}66`, zIndex:5 }} />
+        {/* Bottom accent line */}
+        <div style={{ position:'absolute', bottom:0, left:0, right:0, height:1, background:`linear-gradient(90deg, transparent, ${secondary}88, transparent)`, zIndex:5 }} />
+        {/* Top-left corner accent */}
+        <div style={{ position:'absolute', top:0, left:0, width:16, height:16, borderTop:`2px solid ${primary}`, borderLeft:`2px solid ${primary}`, borderRadius:'8px 0 0 0', zIndex:6 }} />
+        {/* Bottom-left corner accent */}
+        <div style={{ position:'absolute', bottom:0, left:0, width:16, height:16, borderBottom:`2px solid ${secondary}`, borderLeft:`2px solid ${secondary}`, borderRadius:'0 0 0 8px', zIndex:6 }} />
         {/* Header — drops down first */}
         <motion.div
           initial={{ y: -50, opacity: 0 }}
@@ -289,39 +301,124 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
 export function MatchInfoChip({ currentMatch, design }) {
   const t = getThemeInline(design);
   const primary = t.p;
+  const secondary = t.s;
   const mapName = currentMatch?.map_name || 'Bermuda';
   const matchNum = currentMatch?.match_number || 1;
   const tLogo = design?.logoUrl || null;
+  const tName = (design?.tournamentName || 'BOOYAH').toUpperCase();
 
   return (
-    <div style={{
-      position: 'absolute', left: 24, bottom: 24, zIndex: 10,
-      display: 'flex', alignItems: 'center',
-      background: 'rgba(0,0,0,0.85)',
-      border: '1px solid rgba(255,255,255,0.12)',
-      borderRadius: 8,
-      padding: '0 16px', height: 44,
-      backdropFilter: 'blur(10px)',
-      gap: 12,
-    }}>
-      {/* Map color dot */}
-      <div style={{ width: 10, height: 10, borderRadius: 2, background: primary, boxShadow: `0 0 6px ${primary}` }} />
-      {/* Game number */}
-      <span style={{ fontFamily: 'Orbitron', fontSize: 13, fontWeight: 900, color: '#FFD700', letterSpacing: '0.08em' }}>
-        GAME {String(matchNum).padStart(2, '0')}
-      </span>
-      {/* Divider */}
-      <div style={{ width: 1, height: 20, background: 'rgba(255,255,255,0.12)' }} />
-      {/* Map name */}
-      <span style={{ fontFamily: 'Rajdhani', fontSize: 15, fontWeight: 700, color: '#fff' }}>
-        {mapName}
-      </span>
-      {/* Tournament logo */}
-      {tLogo && (
-        <img src={tLogo} alt="" style={{ height: 20, objectFit: 'contain', opacity: 0.7 }}
-          onError={e => { e.target.style.display = 'none'; }} />
-      )}
-    </div>
+    <motion.div
+      initial={{ x: -120, opacity: 0 }}
+      animate={{ x: 0, opacity: 1 }}
+      transition={{ duration: 0.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+      style={{ position: 'absolute', left: 24, bottom: 32, zIndex: 10 }}
+    >
+      {/* Container with diagonal-cut accent bar */}
+      <div style={{
+        display: 'flex', alignItems: 'stretch',
+        height: 52,
+        filter: 'drop-shadow(0 6px 20px rgba(0,0,0,0.6))',
+      }}>
+        {/* Gold accent bar — left edge */}
+        <div style={{
+          width: 5, background: '#f0a818',
+          boxShadow: '0 0 12px rgba(240,168,24,0.6)',
+          borderRadius: '3px 0 0 3px',
+        }} />
+
+        {/* Main glass panel */}
+        <div style={{
+          display: 'flex', alignItems: 'center',
+          background: 'linear-gradient(135deg, rgba(6,8,16,0.95) 0%, rgba(12,15,24,0.92) 100%)',
+          backdropFilter: 'blur(16px) saturate(180%)',
+          border: '1px solid rgba(255,255,255,0.08)',
+          borderLeft: 'none',
+          borderRadius: '0 8px 8px 0',
+          padding: '0 18px 0 14px',
+          gap: 14,
+          position: 'relative',
+          overflow: 'hidden',
+        }}>
+          {/* Subtle inner glow line at top */}
+          <div style={{
+            position: 'absolute', top: 0, left: 0, right: 0, height: 1,
+            background: `linear-gradient(90deg, transparent, ${primary}44, transparent)`,
+          }} />
+
+          {/* Map icon with pulsing dot */}
+          <div style={{ position: 'relative', width: 28, height: 28, display: 'flex', alignItems: 'center', justifyContent: 'center' }}>
+            <div style={{
+              width: 28, height: 28, borderRadius: 6,
+              background: `${primary}15`,
+              border: `1px solid ${primary}44`,
+              display: 'flex', alignItems: 'center', justifyContent: 'center',
+            }}>
+              {/* Pulsing live indicator */}
+              <div style={{
+                width: 8, height: 8, borderRadius: '50%',
+                background: primary,
+                boxShadow: `0 0 8px ${primary}`,
+                animation: 'chipPulse 2s ease-in-out infinite',
+              }} />
+            </div>
+          </div>
+
+          {/* Game number — gold bold */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.2em' }}>
+              MATCH
+            </span>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 16, fontWeight: 900, color: '#f0a818', letterSpacing: '0.06em', lineHeight: 1 }}>
+              {String(matchNum).padStart(2, '0')}
+            </span>
+          </div>
+
+          {/* Vertical divider */}
+          <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.1)' }} />
+
+          {/* Map name */}
+          <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-start', gap: 1 }}>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.2em' }}>
+              MAP
+            </span>
+            <span style={{ fontFamily: 'Rajdhani', fontSize: 18, fontWeight: 700, color: '#fff', lineHeight: 1, textTransform: 'uppercase', letterSpacing: '0.04em' }}>
+              {mapName}
+            </span>
+          </div>
+
+          {/* Vertical divider */}
+          <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.1)' }} />
+
+          {/* Tournament branding */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+            {tLogo ? (
+              <img src={tLogo} alt="" style={{ height: 24, objectFit: 'contain' }}
+                onError={e => { e.target.style.display = 'none'; }} />
+            ) : null}
+            <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 900, color: secondary, letterSpacing: '0.12em' }}>
+              {tName}
+            </span>
+          </div>
+        </div>
+
+        {/* Right diagonal accent — matching game intro style */}
+        <div style={{
+          width: 14, background: `linear-gradient(135deg, ${primary} 0%, ${secondary} 100%)`,
+          clipPath: 'polygon(100% 0, 0 0, 100% 100%)',
+          borderRadius: '0 4px 4px 0',
+          boxShadow: `0 0 10px ${primary}44`,
+        }} />
+      </div>
+
+      {/* Pulse animation keyframes */}
+      <style>{`
+        @keyframes chipPulse {
+          0%, 100% { opacity: 1; transform: scale(1); }
+          50% { opacity: 0.5; transform: scale(0.85); }
+        }
+      `}</style>
+    </motion.div>
   );
 }
 
