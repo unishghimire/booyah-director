@@ -473,6 +473,24 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
   );
 }
 
+/* ─── Theme helper for MatchInfoChip ─── */
+function getThemeInline(design) {
+  const style = design?.overlayStyle || 'default';
+  const userAcc  = design?.accentColor  || null;
+  const userAcc2 = design?.accentColor2 || null;
+  const presets = {
+    default:  { p:'#00C8FF', s:'#1E90FF' },
+    neon:     { p:'#00FF88', s:'#BF00FF' },
+    military: { p:'#9ABF30', s:'#C8A850' },
+    minimal:  { p:'#FFFFFF', s:'#888888' },
+    retro:    { p:'#FF3030', s:'#FFD700' },
+  };
+  const t = { ...(presets[style] || presets.default) };
+  if (userAcc  && style === 'default') t.p = userAcc;
+  if (userAcc2 && style === 'default') t.s = userAcc2;
+  return t;
+}
+
 /* ═══ MATCH INFO CHIP — bottom-left pill badge ═══ */
 export function MatchInfoChip({ currentMatch, design }) {
   const t = getThemeInline(design);
