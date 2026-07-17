@@ -479,11 +479,11 @@ function getThemeInline(design) {
   const userAcc  = design?.accentColor  || null;
   const userAcc2 = design?.accentColor2 || null;
   const presets = {
-    default:  { p:'#00C8FF', s:'#1E90FF' },
-    neon:     { p:'#00FF88', s:'#BF00FF' },
+    default:  { p:'#ff4e00', s:'#ffaa00' },
+    neon:     { p:'#7BC043', s:'#BF00FF' },
     military: { p:'#9ABF30', s:'#C8A850' },
     minimal:  { p:'#FFFFFF', s:'#888888' },
-    retro:    { p:'#FF3030', s:'#FFD700' },
+    retro:    { p:'#FF3030', s:'#ffaa00' },
   };
   const t = { ...(presets[style] || presets.default) };
   if (userAcc  && style === 'default') t.p = userAcc;
@@ -516,7 +516,7 @@ export function MatchInfoChip({ currentMatch, design }) {
       }}>
         {/* Gold accent bar — left edge */}
         <div style={{
-          width: 5, background: '#f0a818',
+          width: 5, background: '#ffaa00',
           boxShadow: '0 0 12px rgba(240,168,24,0.6)',
           borderRadius: '3px 0 0 3px',
         }} />
@@ -563,7 +563,7 @@ export function MatchInfoChip({ currentMatch, design }) {
             <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.2em' }}>
               {(design?.matchInfoLabel || 'MATCH').toUpperCase()}
             </span>
-            <span style={{ fontFamily: 'Orbitron', fontSize: 16, fontWeight: 900, color: '#f0a818', letterSpacing: '0.06em', lineHeight: 1 }}>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 16, fontWeight: 900, color: '#ffaa00', letterSpacing: '0.06em', lineHeight: 1 }}>
               {String(matchNum).padStart(2, '0')}
             </span>
           </div>
@@ -629,7 +629,7 @@ export function GameIntroBanner({ currentMatch, design }) {
       width: 1920,
       height: 1080,
       position: 'relative',
-      background: '#04050a',
+      background: '#0c0c0e',
       backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(20, 24, 40, 0.9) 0%, rgba(5, 6, 12, 0.98) 100%)',
       overflow: 'hidden',
       color: '#fff',
@@ -681,8 +681,8 @@ export function GameIntroBanner({ currentMatch, design }) {
         <div style={{
           width: '65%',
           height: '100%',
-          background: 'linear-gradient(90deg, #090a0f 0%, #11131a 100%)',
-          borderLeft: '4px solid #f0a818',
+          background: 'linear-gradient(90deg, #141418 0%, #141418 100%)',
+          borderLeft: '4px solid #ffaa00',
           clipPath: 'polygon(0% 0%, 100% 0%, 88% 100%, 0% 100%)',
           display: 'flex',
           flexDirection: 'column',
@@ -696,7 +696,7 @@ export function GameIntroBanner({ currentMatch, design }) {
             fontFamily: 'Orbitron',
             fontSize: 12,
             fontWeight: 800,
-            color: '#b0b6c2',
+            color: '#888888',
             letterSpacing: '0.45em',
             textTransform: 'uppercase',
             marginBottom: 4
@@ -708,8 +708,8 @@ export function GameIntroBanner({ currentMatch, design }) {
             fontFamily: 'Orbitron',
             fontSize: 64,
             fontWeight: 900,
-            color: '#f0a818',
-            backgroundImage: 'linear-gradient(to bottom, #ffe680 0%, #f0a818 100%)',
+            color: '#ffaa00',
+            backgroundImage: 'linear-gradient(to bottom, #ffaa00 0%, #ffaa00 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             letterSpacing: '0.05em',
@@ -724,7 +724,7 @@ export function GameIntroBanner({ currentMatch, design }) {
         <div style={{
           width: '35%',
           height: '100%',
-          background: 'linear-gradient(135deg, #a8101a 0%, #e61c2b 100%)',
+          background: 'linear-gradient(135deg, #ef4444 0%, #ef4444 100%)',
           clipPath: 'polygon(22.5% 0%, 100% 0%, 100% 100%, 0% 100%)',
           marginLeft: '-10%', // overlap/align clip paths perfectly
           display: 'flex',
@@ -784,8 +784,8 @@ export function GameIntroBanner({ currentMatch, design }) {
           width: 10,
           height: 10,
           borderRadius: '50%',
-          background: '#f0a818',
-          boxShadow: '0 0 12px #f0a818'
+          background: '#ffaa00',
+          boxShadow: '0 0 12px #ffaa00'
         }} />
         <span style={{
           fontFamily: 'Orbitron',
@@ -897,7 +897,7 @@ export function MatchScheduleGrid({ design }) {
       height: 1080,
       position: 'relative',
       overflow: 'hidden',
-      background: 'radial-gradient(circle at 50% 40%, #150f3b 0%, #070514 80%, #030208 100%)',
+      background: 'radial-gradient(circle at 50% 40%, #141418 0%, #0c0c0e 80%, #0c0c0e 100%)',
       boxSizing: 'border-box',
     }}>
       {/* Hazard diagonal warning stripes in the corners */}
@@ -910,7 +910,7 @@ export function MatchScheduleGrid({ design }) {
         height: 180,
         transform: 'rotate(-45deg)',
         zIndex: 5,
-        backgroundImage: 'repeating-linear-gradient(-45deg, #FFC700, #FFC700 15px, #000 15px, #000 30px)',
+        backgroundImage: 'repeating-linear-gradient(-45deg, #ffaa00, #ffaa00 15px, #000 15px, #000 30px)',
         boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
         borderBottom: '4px solid #fff'
       }} />
@@ -924,7 +924,7 @@ export function MatchScheduleGrid({ design }) {
         height: 180,
         transform: 'rotate(45deg)',
         zIndex: 5,
-        backgroundImage: 'repeating-linear-gradient(45deg, #FFC700, #FFC700 15px, #000 15px, #000 30px)',
+        backgroundImage: 'repeating-linear-gradient(45deg, #ffaa00, #ffaa00 15px, #000 15px, #000 30px)',
         boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
         borderBottom: '4px solid #fff'
       }} />
@@ -938,7 +938,7 @@ export function MatchScheduleGrid({ design }) {
         height: 180,
         transform: 'rotate(45deg)',
         zIndex: 5,
-        backgroundImage: 'repeating-linear-gradient(45deg, #FFC700, #FFC700 15px, #000 15px, #000 30px)',
+        backgroundImage: 'repeating-linear-gradient(45deg, #ffaa00, #ffaa00 15px, #000 15px, #000 30px)',
         boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
         borderTop: '4px solid #fff'
       }} />
@@ -952,7 +952,7 @@ export function MatchScheduleGrid({ design }) {
         height: 180,
         transform: 'rotate(-45deg)',
         zIndex: 5,
-        backgroundImage: 'repeating-linear-gradient(-45deg, #FFC700, #FFC700 15px, #000 15px, #000 30px)',
+        backgroundImage: 'repeating-linear-gradient(-45deg, #ffaa00, #ffaa00 15px, #000 15px, #000 30px)',
         boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
         borderTop: '4px solid #fff'
       }} />
@@ -1019,7 +1019,7 @@ export function MatchScheduleGrid({ design }) {
               <div style={{
                 height: 80,
                 width: 80,
-                background: 'linear-gradient(135deg, #FFC700, #FF5500)',
+                background: 'linear-gradient(135deg, #ffaa00, #ff4e00)',
                 clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
                 display: 'flex',
                 alignItems: 'center',
@@ -1045,7 +1045,7 @@ export function MatchScheduleGrid({ design }) {
                 fontFamily: 'Orbitron',
                 fontSize: 14,
                 fontWeight: 700,
-                color: '#FFC700',
+                color: '#ffaa00',
                 letterSpacing: '0.3em',
                 marginTop: 6,
                 textTransform: 'uppercase',
@@ -1120,7 +1120,7 @@ export function MatchScheduleGrid({ design }) {
                     position: 'absolute',
                     inset: 0,
                     zIndex: 0,
-                    background: 'radial-gradient(circle at center, #1a153b 0%, #0d0a1f 100%)',
+                    background: 'radial-gradient(circle at center, #141418 0%, #0c0c0e 100%)',
                   }}>
                     {/* Animated grid overlay inside Random card */}
                     <div style={{
@@ -1144,7 +1144,7 @@ export function MatchScheduleGrid({ design }) {
                       justifyContent: 'center',
                       boxShadow: '0 0 20px rgba(255, 199, 0, 0.1)'
                     }}>
-                      <span style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#FFC700', opacity: 0.6 }}>?</span>
+                      <span style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#ffaa00', opacity: 0.6 }}>?</span>
                     </div>
                   </div>
                 ) : mapImg ? (
@@ -1161,7 +1161,7 @@ export function MatchScheduleGrid({ design }) {
                     position: 'absolute',
                     inset: 0,
                     zIndex: 0,
-                    background: 'linear-gradient(135deg, #1b163d, #0d0a21)',
+                    background: 'linear-gradient(135deg, #141418, #0c0c0e)',
                   }} />
                 )}
 
@@ -1194,7 +1194,7 @@ export function MatchScheduleGrid({ design }) {
                   justifyContent: 'flex-start',
                 }}>
                   <div style={{
-                    background: 'linear-gradient(135deg, #FFC700 0%, #FF8800 100%)',
+                    background: 'linear-gradient(135deg, #ffaa00 0%, #ff4e00 100%)',
                     borderRadius: 4,
                     padding: '6px 14px',
                     boxShadow: '0 4px 12px rgba(255, 136, 0, 0.4)',
@@ -1236,7 +1236,7 @@ export function MatchScheduleGrid({ design }) {
                     fontFamily: 'Orbitron',
                     fontSize: 10,
                     fontWeight: 700,
-                    color: isRandom ? '#FF8800' : '#00FFCC',
+                    color: isRandom ? '#ff4e00' : '#ffaa00',
                     letterSpacing: '0.2em',
                     marginTop: 6,
                     textTransform: 'uppercase',
@@ -1268,9 +1268,9 @@ export function MatchScheduleGrid({ design }) {
             <div style={{
               width: 12,
               height: 12,
-              background: '#FFC700',
+              background: '#ffaa00',
               clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
-              boxShadow: '0 0 8px #FFC700'
+              boxShadow: '0 0 8px #ffaa00'
             }} />
             <span style={{
               fontFamily: 'Orbitron',
@@ -1287,7 +1287,7 @@ export function MatchScheduleGrid({ design }) {
             fontFamily: 'Orbitron',
             fontSize: 13,
             fontWeight: 800,
-            color: '#FFC700',
+            color: '#ffaa00',
             letterSpacing: '0.15em',
             textTransform: 'uppercase'
           }}>
@@ -1384,7 +1384,7 @@ export function PointRushStandings({ teams = [], design }) {
                 let rankBadgeBorder = '1px solid rgba(255, 255, 255, 0.1)';
                 
                 if (rank === 1) {
-                  rankBadgeBg = 'linear-gradient(135deg, #ffaa00, #ff8800)';
+                  rankBadgeBg = 'linear-gradient(135deg, #ffaa00, #ff4e00)';
                   rankBadgeColor = '#0c0c0e';
                   rankBadgeBorder = 'none';
                 } else if (rank === 2) {
@@ -1707,9 +1707,9 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
   const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
   const sponsorLogo = design?.sponsorLogoUrl || null;
   const sponsorLabel = design?.sponsorLabel || 'OFFICIAL SPONSOR';
-  const accent = '#00C8FF';
-  const accent2 = '#0055FF';
-  const gold = '#FFC700';
+  const accent = '#ff4e00';
+  const accent2 = '#ffaa00';
+  const gold = '#ffaa00';
 
   // Parse format_config to build the roadmap
   let formatConfig = null;
@@ -1778,7 +1778,7 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
   return (
     <div style={{
       width: 1920, height: 1080, position: 'relative', overflow: 'hidden',
-      background: 'radial-gradient(ellipse at 50% 30%, #0a1130 0%, #04060E 70%, #02030a 100%)',
+      background: 'radial-gradient(ellipse at 50% 30%, #141418 0%, #0c0c0e 70%, #0c0c0e 100%)',
       boxSizing: 'border-box', color: '#fff'
     }}>
       {/* Ambient glows */}
@@ -1837,7 +1837,7 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
               }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: '50%',
-                  background: `linear-gradient(135deg, ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}, ${si === 0 ? accent2 : si === stages.length - 1 ? '#ff8800' : accent})`,
+                  background: `linear-gradient(135deg, ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}, ${si === 0 ? accent2 : si === stages.length - 1 ? '#ff4e00' : accent})`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#fff',
                   boxShadow: `0 0 15px ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}60`
@@ -1875,8 +1875,8 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
                               {/* Status dot */}
                               <div style={{
                                 width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
-                                background: isDone ? '#00ff64' : isCurrent ? accent : 'rgba(255,255,255,0.15)',
-                                boxShadow: isDone ? '0 0 8px #00ff6480' : isCurrent ? `0 0 8px ${accent}80` : 'none',
+                                background: isDone ? '#7BC043' : isCurrent ? accent : 'rgba(255,255,255,0.15)',
+                                boxShadow: isDone ? '0 0 8px #7BC04380' : isCurrent ? `0 0 8px ${accent}80` : 'none',
                               }} />
                               {/* Match number */}
                               <span style={{
@@ -1892,7 +1892,7 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
                               }}>{m.map}</span>
                               {/* State badge */}
                               {isCurrent && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: accent, letterSpacing: '0.15em', background: `${accent}15`, padding: '2px 8px', borderRadius: 4 }}>LIVE</span>}
-                              {isDone && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#00ff64', letterSpacing: '0.15em' }}>DONE</span>}
+                              {isDone && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#7BC043', letterSpacing: '0.15em' }}>DONE</span>}
                               {isScheduled && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.15em' }}>—</span>}
                             </div>
                           );
@@ -1930,9 +1930,9 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
   const tSubtitle = design?.tournamentSubtitle || 'FREE FIRE ESPORTS';
   const sponsorLogo = design?.sponsorLogoUrl || null;
   const sponsorLabel = design?.sponsorLabel || 'OFFICIAL SPONSOR';
-  const accent = '#00C8FF';
-  const accent2 = '#0055FF';
-  const gold = '#FFC700';
+  const accent = '#ff4e00';
+  const accent2 = '#ffaa00';
+  const gold = '#ffaa00';
 
   // Parse format config for stats
   let formatConfig = null;
@@ -1982,7 +1982,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
   return (
     <div style={{
       width: 1920, height: 1080, position: 'relative', overflow: 'hidden',
-      background: 'radial-gradient(ellipse at 30% 20%, #0a1130 0%, #04060E 60%, #02030a 100%)',
+      background: 'radial-gradient(ellipse at 30% 20%, #141418 0%, #0c0c0e 60%, #0c0c0e 100%)',
       boxSizing: 'border-box', color: '#fff'
     }}>
       {/* Ambient glows */}
@@ -2054,7 +2054,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
                     )}
                     <div>
                       <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', marginBottom: 6 }}>STATUS</div>
-                      <div style={{ fontFamily: 'Orbitron', fontSize: 28, fontWeight: 900, color: currentState === 'in_game' ? '#00ff64' : accent, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{currentState.replace('_', ' ')}</div>
+                      <div style={{ fontFamily: 'Orbitron', fontSize: 28, fontWeight: 900, color: currentState === 'in_game' ? '#7BC043' : accent, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{currentState.replace('_', ' ')}</div>
                     </div>
                   </div>
                 </>

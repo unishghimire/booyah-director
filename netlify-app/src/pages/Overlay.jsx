@@ -113,11 +113,11 @@ function getTheme(design) {
   const userAcc2 = design?.accentColor2 || null;
 
   const presets = {
-    default:  { p:'#00C8FF', s:'#1E90FF', bg:'rgba(4,6,14,0.92)',  border:'rgba(0,200,255,0.28)',  headerBg:'rgba(2,4,12,0.88)',       rowEven:'rgba(0,200,255,0.02)', shine:'rgba(0,200,255,0.10)',  cornerStyle:'dual',     gridOpacity:0.05, scanlines:false, glow:true  },
-    neon:     { p:'#00FF88', s:'#BF00FF', bg:'rgba(2,4,12,0.92)',   border:'rgba(0,255,136,0.35)',  headerBg:'rgba(0,0,0,0.90)',       rowEven:'rgba(0,255,136,0.02)',  shine:'rgba(0,255,136,0.10)', cornerStyle:'glow',     gridOpacity:0.10, scanlines:false, glow:true  },
+    default:  { p:'#ff4e00', s:'#ffaa00', bg:'rgba(4,6,14,0.92)',  border:'rgba(0,200,255,0.28)',  headerBg:'rgba(2,4,12,0.88)',       rowEven:'rgba(0,200,255,0.02)', shine:'rgba(0,200,255,0.10)',  cornerStyle:'dual',     gridOpacity:0.05, scanlines:false, glow:true  },
+    neon:     { p:'#7BC043', s:'#BF00FF', bg:'rgba(2,4,12,0.92)',   border:'rgba(0,255,136,0.35)',  headerBg:'rgba(0,0,0,0.90)',       rowEven:'rgba(0,255,136,0.02)',  shine:'rgba(0,255,136,0.10)', cornerStyle:'glow',     gridOpacity:0.10, scanlines:false, glow:true  },
     military: { p:'#9ABF30', s:'#C8A850', bg:'rgba(8,12,6,0.92)',   border:'rgba(154,191,48,0.28)', headerBg:'rgba(5,8,3,0.90)',       rowEven:'rgba(154,191,48,0.02)', shine:'rgba(154,191,48,0.08)',cornerStyle:'tick',     gridOpacity:0.04, scanlines:false, glow:false },
     minimal:  { p:'#FFFFFF', s:'#888888', bg:'rgba(10,10,12,0.94)', border:'rgba(255,255,255,0.12)',headerBg:'rgba(255,255,255,0.04)', rowEven:'rgba(255,255,255,0.02)',shine:'rgba(255,255,255,0.06)',cornerStyle:'none',     gridOpacity:0.00, scanlines:false, glow:false },
-    retro:    { p:'#FF3030', s:'#FFD700', bg:'rgba(6,2,2,0.92)',    border:'rgba(255,48,48,0.35)',  headerBg:'rgba(0,0,0,0.88)',       rowEven:'rgba(255,48,48,0.02)',  shine:'rgba(255,48,48,0.10)', cornerStyle:'rect',     gridOpacity:0.08, scanlines:true,  glow:true  },
+    retro:    { p:'#FF3030', s:'#ffaa00', bg:'rgba(6,2,2,0.92)',    border:'rgba(255,48,48,0.35)',  headerBg:'rgba(0,0,0,0.88)',       rowEven:'rgba(255,48,48,0.02)',  shine:'rgba(255,48,48,0.10)', cornerStyle:'rect',     gridOpacity:0.08, scanlines:true,  glow:true  },
   };
 
   const t = { ...(presets[style] || presets.default) };
@@ -202,7 +202,7 @@ function ThemedBackground({ design, mapName, children }) {
 
   return (
     <div style={{ position:'absolute', inset:0, overflow:'hidden' }}>
-      <div style={{ position:'absolute', inset:0, background:design?.bgColor || '#060912' }} />
+      <div style={{ position:'absolute', inset:0, background:design?.bgColor || '#0c0c0e' }} />
       {mapImg && <div style={{ position:'absolute', inset:0, backgroundImage:`url(${mapImg})`, backgroundSize:'cover', backgroundPosition:'center', opacity:style==='minimal'?0.05:0.12, filter:'blur(8px) saturate(0.6)' }} />}
       <div style={{ position:'absolute', inset:0, backgroundImage:g.img, backgroundSize:g.sz }} />
       <div style={{ position:'absolute', inset:0, background:`radial-gradient(ellipse 1400px 900px at 50% 40%,${t.p}20,transparent 70%)` }} />
@@ -248,12 +248,12 @@ function ThemedHeader({ design, center, rightText }) {
 /* ══════════════════════════════════════════════════
    BACKGROUND — atmospheric gaming backdrop
 ══════════════════════════════════════════════════ */
-function GamingBackground({ mapName, accent = '#FF6B00', accent2 = '#00D4FF' }) {
+function GamingBackground({ mapName, accent = '#ff4e00', accent2 = '#ffaa00' }) {
   const mapImages = getMapImages();
   const mapImg = mapImages?.[mapName] || null;
   return (
     <div style={{ position: 'absolute', inset: 0, overflow: 'hidden', zIndex: 0 }}>
-      <div style={{ position: 'absolute', inset: 0, background: '#060912' }} />
+      <div style={{ position: 'absolute', inset: 0, background: '#0c0c0e' }} />
       {mapImg && (
         <div style={{
           position: 'absolute', inset: 0,
@@ -295,9 +295,9 @@ function GamingBackground({ mapName, accent = '#FF6B00', accent2 = '#00D4FF' }) 
    DESIGN TOKENS
 ══════════════════════════════════════════════════ */
 const tok = {
-  acc:  d => d?.accentColor        || '#FF6B00',
-  acc2: d => d?.accentColor2       || '#00D4FF',
-  bg:   d => d?.bgColor            || '#060915',
+  acc:  d => d?.accentColor        || '#ff4e00',
+  acc2: d => d?.accentColor2       || '#ffaa00',
+  bg:   d => d?.bgColor            || '#0c0c0e',
   txt:  d => d?.textColor          || '#ffffff',
   name: d => d?.tournamentName     || 'BOOYAH CHAMPIONSHIP',
   sub:  d => d?.tournamentSubtitle || 'GRAND FINALS',
@@ -321,10 +321,10 @@ function FFPanel({ children, style }) {
       ...style,
     }}>
       {/* Corner accents */}
-      <div style={{ position:'absolute', top:0, left:0, width:14, height:14, borderTop:'3px solid #FF6B00', borderLeft:'3px solid #FF6B00', borderRadius:'4px 0 0 0', zIndex:10 }} />
-      <div style={{ position:'absolute', top:0, right:0, width:14, height:14, borderTop:'3px solid #00D4FF', borderRight:'3px solid #00D4FF', borderRadius:'0 4px 0 0', zIndex:10 }} />
-      <div style={{ position:'absolute', bottom:0, left:0, width:14, height:14, borderBottom:'3px solid #00D4FF', borderLeft:'3px solid #00D4FF', borderRadius:'0 0 0 4px', zIndex:10 }} />
-      <div style={{ position:'absolute', bottom:0, right:0, width:14, height:14, borderBottom:'3px solid #FF6B00', borderRight:'3px solid #FF6B00', borderRadius:'0 0 4px 0', zIndex:10 }} />
+      <div style={{ position:'absolute', top:0, left:0, width:14, height:14, borderTop:'3px solid #ff4e00', borderLeft:'3px solid #ff4e00', borderRadius:'4px 0 0 0', zIndex:10 }} />
+      <div style={{ position:'absolute', top:0, right:0, width:14, height:14, borderTop:'3px solid #ffaa00', borderRight:'3px solid #ffaa00', borderRadius:'0 4px 0 0', zIndex:10 }} />
+      <div style={{ position:'absolute', bottom:0, left:0, width:14, height:14, borderBottom:'3px solid #ffaa00', borderLeft:'3px solid #ffaa00', borderRadius:'0 0 0 4px', zIndex:10 }} />
+      <div style={{ position:'absolute', bottom:0, right:0, width:14, height:14, borderBottom:'3px solid #ff4e00', borderRight:'3px solid #ff4e00', borderRadius:'0 0 4px 0', zIndex:10 }} />
       {children}
     </div>
   );
@@ -383,7 +383,7 @@ function TeamLogo({ team, size = 32 }) {
   return (
     <div style={{
       width: size, height: size, borderRadius: 6,
-      background: `linear-gradient(135deg, ${team?.color || '#FF6B00'}, ${team?.color || '#FF6B00'}88)`,
+      background: `linear-gradient(135deg, ${team?.color || '#ff4e00'}, ${team?.color || '#ff4e00'}88)`,
       display:'flex', alignItems:'center', justifyContent:'center',
       fontSize: size * 0.4, fontWeight:900, color:'#fff', fontFamily:'Orbitron',
       flexShrink: 0,
@@ -463,7 +463,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
         <div style={{ display:'flex', flexDirection:'column' }}>
           {safeArray(rows).map((team, idx) => {
             const rank      = idx + 1;
-            const rankColors = ['#FFD700','#C0C0C0','#CD7F32'];
+            const rankColors = ['#ffaa00','#C0C0C0','#CD7F32'];
             const rankColor = rank <= 3 ? rankColors[rank-1] : 'rgba(255,255,255,0.45)';
             const rowBg     = rank === 1
               ? `linear-gradient(90deg, ${primary}12, transparent)`
@@ -572,7 +572,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
 ══════════════════════════════════════════════════ */
 function FullStandings({ teams = [], design }) {
   const sorted = useMemo(() => [...safeArray(teams)].sort((a,b) => (b.total_tournament_points||0)-(a.total_tournament_points||0)||(b.total_tournament_kills||0)-(a.total_tournament_kills||0)), [teams]);
-  const rankColors = ['#FFD700','#E5E4E2','#CD7F32'];
+  const rankColors = ['#ffaa00','#C0C0C0','#CD7F32'];
   const t = getTheme(design);
   const primary = t.p;
   const secondary = t.s;
@@ -618,7 +618,7 @@ function FullStandings({ teams = [], design }) {
               <div style={{ width:60, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', textAlign:'center', letterSpacing:'0.15em' }}>RANK</div>
               <div style={{ width:40 }} />
               <div style={{ flex:1, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', paddingLeft:16, letterSpacing:'0.15em' }}>TEAM NAME</div>
-              <div style={{ width:100, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#00D4FF', letterSpacing:'0.15em' }}>PPT</div>
+              <div style={{ width:100, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#ffaa00', letterSpacing:'0.15em' }}>PPT</div>
               <div style={{ width:100, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>KILLS</div>
               <div style={{ width:120, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#22c55e', letterSpacing:'0.15em' }}>KILL PTS</div>
               <div style={{ width:150, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:secondary, letterSpacing:'0.15em' }}>TOTAL PTS</div>
@@ -631,11 +631,11 @@ function FullStandings({ teams = [], design }) {
                 const rc = rank<=3 ? rankColors[rank-1] : '#fff';
                 const rowBg = rank===1 ? 'rgba(255,107,0,0.06)' : rank===2 ? 'rgba(0,212,255,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
                 const crEligible = team.champion_rush_eligible;
-                const crBorder = crEligible ? '4px solid #FFC700' : `4px solid ${rank<=3?rankColors[rank-1]:'transparent'}`;
+                const crBorder = crEligible ? '4px solid #ffaa00' : `4px solid ${rank<=3?rankColors[rank-1]:'transparent'}`;
                 const crBg = crEligible ? 'rgba(255, 199, 0, 0.08)' : rowBg;
                 return (
                   <div key={team.id||idx} style={{ display:'flex', alignItems:'center', height:52, background:crBg, borderBottom:'1px solid rgba(255,255,255,0.03)', borderLeft:crBorder, padding:'0 24px', boxShadow: crEligible ? 'inset 0 0 10px rgba(255, 199, 0, 0.1)' : 'none' }}>
-                    <div style={{ width:60, textAlign:'center', fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:crEligible ? '#FFC700' : rc, textShadow: crEligible ? '0 0 8px rgba(255, 199, 0, 0.5)' : 'none' }}>#{rank}{crEligible && <span style={{ fontSize: 9, marginLeft: 2 }}>🏆</span>}</div>
+                    <div style={{ width:60, textAlign:'center', fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:crEligible ? '#ffaa00' : rc, textShadow: crEligible ? '0 0 8px rgba(255, 199, 0, 0.5)' : 'none' }}>#{rank}{crEligible && <span style={{ fontSize: 9, marginLeft: 2 }}>🏆</span>}</div>
                     <div style={{ width:40, display:'flex', justifyContent:'center' }}>
                       <TeamLogo team={team} size={28} />
                     </div>
@@ -648,7 +648,7 @@ function FullStandings({ teams = [], design }) {
                       const ppt = totalPts - killPts;
                       return (
                         <>
-                          <div style={{ width:100, textAlign:'center', fontFamily:'Rajdhani', fontSize:18, fontWeight:900, color:'#00D4FF' }}>{ppt}</div>
+                          <div style={{ width:100, textAlign:'center', fontFamily:'Rajdhani', fontSize:18, fontWeight:900, color:'#ffaa00' }}>{ppt}</div>
                           <div style={{ width:100, textAlign:'center', fontFamily:'Rajdhani', fontSize:20, color:primary, fontWeight:900 }}>{totalKills}</div>
                           <div style={{ width:120, textAlign:'center', fontFamily:'Rajdhani', fontSize:18, fontWeight:900, color:'#22c55e' }}>{killPts}</div>
                           <div style={{ width:150, textAlign:'center', fontFamily:'Rajdhani', fontSize:24, fontWeight:900, color:secondary }}>{totalPts}</div>
@@ -797,7 +797,7 @@ function PreMatchMap({ match, teams = [], design }) {
 
           <div style={{ flex:1, display:'flex', alignItems:'center', justifyContent:'center' }}>
             <div style={{ width:500, height:500, borderRadius:16, overflow:'hidden', border:`2px solid ${primary}44`, boxShadow:`0 0 60px ${primary}30, 0 0 120px rgba(0,0,0,0.6)`, position:'relative' }}>
-              <div style={{ width:'100%', height:'100%', background:`linear-gradient(135deg,#0a1220,#162030)`, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
+              <div style={{ width:'100%', height:'100%', background:`linear-gradient(135deg,#141418,#141418)`, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
                 {mapImg && (
                   <img src={mapImg} alt={mapName}
                     style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover', filter:'saturate(1.2) contrast(1.05)' }}
@@ -894,7 +894,7 @@ function TodaysMatches({ matches = [], design }) {
 function TeamsToday({ teams = [], design }) {
   const displayTeams = useMemo(() => {
     if (teams.length > 0) return teams.slice(0, 12);
-    return Array.from({length:12}, (_,i) => ({ name:`TEAM ${i+1}`, color:'#FF6B00' }));
+    return Array.from({length:12}, (_,i) => ({ name:`TEAM ${i+1}`, color:'#ff4e00' }));
   }, [teams]);
   const t = getTheme(design);
   const primary = t.p;
@@ -1040,8 +1040,8 @@ function UpcomingMap({ match, design }) {
     <div style={{ position:'absolute', left:'50%', bottom:50, transform:'translateX(-50%)', width:800, zIndex:10 }}>
       <ThemedPanel design={design}>
         <div style={{ display:'flex', alignItems:'center', padding:'0 24px', height:90, gap:24 }}>
-          <div style={{ width:110, height:64, borderRadius:8, overflow:'hidden', border:`1px solid ${primary}44`, flexShrink:0, background:'#0a1220' }}>
-            <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)', position:'relative', background:'#0a1220' }}>
+          <div style={{ width:110, height:64, borderRadius:8, overflow:'hidden', border:`1px solid ${primary}44`, flexShrink:0, background:'#141418' }}>
+            <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)', position:'relative', background:'#141418' }}>
               {mapImg && (
                 <img src={mapImg} alt={mapName}
                   style={{ position:'absolute', inset:0, width:'100%', height:'100%', objectFit:'cover' }}
@@ -1573,20 +1573,20 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
         @keyframes cFall{0%{transform:translateY(-40px) rotate(0deg);opacity:1}100%{transform:translateY(1120px) rotate(720deg);opacity:0}}
         @keyframes cPanelUp{0%{transform:translateY(80px) rotate(var(--tilt));opacity:0}100%{transform:translateY(0) rotate(var(--tilt));opacity:1}}
         @keyframes cTitleIn{0%{transform:translateY(30px);opacity:0}100%{transform:translateY(0);opacity:1}}
-        @keyframes cGlow{0%,100%{text-shadow:0 0 30px #00C8FF88,0 0 60px #00C8FF44}50%{text-shadow:0 0 50px #00C8FFCC,0 0 100px #00C8FF66}}
+        @keyframes cGlow{0%,100%{text-shadow:0 0 30px #ff4e0088,0 0 60px #ff4e0044}50%{text-shadow:0 0 50px #ff4e00CC,0 0 100px #ff4e0066}}
         @keyframes cLogoIn{0%{transform:scale(0.5);opacity:0}60%{transform:scale(1.08);opacity:1}100%{transform:scale(1);opacity:1}}
         @keyframes cShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
       `}</style>
 
       {/* Deep navy base with blue radial bloom */}
-      <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, #010810 0%, #020C1A 50%, #010810 100%)', zIndex:0 }} />
+      <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, #0c0c0e 0%, #0c0c0e 50%, #0c0c0e 100%)', zIndex:0 }} />
       <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 1400px 800px at 50% 35%, rgba(0,120,255,0.22) 0%, rgba(0,60,180,0.08) 40%, transparent 70%)', zIndex:0 }} />
       {/* Subtle bottom vignette */}
       <div style={{ position:'absolute', bottom:0, left:0, right:0, height:300, background:'linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%)', zIndex:0 }} />
 
       {/* Confetti — blue/cyan/white */}
       {Array.from({length:50}).map((_,i) => {
-        const cols = ['#00C8FF','#1E90FF','#ffffff','#00C8FF','#7EC8FF','#ffffff'];
+        const cols = ['#ff4e00','#ffaa00','#ffffff','#ff4e00','#ff4e00','#ffffff'];
         return (
           <div key={i} style={{
             position:'absolute', top:-30, left:`${(i*3.7)%100}%`,
@@ -1603,7 +1603,7 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
       <div style={{ position:'absolute', top:32, left:48, right:48, display:'flex', justifyContent:'space-between', alignItems:'center', zIndex:10 }}>
         {tLogo
           ? <img src={tLogo} alt="logo" style={{ height:44, objectFit:'contain', filter:'drop-shadow(0 2px 8px rgba(0,0,0,0.6))' }} onError={e=>e.target.style.display='none'} />
-          : <div style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:'#00C8FF', letterSpacing:'0.2em' }}>{(design?.tournamentName||'BOOYAH').toUpperCase()}</div>
+          : <div style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:'#ff4e00', letterSpacing:'0.2em' }}>{(design?.tournamentName||'BOOYAH').toUpperCase()}</div>
         }
         {sponsorLogo
           ? <img src={sponsorLogo} alt="sponsor" style={{ height:44, objectFit:'contain', filter:'drop-shadow(0 2px 8px rgba(0,0,0,0.6))' }} onError={e=>e.target.style.display='none'} />
@@ -1633,10 +1633,10 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
                 boxShadow:`0 0 30px rgba(0,120,255,0.15), inset 0 1px 0 rgba(0,200,255,0.25)`,
               }}>
                 {/* Top blue accent bar */}
-                <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:'linear-gradient(90deg, #00C8FF, #1E90FF)', borderRadius:'10px 10px 0 0' }} />
+                <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:'linear-gradient(90deg, #ff4e00, #ffaa00)', borderRadius:'10px 10px 0 0' }} />
                 {/* Corner accents */}
-                <div style={{ position:'absolute', top:0, left:0, width:12, height:12, borderTop:'2px solid #00C8FF', borderLeft:'2px solid #00C8FF', borderRadius:'10px 0 0 0' }} />
-                <div style={{ position:'absolute', top:0, right:0, width:12, height:12, borderTop:'2px solid #1E90FF', borderRight:'2px solid #1E90FF', borderRadius:'0 10px 0 0' }} />
+                <div style={{ position:'absolute', top:0, left:0, width:12, height:12, borderTop:'2px solid #ff4e00', borderLeft:'2px solid #ff4e00', borderRadius:'10px 0 0 0' }} />
+                <div style={{ position:'absolute', top:0, right:0, width:12, height:12, borderTop:'2px solid #ffaa00', borderRight:'2px solid #ffaa00', borderRadius:'0 10px 0 0' }} />
 
                 {/* Player photo or team logo fill */}
                 {player?.photo_url ? (
@@ -1648,7 +1648,7 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
                   <div style={{ position:'absolute', top:0, left:0, right:0, bottom:48, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,40,120,0.2)' }}>
                     {winnerTeamObj?.logo_url
                       ? <img src={winnerTeamObj.logo_url} alt="" style={{ width:64, height:64, objectFit:'contain', opacity:0.6 }} onError={e=>e.target.style.display='none'} />
-                      : <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(0,200,255,0.15)', border:'1px solid rgba(0,200,255,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#00C8FF' }}>{(winnerName||'C').charAt(0)}</span></div>
+                      : <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(0,200,255,0.15)', border:'1px solid rgba(0,200,255,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#ff4e00' }}>{(winnerName||'C').charAt(0)}</span></div>
                     }
                   </div>
                 )}
@@ -1662,7 +1662,7 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
                     textShadow:'0 1px 4px rgba(0,0,0,0.8)' }}>
                     {player ? player.name : (winnerName||'').split(' ').slice(0,1).join('')}
                   </div>
-                  <div style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'#00C8FF', letterSpacing:'0.1em', marginTop:2, opacity:0.85 }}>
+                  <div style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'#ff4e00', letterSpacing:'0.1em', marginTop:2, opacity:0.85 }}>
                     {(winnerName||'SQUAD').toUpperCase()}
                   </div>
                 </div>
@@ -1675,14 +1675,14 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
         <div style={{ animation:'cLogoIn 0.6s cubic-bezier(0.22,1,0.36,1) 0.6s both', marginBottom:18 }}>
           <div style={{
             width:80, height:80, borderRadius:'50%',
-            border:'3px solid #00C8FF',
+            border:'3px solid #ff4e00',
             boxShadow:'0 0 40px rgba(0,200,255,0.5), 0 0 80px rgba(0,100,255,0.25)',
             display:'flex', alignItems:'center', justifyContent:'center',
             background:'rgba(0,20,60,0.8)',
           }}>
             {winnerTeamObj?.logo_url
               ? <img src={winnerTeamObj.logo_url} alt="" style={{ width:56, height:56, objectFit:'contain' }} onError={e=>e.target.style.display='none'} />
-              : <span style={{ fontFamily:'Orbitron', fontSize:26, fontWeight:900, color:'#00C8FF' }}>{(winnerName||'C').charAt(0)}</span>
+              : <span style={{ fontFamily:'Orbitron', fontSize:26, fontWeight:900, color:'#ff4e00' }}>{(winnerName||'C').charAt(0)}</span>
             }
           </div>
         </div>
@@ -1692,7 +1692,7 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
           <h1 style={{
             fontFamily:'Orbitron', fontSize:100, fontWeight:900,
             margin:0, lineHeight:0.9, letterSpacing:'0.07em',
-            background:'linear-gradient(90deg, #7EC8FF 0%, #00C8FF 30%, #ffffff 50%, #00C8FF 70%, #1E90FF 100%)',
+            background:'linear-gradient(90deg, #ff4e00 0%, #ff4e00 30%, #ffffff 50%, #ff4e00 70%, #ffaa00 100%)',
             backgroundSize:'200% auto',
             WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent',
             animation:'cShimmer 5s linear infinite, cGlow 3s ease-in-out infinite',
@@ -1707,9 +1707,9 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
         {/* ── STATS ROW ── */}
         <div style={{ display:'flex', gap:40, marginTop:22, paddingTop:18, borderTop:'1px solid rgba(0,200,255,0.18)', animation:'cTitleIn 0.6s ease 0.8s both' }}>
           {[
-            { label:'PPT',       value:placementPts, color:'#00C8FF' },
-            { label:'KILLS',     value:totalKills,   color:'#1E90FF' },
-            { label:'KILL PTS',  value:killPts,      color:'#7EC8FF' },
+            { label:'PPT',       value:placementPts, color:'#ff4e00' },
+            { label:'KILLS',     value:totalKills,   color:'#ffaa00' },
+            { label:'KILL PTS',  value:killPts,      color:'#ff4e00' },
             { label:'TOTAL',     value:totalPoints,  color:'#ffffff', big:true },
           ].map(s => (
             <div key={s.label} style={{ textAlign:'center' }}>
@@ -1747,9 +1747,9 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
 ══════════════════════════════════════════════════ */
 function OverlayLoading() {
   return (
-    <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', background:'#060912' }}>
+    <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', background:'#0c0c0e' }}>
       <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:16 }}>
-        <div style={{ width:48, height:48, borderRadius:'50%', border:'4px solid rgba(255,107,0,0.15)', borderTop:'4px solid #FF6B00', animation:'spin 0.8s linear infinite' }} />
+        <div style={{ width:48, height:48, borderRadius:'50%', border:'4px solid rgba(255,107,0,0.15)', borderTop:'4px solid #ff4e00', animation:'spin 0.8s linear infinite' }} />
         <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.3em' }}>CONNECTING TO OVERLAY...</span>
       </div>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>
@@ -1815,7 +1815,7 @@ function TeamRosterCard({ team, primary, secondary, design }) {
         right: 0,
         width: 60,
         height: 60,
-        background: 'repeating-linear-gradient(45deg, #fcd34d, #fcd34d 5px, #000 5px, #000 10px)',
+        background: 'repeating-linear-gradient(45deg, #ffaa00, #ffaa00 5px, #000 5px, #000 10px)',
         opacity: 0.15,
         clipPath: 'polygon(100% 0, 0 0, 100% 100%)',
         pointerEvents: 'none',
@@ -1879,7 +1879,7 @@ function TeamRosterCard({ team, primary, secondary, design }) {
               fontFamily: 'Rajdhani',
               fontSize: 12,
               fontWeight: 700,
-              color: '#fcd34d',
+              color: '#ffaa00',
               letterSpacing: '0.1em',
               marginTop: 2,
               textTransform: 'uppercase',
@@ -2052,7 +2052,7 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
       height: 1080,
       position: 'relative',
       overflow: 'hidden',
-      background: 'linear-gradient(135deg, #d946ef 0%, #8b5cf6 50%, #3b82f6 100%)',
+      background: 'linear-gradient(135deg, #ff4e00 0%, #ffaa00 50%, #ff4e00 100%)',
       color: '#ffffff',
       display: 'flex',
       flexDirection: 'column',
@@ -2065,7 +2065,7 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
         left: -100,
         width: 300,
         height: 300,
-        background: 'repeating-linear-gradient(45deg, #fcd34d, #fcd34d 15px, #000 15px, #000 30px)',
+        background: 'repeating-linear-gradient(45deg, #ffaa00, #ffaa00 15px, #000 15px, #000 30px)',
         transform: 'rotate(-15deg)',
         opacity: 0.35,
         boxShadow: '0 0 50px rgba(0, 0, 0, 0.5)',
@@ -2079,7 +2079,7 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
         right: -100,
         width: 300,
         height: 300,
-        background: 'repeating-linear-gradient(45deg, #fcd34d, #fcd34d 15px, #000 15px, #000 30px)',
+        background: 'repeating-linear-gradient(45deg, #ffaa00, #ffaa00 15px, #000 15px, #000 30px)',
         transform: 'rotate(-15deg)',
         opacity: 0.35,
         boxShadow: '0 0 50px rgba(0, 0, 0, 0.5)',
@@ -2149,7 +2149,7 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
                 fontFamily: 'Orbitron',
                 fontSize: 16,
                 fontWeight: 700,
-                color: '#fcd34d',
+                color: '#ffaa00',
                 letterSpacing: '0.3em',
                 marginTop: 4,
                 textTransform: 'uppercase',
@@ -2183,9 +2183,9 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
               fontFamily: 'Orbitron',
               fontSize: 14,
               fontWeight: 900,
-              color: '#fcd34d',
+              color: '#ffaa00',
               letterSpacing: '0.15em',
-              border: '2px solid #fcd34d',
+              border: '2px solid #ffaa00',
               padding: '8px 20px',
               borderRadius: 6,
               background: 'rgba(252, 211, 77, 0.1)',
