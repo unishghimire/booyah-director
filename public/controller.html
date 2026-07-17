@@ -1,0 +1,1152 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Booyah Director — Broadcast Controller</title>
+
+<!-- ═══ CDNs ═══ -->
+<link href="https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Teko:wght@400;500;600;700&family=Orbitron:wght@500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.socket.io/4.7.5/socket.io.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/xlsx@0.18.5/dist/xlsx.full.min.js"></script>
+
+<style>
+/* ═══════════════════════════════════════════════════════════════════════
+   ROOT THEME VARIABLES
+   ═══════════════════════════════════════════════════════════════════════ */
+:root {
+  --primary-color: #ff4e00;
+  --accent-glow:   #ffaa00;
+  --bg-dark:       #0c0c0e;
+  --bg-panel:      #141418;
+  --text-main:     #ffffff;
+  --text-muted:    #8a8a8e;
+  --border-dim:    #222226;
+  --border-glow:   rgba(255, 78, 0, 0.4);
+  --save-green:    #00ff7f;
+  --clip-angle:    polygon(12px 0%, 100% 0%, calc(100% - 12px) 100%, 0% 100%);
+  --clip-angled:   polygon(0 0, calc(100% - 12px) 0, 100% 100%, 12px 100%);
+}
+
+/* ═══ RESET & BASE ═══ */
+* { margin: 0; padding: 0; box-sizing: border-box; }
+html, body {
+  height: 100vh;
+  overflow: hidden;
+  font-family: 'Rajdhani', sans-serif;
+  background: var(--bg-dark);
+  color: var(--text-main);
+  user-select: none;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* ═══ SCROLLBAR ═══ */
+::-webkit-scrollbar { width: 6px; }
+::-webkit-scrollbar-track { background: transparent; }
+::-webkit-scrollbar-thumb { background: var(--border-dim); border-radius: 3px; }
+::-webkit-scrollbar-thumb:hover { background: var(--primary-color); }
+
+/* ═══ LAYOUT — 1080p NO SCROLL ═══ */
+#app {
+  display: grid;
+  grid-template-rows: 48px 1fr;
+  height: 100vh;
+  overflow: hidden;
+}
+
+/* ═══ HEADER BAR ═══ */
+.header-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 16px;
+  background: linear-gradient(180deg, #0a0a0c 0%, #0c0c0e 100%);
+  border-bottom: 1px solid var(--border-dim);
+  height: 48px;
+  flex-shrink: 0;
+}
+.header-left { display: flex; align-items: center; gap: 12px; }
+.logo-mark {
+  width: 28px; height: 28px;
+  background: var(--primary-color);
+  clip-path: var(--clip-angle);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 12px;
+  color: #fff;
+  filter: drop-shadow(0 0 6px var(--border-glow));
+}
+.header-title {
+  font-family: 'Teko', sans-serif; font-size: 20px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--text-main);
+}
+.save-indicator {
+  display: flex; align-items: center; gap: 6px;
+  font-size: 12px; font-weight: 500; letter-spacing: 1px;
+  text-transform: uppercase; color: var(--text-muted);
+  transition: color 0.3s;
+}
+.save-indicator.saving { color: var(--accent-glow); }
+.save-indicator.saved  { color: var(--save-green); }
+.save-dot {
+  width: 8px; height: 8px; border-radius: 50%; background: var(--text-muted);
+  transition: all 0.3s;
+}
+.save-indicator.saving .save-dot { background: var(--accent-glow); animation: pulse 0.8s infinite; }
+.save-indicator.saved  .save-dot { background: var(--save-green); box-shadow: 0 0 8px var(--save-green); }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+/* ═══ MAIN GRID ═══ */
+.main-grid {
+  display: grid;
+  grid-template-columns: 280px 1fr 320px;
+  height: calc(100vh - 48px);
+  overflow: hidden;
+}
+
+/* ═══ SIDEBAR (left) ═══ */
+.sidebar-left {
+  background: var(--bg-panel);
+  border-right: 1px solid var(--border-dim);
+  overflow-y: auto;
+  padding: 12px;
+}
+.sidebar-section { margin-bottom: 16px; }
+.sidebar-label {
+  font-family: 'Teko', sans-serif; font-size: 14px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase;
+  color: var(--text-muted); margin-bottom: 8px;
+  padding-left: 4px;
+}
+.nav-btn {
+  display: flex; align-items: center; gap: 8px;
+  width: 100%; padding: 8px 12px;
+  background: transparent; border: 1px solid transparent;
+  color: var(--text-muted); cursor: pointer;
+  font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: 1px;
+  transition: all 0.2s;
+  clip-path: var(--clip-angle);
+  margin-bottom: 4px;
+}
+.nav-btn:hover { background: rgba(255,78,0,0.08); color: var(--text-main); }
+.nav-btn.active {
+  background: rgba(255,78,0,0.15);
+  border-color: var(--primary-color);
+  color: var(--primary-color);
+  filter: drop-shadow(0 0 4px var(--border-glow));
+}
+
+/* ═══ CENTER PANEL ═══ */
+.center-panel {
+  background: var(--bg-dark);
+  overflow-y: auto;
+  padding: 16px;
+}
+.panel-title {
+  font-family: 'Teko', sans-serif; font-size: 24px; font-weight: 600;
+  letter-spacing: 2px; text-transform: uppercase;
+  margin-bottom: 12px;
+  color: var(--text-main);
+}
+.panel-title::after {
+  content: ''; display: block;
+  width: 60px; height: 3px;
+  background: var(--primary-color);
+  margin-top: 4px;
+  filter: drop-shadow(0 0 4px var(--border-glow));
+}
+
+/* ═══ TEAM GRID ═══ */
+.team-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+.team-card {
+  background: var(--bg-panel);
+  border: 1px solid var(--border-dim);
+  padding: 10px;
+  position: relative;
+  overflow: hidden;
+  clip-path: var(--clip-angle);
+  transition: border-color 0.3s;
+}
+.team-card:hover { border-color: var(--primary-color); }
+.team-card-header {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.team-badge {
+  width: 32px; height: 32px; border-radius: 4px;
+  background: var(--team-accent, var(--primary-color));
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Orbitron', sans-serif; font-weight: 900; font-size: 11px;
+  color: #fff; flex-shrink: 0;
+  clip-path: var(--clip-angled);
+}
+.team-logo {
+  width: 32px; height: 32px; border-radius: 4px; object-fit: cover;
+  border: 1px solid var(--border-dim);
+}
+.team-input {
+  flex: 1; min-width: 0;
+  background: transparent; border: none;
+  color: var(--text-main);
+  font-family: 'Rajdhani', sans-serif; font-size: 14px; font-weight: 600;
+  text-transform: uppercase; letter-spacing: 0.5px;
+  outline: none; padding: 2px 4px;
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s;
+}
+.team-input:focus { border-bottom-color: var(--primary-color); }
+.team-input::placeholder { color: var(--text-muted); text-transform: none; }
+
+/* ═══ PLAYER ROW ═══ */
+.player-row {
+  display: grid;
+  grid-template-columns: 28px 1fr 60px;
+  gap: 6px; align-items: center;
+  margin-bottom: 4px;
+}
+.player-img-slot {
+  width: 28px; height: 28px; border-radius: 3px;
+  background: var(--border-dim);
+  border: 1px solid #2a2a2e;
+  cursor: pointer; overflow: hidden;
+  position: relative;
+}
+.player-img-slot img { width: 100%; height: 100%; object-fit: cover; }
+.player-img-slot:hover::after {
+  content: '📷'; position: absolute; inset: 0;
+  display: flex; align-items: center; justify-content: center;
+  font-size: 10px; background: rgba(0,0,0,0.7);
+}
+.player-name-input {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border-dim);
+  color: var(--text-main); padding: 2px 6px;
+  font-family: 'Rajdhani', sans-serif; font-size: 12px;
+  outline: none; border-radius: 2px; width: 100%;
+}
+.player-name-input:focus { border-color: var(--primary-color); }
+.player-role-input {
+  background: rgba(255,255,255,0.03); border: 1px solid var(--border-dim);
+  color: var(--text-muted); padding: 2px 4px;
+  font-family: 'Rajdhani', sans-serif; font-size: 10px;
+  outline: none; border-radius: 2px; text-align: center;
+  text-transform: uppercase; letter-spacing: 0.5px;
+}
+
+/* ═══ STATS BAR ═══ */
+.stats-bar {
+  display: flex; gap: 8px; margin-top: 8px;
+  padding-top: 8px; border-top: 1px solid var(--border-dim);
+}
+.stat-box {
+  flex: 1; text-align: center;
+  background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim);
+  padding: 4px; clip-path: var(--clip-angled);
+}
+.stat-label { font-size: 9px; text-transform: uppercase; color: var(--text-muted); letter-spacing: 1px; }
+.stat-value { font-family: 'Orbitron', sans-serif; font-size: 16px; font-weight: 700; color: var(--primary-color); }
+.stat-btn {
+  background: var(--border-dim); border: none;
+  color: var(--text-main); width: 20px; height: 20px;
+  cursor: pointer; font-size: 12px; border-radius: 2px;
+  font-family: 'Rajdhani', sans-serif; font-weight: 700;
+  clip-path: var(--clip-angled);
+}
+.stat-btn:hover { background: var(--primary-color); }
+
+/* ═══ SIDEBAR (right) — THEME ENGINE ═══ */
+.sidebar-right {
+  background: var(--bg-panel);
+  border-left: 1px solid var(--border-dim);
+  overflow-y: auto;
+  padding: 12px;
+}
+.theme-preset-grid {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 6px;
+  margin-bottom: 12px;
+}
+.preset-card {
+  padding: 10px 8px;
+  background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border-dim);
+  cursor: pointer;
+  clip-path: var(--clip-angle);
+  text-align: center;
+  transition: all 0.2s;
+}
+.preset-card:hover { border-color: var(--primary-color); }
+.preset-card.active {
+  border-color: var(--primary-color);
+  background: rgba(255,78,0,0.1);
+  filter: drop-shadow(0 0 4px var(--border-glow));
+}
+.preset-swatch {
+  display: flex; gap: 4px; justify-content: center; margin-bottom: 4px;
+}
+.preset-swatch span { width: 16px; height: 16px; border-radius: 2px; }
+.preset-name {
+  font-size: 10px; text-transform: uppercase; letter-spacing: 0.5px;
+  color: var(--text-muted); font-weight: 600;
+}
+.preset-card.active .preset-name { color: var(--primary-color); }
+
+.color-picker-row {
+  display: flex; align-items: center; gap: 8px; margin-bottom: 8px;
+}
+.color-picker-row label {
+  flex: 1; font-size: 11px; text-transform: uppercase;
+  color: var(--text-muted); letter-spacing: 1px; font-weight: 500;
+}
+.color-input {
+  width: 36px; height: 24px; border: 1px solid var(--border-dim);
+  border-radius: 2px; cursor: pointer; background: transparent;
+  padding: 0;
+}
+.color-hex {
+  width: 70px; background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim);
+  color: var(--text-main); padding: 2px 6px; font-size: 11px;
+  font-family: 'Orbitron', sans-serif; border-radius: 2px; outline: none;
+}
+
+/* ═══ DROP ZONE ═══ */
+.drop-zone {
+  border: 2px dashed var(--border-dim);
+  border-radius: 4px;
+  padding: 24px 12px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.3s;
+  margin-bottom: 12px;
+  clip-path: var(--clip-angle);
+}
+.drop-zone:hover { border-color: var(--primary-color); background: rgba(255,78,0,0.04); }
+.drop-zone.dragover {
+  border-color: var(--accent-glow);
+  background: rgba(255,170,0,0.08);
+  filter: drop-shadow(0 0 8px rgba(255,170,0,0.4));
+}
+.drop-zone-icon { font-size: 28px; margin-bottom: 6px; }
+.drop-zone-text {
+  font-family: 'Teko', sans-serif; font-size: 16px; font-weight: 500;
+  letter-spacing: 1.5px; text-transform: uppercase;
+  color: var(--text-muted);
+}
+.drop-zone-sub { font-size: 10px; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.5px; }
+
+/* ═══ TAB CONTENT ═══ */
+.tab-content { display: none; }
+.tab-content.active { display: block; animation: slideIn 0.4s cubic-bezier(0.16, 1, 0.3, 1); }
+@keyframes slideIn {
+  from { opacity: 0; transform: translateX(20px); }
+  to   { opacity: 1; transform: translateX(0); }
+}
+
+/* ═══ TOURNAMENT INFO ═══ */
+.info-input-group { margin-bottom: 10px; }
+.info-label { font-size: 10px; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); margin-bottom: 3px; }
+.info-input {
+  width: 100%; background: rgba(0,0,0,0.3); border: 1px solid var(--border-dim);
+  color: var(--text-main); padding: 6px 10px;
+  font-family: 'Rajdhani', sans-serif; font-size: 13px; font-weight: 500;
+  outline: none; border-radius: 2px;
+  transition: border-color 0.2s;
+}
+.info-input:focus { border-color: var(--primary-color); }
+
+/* ═══ LOGO UPLOAD ═══ */
+.logo-upload-btn {
+  display: inline-flex; align-items: center; gap: 6px;
+  padding: 4px 10px; background: rgba(0,0,0,0.3);
+  border: 1px solid var(--border-dim); cursor: pointer;
+  font-size: 11px; text-transform: uppercase; letter-spacing: 1px;
+  color: var(--text-muted); clip-path: var(--clip-angled);
+  transition: all 0.2s;
+}
+.logo-upload-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+.logo-upload-btn input { display: none; }
+
+/* ═══ IMPORT PROGRESS ═══ */
+.import-progress {
+  display: none; margin-top: 8px;
+}
+.import-progress.active { display: block; }
+.progress-bar {
+  height: 4px; background: var(--border-dim); border-radius: 2px; overflow: hidden;
+}
+.progress-fill {
+  height: 100%; background: var(--primary-color);
+  width: 0%; transition: width 0.3s;
+  filter: drop-shadow(0 0 4px var(--border-glow));
+}
+.progress-text { font-size: 10px; color: var(--text-muted); margin-top: 4px; letter-spacing: 0.5px; }
+
+/* ═══ SECTION DIVIDER ═══ */
+.section-divider {
+  display: flex; align-items: center; gap: 8px;
+  margin: 16px 0 8px;
+}
+.section-divider::before, .section-divider::after {
+  content: ''; flex: 1; height: 1px; background: var(--border-dim);
+}
+.section-divider span {
+  font-family: 'Teko', sans-serif; font-size: 12px; font-weight: 500;
+  letter-spacing: 2px; text-transform: uppercase; color: var(--text-muted);
+}
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <!-- ═══ HEADER BAR ═══ -->
+  <div class="header-bar">
+    <div class="header-left">
+      <div class="logo-mark">BD</div>
+      <div class="header-title">Booyah Director</div>
+    </div>
+    <div class="save-indicator" id="saveIndicator">
+      <div class="save-dot"></div>
+      <span id="saveText">System Ready</span>
+    </div>
+  </div>
+
+  <!-- ═══ MAIN GRID ═══ -->
+  <div class="main-grid">
+
+    <!-- ═══ LEFT SIDEBAR — NAVIGATION ═══ -->
+    <div class="sidebar-left">
+      <div class="sidebar-section">
+        <div class="sidebar-label">Control Panels</div>
+        <button class="nav-btn active" data-tab="teams" onclick="switchTab('teams')">▮ Team Setup</button>
+        <button class="nav-btn" data-tab="match" onclick="switchTab('match')">▮ Match Control</button>
+        <button class="nav-btn" data-tab="import" onclick="switchTab('import')">▮ Bulk Import</button>
+        <button class="nav-btn" data-tab="info" onclick="switchTab('info')">▮ Tournament Info</button>
+      </div>
+      <div class="sidebar-section">
+        <div class="sidebar-label">Overlay Links</div>
+        <button class="nav-btn" onclick="openOverlay('/overlay.html')">▶ Scoreboard</button>
+        <button class="nav-btn" onclick="openOverlay('/overlay.html')">▶ MVP Reveal</button>
+        <button class="nav-btn" onclick="openOverlay('/overlay.html')">▶ Standings</button>
+      </div>
+    </div>
+
+    <!-- ═══ CENTER PANEL ═══ -->
+    <div class="center-panel">
+
+      <!-- ─── TAB: TEAMS ─── -->
+      <div class="tab-content active" id="tab-teams">
+        <div class="panel-title">Team Roster</div>
+        <div class="team-grid" id="teamGrid"></div>
+      </div>
+
+      <!-- ─── TAB: MATCH CONTROL ─── -->
+      <div class="tab-content" id="tab-match">
+        <div class="panel-title">Match Control</div>
+        <p style="color: var(--text-muted); font-size: 13px; padding: 20px;">Match control panel — manage active match state, eliminations, and live stats.</p>
+      </div>
+
+      <!-- ─── TAB: BULK IMPORT ─── -->
+      <div class="tab-content" id="tab-import">
+        <div class="panel-title">Bulk Import</div>
+
+        <div class="drop-zone" id="dropZone" onclick="document.getElementById('fileInput').click()">
+          <div class="drop-zone-icon">📄</div>
+          <div class="drop-zone-text">Drop Tournament Spreadsheet</div>
+          <div class="drop-zone-sub">.xlsx / .csv — Auto-parses teams, players & colors</div>
+          <input type="file" id="fileInput" accept=".xlsx,.xls,.csv" style="display:none" onchange="handleFileSelect(event)">
+        </div>
+
+        <div class="import-progress" id="importProgress">
+          <div class="progress-bar"><div class="progress-fill" id="progressFill"></div></div>
+          <div class="progress-text" id="progressText">Processing...</div>
+        </div>
+
+        <div class="section-divider"><span>Expected Columns</span></div>
+        <div style="font-size: 11px; color: var(--text-muted); line-height: 1.6; padding: 0 4px;">
+          <strong style="color: var(--text-main)">Team Name</strong> · <strong style="color: var(--text-main)">Short Name</strong> · <strong style="color: var(--text-main)">Logo URL</strong><br>
+          <strong style="color: var(--text-main)">Player 1 Name</strong> · <strong style="color: var(--text-main)">Player 1 Img</strong> · <strong style="color: var(--text-main)">Player 1 Role</strong><br>
+          ...up to <strong style="color: var(--text-main)">Player 6</strong>
+        </div>
+      </div>
+
+      <!-- ─── TAB: TOURNAMENT INFO ─── -->
+      <div class="tab-content" id="tab-info">
+        <div class="panel-title">Tournament Info</div>
+        <div class="info-input-group">
+          <div class="info-label">Tournament Name</div>
+          <input class="info-input" data-path="tournament.name" placeholder="Enter tournament name" onblur="autoSaveFromInput(event)" onkeypress="autoSaveOnEnter(event)">
+        </div>
+        <div class="info-input-group">
+          <div class="info-label">Sponsor Name</div>
+          <input class="info-input" data-path="tournament.sponsor" placeholder="Enter sponsor name" onblur="autoSaveFromInput(event)" onkeypress="autoSaveOnEnter(event)">
+        </div>
+        <div class="info-input-group">
+          <div class="info-label">Tournament Logo URL</div>
+          <input class="info-input" data-path="tournament.logo" placeholder="Paste image URL" onblur="autoSaveFromInput(event)" onkeypress="autoSaveOnEnter(event)">
+        </div>
+        <div class="info-input-group">
+          <div class="info-label">Sponsor Logo URL</div>
+          <input class="info-input" data-path="tournament.sponsorLogo" placeholder="Paste image URL" onblur="autoSaveFromInput(event)" onkeypress="autoSaveOnEnter(event)">
+        </div>
+      </div>
+
+    </div>
+
+    <!-- ═══ RIGHT SIDEBAR — THEME ENGINE ═══ -->
+    <div class="sidebar-right">
+      <div class="sidebar-label">Theme Engine</div>
+
+      <div class="theme-preset-grid" id="presetGrid">
+        <div class="preset-card active" data-preset="ffws-neon-orange" onclick="applyPreset('ffws-neon-orange')">
+          <div class="preset-swatch"><span style="background:#ff4e00"></span><span style="background:#ffaa00"></span><span style="background:#0c0c0e"></span></div>
+          <div class="preset-name">FFWS Neon Orange</div>
+        </div>
+        <div class="preset-card" data-preset="carbon-yellow" onclick="applyPreset('carbon-yellow')">
+          <div class="preset-swatch"><span style="background:#ffd700"></span><span style="background:#ffaa00"></span><span style="background:#1a1a1a"></span></div>
+          <div class="preset-name">Carbon Yellow</div>
+        </div>
+        <div class="preset-card" data-preset="midnight-cyan" onclick="applyPreset('midnight-cyan')">
+          <div class="preset-swatch"><span style="background:#00c8ff"></span><span style="background:#0055ff"></span><span style="background:#04060e"></span></div>
+          <div class="preset-name">Midnight Cyan</div>
+        </div>
+        <div class="preset-card" data-preset="custom" onclick="applyPreset('custom')">
+          <div class="preset-swatch"><span style="background:#888"></span><span style="background:#aaa"></span><span style="background:#222"></span></div>
+          <div class="preset-name">Custom Palette</div>
+        </div>
+      </div>
+
+      <div class="section-divider"><span>Custom Colors</span></div>
+
+      <div class="color-picker-row">
+        <label>Primary</label>
+        <input type="color" class="color-input" id="colorPrimary" value="#ff4e00" onchange="onThemeColorChange(event,'primaryColor')">
+        <input type="text" class="color-hex" id="hexPrimary" value="#ff4e00" onchange="onHexChange(event,'primaryColor')">
+      </div>
+      <div class="color-picker-row">
+        <label>Accent Glow</label>
+        <input type="color" class="color-input" id="colorAccent" value="#ffaa00" onchange="onThemeColorChange(event,'accentGlow')">
+        <input type="text" class="color-hex" id="hexAccent" value="#ffaa00" onchange="onHexChange(event,'accentGlow')">
+      </div>
+      <div class="color-picker-row">
+        <label>Panel BG</label>
+        <input type="color" class="color-input" id="colorBg" value="#0c0c0e" onchange="onThemeColorChange(event,'bgDark')">
+        <input type="text" class="color-hex" id="hexBg" value="#0c0c0e" onchange="onHexChange(event,'bgDark')">
+      </div>
+
+      <div class="section-divider"><span>Socket Status</span></div>
+      <div style="font-size: 11px; color: var(--text-muted); line-height: 1.8; padding: 0 4px;">
+        <div>Status: <span id="socketStatus" style="color: var(--text-muted)">Connecting...</span></div>
+        <div>Room: <span style="color: var(--accent-glow); font-family: 'Orbitron'; font-size: 10px;">BOOYAH-DIRECTOR-ROOM</span></div>
+        <div>Clients: <span id="clientCount" style="color: var(--text-main)">0</span></div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ═══════════════════════════════════════════════════════════════════════
+   STATE & CONFIG
+   ═══════════════════════════════════════════════════════════════════════ */
+const SOCKET_ROOM = 'booyah-director-room';
+const API_BASE = '';
+
+let state = {
+  tournament: { name: '', logo: '', sponsor: '', sponsorLogo: '' },
+  theme: {
+    preset: 'ffws-neon-orange',
+    primaryColor: '#ff4e00',
+    accentGlow: '#ffaa00',
+    bgDark: '#0c0c0e',
+    textMain: '#ffffff'
+  },
+  teams: []
+};
+
+// Initialize 12 empty teams if none
+for (let i = 0; i < 12; i++) {
+  state.teams.push({
+    id: i + 1,
+    teamName: 'Team ' + (i + 1),
+    shortName: 'T' + (i + 1),
+    logoUrl: '',
+    themeColor: '#ff4e00',
+    players: [
+      { name: '', img: '', role: 'Player 1' },
+      { name: '', img: '', role: 'Player 2' },
+      { name: '', img: '', role: 'Player 3' },
+      { name: '', img: '', role: 'Player 4' }
+    ],
+    liveStats: { kills: 0, alive: 4 }
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THEME PRESETS
+   ═══════════════════════════════════════════════════════════════════════ */
+const PRESETS = {
+  'ffws-neon-orange': { primaryColor: '#ff4e00', accentGlow: '#ffaa00', bgDark: '#0c0c0e', textMain: '#ffffff' },
+  'carbon-yellow':    { primaryColor: '#ffd700', accentGlow: '#ffaa00', bgDark: '#1a1a1a', textMain: '#ffffff' },
+  'midnight-cyan':    { primaryColor: '#00c8ff', accentGlow: '#0055ff', bgDark: '#04060e', textMain: '#ffffff' },
+  'custom':           { primaryColor: '#888888', accentGlow: '#aaaaaa', bgDark: '#222222', textMain: '#ffffff' }
+};
+
+/* ═══════════════════════════════════════════════════════════════════════
+   SOCKET.IO CONNECTION
+   ═══════════════════════════════════════════════════════════════════════ */
+const socket = io({ auth: { token: SOCKET_ROOM } });
+
+socket.on('connect', () => {
+  document.getElementById('socketStatus').textContent = 'Connected';
+  document.getElementById('socketStatus').style.color = 'var(--save-green)';
+  console.log('[Socket] Connected:', socket.id);
+});
+
+socket.on('disconnect', () => {
+  document.getElementById('socketStatus').textContent = 'Disconnected';
+  document.getElementById('socketStatus').style.color = '#ff4444';
+});
+
+socket.on('stateUpdated', (newState) => {
+  if (newState) {
+    state = { ...state, ...newState };
+    if (newState.teams) state.teams = newState.teams;
+    if (newState.theme) state.theme = newState.theme;
+    renderTeams();
+    applyThemeCSS(state.theme);
+    restoreTournamentInfo();
+  }
+});
+
+socket.on('globalThemeUpdate', (theme) => {
+  if (theme) {
+    state.theme = { ...state.theme, ...theme };
+    applyThemeCSS(state.theme);
+    syncThemePickers();
+  }
+});
+
+socket.on('databaseUpdated', (newState) => {
+  if (newState && newState.teams) {
+    state.teams = newState.teams;
+    renderTeams();
+  }
+});
+
+/* ═══════════════════════════════════════════════════════════════════════
+   AUTO-SAVE SYSTEM (400ms debounce)
+   ═══════════════════════════════════════════════════════════════════════ */
+let saveTimer = null;
+
+function showSaving() {
+  const ind = document.getElementById('saveIndicator');
+  const txt = document.getElementById('saveText');
+  ind.className = 'save-indicator saving';
+  txt.textContent = 'Saving...';
+}
+
+function showSaved() {
+  const ind = document.getElementById('saveIndicator');
+  const txt = document.getElementById('saveText');
+  ind.className = 'save-indicator saved';
+  txt.textContent = 'System Saved';
+  setTimeout(() => {
+    ind.className = 'save-indicator';
+    txt.textContent = 'Ready';
+  }, 1500);
+}
+
+function debouncedSave() {
+  showSaving();
+  if (saveTimer) clearTimeout(saveTimer);
+  saveTimer = setTimeout(() => {
+    fetch(API_BASE + '/api/state/save', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(state)
+    })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) showSaved();
+      else showSaved();
+    })
+    .catch(err => {
+      console.error('[Save] Error:', err);
+      showSaved();
+    });
+  }, 400);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   AUTO-SAVE EVENT BINDINGS
+   ═══════════════════════════════════════════════════════════════════════ */
+function autoSaveFromInput(event) {
+  const el = event.target;
+  const path = el.dataset.path;
+  if (!path) return;
+  setNestedProp(state, path, el.value);
+  debouncedSave();
+}
+
+function autoSaveOnEnter(event) {
+  if (event.key === 'Enter') {
+    event.target.blur();
+  }
+}
+
+function autoSaveTeamField(teamId, field, value) {
+  const team = state.teams.find(t => t.id === teamId);
+  if (!team) return;
+  team[field] = value;
+  debouncedSave();
+}
+
+function autoSavePlayerField(teamId, playerIndex, field, value) {
+  const team = state.teams.find(t => t.id === teamId);
+  if (!team || !team.players[playerIndex]) return;
+  team.players[playerIndex][field] = value;
+  debouncedSave();
+}
+
+function autoSaveStat(teamId, statField, delta) {
+  const team = state.teams.find(t => t.id === teamId);
+  if (!team) return;
+  if (statField === 'kills') {
+    team.liveStats.kills = Math.max(0, team.liveStats.kills + delta);
+  } else if (statField === 'alive') {
+    team.liveStats.alive = Math.max(0, Math.min(4, team.liveStats.alive + delta));
+  }
+  renderTeams();
+  debouncedSave();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   THEME ENGINE
+   ═══════════════════════════════════════════════════════════════════════ */
+function applyThemeCSS(theme) {
+  const root = document.documentElement;
+  root.style.setProperty('--primary-color', theme.primaryColor);
+  root.style.setProperty('--accent-glow', theme.accentGlow);
+  root.style.setProperty('--bg-dark', theme.bgDark);
+  root.style.setProperty('--text-main', theme.textMain);
+  root.style.setProperty('--border-glow', hexToRgba(theme.primaryColor, 0.4));
+}
+
+function syncThemePickers() {
+  const t = state.theme;
+  document.getElementById('colorPrimary').value = t.primaryColor;
+  document.getElementById('hexPrimary').value = t.primaryColor;
+  document.getElementById('colorAccent').value = t.accentGlow;
+  document.getElementById('hexAccent').value = t.accentGlow;
+  document.getElementById('colorBg').value = t.bgDark;
+  document.getElementById('hexBg').value = t.bgDark;
+
+  // Update preset active state
+  document.querySelectorAll('.preset-card').forEach(c => {
+    c.classList.toggle('active', c.dataset.preset === t.preset);
+  });
+}
+
+function applyPreset(presetName) {
+  const preset = PRESETS[presetName];
+  if (!preset) return;
+
+  state.theme = { ...state.theme, ...preset, preset: presetName };
+  applyThemeCSS(state.theme);
+  syncThemePickers();
+  debouncedSave();
+}
+
+function onThemeColorChange(event, key) {
+  const val = event.target.value;
+  state.theme[key] = val;
+  state.theme.preset = 'custom';
+  applyThemeCSS(state.theme);
+  syncThemePickers();
+  debouncedSave();
+}
+
+function onHexChange(event, key) {
+  let val = event.target.value.trim();
+  if (!val.startsWith('#')) val = '#' + val;
+  if (!/^#[0-9A-Fa-f]{6}$/.test(val)) return;
+  state.theme[key] = val;
+  state.theme.preset = 'custom';
+  applyThemeCSS(state.theme);
+  syncThemePickers();
+  debouncedSave();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TEAM ROSTER RENDERING
+   ═══════════════════════════════════════════════════════════════════════ */
+function renderTeams() {
+  const grid = document.getElementById('teamGrid');
+  if (!grid) return;
+  grid.innerHTML = '';
+
+  state.teams.forEach((team, idx) => {
+    const card = document.createElement('div');
+    card.className = 'team-card';
+    card.style.setProperty('--team-accent', team.themeColor || state.theme.primaryColor);
+
+    // Header
+    let headerHTML = '<div class="team-card-header">';
+    if (team.logoUrl) {
+      headerHTML += '<img class="team-logo" src="' + escapeAttr(team.logoUrl) + '" onerror="this.style.display=\'none\'">';
+    } else {
+      headerHTML += '<div class="team-badge">' + escapeHtml(team.shortName || ('T' + team.id)) + '</div>';
+    }
+    headerHTML += '<input class="team-input" placeholder="Team ' + team.id + '" value="' + escapeAttr(team.teamName || '') + '" onblur="autoSaveTeamField(' + team.id + ',\'teamName\',this.value)" onkeypress="if(event.key===\'Enter\')this.blur()">';
+    headerHTML += '</div>';
+
+    // Short name row
+    headerHTML += '<div style="display:flex;gap:6px;margin-bottom:6px;">';
+    headerHTML += '<input class="team-input" style="font-size:11px;flex:0 0 60px" placeholder="Short" value="' + escapeAttr(team.shortName || '') + '" onblur="autoSaveTeamField(' + team.id + ',\'shortName\',this.value)" onkeypress="if(event.key===\'Enter\')this.blur()">';
+    headerHTML += '<label class="logo-upload-btn">Logo<input type="file" accept="image/*" onchange="uploadTeamLogo(' + team.id + ',event)"></label>';
+    headerHTML += '</div>';
+
+    // Players
+    headerHTML += '<div class="section-divider" style="margin:6px 0;"><span>Players</span></div>';
+    (team.players || []).forEach((p, pi) => {
+      let imgHTML = '<div class="player-img-slot" onclick="uploadPlayerImg(' + team.id + ',' + pi + ')">';
+      if (p.img) imgHTML += '<img src="' + escapeAttr(p.img) + '" onerror="this.style.display=\'none\'">';
+      imgHTML += '</div>';
+
+      headerHTML += '<div class="player-row">';
+      headerHTML += imgHTML;
+      headerHTML += '<input class="player-name-input" placeholder="Player ' + (pi + 1) + ' name" value="' + escapeAttr(p.name || '') + '" onblur="autoSavePlayerField(' + team.id + ',' + pi + ',\'name\',this.value)" onkeypress="if(event.key===\'Enter\')this.blur()">';
+      headerHTML += '<input class="player-role-input" placeholder="Role" value="' + escapeAttr(p.role || '') + '" onblur="autoSavePlayerField(' + team.id + ',' + pi + ',\'role\',this.value)" onkeypress="if(event.key===\'Enter\')this.blur()">';
+      headerHTML += '</div>';
+    });
+
+    // Stats
+    headerHTML += '<div class="stats-bar">';
+    headerHTML += '<div class="stat-box"><div class="stat-label">Kills</div><div style="display:flex;align-items:center;justify-content:center;gap:4px;"><button class="stat-btn" onclick="autoSaveStat(' + team.id + ',\'kills\',-1)">-</button><span class="stat-value">' + (team.liveStats?.kills || 0) + '</span><button class="stat-btn" onclick="autoSaveStat(' + team.id + ',\'kills\',1)">+</button></div></div>';
+    headerHTML += '<div class="stat-box"><div class="stat-label">Alive</div><div style="display:flex;align-items:center;justify-content:center;gap:4px;"><button class="stat-btn" onclick="autoSaveStat(' + team.id + ',\'alive\',-1)">-</button><span class="stat-value">' + (team.liveStats?.alive || 0) + '</span><button class="stat-btn" onclick="autoSaveStat(' + team.id + ',\'alive\',1)">+</button></div></div>';
+    headerHTML += '</div>';
+
+    card.innerHTML = headerHTML;
+    grid.appendChild(card);
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   FILE UPLOADS
+   ═══════════════════════════════════════════════════════════════════════ */
+function uploadTeamLogo(teamId, event) {
+  const file = event.target.files[0];
+  if (!file) return;
+  const formData = new FormData();
+  formData.append('file', file);
+  formData.append('teamId', teamId);
+  formData.append('fieldType', 'logo');
+
+  fetch(API_BASE + '/api/media/upload', { method: 'POST', body: formData })
+    .then(r => r.json())
+    .then(data => {
+      if (data.success) {
+        const team = state.teams.find(t => t.id === teamId);
+        if (team) {
+          team.logoUrl = data.url;
+          renderTeams();
+          debouncedSave();
+        }
+      }
+    })
+    .catch(err => console.error('[Upload] Error:', err));
+}
+
+function uploadPlayerImg(teamId, playerIndex) {
+  // Create hidden file input
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = 'image/*';
+  input.onchange = function() {
+    const file = input.files[0];
+    if (!file) return;
+    const formData = new FormData();
+    formData.append('file', file);
+    formData.append('teamId', teamId);
+    formData.append('fieldType', 'player');
+    formData.append('playerIndex', playerIndex);
+
+    fetch(API_BASE + '/api/media/upload', { method: 'POST', body: formData })
+      .then(r => r.json())
+      .then(data => {
+        if (data.success) {
+          const team = state.teams.find(t => t.id === teamId);
+          if (team && team.players[playerIndex]) {
+            team.players[playerIndex].img = data.url;
+            renderTeams();
+            debouncedSave();
+          }
+        }
+      })
+      .catch(err => console.error('[Upload] Error:', err));
+  };
+  input.click();
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   EXCEL/CSV BULK IMPORT (SheetJS)
+   ═══════════════════════════════════════════════════════════════════════ */
+function handleFileSelect(event) {
+  const file = event.target.files[0];
+  if (file) processSpreadsheet(file);
+}
+
+function setupDropZone() {
+  const dz = document.getElementById('dropZone');
+  ['dragenter', 'dragover'].forEach(ev => {
+    dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.add('dragover'); });
+  });
+  ['dragleave', 'drop'].forEach(ev => {
+    dz.addEventListener(ev, (e) => { e.preventDefault(); dz.classList.remove('dragover'); });
+  });
+  dz.addEventListener('drop', (e) => {
+    const file = e.dataTransfer.files[0];
+    if (file) processSpreadsheet(file);
+  });
+}
+
+function processSpreadsheet(file) {
+  const reader = new FileReader();
+  const progressEl = document.getElementById('importProgress');
+  const fillEl = document.getElementById('progressFill');
+  const textEl = document.getElementById('progressText');
+
+  progressEl.classList.add('active');
+  fillEl.style.width = '10%';
+  textEl.textContent = 'Reading file...';
+
+  reader.onload = function(e) {
+    try {
+      fillEl.style.width = '30%';
+      textEl.textContent = 'Parsing spreadsheet...';
+
+      const data = new Uint8Array(e.target.result);
+      const wb = XLSX.read(data, { type: 'array' });
+      const ws = wb.Sheets[wb.SheetNames[0]];
+      const rows = XLSX.utils.sheet_to_json(ws, { defval: '' });
+
+      fillEl.style.width = '50%';
+      textEl.textContent = 'Mapping ' + rows.length + ' teams...';
+
+      const teams = rows.map((row, idx) => {
+        // Case-insensitive column mapping
+        const get = (keys) => {
+          for (const k of Object.keys(row)) {
+            const lk = k.toLowerCase().trim();
+            for (const target of keys) {
+              if (lk === target.toLowerCase()) return row[k];
+            }
+          }
+          return '';
+        };
+
+        // Extract up to 6 players
+        const players = [];
+        for (let p = 1; p <= 6; p++) {
+          const pname = get(['Player ' + p + ' Name', 'Player' + p + 'Name', 'P' + p + ' Name']);
+          if (pname) {
+            players.push({
+              name: pname,
+              img: get(['Player ' + p + ' Img', 'Player' + p + 'Img', 'P' + p + ' Img']),
+              role: get(['Player ' + p + ' Role', 'Player' + p + 'Role', 'P' + p + ' Role']) || ('Player ' + p)
+            });
+          }
+        }
+        // Pad to 4 players
+        while (players.length < 4) {
+          players.push({ name: '', img: '', role: 'Player ' + (players.length + 1) });
+        }
+
+        return {
+          id: idx + 1,
+          teamName: get(['Team Name', 'TeamName', 'Team']),
+          shortName: get(['Short Name', 'ShortName', 'Short']) || ('T' + (idx + 1)),
+          logoUrl: get(['Logo URL', 'LogoURL', 'Logo']),
+          themeColor: '#ff4e00',
+          players,
+          liveStats: { kills: 0, alive: 4 }
+        };
+      });
+
+      fillEl.style.width = '70%';
+      textEl.textContent = 'Extracting team colors from logos...';
+
+      // Color extraction from logos
+      const logoPromises = teams.map(team => {
+        if (!team.logoUrl) return Promise.resolve();
+        return extractDominantColor(team.logoUrl)
+          .then(hex => { team.themeColor = hex; })
+          .catch(() => {});
+      });
+
+      Promise.all(logoPromises).then(() => {
+        fillEl.style.width = '90%';
+        textEl.textContent = 'Uploading to server...';
+
+        fetch(API_BASE + '/api/teams/bulk-import', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ teams })
+        })
+        .then(r => r.json())
+        .then(data => {
+          if (data.success) {
+            fillEl.style.width = '100%';
+            textEl.textContent = 'Imported ' + data.count + ' teams successfully!';
+            state.teams = teams;
+            renderTeams();
+            setTimeout(() => { progressEl.classList.remove('active'); }, 3000);
+          } else {
+            textEl.textContent = 'Import failed: ' + (data.error || 'Unknown error');
+          }
+        })
+        .catch(err => {
+          textEl.textContent = 'Upload error: ' + err.message;
+        });
+      });
+
+    } catch (err) {
+      textEl.textContent = 'Parse error: ' + err.message;
+      console.error('[Import] Error:', err);
+    }
+  };
+
+  reader.readAsArrayBuffer(file);
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   HTML5 CANVAS COLOR EXTRACTOR
+   ═══════════════════════════════════════════════════════════════════════ */
+function extractDominantColor(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    img.crossOrigin = 'Anonymous';
+
+    img.onload = function() {
+      try {
+        // Draw to 1x1 canvas for averaged color
+        const canvas = document.createElement('canvas');
+        canvas.width = 1;
+        canvas.height = 1;
+        const ctx = canvas.getContext('2d');
+        ctx.drawImage(img, 0, 0, 1, 1);
+
+        const pixel = ctx.getImageData(0, 0, 1, 1).data;
+        let r = pixel[0], g = pixel[1], b = pixel[2];
+
+        // Boost brightness for a vivid hex
+        r = Math.min(255, Math.round(r * 1.15));
+        g = Math.min(255, Math.round(g * 1.15));
+        b = Math.min(255, Math.round(b * 1.15));
+
+        const hex = '#' + [r, g, b].map(v => v.toString(16).padStart(2, '0')).join('');
+        resolve(hex);
+      } catch (err) {
+        // CORS or taint error — fall back to default
+        resolve('#ff4e00');
+      }
+    };
+
+    img.onerror = function() {
+      resolve('#ff4e00');
+    };
+
+    img.src = url;
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   UTILITIES
+   ═══════════════════════════════════════════════════════════════════════ */
+function hexToRgba(hex, alpha) {
+  const r = parseInt(hex.slice(1, 3), 16);
+  const g = parseInt(hex.slice(3, 5), 16);
+  const b = parseInt(hex.slice(5, 7), 16);
+  return 'rgba(' + r + ',' + g + ',' + b + ',' + alpha + ')';
+}
+
+function setNestedProp(obj, path, value) {
+  const keys = path.split('.');
+  let cur = obj;
+  for (let i = 0; i < keys.length - 1; i++) cur = cur[keys[i]] = cur[keys[i]] || {};
+  cur[keys[keys.length - 1]] = value;
+}
+
+function getNestedProp(obj, path) {
+  return path.split('.').reduce((o, k) => (o || {})[k], obj);
+}
+
+function escapeHtml(s) {
+  return String(s || '').replace(/[&<>"']/g, c => ({ '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;' }[c]));
+}
+
+function escapeAttr(s) {
+  return String(s || '').replace(/"/g, '&quot;');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TAB SWITCHING
+   ═══════════════════════════════════════════════════════════════════════ */
+function switchTab(tabName) {
+  document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+  document.querySelectorAll('.nav-btn[data-tab]').forEach(el => el.classList.remove('active'));
+  const tab = document.getElementById('tab-' + tabName);
+  if (tab) tab.classList.add('active');
+  const btn = document.querySelector('.nav-btn[data-tab="' + tabName + '"]');
+  if (btn) btn.classList.add('active');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   TOURNAMENT INFO RESTORE
+   ═══════════════════════════════════════════════════════════════════════ */
+function restoreTournamentInfo() {
+  document.querySelectorAll('[data-path]').forEach(el => {
+    const val = getNestedProp(state, el.dataset.path);
+    if (val !== undefined && el.value !== val) el.value = val;
+  });
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   OVERLAY OPEN
+   ═══════════════════════════════════════════════════════════════════════ */
+function openOverlay(url) {
+  window.open(url, '_blank', 'width=1920,height=1080');
+}
+
+/* ═══════════════════════════════════════════════════════════════════════
+   INITIALIZATION
+   ═══════════════════════════════════════════════════════════════════════ */
+document.addEventListener('DOMContentLoaded', () => {
+  setupDropZone();
+  renderTeams();
+  applyThemeCSS(state.theme);
+  syncThemePickers();
+
+  // Fetch initial state from server
+  fetch(API_BASE + '/api/state')
+    .then(r => r.json())
+    .then(data => {
+      if (data && data.teams) {
+        state = { ...state, ...data };
+        renderTeams();
+        if (data.theme) {
+          applyThemeCSS(data.theme);
+          syncThemePickers();
+        }
+        restoreTournamentInfo();
+      }
+    })
+    .catch(err => console.log('[Init] Using local state:', err.message));
+});
+</script>
+</body>
+</html>
