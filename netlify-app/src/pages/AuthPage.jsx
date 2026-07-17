@@ -90,10 +90,10 @@ export default function AuthPage() {
             alignItems:'center', justifyContent:'center', marginBottom:16,
             boxShadow:'0 0 40px rgba(255,107,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
           }}>
-            <Zap size={32} style={{ color:'#FF6B00' }} />
+            <Zap size={32} style={{ color:'#ff4e00' }} />
           </div>
           <h1 style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', letterSpacing:'0.1em', margin:0 }}>
-            BOOYAH <span style={{ background:'linear-gradient(90deg,#FF6B00,#00D4FF)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>DIRECTOR</span>
+            BOOYAH <span style={{ background:'linear-gradient(90deg,#ff4e00,#ffaa00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>DIRECTOR</span>
           </h1>
           <p style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(0,212,255,0.7)', letterSpacing:'0.3em', marginTop:6 }}>
             OFFICIAL TOURNAMENT BROADCAST SYSTEM
@@ -146,7 +146,7 @@ export default function AuthPage() {
             {[['login','LOG IN'],['register','SIGN UP']].map(([m,label]) => (
               <button key={m} onClick={() => setMode(m)} style={{
                 flex:1, padding:'10px 0', fontFamily:'Orbitron', fontSize:10, fontWeight:900, letterSpacing:'0.1em',
-                background: mode === m ? 'linear-gradient(135deg,#FF6B00,#ff5500)' : 'transparent',
+                background: mode === m ? 'linear-gradient(135deg,#ff4e00,#ff4e00)' : 'transparent',
                 color: mode === m ? '#fff' : 'rgba(255,255,255,0.35)',
                 border:'none', cursor:'pointer', transition:'all 0.2s',
               }}>{label}</button>
@@ -180,7 +180,7 @@ export default function AuthPage() {
             <button type="submit" disabled={loading} style={{
               padding:'13px', borderRadius:10, fontFamily:'Orbitron', fontSize:11, fontWeight:900,
               color:'#fff', letterSpacing:'0.12em', cursor: loading ? 'not-allowed' : 'pointer',
-              background:'linear-gradient(135deg,#FF6B00,#ff4500)', border:'none',
+              background:'linear-gradient(135deg,#ff4e00,#ff4e00)', border:'none',
               boxShadow:'0 4px 20px rgba(255,107,0,0.4)', opacity: loading ? 0.6 : 1, transition:'all 0.2s', marginTop:4,
             }}>
               {loading ? 'LOADING...' : mode === 'login' ? 'ACCESS SYSTEM' : 'CREATE ACCOUNT'}

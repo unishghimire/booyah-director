@@ -502,7 +502,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
                     const isAlive   = slot.alive;
                     const isEmpty   = slot.name === null;
                     const barColor  = isAlive
-                      ? '#22c55e'                        // green — alive
+                      ? '#7BC043'                        // green — alive
                       : isEmpty
                       ? 'rgba(255,255,255,0.06)'         // very faint — no player in slot
                       : 'rgba(255,255,255,0.18)';        // gray — eliminated
@@ -513,7 +513,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
                         height: 28,
                         borderRadius: 3,
                         background: barColor,
-                        boxShadow: isAlive ? `0 0 8px #22c55eaa, 0 0 2px #22c55e` : 'none',
+                        boxShadow: isAlive ? `0 0 8px #7BC043aa, 0 0 2px #7BC043` : 'none',
                         transition: 'background 0.35s ease, box-shadow 0.35s ease',
                         position: 'relative',
                         overflow: 'hidden',
@@ -554,7 +554,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
         {/* ── Footer legend ── */}
         <div style={{ height:26, background:t.headerBg, borderTop:`1px solid rgba(255,255,255,0.04)`, display:'flex', alignItems:'center', justifyContent:'center', gap:16 }}>
           <div style={{ display:'flex', alignItems:'center', gap:5 }}>
-            <div style={{ width:10, height:18, borderRadius:2, background:'#22c55e', boxShadow:t.glow?'0 0 6px #22c55eaa':'none' }} />
+            <div style={{ width:10, height:18, borderRadius:2, background:'#7BC043', boxShadow:t.glow?'0 0 6px #7BC043aa':'none' }} />
             <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>ALIVE</span>
           </div>
           <div style={{ display:'flex', alignItems:'center', gap:5 }}>
@@ -620,7 +620,7 @@ function FullStandings({ teams = [], design }) {
               <div style={{ flex:1, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', paddingLeft:16, letterSpacing:'0.15em' }}>TEAM NAME</div>
               <div style={{ width:100, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#ffaa00', letterSpacing:'0.15em' }}>PPT</div>
               <div style={{ width:100, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>KILLS</div>
-              <div style={{ width:120, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#22c55e', letterSpacing:'0.15em' }}>KILL PTS</div>
+              <div style={{ width:120, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#7BC043', letterSpacing:'0.15em' }}>KILL PTS</div>
               <div style={{ width:150, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:secondary, letterSpacing:'0.15em' }}>TOTAL PTS</div>
             </div>
 
@@ -650,7 +650,7 @@ function FullStandings({ teams = [], design }) {
                         <>
                           <div style={{ width:100, textAlign:'center', fontFamily:'Rajdhani', fontSize:18, fontWeight:900, color:'#ffaa00' }}>{ppt}</div>
                           <div style={{ width:100, textAlign:'center', fontFamily:'Rajdhani', fontSize:20, color:primary, fontWeight:900 }}>{totalKills}</div>
-                          <div style={{ width:120, textAlign:'center', fontFamily:'Rajdhani', fontSize:18, fontWeight:900, color:'#22c55e' }}>{killPts}</div>
+                          <div style={{ width:120, textAlign:'center', fontFamily:'Rajdhani', fontSize:18, fontWeight:900, color:'#7BC043' }}>{killPts}</div>
                           <div style={{ width:150, textAlign:'center', fontFamily:'Rajdhani', fontSize:24, fontWeight:900, color:secondary }}>{totalPts}</div>
                         </>
                       );

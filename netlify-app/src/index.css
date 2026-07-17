@@ -109,7 +109,7 @@
   --ffws-gunmetal:  #141418;
   --ffws-orange:    #ff4e00;
   --ffws-gold:      #ffaa00;
-  --ffws-cyan:      #00d4ff;
+  --ffws-cyan:      #ffaa00;  /* accent gold (renamed for compat) */
   --ffws-green:     #7BC043;
   --ffws-red:       #ff3333;
   --ffws-text:      #ffffff;
@@ -156,7 +156,7 @@
 
 /* ===== FFWS Text Gradients ===== */
 .text-gradient-gold {
-  background: linear-gradient(135deg, #ffaa00 0%, #ff8800 50%, #ff6600 100%);
+  background: linear-gradient(135deg, #ffaa00 0%, #ff4e00 50%, #ff4e00 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;
@@ -177,7 +177,7 @@
   color: transparent;
 }
 .text-gradient-orange {
-  background: linear-gradient(135deg, #ff4e00 0%, #ff6e00 50%, #ff8e00 100%);
+  background: linear-gradient(135deg, #ff4e00 0%, #ff4e00 50%, #ff4e00 100%);
   -webkit-background-clip: text;
   background-clip: text;
   -webkit-text-fill-color: transparent;

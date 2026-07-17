@@ -11,9 +11,9 @@ import {
 
 /* ─── Team colour palette ─── */
 const COLORS = [
-  '#f97316','#3b82f6','#10b981','#a855f7',
+  '#ff4e00','#ff4e00','#7BC043','#ff4e00',
   '#ef4444','#06b6d4','#eab308','#ec4899',
-  '#8b5cf6','#14b8a6','#f59e0b','#6366f1',
+  '#ffaa00','#ffaa00','#ffaa00','#ff4e00',
 ];
 
 export default function DataInputer() {
@@ -119,13 +119,13 @@ export default function DataInputer() {
       ───────────────────────────────────────── */}
       <div className="relative flex h-[52px] items-center justify-between border-b border-[rgba(0,212,255,0.2)] bg-[#0c0c18] px-5 flex-shrink-0">
         <div className="flex items-center gap-3">
-          <div className="h-5 w-[4px] bg-[#00D4FF]" />
+          <div className="h-5 w-[4px] bg-[#ffaa00]" />
           <div className="leading-none flex items-center gap-2">
             <span className="font-orbitron text-xs font-black uppercase text-white">
               {tournament?.name || 'CHAMPIONSHIP TOUR'}
             </span>
             <span className="text-gray-500 font-bold text-xs">//</span>
-            <span className="font-orbitron text-[10px] font-bold text-[#00D4FF] tracking-wider uppercase">
+            <span className="font-orbitron text-[10px] font-bold text-[#ffaa00] tracking-wider uppercase">
               {currentMatch ? `MATCH #${currentMatch.match_number}` : 'NO ACTIVE MATCH'}
             </span>
             {currentMatch?.map && (
@@ -142,9 +142,9 @@ export default function DataInputer() {
         {/* Center: Live statistics pill */}
         <div className="flex items-center gap-4 bg-[#09090f] border border-[rgba(0,212,255,0.3)] rounded-full px-4 py-1">
           <div className="flex items-center gap-1.5">
-            <Users className="h-3.5 w-3.5 text-[#00D4FF]" />
+            <Users className="h-3.5 w-3.5 text-[#ffaa00]" />
             <span className="font-orbitron text-[10px] font-black text-white">
-              TEAMS ALIVE: <span className="text-[#00D4FF] font-mono">{totalAliveTeams}/{teams.length}</span>
+              TEAMS ALIVE: <span className="text-[#ffaa00] font-mono">{totalAliveTeams}/{teams.length}</span>
             </span>
           </div>
           <div className="h-3 w-[1px] bg-white/10" />
@@ -162,11 +162,11 @@ export default function DataInputer() {
           disabled={refreshing}
           className="flex h-8 w-8 items-center justify-center rounded border border-white/10 bg-[#13131f] text-gray-400 hover:text-white transition-all"
         >
-          <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin text-[#00D4FF]' : ''}`} />
+          <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin text-[#ffaa00]' : ''}`} />
         </button>
 
         {/* Bottom strip gradient line */}
-        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-[#00D4FF] via-transparent to-[#FF6B00]" />
+        <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-[#ffaa00] via-transparent to-[#ff4e00]" />
       </div>
 
       {/* ─────────────────────────────────────────
@@ -188,7 +188,7 @@ export default function DataInputer() {
               style={
                 isActive
                   ? {
-                      color: '#00D4FF',
+                      color: '#ffaa00',
                       background: 'rgba(0,212,255,0.05)',
                     }
                   : { color: 'rgba(255,255,255,0.4)' }
@@ -197,7 +197,7 @@ export default function DataInputer() {
               <Icon className="h-4 w-4" />
               {t.label}
               {isActive && (
-                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#00D4FF]" />
+                <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#ffaa00]" />
               )}
             </button>
           );
@@ -210,7 +210,7 @@ export default function DataInputer() {
       <main className="flex-1 overflow-y-auto p-6 min-h-0">
         {loading && (
           <div className="flex h-40 items-center justify-center">
-            <RefreshCw className="h-8 w-8 animate-spin text-[#00D4FF]" />
+            <RefreshCw className="h-8 w-8 animate-spin text-[#ffaa00]" />
           </div>
         )}
 
@@ -228,7 +228,7 @@ export default function DataInputer() {
                     placeholder="Search team or player..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full rounded-xl border border-white/5 bg-[#0f0f1a] py-3.5 pl-11 pr-4 text-xs font-semibold text-white outline-none focus:border-[#00D4FF]/40 focus:bg-[#13131f] transition-all"
+                    className="w-full rounded-xl border border-white/5 bg-[#0f0f1a] py-3.5 pl-11 pr-4 text-xs font-semibold text-white outline-none focus:border-[#ffaa00]/40 focus:bg-[#13131f] transition-all"
                   />
                 </div>
 
@@ -293,7 +293,7 @@ export default function DataInputer() {
                           value={newTeamName}
                           onChange={(e) => setNewTeamName(e.target.value)}
                           placeholder="e.g. TEAM LIQUID"
-                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
+                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#ff4e00]/40"
                         />
                       </div>
                       <ImageUpload
@@ -304,7 +304,7 @@ export default function DataInputer() {
                       <button
                         type="submit"
                         disabled={teamAdding}
-                        className="w-full rounded-lg bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(255,107,0,0.2)] transition-all disabled:opacity-50"
+                        className="w-full rounded-lg bg-gradient-to-r from-[#ff4e00] to-[#ffaa00] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(255,107,0,0.2)] transition-all disabled:opacity-50"
                       >
                         {teamAdding ? 'ADDING TEAM...' : 'CREATE TEAM'}
                       </button>
@@ -325,7 +325,7 @@ export default function DataInputer() {
                           required
                           value={playerTeamId}
                           onChange={(e) => setPlayerTeamId(e.target.value)}
-                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
+                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#ff4e00]/40"
                         >
                           <option value="">— select team —</option>
                           {safeArray(teams).map((t) => (
@@ -345,7 +345,7 @@ export default function DataInputer() {
                           value={newPlayerName}
                           onChange={(e) => setNewPlayerName(e.target.value)}
                           placeholder="e.g. TSUNAMI"
-                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
+                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#ff4e00]/40"
                         />
                       </div>
                       <div>
@@ -357,7 +357,7 @@ export default function DataInputer() {
                           value={newPlayerRole}
                           onChange={(e) => setNewPlayerRole(e.target.value)}
                           placeholder="e.g. Assaulter, IGL..."
-                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#FF6B00]/40"
+                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#ff4e00]/40"
                         />
                       </div>
                       <ImageUpload
@@ -370,7 +370,7 @@ export default function DataInputer() {
                       <button
                         type="submit"
                         disabled={playerAdding}
-                        className="w-full rounded-lg bg-gradient-to-r from-[#FF6B00] to-[#FF8C00] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(255,107,0,0.2)] transition-all disabled:opacity-50"
+                        className="w-full rounded-lg bg-gradient-to-r from-[#ff4e00] to-[#ffaa00] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(255,107,0,0.2)] transition-all disabled:opacity-50"
                       >
                         {playerAdding ? 'ADDING PLAYER...' : 'ADD PLAYER'}
                       </button>
@@ -446,10 +446,10 @@ export default function DataInputer() {
                 {/* KILL LOG */}
                 <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
                   <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
-                    <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-[#FF6B00]">
+                    <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-[#ff4e00]">
                       KILL LOG
                     </h3>
-                    <Crosshair className="h-4 w-4 text-[#FF6B00]" />
+                    <Crosshair className="h-4 w-4 text-[#ff4e00]" />
                   </div>
                   <div className="space-y-2 max-h-[500px] overflow-y-auto">
                     {killFeed.length === 0 ? (
@@ -463,7 +463,7 @@ export default function DataInputer() {
                           className="flex items-center justify-between bg-white/[0.02] border border-white/5 p-3 rounded-lg text-xs"
                         >
                           <div className="flex items-center gap-2">
-                            <span className="font-orbitron font-bold text-[#FF6B00]">
+                            <span className="font-orbitron font-bold text-[#ff4e00]">
                               {k.killer_name}
                             </span>
                             <span className="text-gray-500 font-medium">killed</span>
@@ -772,7 +772,7 @@ function TeamInputCard({
         <select
           value={placement}
           onChange={(e) => setPlacement(e.target.value)}
-          className="flex-1 rounded border border-white/10 bg-[#13131f] px-2 py-1 text-[11px] font-semibold text-white outline-none focus:border-[#00D4FF]/40"
+          className="flex-1 rounded border border-white/10 bg-[#13131f] px-2 py-1 text-[11px] font-semibold text-white outline-none focus:border-[#ffaa00]/40"
         >
           <option value="">— rank —</option>
           {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
@@ -871,7 +871,7 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction }) {
       <div className="flex items-center justify-between gap-1.5 mb-2">
         <div className="flex items-center gap-1.5 min-w-0">
           {alive ? (
-            <span className="h-1.5 w-1.5 rounded-full bg-[#10b981] flex-shrink-0" />
+            <span className="h-1.5 w-1.5 rounded-full bg-[#7BC043] flex-shrink-0" />
           ) : (
             <span className="h-1.5 w-1.5 rounded-full bg-[#ef4444] flex-shrink-0" />
           )}
@@ -883,7 +883,7 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction }) {
             {player.name}
           </span>
         </div>
-        <span className="rounded bg-[#FF6B00]/10 border border-[#FF6B00]/20 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#FF6B00] tabular-nums">
+        <span className="rounded bg-[#ff4e00]/10 border border-[#ff4e00]/20 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#ff4e00] tabular-nums">
           {kills} K
         </span>
       </div>
