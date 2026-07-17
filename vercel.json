@@ -4,6 +4,8 @@
   "outputDirectory": "netlify-app/dist",
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/index.js" },
-    { "source": "/((?!api/).*)", "destination": "/index.html" }
+    { "source": "/controller.html", "destination": "/controller.html" },
+    { "source": "/overlay.html", "destination": "/overlay.html" },
+    { "source": "/((?!api/|controller.html|overlay.html).*)", "destination": "/index.html" }
   ]
 }
