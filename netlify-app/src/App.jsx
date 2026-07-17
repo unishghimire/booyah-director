@@ -73,9 +73,9 @@ function NavBarInner({ loc }) {
     : 'STAND BY';
 
   const tabs = [
-    { to: '/director',      label: 'DIRECTOR',     icon: Clapperboard, color: '#FF6B00' },
-    { to: '/overlay-links', label: 'OBS LINKS',    icon: Monitor,      color: '#00D4FF' },
-    { to: '/inputer',       label: 'DATA INPUTER', icon: Keyboard,     color: '#00D4FF' },
+    { to: '/director',      label: 'DIRECTOR',     icon: Clapperboard, color: '#ff4e00' },
+    { to: '/overlay-links', label: 'OBS LINKS',    icon: Monitor,      color: '#ffaa00' },
+    { to: '/inputer',       label: 'DATA INPUTER', icon: Keyboard,     color: '#ffaa00' },
   ];
 
   const active = (to) => loc.pathname === to || (loc.pathname === '/' && to === '/director');
@@ -84,11 +84,11 @@ function NavBarInner({ loc }) {
     <nav className="relative flex items-center justify-between border-b border-white/10 bg-[#060912] px-4 py-2 flex-shrink-0">
       {/* Brand */}
       <div className="flex items-center gap-2.5">
-        <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-[#FF6B00] to-[#FF8C00]">
+        <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-[#ff4e00] to-[#ffaa00]">
           <Zap className="h-4.5 w-4.5 text-black stroke-[2.5]" />
         </div>
         <div className="leading-none">
-          <p className="font-orbitron text-xs font-black tracking-widest text-[#FF6B00]">BOOYAH</p>
+          <p className="font-orbitron text-xs font-black tracking-widest text-[#ff4e00]">BOOYAH</p>
           <p className="font-orbitron text-[9px] font-bold tracking-widest text-white">DIRECTOR</p>
         </div>
       </div>
@@ -113,12 +113,12 @@ function NavBarInner({ loc }) {
 
       {/* Right: status + logout */}
       <div className="flex items-center gap-3">
-        <div className="flex items-center gap-2 rounded-full border border-[rgba(255,107,0,0.4)] bg-[#09090f] px-3 py-1">
+        <div className="flex items-center gap-2 rounded-full border border-[rgba(255,78,0,0.4)] bg-[#09090f] px-3 py-1">
           <span className="relative flex h-2 w-2">
-            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#FF6B00] opacity-75" />
-            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#FF6B00]" />
+            <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#ff4e00] opacity-75" />
+            <span className="relative inline-flex h-2 w-2 rounded-full bg-[#ff4e00]" />
           </span>
-          <span className="font-orbitron text-[9px] font-black text-[#FF6B00] tracking-wider">
+          <span className="font-orbitron text-[9px] font-black text-[#ff4e00] tracking-wider">
             LIVE: {currentScreenName}
           </span>
         </div>
@@ -127,7 +127,7 @@ function NavBarInner({ loc }) {
           href="/overlay/scoreboard"
           target="_blank"
           rel="noopener noreferrer"
-          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-[#0f0f1a] px-3 py-1.5 text-[10px] font-orbitron font-black text-[rgba(255,255,255,0.6)] hover:border-[#FF6B00]/40 hover:text-white transition-all"
+          className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-[#0f0f1a] px-3 py-1.5 text-[10px] font-orbitron font-black text-[rgba(255,255,255,0.6)] hover:border-[#ff4e00]/40 hover:text-white transition-all"
         >
           <Monitor className="h-3.5 w-3.5" /> OBS SOURCE <ExternalLink className="h-3 w-3" />
         </a>
@@ -140,7 +140,7 @@ function NavBarInner({ loc }) {
         </button>
       </div>
 
-      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-[#FF6B00] via-transparent to-[#00D4FF]" />
+      <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-[#ff4e00] via-transparent to-[#ffaa00]" />
     </nav>
   );
 }
@@ -152,7 +152,7 @@ function AppRoutes() {
   if (loading) {
     return (
       <div className="flex h-screen items-center justify-center bg-[#060915]">
-        <div className="h-10 w-10 rounded-full border-4 border-[#FF6B00]/20 border-t-[#FF6B00] animate-spin" />
+        <div className="h-10 w-10 rounded-full border-4 border-[#ff4e00]/20 border-t-[#ff4e00] animate-spin" />
       </div>
     );
   }
@@ -234,7 +234,7 @@ export default function App() {
             border: '1px solid rgba(249,115,22,0.3)',
             fontSize: '12px', fontFamily: 'Orbitron, sans-serif', fontWeight: '600',
           },
-          success: { iconTheme: { primary: '#f97316', secondary: '#000' } },
+          success: { iconTheme: { primary: '#ff4e00', secondary: '#000' } },
           error:   { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
         }}
       />

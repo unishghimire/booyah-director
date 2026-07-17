@@ -307,7 +307,7 @@ export default function DirectorPanel() {
                     <div className="space-y-1.5 text-xs text-gray-400">
                       <p>1. OBS → <span className="text-white font-bold">Add → Browser Source</span> → paste the URL below</p>
                       <p>2. Width: <span className="text-white font-bold font-mono">1920</span> · Height: <span className="text-white font-bold font-mono">1080</span></p>
-                      <p>3. For transparent overlays: enable <span className="text-white font-bold">Custom CSS</span> → <code className="text-[#00D4FF] font-mono">body {'{ background: transparent !important; }'}</code></p>
+                      <p>3. For transparent overlays: enable <span className="text-white font-bold">Custom CSS</span> → <code className="text-[#ffaa00] font-mono">body {'{ background: transparent !important; }'}</code></p>
                       <p>4. Uncheck <span className="text-white font-bold">"Shutdown source when not visible"</span></p>
                     </div>
                   </div>
@@ -317,7 +317,7 @@ export default function DirectorPanel() {
                     <div className="rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
                       <p className="font-orbitron text-[10px] font-black text-gray-400 tracking-wider mb-2">YOUR UNIQUE SHARE TOKEN</p>
                       <div className="flex items-center gap-3">
-                        <code className="flex-1 truncate rounded-lg border border-white/5 bg-black/40 px-3 py-2 font-mono text-xs text-[#00D4FF]">{shareToken}</code>
+                        <code className="flex-1 truncate rounded-lg border border-white/5 bg-black/40 px-3 py-2 font-mono text-xs text-[#ffaa00]">{shareToken}</code>
                         <CopyBtn text={shareToken} id="token" copied={copied} onCopy={copy} />
                       </div>
                     </div>
@@ -326,8 +326,8 @@ export default function DirectorPanel() {
                   {/* Transparent Overlays */}
                   <div>
                     <div className="flex items-center gap-2 mb-4">
-                      <div className="h-1.5 w-1.5 bg-[#00D4FF] rounded-full animate-pulse" />
-                      <span className="font-orbitron text-[10px] font-black text-[#00D4FF] tracking-widest">TRANSPARENT — LAYER OVER GAMEPLAY</span>
+                      <div className="h-1.5 w-1.5 bg-[#ffaa00] rounded-full animate-pulse" />
+                      <span className="font-orbitron text-[10px] font-black text-[#ffaa00] tracking-widest">TRANSPARENT — LAYER OVER GAMEPLAY</span>
                       <div className="h-px flex-1 bg-white/5" />
                     </div>
                     <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -337,19 +337,19 @@ export default function DirectorPanel() {
                         return (
                           <div
                             key={ov.id}
-                            className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#00D4FF]/30 hover:shadow-[0_0_15px_rgba(0,212,255,0.05)] transition-all group"
+                            className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#ffaa00]/30 hover:shadow-[0_0_15px_rgba(255,170,0,0.05)] transition-all group"
                           >
                             <div>
                               <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#00D4FF]/10 border border-[#00D4FF]/20 group-hover:bg-[#00D4FF]/20 transition-all">
-                                  <Icon className="h-4 w-4 text-[#00D4FF]" />
+                                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#ffaa00]/10 border border-[#ffaa00]/20 group-hover:bg-[#ffaa00]/20 transition-all">
+                                  <Icon className="h-4 w-4 text-[#ffaa00]" />
                                 </div>
                                 <div>
                                   <h3 className="font-orbitron text-xs font-black text-white tracking-wider">{ov.label}</h3>
                                   <p className="text-[10px] text-gray-400 mt-0.5">{ov.desc}</p>
                                 </div>
                               </div>
-                              <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#00D4FF]/80 truncate">
+                              <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#ffaa00]/80 truncate">
                                 {url}
                               </div>
                             </div>
@@ -361,7 +361,7 @@ export default function DirectorPanel() {
                                   href={url}
                                   target="_blank"
                                   rel="noreferrer"
-                                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-[#00D4FF] hover:border-[#00D4FF]/30 transition-all"
+                                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-[#ffaa00] hover:border-[#ffaa00]/30 transition-all"
                                   title="Open Link"
                                 >
                                   <ExternalLink className="h-4 w-4" />
@@ -396,7 +396,7 @@ export default function DirectorPanel() {
                         return (
                           <div
                             key={ov.id}
-                            className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#ff4e00]/30 hover:shadow-[0_0_15px_rgba(255,107,0,0.05)] transition-all group"
+                            className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#ff4e00]/30 hover:shadow-[0_0_15px_rgba(255,78,0,0.05)] transition-all group"
                           >
                             <div>
                               <div className="flex items-center gap-3 mb-2">
@@ -523,7 +523,7 @@ export default function DirectorPanel() {
                               isCurrent
                                 ? {
                                     borderColor: '#ff4e00',
-                                    backgroundColor: 'rgba(255,107,0,0.1)',
+                                    backgroundColor: 'rgba(255,78,0,0.1)',
                                     color: '#ff4e00',
                                   }
                                 : {

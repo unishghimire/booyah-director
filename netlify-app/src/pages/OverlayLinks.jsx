@@ -144,7 +144,7 @@ export default function OverlayLinks() {
             return (
               <div
                 key={ov.id}
-                className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#ffaa00]/30 hover:shadow-[0_0_15px_rgba(0,212,255,0.05)] transition-all group"
+                className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#ffaa00]/30 hover:shadow-[0_0_15px_rgba(255,170,0,0.05)] transition-all group"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">
@@ -206,7 +206,7 @@ export default function OverlayLinks() {
             return (
               <div
                 key={ov.id}
-                className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#ffaa00]/30 hover:shadow-[0_0_15px_rgba(0,212,255,0.05)] transition-all group"
+                className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#ffaa00]/30 hover:shadow-[0_0_15px_rgba(255,170,0,0.05)] transition-all group"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">

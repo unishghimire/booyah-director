@@ -91,11 +91,11 @@ export default function MatchControls({ tournament, currentMatch, onAction }) {
 
       {/* Stage / Day / Map context bar */}
       {(stageName || dayLabel) && (
-        <div className="mb-3 flex items-center gap-2 flex-wrap rounded-lg border border-[#FF6B00]/15 bg-[#FF6B00]/5 px-3 py-2">
+        <div className="mb-3 flex items-center gap-2 flex-wrap rounded-lg border border-[#ff4e00]/15 bg-[#ff4e00]/5 px-3 py-2">
           {stageName && (
             <div className="flex items-center gap-1.5">
-              <Layers className="h-3 w-3 text-[#FF6B00]" />
-              <span className="font-orbitron text-[10px] font-bold text-[#FF6B00] tracking-wider">{stageName.toUpperCase()}</span>
+              <Layers className="h-3 w-3 text-[#ff4e00]" />
+              <span className="font-orbitron text-[10px] font-bold text-[#ff4e00] tracking-wider">{stageName.toUpperCase()}</span>
             </div>
           )}
           {dayLabel && (

@@ -537,7 +537,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
                 </div>
 
                 {/* Points */}
-                <div style={{ width:36, textAlign:'center', fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color: isEliminated ? 'rgba(0,212,255,0.4)' : secondary }}>
+                <div style={{ width:36, textAlign:'center', fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color: isEliminated ? 'rgba(255,170,0,0.4)' : secondary }}>
                   {team.total_tournament_points || 0}
                 </div>
               </div>
@@ -629,7 +629,7 @@ function FullStandings({ teams = [], design }) {
               {sorted.map((team, idx) => {
                 const rank = idx+1;
                 const rc = rank<=3 ? rankColors[rank-1] : '#fff';
-                const rowBg = rank===1 ? 'rgba(255, 78, 0,0.06)' : rank===2 ? 'rgba(0,212,255,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
+                const rowBg = rank===1 ? 'rgba(255, 78, 0,0.06)' : rank===2 ? 'rgba(255,170,0,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
                 const crEligible = team.champion_rush_eligible;
                 const crBorder = crEligible ? '4px solid #ffaa00' : `4px solid ${rank<=3?rankColors[rank-1]:'transparent'}`;
                 const crBg = crEligible ? 'rgba(255, 199, 0, 0.08)' : rowBg;

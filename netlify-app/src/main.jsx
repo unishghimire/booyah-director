@@ -66,7 +66,7 @@ if (rootEl) {
         <div style="font-size:40px;margin-bottom:12px">⚠️</div>
         <div style="font-size:13px;font-weight:900;letter-spacing:2px">BOOYAH DIRECTOR FAILED TO START</div>
         <div style="font-size:11px;color:rgba(255,255,255,0.3);margin-top:8px">Root element missing. Try clearing your browser cache.</div>
-        <button onclick="location.reload()" style="margin-top:20px;padding:10px 24px;background:rgba(255,107,0,0.15);border:1px solid rgba(255,107,0,0.4);border-radius:8px;color:#FF6B00;font-size:11px;cursor:pointer;font-family:Orbitron,sans-serif;font-weight:900;letter-spacing:1px">
+        <button onclick="location.reload()" style="margin-top:20px;padding:10px 24px;background:rgba(255,78,0,0.15);border:1px solid rgba(255,78,0,0.4);border-radius:8px;color:#ff4e00;font-size:11px;cursor:pointer;font-family:Orbitron,sans-serif;font-weight:900;letter-spacing:1px">
           RELOAD
         </button>
       </div>

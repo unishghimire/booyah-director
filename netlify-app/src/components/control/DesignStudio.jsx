@@ -28,12 +28,12 @@ import { MAPS } from '@/lib/maps';
 
 /* ─── Colour presets matching official FF tournament palettes ─── */
 const PRESETS = [
-  { label: 'FF Orange',   accentColor:'#f97316', accentColor2:'#00d4ff', bgColor:'#060915', textColor:'#ffffff' },
-  { label: 'Midnight',    accentColor:'#00d4ff', accentColor2:'#a855f7', bgColor:'#060915', textColor:'#ffffff' },
-  { label: 'Valorant',    accentColor:'#ff4655', accentColor2:'#ff8c00', bgColor:'#0f0f0f', textColor:'#ece8e1' },
-  { label: 'PUBG Blue',   accentColor:'#3b82f6', accentColor2:'#06b6d4', bgColor:'#050a14', textColor:'#ffffff' },
-  { label: 'Esports Gold',accentColor:'#fbbf24', accentColor2:'#f97316', bgColor:'#0d0a00', textColor:'#ffffff' },
-  { label: 'Cyber Purple',accentColor:'#a855f7', accentColor2:'#ec4899', bgColor:'#09050f', textColor:'#ffffff' },
+  { label: 'FF Orange',   accentColor:'#ff4e00', accentColor2:'#ffaa00', bgColor:'#060915', textColor:'#ffffff' },
+  { label: 'Midnight',    accentColor:'#ffaa00', accentColor2:'#ff4e00', bgColor:'#060915', textColor:'#ffffff' },
+  { label: 'Valorant',    accentColor:'#ff4655', accentColor2:'#ffaa00', bgColor:'#0f0f0f', textColor:'#ece8e1' },
+  { label: 'PUBG Blue',   accentColor:'#ff4e00', accentColor2:'#06b6d4', bgColor:'#050a14', textColor:'#ffffff' },
+  { label: 'Esports Gold',accentColor:'#fbbf24', accentColor2:'#ff4e00', bgColor:'#0d0a00', textColor:'#ffffff' },
+  { label: 'Cyber Purple',accentColor:'#ff4e00', accentColor2:'#ec4899', bgColor:'#09050f', textColor:'#ffffff' },
   { label: 'Neon Green',  accentColor:'#10b981', accentColor2:'#06b6d4', bgColor:'#020f0a', textColor:'#ffffff' },
   { label: 'Classic Dark',accentColor:'#ffffff', accentColor2:'#94a3b8', bgColor:'#111827', textColor:'#f8fafc' },
 ];
@@ -49,7 +49,7 @@ const OVERLAY_STYLES = [
     key: 'default',
     label: 'Dual Border (Default)',
     desc: 'Orange & cyan dual-corner glass panels. The original AAA esports style.',
-    preview: { p:'#FF6B00', s:'#00D4FF', corner:'dual' },
+    preview: { p:'#ff4e00', s:'#ffaa00', corner:'dual' },
   },
   {
     key: 'neon',
@@ -73,12 +73,12 @@ const OVERLAY_STYLES = [
     key: 'retro',
     label: 'Retro Arcade',
     desc: 'Red & gold CRT scanline aesthetic with bold solid borders.',
-    preview: { p:'#FF3030', s:'#FFD700', corner:'rect' },
+    preview: { p:'#FF3030', s:'#ffaa00', corner:'rect' },
   },
 ];
 
 const DEFAULT_DESIGN = {
-  accentColor:'#f97316', accentColor2:'#00d4ff',
+  accentColor:'#ff4e00', accentColor2:'#ffaa00',
   bgColor:'#060915',     textColor:'#ffffff',
   tournamentName:'FF OFFICIAL', tournamentSubtitle:'GRAND FINALS',
   gameLabel:'MATCH', logoUrl:'', overlayStyle:'default', fontStyle:'orbitron',
@@ -323,10 +323,10 @@ function DiscordSection({ tournament }) {
   const isConnected = !!tournament?.discord_webhook_url;
 
   const POST_BUTTONS = [
-    { type: 'standings', label: 'LIVE STANDINGS',  icon: BarChart3, color: '#00D4FF' },
-    { type: 'mvp',       label: 'MATCH MVP',        icon: Star,      color: '#FFD700' },
-    { type: 'champion',  label: 'CHAMPIONS',        icon: Trophy,    color: '#FF6B00' },
-    { type: 'teams',     label: 'TEAMS LINEUP',     icon: Users,     color: '#a855f7' },
+    { type: 'standings', label: 'LIVE STANDINGS',  icon: BarChart3, color: '#ffaa00' },
+    { type: 'mvp',       label: 'MATCH MVP',        icon: Star,      color: '#ffaa00' },
+    { type: 'champion',  label: 'CHAMPIONS',        icon: Trophy,    color: '#ff4e00' },
+    { type: 'teams',     label: 'TEAMS LINEUP',     icon: Users,     color: '#ff4e00' },
   ];
 
   return (
@@ -696,7 +696,7 @@ export default function DesignStudio(props) {
             { key:'scheduleBrandText',   label:'Schedule Brand Label',   placeholder:'FREE FIRE WORLD SERIES' },
             { key:'scoreboardSubtitle',  label:'Scoreboard Subtitle',    placeholder:'STANDBY' },
             { key:'scoreboardBrand',     label:'Scoreboard Brand (e.g. EWC)', placeholder:'EWC' },
-            { key:'scoreboardAccent',    label:'Scoreboard Accent Color (hex)', placeholder:'#FF6B00' },
+            { key:'scoreboardAccent',    label:'Scoreboard Accent Color (hex)', placeholder:'#ff4e00' },
             { key:'stageLabel',          label:'Stage Label',            placeholder:'GROUP STAGE' },
             { key:'dayLabel',            label:'Day Label',              placeholder:'DAY 1' },
             { key:'matchLabel',          label:'Match Label',            placeholder:'MATCH 1' },
@@ -872,11 +872,11 @@ export default function DesignStudio(props) {
       </Section>
 
       {/* ── LIVE PREVIEW ── */}
-      <div className="rounded-xl overflow-hidden border-2" style={{ borderColor: (design?.accentColor || '#f97316') + '55' }}>
+      <div className="rounded-xl overflow-hidden border-2" style={{ borderColor: (design?.accentColor || '#ff4e00') + '55' }}>
         <div className="flex items-center justify-between px-4 py-2.5"
-          style={{ background: `linear-gradient(135deg, ${(design?.accentColor || '#f97316')}22, ${design?.bgColor || '#060915'}, ${(design?.accentColor2 || '#00d4ff')}22)`, borderBottom: `1px solid ${(design?.accentColor || '#f97316')}33` }}>
+          style={{ background: `linear-gradient(135deg, ${(design?.accentColor || '#ff4e00')}22, ${design?.bgColor || '#060915'}, ${(design?.accentColor2 || '#ffaa00')}22)`, borderBottom: `1px solid ${(design?.accentColor || '#ff4e00')}33` }}>
           <div className="flex items-center gap-2">
-            <div className="h-5 w-5 rounded-full" style={{ background: (design?.accentColor || '#f97316') + '44' }}>
+            <div className="h-5 w-5 rounded-full" style={{ background: (design?.accentColor || '#ff4e00') + '44' }}>
               <div className="h-full w-full flex items-center justify-center">
                 <span className="text-[8px]" style={{ color: design?.accentColor }}>G</span>
               </div>
@@ -893,7 +893,7 @@ export default function DesignStudio(props) {
         <div className="flex items-center justify-between px-4 py-3" style={{ background: design?.bgColor || '#060915' }}>
           <div style={{ color: (design?.textColor || '#ffffff') + '88', fontSize: 10 }}>RANK · LOGO · TEAM NAME · KILLS · BOOYAH · TOTAL POINTS</div>
           <div className="flex gap-0.5">
-            {[1,1,1,0].map((a,i) => <div key={i} className="rounded-sm" style={{ width:4, height:a?12:6, background:a?(design?.accentColor || '#f97316'):(design?.accentColor || '#f97316')+'33', marginTop:a?0:3 }} />)}
+            {[1,1,1,0].map((a,i) => <div key={i} className="rounded-sm" style={{ width:4, height:a?12:6, background:a?(design?.accentColor || '#ff4e00'):(design?.accentColor || '#ff4e00')+'33', marginTop:a?0:3 }} />)}
           </div>
         </div>
       </div>
@@ -906,7 +906,7 @@ export default function DesignStudio(props) {
         </button>
         <button onClick={save} disabled={saving}
           className="flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-black text-black transition-all disabled:opacity-50"
-          style={{ background: saving ? (design?.accentColor || '#f97316') + 'aa' : (design?.accentColor || '#f97316') }}>
+          style={{ background: saving ? (design?.accentColor || '#ff4e00') + 'aa' : (design?.accentColor || '#ff4e00') }}>
           {saving ? <><RefreshCw className="h-4 w-4 animate-spin" /> Saving…</> : <><Save className="h-4 w-4" /> Apply Design to Overlay</>}
         </button>
       </div>
@@ -990,19 +990,19 @@ function TournamentSettingsSection({ tournament, onAction }) {
       {/* Champion Rush Threshold */}
       <div className="rounded-lg border border-white/8 bg-black/20 p-3 space-y-3">
         <div className="flex items-center gap-2">
-          <Trophy className="h-3.5 w-3.5 text-[#FFC700]" />
-          <span className="font-orbitron text-[10px] font-bold text-[#FFC700] tracking-wider">CHAMPION RUSH THRESHOLD</span>
+          <Trophy className="h-3.5 w-3.5 text-[#ffaa00]" />
+          <span className="font-orbitron text-[10px] font-bold text-[#ffaa00] tracking-wider">CHAMPION RUSH THRESHOLD</span>
         </div>
         <div className="flex gap-2">
           <select value={threshold} onChange={e => setThreshold(Number(e.target.value))}
-            className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#FF6B00]/50">
+            className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#ff4e00]/50">
             <option value={0}>Disabled</option>
             <option value={80}>80 Points</option>
             <option value={90}>90 Points</option>
             <option value={100}>100 Points</option>
           </select>
           <button onClick={saveThreshold} disabled={saving}
-            className="rounded-lg bg-[#FFC700]/15 border border-[#FFC700]/30 px-4 py-2 text-[10px] font-orbitron font-black text-[#FFC700] hover:bg-[#FFC700]/25 transition-all disabled:opacity-50">
+            className="rounded-lg bg-[#ffaa00]/15 border border-[#ffaa00]/30 px-4 py-2 text-[10px] font-orbitron font-black text-[#ffaa00] hover:bg-[#ffaa00]/25 transition-all disabled:opacity-50">
             {saving ? '...' : 'SAVE'}
           </button>
         </div>
@@ -1015,8 +1015,8 @@ function TournamentSettingsSection({ tournament, onAction }) {
       <div className="rounded-lg border border-white/8 bg-black/20 p-3 space-y-3">
         <button onClick={() => setShowHeadstart(!showHeadstart)} className="flex w-full items-center justify-between">
           <div className="flex items-center gap-2">
-            <Zap className="h-3.5 w-3.5 text-[#00D4FF]" />
-            <span className="font-orbitron text-[10px] font-bold text-[#00D4FF] tracking-wider">POINT RUSH CARRYOVERS</span>
+            <Zap className="h-3.5 w-3.5 text-[#ffaa00]" />
+            <span className="font-orbitron text-[10px] font-bold text-[#ffaa00] tracking-wider">POINT RUSH CARRYOVERS</span>
           </div>
           <span className="text-[10px] text-gray-500">{showHeadstart ? '▲' : '▼'}</span>
         </button>
@@ -1027,7 +1027,7 @@ function TournamentSettingsSection({ tournament, onAction }) {
               Assign bonus starting points to teams based on their previous stage placement. These are added to each team's total tournament points.
             </p>
             <button onClick={autoCalcHeadstart}
-              className="w-full rounded-lg border border-[#00D4FF]/20 bg-[#00D4FF]/5 py-1.5 text-[10px] font-orbitron font-bold text-[#00D4FF] hover:bg-[#00D4FF]/10 transition-all">
+              className="w-full rounded-lg border border-[#ffaa00]/20 bg-[#ffaa00]/5 py-1.5 text-[10px] font-orbitron font-bold text-[#ffaa00] hover:bg-[#ffaa00]/10 transition-all">
               AUTO-CALC FROM RANK (Garena Rules)
             </button>
             {headstartTeams.length > 0 ? (
@@ -1038,7 +1038,7 @@ function TournamentSettingsSection({ tournament, onAction }) {
                     <span className="flex-1 text-[10px] text-gray-300 truncate">{t.teamName}</span>
                     <input type="number" min={0} value={t.points}
                       onChange={e => updateHeadstartPoint(i, e.target.value)}
-                      className="w-16 rounded border border-white/10 bg-black/40 px-2 py-1 text-[10px] text-white text-center outline-none focus:border-[#00D4FF]/50" />
+                      className="w-16 rounded border border-white/10 bg-black/40 px-2 py-1 text-[10px] text-white text-center outline-none focus:border-[#ffaa00]/50" />
                     <span className="text-[8px] text-gray-600 w-6">pts</span>
                   </div>
                 ))}
@@ -1047,7 +1047,7 @@ function TournamentSettingsSection({ tournament, onAction }) {
               <p className="text-[10px] text-gray-600 italic">No teams or standings available. Create teams and play matches first.</p>
             )}
             <button onClick={applyHeadstart} disabled={saving}
-              className="w-full rounded-lg bg-[#00D4FF]/15 border border-[#00D4FF]/30 py-2 text-[10px] font-orbitron font-black text-[#00D4FF] hover:bg-[#00D4FF]/25 transition-all disabled:opacity-50">
+              className="w-full rounded-lg bg-[#ffaa00]/15 border border-[#ffaa00]/30 py-2 text-[10px] font-orbitron font-black text-[#ffaa00] hover:bg-[#ffaa00]/25 transition-all disabled:opacity-50">
               {saving ? 'APPLYING...' : 'APPLY HEADSTART POINTS'}
             </button>
           </div>

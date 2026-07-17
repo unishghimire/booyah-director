@@ -9,13 +9,13 @@ function GridBg() {
   return (
     <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none' }}>
       {/* Grid lines */}
-      <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(rgba(255,107,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(0,212,255,0.04) 1px, transparent 1px)', backgroundSize:'72px 72px' }} />
+      <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(rgba(255,78,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,170,0,0.04) 1px, transparent 1px)', backgroundSize:'72px 72px' }} />
       {/* Orange radial glow top */}
-      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 900px 500px at 50% 0%, rgba(255,107,0,0.1), transparent)' }} />
+      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 900px 500px at 50% 0%, rgba(255,78,0,0.1), transparent)' }} />
       {/* Cyan radial glow bottom */}
-      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 700px 400px at 50% 100%, rgba(0,212,255,0.06), transparent)' }} />
+      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 700px 400px at 50% 100%, rgba(255,170,0,0.06), transparent)' }} />
       {/* Scan line animation */}
-      <div style={{ position:'absolute', left:0, right:0, height:1, background:'linear-gradient(90deg,transparent,rgba(255,107,0,0.4),transparent)', animation:'scan 4s linear infinite', top:0 }} />
+      <div style={{ position:'absolute', left:0, right:0, height:1, background:'linear-gradient(90deg,transparent,rgba(255,78,0,0.4),transparent)', animation:'scan 4s linear infinite', top:0 }} />
       <style>{`@keyframes scan{0%{top:0}100%{top:100%}}`}</style>
     </div>
   );
@@ -85,17 +85,17 @@ export default function AuthPage() {
         <div style={{ textAlign:'center', marginBottom:36 }}>
           <div style={{
             display:'inline-flex', width:72, height:72, borderRadius:20,
-            background:'linear-gradient(135deg,rgba(255,107,0,0.15),rgba(255,107,0,0.05))',
-            border:'1px solid rgba(255,107,0,0.4)',
+            background:'linear-gradient(135deg,rgba(255,78,0,0.15),rgba(255,78,0,0.05))',
+            border:'1px solid rgba(255,78,0,0.4)',
             alignItems:'center', justifyContent:'center', marginBottom:16,
-            boxShadow:'0 0 40px rgba(255,107,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
+            boxShadow:'0 0 40px rgba(255,78,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
           }}>
             <Zap size={32} style={{ color:'#ff4e00' }} />
           </div>
           <h1 style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', letterSpacing:'0.1em', margin:0 }}>
             BOOYAH <span style={{ background:'linear-gradient(90deg,#ff4e00,#ffaa00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>DIRECTOR</span>
           </h1>
-          <p style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(0,212,255,0.7)', letterSpacing:'0.3em', marginTop:6 }}>
+          <p style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,170,0,0.7)', letterSpacing:'0.3em', marginTop:6 }}>
             OFFICIAL TOURNAMENT BROADCAST SYSTEM
           </p>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:10 }}>
@@ -111,8 +111,8 @@ export default function AuthPage() {
             width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:12,
             padding:'14px 20px', borderRadius:14, marginBottom:16,
             background:'rgba(255,255,255,0.04)', backdropFilter:'blur(12px)',
-            border:'1px solid rgba(255,107,0,0.35)',
-            boxShadow:'0 0 20px rgba(255,107,0,0.08)',
+            border:'1px solid rgba(255,78,0,0.35)',
+            boxShadow:'0 0 20px rgba(255,78,0,0.08)',
             fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', letterSpacing:'0.12em',
             cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1,
             transition:'all 0.2s',
@@ -181,7 +181,7 @@ export default function AuthPage() {
               padding:'13px', borderRadius:10, fontFamily:'Orbitron', fontSize:11, fontWeight:900,
               color:'#fff', letterSpacing:'0.12em', cursor: loading ? 'not-allowed' : 'pointer',
               background:'linear-gradient(135deg,#ff4e00,#ff4e00)', border:'none',
-              boxShadow:'0 4px 20px rgba(255,107,0,0.4)', opacity: loading ? 0.6 : 1, transition:'all 0.2s', marginTop:4,
+              boxShadow:'0 4px 20px rgba(255,78,0,0.4)', opacity: loading ? 0.6 : 1, transition:'all 0.2s', marginTop:4,
             }}>
               {loading ? 'LOADING...' : mode === 'login' ? 'ACCESS SYSTEM' : 'CREATE ACCOUNT'}
             </button>

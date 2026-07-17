@@ -117,7 +117,7 @@ export default function DataInputer() {
       {/* ─────────────────────────────────────────
          STATUS BAR — 52px
       ───────────────────────────────────────── */}
-      <div className="relative flex h-[52px] items-center justify-between border-b border-[rgba(0,212,255,0.2)] bg-[#0c0c18] px-5 flex-shrink-0">
+      <div className="relative flex h-[52px] items-center justify-between border-b border-[rgba(255,170,0,0.2)] bg-[#0c0c18] px-5 flex-shrink-0">
         <div className="flex items-center gap-3">
           <div className="h-5 w-[4px] bg-[#ffaa00]" />
           <div className="leading-none flex items-center gap-2">
@@ -140,7 +140,7 @@ export default function DataInputer() {
         </div>
 
         {/* Center: Live statistics pill */}
-        <div className="flex items-center gap-4 bg-[#09090f] border border-[rgba(0,212,255,0.3)] rounded-full px-4 py-1">
+        <div className="flex items-center gap-4 bg-[#09090f] border border-[rgba(255,170,0,0.3)] rounded-full px-4 py-1">
           <div className="flex items-center gap-1.5">
             <Users className="h-3.5 w-3.5 text-[#ffaa00]" />
             <span className="font-orbitron text-[10px] font-black text-white">
@@ -189,7 +189,7 @@ export default function DataInputer() {
                 isActive
                   ? {
                       color: '#ffaa00',
-                      background: 'rgba(0,212,255,0.05)',
+                      background: 'rgba(255,170,0,0.05)',
                     }
                   : { color: 'rgba(255,255,255,0.4)' }
               }
@@ -304,7 +304,7 @@ export default function DataInputer() {
                       <button
                         type="submit"
                         disabled={teamAdding}
-                        className="w-full rounded-lg bg-gradient-to-r from-[#ff4e00] to-[#ffaa00] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(255,107,0,0.2)] transition-all disabled:opacity-50"
+                        className="w-full rounded-lg bg-gradient-to-r from-[#ff4e00] to-[#ffaa00] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(255,78,0,0.2)] transition-all disabled:opacity-50"
                       >
                         {teamAdding ? 'ADDING TEAM...' : 'CREATE TEAM'}
                       </button>
@@ -370,7 +370,7 @@ export default function DataInputer() {
                       <button
                         type="submit"
                         disabled={playerAdding}
-                        className="w-full rounded-lg bg-gradient-to-r from-[#ff4e00] to-[#ffaa00] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(255,107,0,0.2)] transition-all disabled:opacity-50"
+                        className="w-full rounded-lg bg-gradient-to-r from-[#ff4e00] to-[#ffaa00] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(255,78,0,0.2)] transition-all disabled:opacity-50"
                       >
                         {playerAdding ? 'ADDING PLAYER...' : 'ADD PLAYER'}
                       </button>

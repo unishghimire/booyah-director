@@ -119,11 +119,11 @@ function FormatBuilder({ format, setFormat }) {
   return (
     <div className="space-y-3">
       {stages.map((stage, si) => (
-        <div key={si} className="rounded-lg border border-[#FF6B00]/20 bg-[#FF6B00]/5 p-3 space-y-3">
+        <div key={si} className="rounded-lg border border-[#ff4e00]/20 bg-[#ff4e00]/5 p-3 space-y-3">
           <div className="flex items-center gap-2">
-            <Layers className="h-3.5 w-3.5 text-[#FF6B00] flex-shrink-0" />
+            <Layers className="h-3.5 w-3.5 text-[#ff4e00] flex-shrink-0" />
             <input value={stage.name} onChange={e => updateStage(si, 'name', e.target.value)}
-              className="flex-1 rounded border border-white/10 bg-black/40 px-2 py-1 text-xs font-orbitron font-bold text-[#FF6B00] outline-none focus:border-[#FF6B00]/50" placeholder="Stage name" />
+              className="flex-1 rounded border border-white/10 bg-black/40 px-2 py-1 text-xs font-orbitron font-bold text-[#ff4e00] outline-none focus:border-[#ff4e00]/50" placeholder="Stage name" />
             <button type="button" onClick={() => duplicateStage(si)} title="Duplicate" className="rounded p-1 text-gray-500 hover:text-white hover:bg-white/10 transition-colors"><Copy className="h-3 w-3" /></button>
             {stages.length > 1 && <button type="button" onClick={() => removeStage(si)} title="Remove" className="rounded p-1 text-gray-500 hover:text-red-400 hover:bg-red-500/10 transition-colors"><X className="h-3 w-3" /></button>}
           </div>
@@ -143,21 +143,21 @@ function FormatBuilder({ format, setFormat }) {
                       <span className="font-orbitron text-[9px] font-black text-gray-600 w-6 text-right">M{gmn}</span>
                       <MapPin className="h-3 w-3 text-gray-600 flex-shrink-0" />
                       <select value={m.map} onChange={e => updateMap(si, di, mi, e.target.value)}
-                        className="flex-1 rounded border border-white/10 bg-black/50 px-2 py-1 text-[10px] text-white outline-none focus:border-[#FF6B00]/40">
+                        className="flex-1 rounded border border-white/10 bg-black/50 px-2 py-1 text-[10px] text-white outline-none focus:border-[#ff4e00]/40">
                         {MAPS.map(map => <option key={map} value={map}>{map}</option>)}
                       </select>
                       {day.matches.length > 1 && <button type="button" onClick={() => removeMatch(si, di, mi)} className="rounded p-0.5 text-gray-600 hover:text-red-400 transition-colors"><X className="h-3 w-3" /></button>}
                     </div>
                   );
                 })}
-                <button type="button" onClick={() => addMatch(si, di)} className="flex items-center gap-1 ml-7 text-[9px] font-orbitron font-bold text-gray-500 hover:text-[#FF6B00] transition-colors"><Plus className="h-2.5 w-2.5" /> ADD MAP</button>
+                <button type="button" onClick={() => addMatch(si, di)} className="flex items-center gap-1 ml-7 text-[9px] font-orbitron font-bold text-gray-500 hover:text-[#ff4e00] transition-colors"><Plus className="h-2.5 w-2.5" /> ADD MAP</button>
               </div>
             </div>
           ))}
           <button type="button" onClick={() => addDay(si)} className="flex items-center gap-1 ml-5 text-[10px] font-orbitron font-bold text-gray-500 hover:text-white transition-colors"><Plus className="h-3 w-3" /> ADD DAY</button>
         </div>
       ))}
-      <button type="button" onClick={addStage} className="flex items-center gap-1.5 w-full rounded-lg border border-dashed border-white/10 py-2 text-xs font-orbitron font-bold text-gray-500 hover:text-[#FF6B00] hover:border-[#FF6B00]/30 transition-all"><Plus className="h-3.5 w-3.5" /> ADD STAGE</button>
+      <button type="button" onClick={addStage} className="flex items-center gap-1.5 w-full rounded-lg border border-dashed border-white/10 py-2 text-xs font-orbitron font-bold text-gray-500 hover:text-[#ff4e00] hover:border-[#ff4e00]/30 transition-all"><Plus className="h-3.5 w-3.5" /> ADD STAGE</button>
     </div>
   );
 }
@@ -208,32 +208,32 @@ export default function TournamentSetup({ onCreated }) {
   return (
     <form onSubmit={handleSubmit} className="space-y-5">
       <div className="rounded-xl border border-white/8 bg-[#0a0e1a] p-4 space-y-4">
-        <div className="flex items-center gap-2 text-[#FF6B00]">
+        <div className="flex items-center gap-2 text-[#ff4e00]">
           <Trophy className="h-4 w-4" />
           <h3 className="font-orbitron text-sm font-black tracking-wider">TOURNAMENT INFO</h3>
         </div>
         <div>
           <label className="font-orbitron text-[10px] text-gray-500 tracking-wider block mb-1.5">TOURNAMENT NAME</label>
           <input value={name} onChange={e => setName(e.target.value)} placeholder="e.g. BOOYAH CUP 2026"
-            className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none focus:border-[#FF6B00]/60 font-orbitron tracking-wider" />
+            className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white outline-none focus:border-[#ff4e00]/60 font-orbitron tracking-wider" />
         </div>
         <div className="grid grid-cols-3 gap-3">
           <div>
             <label className="font-orbitron text-[10px] text-gray-500 tracking-wider block mb-1.5">POINTS / KILL</label>
             <input type="number" min={0} value={pointsPerKill} onChange={e => setPointsPerKill(e.target.value)}
-              className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#FF6B00]/60" />
+              className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#ff4e00]/60" />
           </div>
           <div>
             <label className="font-orbitron text-[10px] text-gray-500 tracking-wider block mb-1.5">TOTAL MATCHES</label>
             <div className="flex items-center gap-2">
-              <input type="number" value={totalMatches} disabled className="w-full rounded-lg border border-[#FF6B00]/30 bg-[#FF6B00]/5 px-3 py-2 text-sm text-[#FF6B00] font-bold outline-none" />
+              <input type="number" value={totalMatches} disabled className="w-full rounded-lg border border-[#ff4e00]/30 bg-[#ff4e00]/5 px-3 py-2 text-sm text-[#ff4e00] font-bold outline-none" />
               <span className="text-[9px] font-orbitron text-gray-500 whitespace-nowrap">AUTO</span>
             </div>
           </div>
           <div>
             <label className="font-orbitron text-[10px] text-gray-500 tracking-wider block mb-1.5">CHAMPION RUSH 🏆</label>
             <select value={championRushThreshold} onChange={e => setChampionRushThreshold(Number(e.target.value))}
-              className="w-full rounded-lg border border-[#FF6B00]/30 bg-[#FF6B00]/5 px-2 py-2 text-sm text-[#FF6B00] font-bold outline-none focus:border-[#FF6B00]/60">
+              className="w-full rounded-lg border border-[#ff4e00]/30 bg-[#ff4e00]/5 px-2 py-2 text-sm text-[#ff4e00] font-bold outline-none focus:border-[#ff4e00]/60">
               <option value={0}>Disabled</option>
               <option value={80}>80 Points</option>
               <option value={90}>90 Points</option>
@@ -242,8 +242,8 @@ export default function TournamentSetup({ onCreated }) {
           </div>
         </div>
         {championRushThreshold > 0 && (
-          <div className="rounded-lg border border-[#FFC700]/20 bg-[#FFC700]/5 p-2.5 text-[10px] text-gray-400">
-            <span className="font-orbitron font-bold text-[#FFC700] tracking-wider">CHAMPION RUSH ACTIVE:</span> Once a team crosses {championRushThreshold} pts, they must win a Booyah (1st place) to be crowned champions. Point Rush carryovers from previous stages are added to totals.
+          <div className="rounded-lg border border-[#ffaa00]/20 bg-[#ffaa00]/5 p-2.5 text-[10px] text-gray-400">
+            <span className="font-orbitron font-bold text-[#ffaa00] tracking-wider">CHAMPION RUSH ACTIVE:</span> Once a team crosses {championRushThreshold} pts, they must win a Booyah (1st place) to be crowned champions. Point Rush carryovers from previous stages are added to totals.
           </div>
         )}
         <div>
@@ -258,7 +258,7 @@ export default function TournamentSetup({ onCreated }) {
                   <label className="font-orbitron text-[9px] text-gray-500 block mb-0.5">#{pos}</label>
                   <input type="number" min={0} value={placements[pos] ?? 0}
                     onChange={e => setPlacements(prev => ({ ...prev, [pos]: Number(e.target.value) || 0 }))}
-                    className="w-full rounded border border-white/10 bg-black/50 px-1.5 py-1 text-xs text-white outline-none focus:border-[#FF6B00]/50" />
+                    className="w-full rounded border border-white/10 bg-black/50 px-1.5 py-1 text-xs text-white outline-none focus:border-[#ff4e00]/50" />
                 </div>
               ))}
             </div>
@@ -268,19 +268,19 @@ export default function TournamentSetup({ onCreated }) {
 
       <div className="rounded-xl border border-white/8 bg-[#0a0e1a] p-4 space-y-3">
         <div className="flex items-center justify-between">
-          <div className="flex items-center gap-2 text-[#FF6B00]">
+          <div className="flex items-center gap-2 text-[#ff4e00]">
             <Layers className="h-4 w-4" />
             <h3 className="font-orbitron text-sm font-black tracking-wider">TOURNAMENT FORMAT</h3>
           </div>
           <div className="flex items-center gap-2">
-            <span className="rounded-md bg-[#FF6B00]/10 px-2 py-0.5 text-[10px] font-orbitron font-black text-[#FF6B00]">{totalMatches} MATCHES</span>
+            <span className="rounded-md bg-[#ff4e00]/10 px-2 py-0.5 text-[10px] font-orbitron font-black text-[#ff4e00]">{totalMatches} MATCHES</span>
             <button type="button" onClick={() => setShowFormat(!showFormat)} className="text-gray-500 hover:text-white">{showFormat ? <ChevronUp className="h-4 w-4" /> : <ChevronDown className="h-4 w-4" />}</button>
           </div>
         </div>
         <div className="flex flex-wrap gap-1.5">
           {Object.entries(TEMPLATES).map(([key, tmpl]) => (
             <button key={key} type="button" onClick={() => applyTemplate(key)}
-              className={`rounded-lg border px-3 py-1.5 font-orbitron text-[10px] font-bold tracking-wider transition-all ${template === key ? 'border-[#FF6B00] bg-[#FF6B00]/15 text-[#FF6B00]' : 'border-white/10 bg-black/30 text-gray-500 hover:text-white hover:border-white/20'}`}>
+              className={`rounded-lg border px-3 py-1.5 font-orbitron text-[10px] font-bold tracking-wider transition-all ${template === key ? 'border-[#ff4e00] bg-[#ff4e00]/15 text-[#ff4e00]' : 'border-white/10 bg-black/30 text-gray-500 hover:text-white hover:border-white/20'}`}>
               {tmpl.label}
             </button>
           ))}
@@ -292,7 +292,7 @@ export default function TournamentSetup({ onCreated }) {
         <div className="flex items-center justify-between">
           <h3 className="font-orbitron text-sm font-black text-white tracking-wider">ADD TEAMS <span className="text-gray-600 text-[10px] font-normal ml-1">(optional)</span></h3>
           <button type="button" onClick={addTeam}
-            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#FF6B00]/10 border border-[#FF6B00]/30 text-[#FF6B00] font-orbitron text-[10px] font-black tracking-wider hover:bg-[#FF6B00]/20 transition-all">
+            className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg bg-[#ff4e00]/10 border border-[#ff4e00]/30 text-[#ff4e00] font-orbitron text-[10px] font-black tracking-wider hover:bg-[#ff4e00]/20 transition-all">
             <Plus className="h-3 w-3" /> ADD TEAM
           </button>
         </div>
@@ -301,7 +301,7 @@ export default function TournamentSetup({ onCreated }) {
             <div key={i} className="rounded-lg border border-white/5 bg-black/30 p-3 space-y-2">
               <div className="flex items-center gap-2">
                 <input value={team.name} onChange={e => updateTeam(i, 'name', e.target.value)} placeholder={`Team ${i + 1} name`}
-                  className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#FF6B00]/50" />
+                  className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#ff4e00]/50" />
                 {teams.length > 1 && <button type="button" onClick={() => removeTeam(i)} className="text-gray-600 hover:text-red-400 transition-colors"><X className="h-4 w-4" /></button>}
               </div>
               <ImageUpload value={team.logoUrl} onChange={(url) => updateTeam(i, 'logoUrl', url)} label="Team Logo" name={`team-${i + 1}-logo`} size="sm" />
@@ -312,7 +312,7 @@ export default function TournamentSetup({ onCreated }) {
 
       <button type="submit" disabled={submitting}
         className="w-full rounded-xl py-3 font-orbitron text-sm font-black text-white tracking-widest transition-all disabled:opacity-50"
-        style={{ background: 'linear-gradient(135deg, #FF6B00, #ff4500)', boxShadow: submitting ? 'none' : '0 4px 20px rgba(255,107,0,0.35)' }}>
+        style={{ background: 'linear-gradient(135deg, #ff4e00, #ff4e00)', boxShadow: submitting ? 'none' : '0 4px 20px rgba(255,78,0,0.35)' }}>
         {submitting ? 'CREATING TOURNAMENT...' : 'CREATE TOURNAMENT'}
       </button>
     </form>

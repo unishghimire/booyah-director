@@ -81,7 +81,7 @@ class _ErrorBoundary extends React.Component {
               )}
             </p>
             <div style={{ display: 'flex', gap: 10, justifyContent: 'center' }}>
-              <button onClick={handleRetry} style={{ padding: '10px 20px', borderRadius: 8, border: '1px solid rgba(255,107,0,0.4)', background: 'rgba(255,107,0,0.1)', color: '#FF6B00', fontSize: 10, fontWeight: 900, cursor: 'pointer', letterSpacing: 1, fontFamily: 'Orbitron, sans-serif' }}>
+              <button onClick={handleRetry} style={{ padding: '10px 20px', borderRadius: 8, border: '1px solid rgba(255,78,0,0.4)', background: 'rgba(255,78,0,0.1)', color: '#ff4e00', fontSize: 10, fontWeight: 900, cursor: 'pointer', letterSpacing: 1, fontFamily: 'Orbitron, sans-serif' }}>
                 RETRY
               </button>
               <button onClick={() => window.location.reload()} style={{ padding: '10px 20px', borderRadius: 8, border: '1px solid rgba(239,68,68,0.4)', background: 'rgba(239,68,68,0.1)', color: '#f87171', fontSize: 10, fontWeight: 900, cursor: 'pointer', letterSpacing: 1, fontFamily: 'Orbitron, sans-serif' }}>
