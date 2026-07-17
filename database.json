@@ -69,5 +69,158 @@
         "alive": 2
       }
     }
+  ],
+  "tournamentSettings": {
+    "championRushThreshold": 80,
+    "currentStage": "Grand-Finals",
+    "pointsPerKill": 1,
+    "placementPoints": {
+      "1": 12,
+      "2": 9,
+      "3": 8,
+      "4": 7,
+      "5": 6,
+      "6": 5,
+      "7": 4,
+      "8": 3,
+      "9": 2,
+      "10": 1,
+      "11": 0,
+      "12": 0
+    }
+  },
+  "headstartPoints": {
+    "1": 10,
+    "2": 7,
+    "3": 5,
+    "4": 3,
+    "5": 2,
+    "6": 1
+  },
+  "matches": [
+    {
+      "matchNumber": 1,
+      "mapName": "Bermuda",
+      "results": [
+        {
+          "teamId": 1,
+          "placement": 1,
+          "kills": 8
+        },
+        {
+          "teamId": 2,
+          "placement": 2,
+          "kills": 5
+        },
+        {
+          "teamId": 3,
+          "placement": 3,
+          "kills": 3
+        },
+        {
+          "teamId": 4,
+          "placement": 4,
+          "kills": 2
+        },
+        {
+          "teamId": 5,
+          "placement": 5,
+          "kills": 1
+        },
+        {
+          "teamId": 6,
+          "placement": 6,
+          "kills": 0
+        }
+      ],
+      "timestamp": 1784267481035
+    },
+    {
+      "matchNumber": 2,
+      "mapName": "Purgatory",
+      "results": [
+        {
+          "teamId": 1,
+          "placement": 1,
+          "kills": 10
+        },
+        {
+          "teamId": 2,
+          "placement": 2,
+          "kills": 4
+        }
+      ],
+      "timestamp": 1784267490941
+    },
+    {
+      "matchNumber": 3,
+      "mapName": "Kalahari",
+      "results": [
+        {
+          "teamId": 1,
+          "placement": 1,
+          "kills": 12
+        },
+        {
+          "teamId": 2,
+          "placement": 2,
+          "kills": 3
+        }
+      ],
+      "timestamp": 1784267490986
+    },
+    {
+      "matchNumber": 4,
+      "mapName": "Bermuda",
+      "results": [
+        {
+          "teamId": 1,
+          "placement": 1,
+          "kills": 4
+        },
+        {
+          "teamId": 2,
+          "placement": 2,
+          "kills": 2
+        }
+      ],
+      "timestamp": 1784267497761
+    }
+  ],
+  "standings": [
+    {
+      "teamId": 1,
+      "teamName": "Phoenix Force",
+      "shortName": "PF",
+      "logoUrl": "",
+      "themeColor": "#ff4e00",
+      "liveStats": {
+        "kills": 5,
+        "alive": 4
+      },
+      "matchPoints": 82,
+      "headstartPoints": 10,
+      "totalPoints": 92,
+      "totalKills": 34,
+      "isEligible": true,
+      "isTournamentWinner": true
+    },
+    {
+      "teamId": 2,
+      "teamName": "Iron Wolves",
+      "shortName": "IW",
+      "logoUrl": "",
+      "themeColor": "#00c8ff",
+      "liveStats": {
+        "kills": 3,
+        "alive": 2
+      },
+      "matchPoints": 50,
+      "headstartPoints": 7,
+      "totalPoints": 57,
+      "totalKills": 14,
+      "isEligible": false,
+      "isTournamentWinner": false
+    }
   ]
 }

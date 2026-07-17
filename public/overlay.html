@@ -370,6 +370,91 @@ html, body {
 @keyframes dots {
   0% { content: '   '; } 33% { content: '.  '; } 66% { content: '.. '; } 100% { content: '...'; }
 }
+
+/* ═══ CHAMPION RUSH — GOLD ELIGIBLE FRAME ═══ */
+.team-row.champion-eligible {
+  border-left: 3px solid #ffd700;
+  background: linear-gradient(90deg, rgba(255,215,0,0.12) 0%, var(--bg-panel) 30%);
+  box-shadow: inset 0 0 12px rgba(255,215,0,0.08);
+}
+.team-row.champion-eligible .t-rank {
+  color: #ffd700;
+  text-shadow: 0 0 6px rgba(255,215,0,0.6);
+}
+
+/* ═══ HEADSTART POINTS INDICATOR ═══ */
+.t-headstart {
+  font-family: 'Orbitron', sans-serif; font-size: 9px; font-weight: 700;
+  color: #ffd700; opacity: 0.8;
+  padding-left: 2px;
+}
+
+/* ═══ CHAMPION CELEBRATION OVERLAY ═══ */
+.champion-celebration {
+  position: fixed; inset: 0; z-index: 500;
+  display: none; align-items: center; justify-content: center;
+  background: radial-gradient(ellipse at center, rgba(0,0,0,0.85) 0%, rgba(0,0,0,0.95) 100%);
+  pointer-events: none;
+}
+.champion-celebration.active { display: flex; animation: celebFadeIn 0.8s ease-out; }
+@keyframes celebFadeIn { from { opacity: 0; } to { opacity: 1; } }
+
+.champion-banner {
+  text-align: center;
+  animation: celebScale 0.6s cubic-bezier(0.16, 1, 0.3, 1);
+}
+@keyframes celebScale {
+  from { transform: scale(0.3); opacity: 0; }
+  to   { transform: scale(1); opacity: 1; }
+}
+.champion-crown {
+  font-size: 80px; line-height: 1;
+  filter: drop-shadow(0 0 20px #ffd700);
+  animation: crownFloat 2s ease-in-out infinite;
+}
+@keyframes crownFloat {
+  0%,100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+.champion-label {
+  font-family: 'Teko', sans-serif; font-size: 48px; font-weight: 700;
+  letter-spacing: 6px; text-transform: uppercase;
+  color: #ffd700;
+  text-shadow: 0 0 20px rgba(255,215,0,0.8), 0 0 40px rgba(255,215,0,0.4);
+  margin-top: 10px;
+}
+.champion-team {
+  font-family: 'Orbitron', sans-serif; font-size: 36px; font-weight: 900;
+  letter-spacing: 3px; text-transform: uppercase;
+  color: var(--text-main);
+  margin-top: 12px;
+  text-shadow: 0 0 16px var(--primary-color);
+}
+.champion-points {
+  font-family: 'Orbitron', sans-serif; font-size: 20px; font-weight: 700;
+  color: var(--accent-glow); margin-top: 8px; letter-spacing: 2px;
+}
+
+/* ═══ RUSH PROGRESS BAR (in header) ═══ */
+.rush-progress {
+  position: absolute; top: 96px; right: 0;
+  width: 360px; height: 4px;
+  background: rgba(255,255,255,0.1);
+  z-index: 11;
+}
+.rush-progress-fill {
+  height: 100%;
+  background: linear-gradient(90deg, #ffd700, var(--primary-color));
+  width: 0%;
+  transition: width 0.5s ease;
+  filter: drop-shadow(0 0 4px rgba(255,215,0,0.6));
+}
+.rush-progress-label {
+  position: absolute; right: 8px; top: -14px;
+  font-family: 'Orbitron', sans-serif; font-size: 8px; font-weight: 700;
+  color: #ffd700; letter-spacing: 1px;
+  text-transform: uppercase; opacity: 0.7;
+}
 </style>
 </head>
 <body>
@@ -431,6 +516,22 @@ html, body {
   <div id="ppPlayers"></div>
 </div>
 
+
+<!-- Champion celebration overlay -->
+<div class="champion-celebration" id="championCelebration">
+  <div class="champion-banner">
+    <div class="champion-crown">👑</div>
+    <div class="champion-label">Champion</div>
+    <div class="champion-team" id="champTeam"></div>
+    <div class="champion-points" id="champPoints"></div>
+  </div>
+</div>
+
+<!-- Rush progress bar -->
+<div class="rush-progress" id="rushProgress" style="display:none;">
+  <div class="rush-progress-label" id="rushLabel">Rush 80</div>
+  <div class="rush-progress-fill" id="rushFill"></div>
+</div>
 <script>
 /* ═══════════════════════════════════════════════════════════════════════
    STATE & SOCKET
@@ -702,6 +803,110 @@ function escHtml(s) {
   return String(s||'').replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
 }
 function escAttr(s) { return String(s||'').replace(/"/g,'&quot;'); }
+
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CHAMPION RUSH & POINT RUSH (OVERLAY)
+   ═══════════════════════════════════════════════════════════════════════ */
+let championRushThreshold = 80;
+
+// Listen for standings updates from server
+socket.on('standingsUpdated', (standings) => {
+  renderStandingsOnOverlay(standings);
+  updateRushProgress(standings);
+});
+
+// Listen for champion winner
+socket.on('championRushUpdate', (champion) => {
+  if (champion) showChampionCelebration(champion);
+});
+
+function renderStandingsOnOverlay(standings) {
+  if (!standings || !Array.isArray(standings)) return;
+  const rowsEl = document.getElementById('teamRows');
+  if (!rowsEl) return;
+  rowsEl.innerHTML = '';
+
+  standings.forEach((team, idx) => {
+    const alive = team.liveStats?.alive || 0;
+    const kills = team.totalKills || 0;
+    const isDead = alive === 0;
+    const eligible = team.isEligible;
+    const winner = team.isTournamentWinner;
+
+    const row = document.createElement('div');
+    let classes = 'team-row';
+    if (isDead) classes += ' dead';
+    if (eligible) classes += ' champion-eligible';
+    row.className = classes;
+    row.style.setProperty('--team-accent', team.themeColor || state.theme.primaryColor);
+    row.onmouseenter = () => showPlayerPopup(state.teams.find(t => t.id === team.teamId) || team);
+    row.onmouseleave = () => hidePlayerPopup();
+
+    let html = '<div class="t-rank">' + (idx + 1) + '</div>';
+
+    // Logo
+    if (team.logoUrl) {
+      html += '<div class="t-logo"><img src="' + escAttr(team.logoUrl) + '" onerror="this.style.display=\'none\'"></div>';
+    } else {
+      html += '<div class="t-logo"><div class="t-logo-fallback">' + escHtml(team.shortName || ('T'+team.teamId)) + '</div></div>';
+    }
+
+    // Name + headstart
+    html += '<div class="t-name">' + escHtml(team.teamName);
+    if (team.headstartPoints > 0) {
+      html += ' <span class="t-headstart">+' + team.headstartPoints + '</span>';
+    }
+    html += '</div>';
+
+    // Life bars
+    html += '<div class="t-life">';
+    for (let i = 0; i < 4; i++) {
+      html += '<div class="life-bar ' + (i < alive ? 'alive' : 'dead') + '"></div>';
+    }
+    html += '</div>';
+
+    // Total points (instead of just kills)
+    html += '<div class="t-kills">' + (team.totalPoints || 0) + '</div>';
+
+    row.innerHTML = html;
+    rowsEl.appendChild(row);
+  });
+}
+
+function updateRushProgress(standings) {
+  if (!standings || !standings.length) return;
+  const top = standings[0];
+  const points = top.totalPoints || 0;
+  const pct = Math.min(100, (points / championRushThreshold) * 100);
+
+  const bar = document.getElementById('rushProgress');
+  const fill = document.getElementById('rushFill');
+  const label = document.getElementById('rushLabel');
+
+  if (bar && fill && label) {
+    bar.style.display = 'block';
+    fill.style.width = pct + '%';
+    label.textContent = 'Rush ' + championRushThreshold + ' | ' + points + 'pts';
+  }
+}
+
+function showChampionCelebration(champion) {
+  const el = document.getElementById('championCelebration');
+  document.getElementById('champTeam').textContent = champion.teamName;
+  document.getElementById('champPoints').textContent = champion.totalPoints + ' Points';
+  el.classList.add('active');
+
+  // Auto-hide after 8 seconds
+  setTimeout(() => { el.classList.remove('active'); }, 8000);
+}
+
+// Update threshold from state
+socket.on('stateUpdated', (newState) => {
+  if (newState && newState.tournamentSettings && newState.tournamentSettings.championRushThreshold) {
+    championRushThreshold = newState.tournamentSettings.championRushThreshold;
+  }
+});
 
 /* ═══════════════════════════════════════════════════════════════════════
    INIT

@@ -425,6 +425,7 @@ html, body {
         <button class="nav-btn" data-tab="match" onclick="switchTab('match')">▮ Match Control</button>
         <button class="nav-btn" data-tab="import" onclick="switchTab('import')">▮ Bulk Import</button>
         <button class="nav-btn" data-tab="info" onclick="switchTab('info')">▮ Tournament Info</button>
+        <button class="nav-btn" data-tab="scoring" onclick="switchTab('scoring')">▮ Champion Rush</button>
       </div>
       <div class="sidebar-section">
         <div class="sidebar-label">Overlay Links</div>
@@ -491,6 +492,69 @@ html, body {
         <div class="info-input-group">
           <div class="info-label">Sponsor Logo URL</div>
           <input class="info-input" data-path="tournament.sponsorLogo" placeholder="Paste image URL" onblur="autoSaveFromInput(event)" onkeypress="autoSaveOnEnter(event)">
+        </div>
+      </div>
+
+      <!-- ─── TAB: CHAMPION RUSH & SCORING ─── -->
+      <div class="tab-content" id="tab-scoring">
+        <div class="panel-title">Champion Rush & Scoring</div>
+
+        <!-- Tournament Settings -->
+        <div style="background: var(--bg-panel); border: 1px solid var(--border-dim); padding: 12px; margin-bottom: 12px; clip-path: var(--clip-angle);">
+          <div class="sidebar-label" style="margin-bottom: 8px;">Tournament Settings</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px;">
+            <div>
+              <div class="info-label">Champion Rush Threshold</div>
+              <input class="info-input" type="number" id="rushThreshold" value="80" min="1" max="999"
+                onchange="updateRushThreshold(this.value)" onkeypress="if(event.key==='Enter')this.blur()">
+            </div>
+            <div>
+              <div class="info-label">Current Stage</div>
+              <select class="info-input" id="currentStage" onchange="updateStage(this.value)">
+                <option value="Group-Stage">Group Stage</option>
+                <option value="Playoffs">Playoffs</option>
+                <option value="Grand-Finals" selected>Grand Finals</option>
+              </select>
+            </div>
+            <div>
+              <div class="info-label">Points Per Kill</div>
+              <input class="info-input" type="number" id="ppk" value="1" min="0" max="10"
+                onchange="updatePPK(this.value)" onkeypress="if(event.key==='Enter')this.blur()">
+            </div>
+          </div>
+        </div>
+
+        <!-- Headstart / Point Rush -->
+        <div style="background: var(--bg-panel); border: 1px solid var(--border-dim); padding: 12px; margin-bottom: 12px; clip-path: var(--clip-angle);">
+          <div class="sidebar-label" style="margin-bottom: 8px;">Point Rush — Headstart Carryovers</div>
+          <p style="font-size: 11px; color: var(--text-muted); margin-bottom: 8px;">
+            Auto-assigns bonus points: 1st→10, 2nd→7, 3rd→5, 4th→3, 5th→2, 6th→1
+          </p>
+          <div id="headstartGrid" style="display: grid; grid-template-columns: repeat(2,1fr); gap: 6px;"></div>
+          <button class="nav-btn" style="margin-top: 8px; border-color: var(--primary-color); color: var(--primary-color);" onclick="assignHeadstartFromStandings()">⟲ Auto-Assign from Previous Stage</button>
+        </div>
+
+        <!-- Match Submit -->
+        <div style="background: var(--bg-panel); border: 1px solid var(--border-dim); padding: 12px; margin-bottom: 12px; clip-path: var(--clip-angle);">
+          <div class="sidebar-label" style="margin-bottom: 8px;">Submit Match Results</div>
+          <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 10px;">
+            <div>
+              <div class="info-label">Match Number</div>
+              <input class="info-input" type="number" id="matchNum" value="1" min="1">
+            </div>
+            <div>
+              <div class="info-label">Map Name</div>
+              <input class="info-input" id="matchMap" placeholder="e.g. Bermuda" onblur="debouncedSave()" onkeypress="if(event.key==='Enter')this.blur()">
+            </div>
+          </div>
+          <div id="matchResultsGrid" style="display: grid; grid-template-columns: repeat(2,1fr); gap: 6px; max-height: 260px; overflow-y: auto;"></div>
+          <button class="nav-btn" style="margin-top: 10px; border-color: var(--accent-glow); color: var(--accent-glow); font-size: 16px; padding: 10px;" onclick="submitMatch()">▶ Submit Match & Calculate Standings</button>
+        </div>
+
+        <!-- Live Standings -->
+        <div style="background: var(--bg-panel); border: 1px solid var(--border-dim); padding: 12px; clip-path: var(--clip-angle);">
+          <div class="sidebar-label" style="margin-bottom: 8px;">Live Standings</div>
+          <div id="liveStandings" style="font-size: 12px;"></div>
         </div>
       </div>
 
@@ -1147,6 +1211,207 @@ document.addEventListener('DOMContentLoaded', () => {
     })
     .catch(err => console.log('[Init] Using local state:', err.message));
 });
+
+/* ═══════════════════════════════════════════════════════════════════════
+   CHAMPION RUSH & SCORING ENGINE (CONTROLLER)
+   ═══════════════════════════════════════════════════════════════════════ */
+
+// Headstart points map (must match server)
+const HEADSTART_MAP = { 1: 10, 2: 7, 3: 5, 4: 3, 5: 2, 6: 1 };
+
+function renderHeadstartGrid() {
+  const grid = document.getElementById('headstartGrid');
+  if (!grid || !state.teams) return;
+  grid.innerHTML = '';
+  state.teams.forEach((team, idx) => {
+    const hs = (state.headstartPoints && state.headstartPoints[team.id]) || 0;
+    const div = document.createElement('div');
+    div.style.cssText = 'display:flex;align-items:center;gap:4px;background:rgba(0,0,0,0.3);padding:4px 6px;border:1px solid var(--border-dim);clip-path:var(--clip-angled);';
+    div.innerHTML = '<span style="font-size:11px;color:var(--text-muted);min-width:50px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(team.shortName || ('T'+team.id)) + '</span>' +
+      '<input type="number" value="' + hs + '" min="0" max="50" style="width:40px;background:transparent;border:1px solid var(--border-dim);color:var(--accent-glow);text-align:center;font-family:Orbitron;font-size:12px;padding:1px 2px;outline:none;" ' +
+      'onchange="setManualHeadstart(' + team.id + ',this.value)" onkeypress="if(event.key===\'Enter\')this.blur()">';
+    grid.appendChild(div);
+  });
+}
+
+function setManualHeadstart(teamId, points) {
+  fetch(API_BASE + '/api/headstart/manual', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ teamId, points: parseInt(points) || 0 })
+  }).then(r => r.json()).then(data => {
+    if (data.success) {
+      state.headstartPoints = data.headstartPoints;
+      showSaved();
+    }
+  });
+}
+
+function assignHeadstartFromStandings() {
+  // Use current standings (sorted by points/kills) as "previous stage standings"
+  const sorted = [...(state.teams || [])].filter(t => t.teamName && t.teamName !== 'Team ' + t.id)
+    .sort((a, b) => (b.liveStats?.kills || 0) - (a.liveStats?.kills || 0));
+
+  const previousStage = sorted.map(t => ({ teamId: t.id, teamName: t.teamName }));
+
+  fetch(API_BASE + '/api/headstart/assign', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ previousStageStandings: previousStage })
+  }).then(r => r.json()).then(data => {
+    if (data.success) {
+      state.headstartPoints = data.headstartPoints;
+      renderHeadstartGrid();
+      showSaved();
+    }
+  });
+}
+
+function updateRushThreshold(val) {
+  const threshold = parseInt(val) || 80;
+  fetch(API_BASE + '/api/settings/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ championRushThreshold: threshold })
+  }).then(r => r.json()).then(data => {
+    if (data.success) showSaved();
+  });
+}
+
+function updateStage(val) {
+  fetch(API_BASE + '/api/settings/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ currentStage: val })
+  }).then(r => r.json()).then(data => {
+    if (data.success) showSaved();
+  });
+}
+
+function updatePPK(val) {
+  const ppk = parseInt(val) || 1;
+  fetch(API_BASE + '/api/settings/update', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ pointsPerKill: ppk })
+  }).then(r => r.json()).then(data => {
+    if (data.success) showSaved();
+  });
+}
+
+function renderMatchResultsGrid() {
+  const grid = document.getElementById('matchResultsGrid');
+  if (!grid || !state.teams) return;
+  grid.innerHTML = '';
+  state.teams.forEach(team => {
+    if (!team.teamName || team.teamName === 'Team ' + team.id) return;
+    const div = document.createElement('div');
+    div.style.cssText = 'background:rgba(0,0,0,0.3);padding:6px;border:1px solid var(--border-dim);clip-path:var(--clip-angled);';
+    div.innerHTML = '<div style="font-size:11px;color:var(--text-main);font-weight:600;margin-bottom:4px;text-transform:uppercase;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(team.teamName) + '</div>' +
+      '<div style="display:flex;gap:4px;">' +
+      '<input type="number" min="1" max="12" placeholder="#" style="width:40px;background:rgba(255,255,255,0.03);border:1px solid var(--border-dim);color:var(--accent-glow);text-align:center;font-family:Orbitron;font-size:11px;padding:2px;outline:none;" data-team="' + team.id + '" data-field="placement">' +
+      '<input type="number" min="0" max="99" placeholder="K" style="width:40px;background:rgba(255,255,255,0.03);border:1px solid var(--border-dim);color:var(--primary-color);text-align:center;font-family:Orbitron;font-size:11px;padding:2px;outline:none;" data-team="' + team.id + '" data-field="kills">' +
+      '</div>';
+    grid.appendChild(div);
+  });
+}
+
+function submitMatch() {
+  const matchNum = parseInt(document.getElementById('matchNum')?.value || 1);
+  const mapName = document.getElementById('matchMap')?.value || 'Unknown';
+
+  const inputs = document.querySelectorAll('#matchResultsGrid [data-team]');
+  const teamMap = {};
+  inputs.forEach(inp => {
+    const teamId = parseInt(inp.dataset.team);
+    const field = inp.dataset.field;
+    const val = parseInt(inp.value) || 0;
+    if (!teamMap[teamId]) teamMap[teamId] = { teamId, placement: 0, kills: 0 };
+    if (field === 'placement') teamMap[teamId].placement = val;
+    if (field === 'kills') teamMap[teamId].kills = val;
+  });
+
+  const results = Object.values(teamMap).filter(r => r.placement > 0 || r.kills > 0);
+  if (results.length === 0) { alert('Enter at least one team result'); return; }
+
+  fetch(API_BASE + '/api/match/submit', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ match: { matchNumber: matchNum, mapName, results } })
+  }).then(r => r.json()).then(data => {
+    if (data.success) {
+      renderLiveStandings(data.standings);
+      if (data.champion) {
+        alert('CHAMPION: ' + data.champion.teamName + ' has won the tournament!');
+      }
+      // Increment match number
+      if (document.getElementById('matchNum')) {
+        document.getElementById('matchNum').value = matchNum + 1;
+      }
+    } else {
+      alert('Error: ' + (data.error || 'Unknown'));
+    }
+  }).catch(err => alert('Submit error: ' + err.message));
+}
+
+function renderLiveStandings(standings) {
+  const el = document.getElementById('liveStandings');
+  if (!el) return;
+  if (!standings) {
+    // Fetch from API
+    fetch(API_BASE + '/api/standings').then(r => r.json()).then(data => {
+      if (data.standings) renderLiveStandings(data.standings);
+    });
+    return;
+  }
+  el.innerHTML = '';
+  standings.forEach((s, idx) => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:6px;padding:3px 6px;' +
+      (s.isTournamentWinner ? 'background:linear-gradient(90deg,rgba(255,215,0,0.2),transparent);border-left:3px solid #ffd700;' :
+       s.isEligible ? 'background:rgba(255,215,0,0.08);border-left:3px solid rgba(255,215,0,0.5);' : '');
+    let badge = '';
+    if (s.isTournamentWinner) badge = ' 👑';
+    else if (s.isEligible) badge = ' ★';
+    row.innerHTML = '<span style="font-family:Orbitron;font-size:11px;color:var(--accent-glow);width:20px;">' + (idx+1) + '</span>' +
+      '<span style="flex:1;color:var(--text-main);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + escHtml(s.teamName) + badge + '</span>' +
+      '<span style="color:var(--text-muted);font-size:10px;">+' + (s.headstartPoints||0) + '</span>' +
+      '<span style="font-family:Orbitron;color:var(--primary-color);width:40px;text-align:right;">' + s.totalPoints + '</span>';
+    el.appendChild(row);
+  });
+}
+
+// Socket listeners for scoring events
+socket.on('standingsUpdated', (standings) => {
+  renderLiveStandings(standings);
+});
+
+socket.on('championRushUpdate', (champion) => {
+  if (champion) {
+    console.log('[Champion Rush] Winner:', champion.teamName);
+  }
+});
+
+// Override switchTab to render scoring components when tab is opened
+const _originalSwitchTab = switchTab;
+switchTab = function(tabName) {
+  _originalSwitchTab(tabName);
+  if (tabName === 'scoring') {
+    // Restore settings from state
+    if (state.tournamentSettings) {
+      const ts = state.tournamentSettings;
+      const thr = document.getElementById('rushThreshold');
+      const stage = document.getElementById('currentStage');
+      const ppk = document.getElementById('ppk');
+      if (thr) thr.value = ts.championRushThreshold || 80;
+      if (stage) stage.value = ts.currentStage || 'Grand-Finals';
+      if (ppk) ppk.value = ts.pointsPerKill || 1;
+    }
+    renderHeadstartGrid();
+    renderMatchResultsGrid();
+    renderLiveStandings();
+  }
+};
 </script>
 </body>
 </html>
