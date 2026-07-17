@@ -1,8 +1,8 @@
 {
   "tournament": {
-    "name": "Untitled Tournament",
+    "name": "Free Fire Pro League 2026",
     "logo": "",
-    "sponsor": "",
+    "sponsor": "Red Bull",
     "sponsorLogo": ""
   },
   "theme": {
@@ -17,7 +17,7 @@
       "id": 1,
       "teamName": "Phoenix Force",
       "shortName": "PF",
-      "logoUrl": "/uploads/asset_1784267014935_135607886.png",
+      "logoUrl": "",
       "themeColor": "#ff4e00",
       "players": [
         {
@@ -29,374 +29,44 @@
           "name": "Bravo",
           "img": "",
           "role": "Sniper"
+        },
+        {
+          "name": "Charlie",
+          "img": "",
+          "role": "Support"
+        },
+        {
+          "name": "Delta",
+          "img": "",
+          "role": "Entry"
         }
       ],
       "liveStats": {
-        "kills": 0,
+        "kills": 5,
         "alive": 4
       }
     },
     {
       "id": 2,
-      "teamName": "Team 2",
-      "shortName": "T2",
+      "teamName": "Iron Wolves",
+      "shortName": "IW",
       "logoUrl": "",
-      "themeColor": "#ff4e00",
+      "themeColor": "#00c8ff",
       "players": [
         {
-          "name": "",
+          "name": "Echo",
           "img": "",
-          "role": "Player 1"
+          "role": "IGL"
         },
         {
-          "name": "",
+          "name": "Foxtrot",
           "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
+          "role": "Sniper"
         }
       ],
       "liveStats": {
-        "kills": 0,
-        "alive": 4
-      }
-    },
-    {
-      "id": 3,
-      "teamName": "Team 3",
-      "shortName": "T3",
-      "logoUrl": "",
-      "themeColor": "#ff4e00",
-      "players": [
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 1"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
-        }
-      ],
-      "liveStats": {
-        "kills": 0,
-        "alive": 4
-      }
-    },
-    {
-      "id": 4,
-      "teamName": "Team 4",
-      "shortName": "T4",
-      "logoUrl": "",
-      "themeColor": "#ff4e00",
-      "players": [
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 1"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
-        }
-      ],
-      "liveStats": {
-        "kills": 0,
-        "alive": 4
-      }
-    },
-    {
-      "id": 5,
-      "teamName": "Team 5",
-      "shortName": "T5",
-      "logoUrl": "",
-      "themeColor": "#ff4e00",
-      "players": [
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 1"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
-        }
-      ],
-      "liveStats": {
-        "kills": 0,
-        "alive": 4
-      }
-    },
-    {
-      "id": 6,
-      "teamName": "Team 6",
-      "shortName": "T6",
-      "logoUrl": "",
-      "themeColor": "#ff4e00",
-      "players": [
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 1"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
-        }
-      ],
-      "liveStats": {
-        "kills": 0,
-        "alive": 4
-      }
-    },
-    {
-      "id": 7,
-      "teamName": "Team 7",
-      "shortName": "T7",
-      "logoUrl": "",
-      "themeColor": "#ff4e00",
-      "players": [
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 1"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
-        }
-      ],
-      "liveStats": {
-        "kills": 0,
-        "alive": 4
-      }
-    },
-    {
-      "id": 8,
-      "teamName": "Team 8",
-      "shortName": "T8",
-      "logoUrl": "",
-      "themeColor": "#ff4e00",
-      "players": [
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 1"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
-        }
-      ],
-      "liveStats": {
-        "kills": 0,
-        "alive": 4
-      }
-    },
-    {
-      "id": 9,
-      "teamName": "Team 9",
-      "shortName": "T9",
-      "logoUrl": "",
-      "themeColor": "#ff4e00",
-      "players": [
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 1"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
-        }
-      ],
-      "liveStats": {
-        "kills": 0,
-        "alive": 4
-      }
-    },
-    {
-      "id": 10,
-      "teamName": "Team 10",
-      "shortName": "T10",
-      "logoUrl": "",
-      "themeColor": "#ff4e00",
-      "players": [
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 1"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
-        }
-      ],
-      "liveStats": {
-        "kills": 0,
-        "alive": 4
-      }
-    },
-    {
-      "id": 11,
-      "teamName": "Team 11",
-      "shortName": "T11",
-      "logoUrl": "",
-      "themeColor": "#ff4e00",
-      "players": [
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 1"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
-        }
-      ],
-      "liveStats": {
-        "kills": 0,
-        "alive": 4
-      }
-    },
-    {
-      "id": 12,
-      "teamName": "Team 12",
-      "shortName": "T12",
-      "logoUrl": "",
-      "themeColor": "#ff4e00",
-      "players": [
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 1"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 2"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 3"
-        },
-        {
-          "name": "",
-          "img": "",
-          "role": "Player 4"
-        }
-      ],
-      "liveStats": {
-        "kills": 0,
-        "alive": 4
+        "kills": 3,
+        "alive": 2
       }
     }
   ]
