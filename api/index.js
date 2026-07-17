@@ -668,6 +668,203 @@ module.exports = async (req, res) => {
       }
     }
 
+
+    // ═══════════════════════════════════════════════════════════════════
+    //  CHAMPION RUSH & POINT RUSH — Broadcast Scoring Engine
+    //  Routes: broadcastState, broadcastSave, settingsUpdate,
+    //          headstartAssign, headstartManual, matchSubmit, standings
+    // ═══════════════════════════════════════════════════════════════════
+
+    const HEADSTART_POINTS_MAP = { 1:10, 2:7, 3:5, 4:3, 5:2, 6:1 };
+
+    function getDefaultTournamentSettings() {
+      return {
+        championRushThreshold: 80,
+        currentStage: 'Grand-Finals',
+        pointsPerKill: 1,
+        placementPoints: { 1:12, 2:9, 3:8, 4:7, 5:6, 6:5, 7:4, 8:3, 9:2, 10:1, 11:0, 12:0 }
+      };
+    }
+
+    // Broadcast state is stored in Firebase RTDB at /booyah_broadcast/{uid or 'public'}/state
+    // Falls back to in-memory if Firebase is not configured
+    const broadcastCache = {};
+
+    async function getBroadcastState(uid) {
+      const key = uid || 'public';
+      // Try Firebase first
+      const dbUrl = process.env.FIREBASE_DATABASE_URL;
+      const dbSecret = process.env.FIREBASE_DATABASE_SECRET;
+      if (dbUrl && dbSecret) {
+        try {
+          const r = await fetch(`${dbUrl}/booyah_broadcast/${key}/state.json?auth=${dbSecret}`);
+          if (r.ok) {
+            const data = await r.json();
+            if (data) {
+              broadcastCache[key] = data;
+              return data;
+            }
+          }
+        } catch(_) {}
+      }
+      // Fall back to cache
+      if (!broadcastCache[key]) {
+        broadcastCache[key] = {
+          tournament: { name: 'Untitled Tournament', logo: '', sponsor: '', sponsorLogo: '' },
+          theme: { preset: 'ffws-neon-orange', primaryColor: '#ff4e00', accentGlow: '#ffaa00', bgDark: '#0c0c0e', textMain: '#ffffff' },
+          tournamentSettings: getDefaultTournamentSettings(),
+          headstartPoints: {},
+          matches: [],
+          standings: [],
+          teams: []
+        };
+      }
+      return broadcastCache[key];
+    }
+
+    async function saveBroadcastState(uid, state) {
+      const key = uid || 'public';
+      broadcastCache[key] = state;
+      const dbUrl = process.env.FIREBASE_DATABASE_URL;
+      const dbSecret = process.env.FIREBASE_DATABASE_SECRET;
+      if (dbUrl && dbSecret) {
+        try {
+          await fetch(`${dbUrl}/booyah_broadcast/${key}/state.json?auth=${dbSecret}`, {
+            method: 'PUT',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify(state)
+          });
+        } catch(_) {}
+      }
+      return state;
+    }
+
+    function calcStandings(state) {
+      const teams = state.teams || [];
+      const matches = state.matches || [];
+      const headstart = state.headstartPoints || {};
+      const ppk = state.tournamentSettings?.pointsPerKill || 1;
+      const pp = state.tournamentSettings?.placementPoints || {};
+
+      const standings = teams.map(team => {
+        const teamId = team.id;
+        let matchPoints = 0, totalKills = 0;
+        matches.forEach(m => {
+          if (m.results) {
+            const r = m.results.find(x => x.teamId === teamId);
+            if (r) {
+              matchPoints += (pp[r.placement] || 0) + (r.kills || 0) * ppk;
+              totalKills += r.kills || 0;
+            }
+          }
+        });
+        const hs = headstart[teamId] || 0;
+        return {
+          teamId, teamName: team.teamName, shortName: team.shortName,
+          logoUrl: team.logoUrl, themeColor: team.themeColor, liveStats: team.liveStats,
+          matchPoints, headstartPoints: hs, totalPoints: matchPoints + hs, totalKills
+        };
+      });
+      standings.sort((a, b) => b.totalPoints - a.totalPoints || b.totalKills - a.totalKills);
+      return standings;
+    }
+
+    function evalChampionRush(standings, threshold, latestMatch) {
+      let booyahWinnerId = null;
+      if (latestMatch && latestMatch.results) {
+        const w = latestMatch.results.find(t => t.placement === 1);
+        booyahWinnerId = w ? (w.teamId || w.id) : null;
+      }
+      return standings.map(team => ({
+        ...team,
+        isEligible: team.totalPoints >= threshold,
+        isTournamentWinner: team.totalPoints >= threshold && team.teamId === booyahWinnerId
+      }));
+    }
+
+    // ── GET /api/broadcastState ──
+    if (route === 'broadcastState' && req.method === 'GET') {
+      const state = await getBroadcastState('public');
+      return ok(state);
+    }
+
+    // ── POST /api/broadcastSave ──
+    if (route === 'broadcastSave' && req.method === 'POST') {
+      const incoming = req.body;
+      if (!incoming || typeof incoming !== 'object') return err(400, 'Invalid payload');
+      const current = await getBroadcastState('public');
+      const merged = { ...current, ...incoming };
+      await saveBroadcastState('public', merged);
+      return ok({ success: true, timestamp: Date.now() });
+    }
+
+    // ── POST /api/settingsUpdate ──
+    if (route === 'settingsUpdate' && req.method === 'POST') {
+      const current = await getBroadcastState('public');
+      current.tournamentSettings = { ...current.tournamentSettings, ...req.body };
+      await saveBroadcastState('public', current);
+      return ok({ success: true, settings: current.tournamentSettings });
+    }
+
+    // ── POST /api/headstartAssign ──
+    if (route === 'headstartAssign' && req.method === 'POST') {
+      const { previousStageStandings } = req.body;
+      if (!Array.isArray(previousStageStandings)) return err(400, 'Expected previousStageStandings array');
+      const current = await getBroadcastState('public');
+      const hs = {};
+      previousStageStandings.forEach((t, i) => {
+        hs[t.teamId || t.id] = HEADSTART_POINTS_MAP[i + 1] || 0;
+      });
+      current.headstartPoints = hs;
+      await saveBroadcastState('public', current);
+      return ok({ success: true, headstartPoints: hs });
+    }
+
+    // ── POST /api/headstartManual ──
+    if (route === 'headstartManual' && req.method === 'POST') {
+      const { teamId, points } = req.body;
+      if (!teamId) return err(400, 'teamId required');
+      const current = await getBroadcastState('public');
+      if (!current.headstartPoints) current.headstartPoints = {};
+      current.headstartPoints[teamId] = parseInt(points) || 0;
+      await saveBroadcastState('public', current);
+      return ok({ success: true, headstartPoints: current.headstartPoints });
+    }
+
+    // ── POST /api/matchSubmit ──
+    if (route === 'matchSubmit' && req.method === 'POST') {
+      const match = req.body.match;
+      if (!match || !Array.isArray(match.results)) return err(400, 'Expected { match: { results: [...] } }');
+      const current = await getBroadcastState('public');
+      if (!current.matches) current.matches = [];
+      const record = {
+        matchNumber: match.matchNumber || (current.matches.length + 1),
+        mapName: match.mapName || 'Unknown',
+        results: match.results,
+        timestamp: Date.now()
+      };
+      current.matches.push(record);
+      let standings = calcStandings(current);
+      const threshold = current.tournamentSettings?.championRushThreshold || 80;
+      const final = evalChampionRush(standings, threshold, record);
+      current.standings = final;
+      await saveBroadcastState('public', current);
+      const champion = final.find(t => t.isTournamentWinner);
+      return ok({ success: true, standings: final, champion: champion || null, matchNumber: record.matchNumber });
+    }
+
+    // ── GET /api/standings ──
+    if (route === 'standings' && req.method === 'GET') {
+      const current = await getBroadcastState('public');
+      let standings = calcStandings(current);
+      const threshold = current.tournamentSettings?.championRushThreshold || 80;
+      const lastMatch = current.matches?.[current.matches.length - 1] || null;
+      standings = evalChampionRush(standings, threshold, lastMatch);
+      return ok({ standings, threshold });
+    }
+
+
+
     // ─── AUTHENTICATION REQUIRED FOR ALL OTHER ROUTES ───
     const authHeader = req.headers.authorization || req.headers.Authorization || '';
     const user = await verifyToken(authHeader);
@@ -2159,201 +2356,6 @@ module.exports = async (req, res) => {
         await saveDb(uid, db);
         return ok({ success:true, teams_added:teamsAdded, players_added:playersAdded, sheet_id:sheetId });
       } catch(e) { return err(500, `Sheet import failed: ${e.message}`); }
-    }
-
-
-    // ═══════════════════════════════════════════════════════════════════
-    //  CHAMPION RUSH & POINT RUSH — Broadcast Scoring Engine
-    //  Routes: broadcastState, broadcastSave, settingsUpdate,
-    //          headstartAssign, headstartManual, matchSubmit, standings
-    // ═══════════════════════════════════════════════════════════════════
-
-    const HEADSTART_POINTS_MAP = { 1:10, 2:7, 3:5, 4:3, 5:2, 6:1 };
-
-    function getDefaultTournamentSettings() {
-      return {
-        championRushThreshold: 80,
-        currentStage: 'Grand-Finals',
-        pointsPerKill: 1,
-        placementPoints: { 1:12, 2:9, 3:8, 4:7, 5:6, 6:5, 7:4, 8:3, 9:2, 10:1, 11:0, 12:0 }
-      };
-    }
-
-    // Broadcast state is stored in Firebase RTDB at /booyah_broadcast/{uid or 'public'}/state
-    // Falls back to in-memory if Firebase is not configured
-    const broadcastCache = {};
-
-    async function getBroadcastState(uid) {
-      const key = uid || 'public';
-      // Try Firebase first
-      const dbUrl = process.env.FIREBASE_DATABASE_URL;
-      const dbSecret = process.env.FIREBASE_DATABASE_SECRET;
-      if (dbUrl && dbSecret) {
-        try {
-          const r = await fetch(`${dbUrl}/booyah_broadcast/${key}/state.json?auth=${dbSecret}`);
-          if (r.ok) {
-            const data = await r.json();
-            if (data) {
-              broadcastCache[key] = data;
-              return data;
-            }
-          }
-        } catch(_) {}
-      }
-      // Fall back to cache
-      if (!broadcastCache[key]) {
-        broadcastCache[key] = {
-          tournament: { name: 'Untitled Tournament', logo: '', sponsor: '', sponsorLogo: '' },
-          theme: { preset: 'ffws-neon-orange', primaryColor: '#ff4e00', accentGlow: '#ffaa00', bgDark: '#0c0c0e', textMain: '#ffffff' },
-          tournamentSettings: getDefaultTournamentSettings(),
-          headstartPoints: {},
-          matches: [],
-          standings: [],
-          teams: []
-        };
-      }
-      return broadcastCache[key];
-    }
-
-    async function saveBroadcastState(uid, state) {
-      const key = uid || 'public';
-      broadcastCache[key] = state;
-      const dbUrl = process.env.FIREBASE_DATABASE_URL;
-      const dbSecret = process.env.FIREBASE_DATABASE_SECRET;
-      if (dbUrl && dbSecret) {
-        try {
-          await fetch(`${dbUrl}/booyah_broadcast/${key}/state.json?auth=${dbSecret}`, {
-            method: 'PUT',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify(state)
-          });
-        } catch(_) {}
-      }
-      return state;
-    }
-
-    function calcStandings(state) {
-      const teams = state.teams || [];
-      const matches = state.matches || [];
-      const headstart = state.headstartPoints || {};
-      const ppk = state.tournamentSettings?.pointsPerKill || 1;
-      const pp = state.tournamentSettings?.placementPoints || {};
-
-      const standings = teams.map(team => {
-        const teamId = team.id;
-        let matchPoints = 0, totalKills = 0;
-        matches.forEach(m => {
-          if (m.results) {
-            const r = m.results.find(x => x.teamId === teamId);
-            if (r) {
-              matchPoints += (pp[r.placement] || 0) + (r.kills || 0) * ppk;
-              totalKills += r.kills || 0;
-            }
-          }
-        });
-        const hs = headstart[teamId] || 0;
-        return {
-          teamId, teamName: team.teamName, shortName: team.shortName,
-          logoUrl: team.logoUrl, themeColor: team.themeColor, liveStats: team.liveStats,
-          matchPoints, headstartPoints: hs, totalPoints: matchPoints + hs, totalKills
-        };
-      });
-      standings.sort((a, b) => b.totalPoints - a.totalPoints || b.totalKills - a.totalKills);
-      return standings;
-    }
-
-    function evalChampionRush(standings, threshold, latestMatch) {
-      let booyahWinnerId = null;
-      if (latestMatch && latestMatch.results) {
-        const w = latestMatch.results.find(t => t.placement === 1);
-        booyahWinnerId = w ? (w.teamId || w.id) : null;
-      }
-      return standings.map(team => ({
-        ...team,
-        isEligible: team.totalPoints >= threshold,
-        isTournamentWinner: team.totalPoints >= threshold && team.teamId === booyahWinnerId
-      }));
-    }
-
-    // ── GET /api/broadcastState ──
-    if (route === 'broadcastState' && req.method === 'GET') {
-      const state = await getBroadcastState('public');
-      return ok(state);
-    }
-
-    // ── POST /api/broadcastSave ──
-    if (route === 'broadcastSave' && req.method === 'POST') {
-      const incoming = req.body;
-      if (!incoming || typeof incoming !== 'object') return err(400, 'Invalid payload');
-      const current = await getBroadcastState('public');
-      const merged = { ...current, ...incoming };
-      await saveBroadcastState('public', merged);
-      return ok({ success: true, timestamp: Date.now() });
-    }
-
-    // ── POST /api/settingsUpdate ──
-    if (route === 'settingsUpdate' && req.method === 'POST') {
-      const current = await getBroadcastState('public');
-      current.tournamentSettings = { ...current.tournamentSettings, ...req.body };
-      await saveBroadcastState('public', current);
-      return ok({ success: true, settings: current.tournamentSettings });
-    }
-
-    // ── POST /api/headstartAssign ──
-    if (route === 'headstartAssign' && req.method === 'POST') {
-      const { previousStageStandings } = req.body;
-      if (!Array.isArray(previousStageStandings)) return err(400, 'Expected previousStageStandings array');
-      const current = await getBroadcastState('public');
-      const hs = {};
-      previousStageStandings.forEach((t, i) => {
-        hs[t.teamId || t.id] = HEADSTART_POINTS_MAP[i + 1] || 0;
-      });
-      current.headstartPoints = hs;
-      await saveBroadcastState('public', current);
-      return ok({ success: true, headstartPoints: hs });
-    }
-
-    // ── POST /api/headstartManual ──
-    if (route === 'headstartManual' && req.method === 'POST') {
-      const { teamId, points } = req.body;
-      if (!teamId) return err(400, 'teamId required');
-      const current = await getBroadcastState('public');
-      if (!current.headstartPoints) current.headstartPoints = {};
-      current.headstartPoints[teamId] = parseInt(points) || 0;
-      await saveBroadcastState('public', current);
-      return ok({ success: true, headstartPoints: current.headstartPoints });
-    }
-
-    // ── POST /api/matchSubmit ──
-    if (route === 'matchSubmit' && req.method === 'POST') {
-      const match = req.body.match;
-      if (!match || !Array.isArray(match.results)) return err(400, 'Expected { match: { results: [...] } }');
-      const current = await getBroadcastState('public');
-      if (!current.matches) current.matches = [];
-      const record = {
-        matchNumber: match.matchNumber || (current.matches.length + 1),
-        mapName: match.mapName || 'Unknown',
-        results: match.results,
-        timestamp: Date.now()
-      };
-      current.matches.push(record);
-      let standings = calcStandings(current);
-      const threshold = current.tournamentSettings?.championRushThreshold || 80;
-      const final = evalChampionRush(standings, threshold, record);
-      current.standings = final;
-      await saveBroadcastState('public', current);
-      const champion = final.find(t => t.isTournamentWinner);
-      return ok({ success: true, standings: final, champion: champion || null, matchNumber: record.matchNumber });
-    }
-
-    // ── GET /api/standings ──
-    if (route === 'standings' && req.method === 'GET') {
-      const current = await getBroadcastState('public');
-      let standings = calcStandings(current);
-      const threshold = current.tournamentSettings?.championRushThreshold || 80;
-      const lastMatch = current.matches?.[current.matches.length - 1] || null;
-      standings = evalChampionRush(standings, threshold, lastMatch);
-      return ok({ standings, threshold });
     }
 
 
