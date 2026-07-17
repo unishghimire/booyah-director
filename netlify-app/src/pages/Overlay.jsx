@@ -113,11 +113,11 @@ function getTheme(design) {
   const userAcc2 = design?.accentColor2 || null;
 
   const presets = {
-    default:  { p:'#ff4e00', s:'#ffaa00', bg:'rgba(4,6,14,0.92)',  border:'rgba(0,200,255,0.28)',  headerBg:'rgba(2,4,12,0.88)',       rowEven:'rgba(0,200,255,0.02)', shine:'rgba(0,200,255,0.10)',  cornerStyle:'dual',     gridOpacity:0.05, scanlines:false, glow:true  },
-    neon:     { p:'#7BC043', s:'#BF00FF', bg:'rgba(2,4,12,0.92)',   border:'rgba(0,255,136,0.35)',  headerBg:'rgba(0,0,0,0.90)',       rowEven:'rgba(0,255,136,0.02)',  shine:'rgba(0,255,136,0.10)', cornerStyle:'glow',     gridOpacity:0.10, scanlines:false, glow:true  },
+    default:  { p:'#ff4e00', s:'#ffaa00', bg:'rgba(4,6,14,0.92)',  border:'rgba(255, 78, 0,0.28)',  headerBg:'rgba(2,4,12,0.88)',       rowEven:'rgba(255, 78, 0,0.02)', shine:'rgba(255, 78, 0,0.10)',  cornerStyle:'dual',     gridOpacity:0.05, scanlines:false, glow:true  },
+    neon:     { p:'#7BC043', s:'#BF00FF', bg:'rgba(2,4,12,0.92)',   border:'rgba(255, 78, 0,0.35)',  headerBg:'rgba(0,0,0,0.90)',       rowEven:'rgba(255, 78, 0,0.02)',  shine:'rgba(255, 78, 0,0.10)', cornerStyle:'glow',     gridOpacity:0.10, scanlines:false, glow:true  },
     military: { p:'#9ABF30', s:'#C8A850', bg:'rgba(8,12,6,0.92)',   border:'rgba(154,191,48,0.28)', headerBg:'rgba(5,8,3,0.90)',       rowEven:'rgba(154,191,48,0.02)', shine:'rgba(154,191,48,0.08)',cornerStyle:'tick',     gridOpacity:0.04, scanlines:false, glow:false },
     minimal:  { p:'#FFFFFF', s:'#888888', bg:'rgba(10,10,12,0.94)', border:'rgba(255,255,255,0.12)',headerBg:'rgba(255,255,255,0.04)', rowEven:'rgba(255,255,255,0.02)',shine:'rgba(255,255,255,0.06)',cornerStyle:'none',     gridOpacity:0.00, scanlines:false, glow:false },
-    retro:    { p:'#FF3030', s:'#ffaa00', bg:'rgba(6,2,2,0.92)',    border:'rgba(255,48,48,0.35)',  headerBg:'rgba(0,0,0,0.88)',       rowEven:'rgba(255,48,48,0.02)',  shine:'rgba(255,48,48,0.10)', cornerStyle:'rect',     gridOpacity:0.08, scanlines:true,  glow:true  },
+    retro:    { p:'#FF3030', s:'#ffaa00', bg:'rgba(6,2,2,0.92)',    border:'rgba(239, 68, 68,0.35)',  headerBg:'rgba(0,0,0,0.88)',       rowEven:'rgba(239, 68, 68,0.02)',  shine:'rgba(239, 68, 68,0.10)', cornerStyle:'rect',     gridOpacity:0.08, scanlines:true,  glow:true  },
   };
 
   const t = { ...(presets[style] || presets.default) };
@@ -196,7 +196,7 @@ function ThemedBackground({ design, mapName, children }) {
     neon:     { img:`linear-gradient(${t.p}12 1px,transparent 1px),linear-gradient(90deg,${t.p}12 1px,transparent 1px)`, sz:'60px 60px' },
     military: { img:`repeating-linear-gradient(0deg,${t.p}06 0,${t.p}06 1px,transparent 1px,transparent 20px),repeating-linear-gradient(90deg,${t.p}06 0,${t.p}06 1px,transparent 1px,transparent 20px)`, sz:'20px 20px' },
     minimal:  { img:`linear-gradient(rgba(255,255,255,0.02) 1px,transparent 1px),linear-gradient(90deg,rgba(255,255,255,0.02) 1px,transparent 1px)`, sz:'120px 120px' },
-    retro:    { img:`repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(255,48,48,0.04) 3px,rgba(255,48,48,0.04) 4px)`, sz:'4px 4px' },
+    retro:    { img:`repeating-linear-gradient(0deg,transparent,transparent 3px,rgba(239, 68, 68,0.04) 3px,rgba(239, 68, 68,0.04) 4px)`, sz:'4px 4px' },
   };
   const g = grids[style] || grids.default;
 
@@ -314,7 +314,7 @@ function FFPanel({ children, style }) {
     <div style={{
       background: 'rgba(6,9,18,0.85)',
       backdropFilter: 'blur(12px) saturate(180%)',
-      border: '1px solid rgba(255,107,0,0.3)',
+      border: '1px solid rgba(255, 78, 0,0.3)',
       borderRadius: 8,
       boxShadow: '0 12px 40px rgba(0,0,0,0.7), inset 0 1px 0 rgba(255,255,255,0.05)',
       position: 'relative', overflow: 'hidden', display: 'flex', flexDirection: 'column',
@@ -338,7 +338,7 @@ function FFPanelHeader({ design, center }) {
   return (
     <div style={{
       height: 48, background: 'rgba(4,5,11,0.7)',
-      borderBottom: '1px solid rgba(255,107,0,0.2)',
+      borderBottom: '1px solid rgba(255, 78, 0,0.2)',
       display: 'flex', alignItems: 'center', justifyContent: 'space-between',
       padding: '0 20px', flexShrink: 0, zIndex: 2,
     }}>
@@ -349,7 +349,7 @@ function FFPanelHeader({ design, center }) {
             onError={e => { e.target.style.display='none'; }}
           />
         ) : (
-          <div style={{ width:22, height:22, borderRadius:'50%', background:'rgba(255,107,0,0.15)', border:'1px solid rgba(255,107,0,0.5)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+          <div style={{ width:22, height:22, borderRadius:'50%', background:'rgba(255, 78, 0,0.15)', border:'1px solid rgba(255, 78, 0,0.5)', display:'flex', alignItems:'center', justifyContent:'center' }}>
             <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:primary }}>B</span>
           </div>
         )}
@@ -532,7 +532,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
                 </div>
 
                 {/* Kills */}
-                <div style={{ width:36, textAlign:'center', fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color: isEliminated ? 'rgba(255,107,0,0.4)' : primary }}>
+                <div style={{ width:36, textAlign:'center', fontFamily:'Rajdhani', fontSize:16, fontWeight:900, color: isEliminated ? 'rgba(255, 78, 0,0.4)' : primary }}>
                   {team.total_tournament_kills || 0}
                 </div>
 
@@ -629,7 +629,7 @@ function FullStandings({ teams = [], design }) {
               {sorted.map((team, idx) => {
                 const rank = idx+1;
                 const rc = rank<=3 ? rankColors[rank-1] : '#fff';
-                const rowBg = rank===1 ? 'rgba(255,107,0,0.06)' : rank===2 ? 'rgba(0,212,255,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
+                const rowBg = rank===1 ? 'rgba(255, 78, 0,0.06)' : rank===2 ? 'rgba(0,212,255,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
                 const crEligible = team.champion_rush_eligible;
                 const crBorder = crEligible ? '4px solid #ffaa00' : `4px solid ${rank<=3?rankColors[rank-1]:'transparent'}`;
                 const crBg = crEligible ? 'rgba(255, 199, 0, 0.08)' : rowBg;
@@ -698,7 +698,7 @@ function KillFeedScreen({ killFeed = [], design }) {
                 style={{
                   display:'flex', alignItems:'center', padding:'10px 16px', gap:10,
                   borderBottom:'1px solid rgba(255,255,255,0.03)',
-                  background: idx===0 ? `rgba(255,107,0,0.08)` : 'transparent',
+                  background: idx===0 ? `rgba(255, 78, 0,0.08)` : 'transparent',
                 }}
               >
                 <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
@@ -856,7 +856,7 @@ function TodaysMatches({ matches = [], design }) {
             const isLive = m.status==='LIVE';
             const isDone = m.status==='COMPLETED';
             return (
-              <ThemedPanel design={design} key={idx} style={{ width:280, height:380, background: isLive ? 'rgba(255,107,0,0.06)' : 'rgba(6,9,18,0.85)' }}>
+              <ThemedPanel design={design} key={idx} style={{ width:280, height:380, background: isLive ? 'rgba(255, 78, 0,0.06)' : 'rgba(6,9,18,0.85)' }}>
                 <div style={{ padding:24, flex:1, display:'flex', flexDirection:'column', justifyContent:'space-between' }}>
                   <div style={{ display:'flex', justifyContent:'space-between', alignItems:'center' }}>
                     <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>{m.matchNumber||`MATCH 0${idx+1}`}</span>
@@ -1629,8 +1629,8 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
                 overflow:'hidden',
                 background:'linear-gradient(180deg, rgba(0,100,220,0.18) 0%, rgba(0,50,140,0.08) 60%, rgba(0,0,0,0.6) 100%)',
                 backdropFilter:'blur(8px)',
-                border:'1px solid rgba(0,200,255,0.30)',
-                boxShadow:`0 0 30px rgba(0,120,255,0.15), inset 0 1px 0 rgba(0,200,255,0.25)`,
+                border:'1px solid rgba(255, 78, 0,0.30)',
+                boxShadow:`0 0 30px rgba(0,120,255,0.15), inset 0 1px 0 rgba(255, 78, 0,0.25)`,
               }}>
                 {/* Top blue accent bar */}
                 <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:'linear-gradient(90deg, #ff4e00, #ffaa00)', borderRadius:'10px 10px 0 0' }} />
@@ -1648,7 +1648,7 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
                   <div style={{ position:'absolute', top:0, left:0, right:0, bottom:48, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,40,120,0.2)' }}>
                     {winnerTeamObj?.logo_url
                       ? <img src={winnerTeamObj.logo_url} alt="" style={{ width:64, height:64, objectFit:'contain', opacity:0.6 }} onError={e=>e.target.style.display='none'} />
-                      : <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(0,200,255,0.15)', border:'1px solid rgba(0,200,255,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#ff4e00' }}>{(winnerName||'C').charAt(0)}</span></div>
+                      : <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(255, 78, 0,0.15)', border:'1px solid rgba(255, 78, 0,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#ff4e00' }}>{(winnerName||'C').charAt(0)}</span></div>
                     }
                   </div>
                 )}
@@ -1676,7 +1676,7 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
           <div style={{
             width:80, height:80, borderRadius:'50%',
             border:'3px solid #ff4e00',
-            boxShadow:'0 0 40px rgba(0,200,255,0.5), 0 0 80px rgba(0,100,255,0.25)',
+            boxShadow:'0 0 40px rgba(255, 78, 0,0.5), 0 0 80px rgba(0,100,255,0.25)',
             display:'flex', alignItems:'center', justifyContent:'center',
             background:'rgba(0,20,60,0.8)',
           }}>
@@ -1699,13 +1699,13 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
           }}>
             {(design?.championTitle || 'CHAMPIONS').toUpperCase()}
           </h1>
-          <div style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:700, color:'rgba(0,200,255,0.7)', letterSpacing:'0.5em', marginTop:10, textTransform:'uppercase' }}>
+          <div style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:700, color:'rgba(255, 78, 0,0.7)', letterSpacing:'0.5em', marginTop:10, textTransform:'uppercase' }}>
             {(design?.championSubtitle || 'GRAND TOURNAMENT CHAMPION').toUpperCase()}
           </div>
         </div>
 
         {/* ── STATS ROW ── */}
-        <div style={{ display:'flex', gap:40, marginTop:22, paddingTop:18, borderTop:'1px solid rgba(0,200,255,0.18)', animation:'cTitleIn 0.6s ease 0.8s both' }}>
+        <div style={{ display:'flex', gap:40, marginTop:22, paddingTop:18, borderTop:'1px solid rgba(255, 78, 0,0.18)', animation:'cTitleIn 0.6s ease 0.8s both' }}>
           {[
             { label:'PPT',       value:placementPts, color:'#ff4e00' },
             { label:'KILLS',     value:totalKills,   color:'#ffaa00' },
@@ -1722,7 +1722,7 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
 
       {/* ── BOTTOM SPONSOR BAR ── */}
       <div style={{ position:'absolute', bottom:0, left:0, right:0, zIndex:10 }}>
-        <div style={{ height:1, background:'linear-gradient(90deg, transparent, rgba(0,200,255,0.4), transparent)' }} />
+        <div style={{ height:1, background:'linear-gradient(90deg, transparent, rgba(255, 78, 0,0.4), transparent)' }} />
         <div style={{ display:'flex', justifyContent:'space-around', alignItems:'center', padding:'14px 60px', background:'rgba(1,5,16,0.85)', backdropFilter:'blur(8px)' }}>
           {[
             { label:'HOSTED BY',    value: design?.hostedBy     || tok.name(design) },
@@ -1730,7 +1730,7 @@ function ChampionsScreen({ teams = [], design, overlayState, players = [] }) {
             { label:'VISUALS BY',   value: design?.visualsBy    || 'BOOYAH DIRECTOR' },
           ].map(item => (
             <div key={item.label} style={{ textAlign:'center' }}>
-              <div style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'rgba(0,200,255,0.5)', letterSpacing:'0.2em' }}>{item.label}</div>
+              <div style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'rgba(255, 78, 0,0.5)', letterSpacing:'0.2em' }}>{item.label}</div>
               <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', letterSpacing:'0.1em', marginTop:3, textTransform:'uppercase' }}>{(item.value||'').toUpperCase()}</div>
             </div>
           ))}
@@ -1749,7 +1749,7 @@ function OverlayLoading() {
   return (
     <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', background:'#0c0c0e' }}>
       <div style={{ display:'flex', flexDirection:'column', alignItems:'center', gap:16 }}>
-        <div style={{ width:48, height:48, borderRadius:'50%', border:'4px solid rgba(255,107,0,0.15)', borderTop:'4px solid #ff4e00', animation:'spin 0.8s linear infinite' }} />
+        <div style={{ width:48, height:48, borderRadius:'50%', border:'4px solid rgba(255, 78, 0,0.15)', borderTop:'4px solid #ff4e00', animation:'spin 0.8s linear infinite' }} />
         <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.3em' }}>CONNECTING TO OVERLAY...</span>
       </div>
       <style>{`@keyframes spin{to{transform:rotate(360deg)}}`}</style>

@@ -2025,7 +2025,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
           <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: 24 }}>
             {/* Current Match Card */}
             <div style={{
-              borderRadius: 20, border: `1px solid ${accent}30`, background: 'rgba(0, 200, 255, 0.04)',
+              borderRadius: 20, border: `1px solid ${accent}30`, background: 'rgba(255, 78, 0, 0.04)',
               padding: 32, position: 'relative', overflow: 'hidden',
             }}>
               {/* Glow effect */}
