@@ -297,10 +297,15 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
           display: 'flex',
           alignItems: 'center',
           flexShrink: 0,
-          padding: '0 12px',
+          padding: '0 12px 0 8px',
           boxSizing: 'border-box',
           clipPath: 'polygon(12px 0, 100% 0, 100% 100%, 0 100%)',
         }}>
+          {/* Rank spacer — matches row rank column */}
+          <div style={{ width: 20, flexShrink: 0, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>#</div>
+          {/* Logo spacer — matches row logo column */}
+          <div style={{ width: 26, flexShrink: 0 }} />
+          {/* SCOREBOARD title — matches row team name column (flex: 1) */}
           <div style={{
             flex: 1,
             fontFamily: 'Teko, sans-serif',
@@ -309,13 +314,16 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
             color: '#0c0c0e',
             letterSpacing: '2px',
             textTransform: 'uppercase',
-            paddingLeft: 10,
+            paddingLeft: 6,
           }}>
             SCOREBOARD
           </div>
-          <div style={{ width: 44, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>ALIVE</div>
-          <div style={{ width: 32, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>PTS</div>
-          <div style={{ width: 32, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>ELM</div>
+          {/* ALIVE header — matches row alive bars column */}
+          <div style={{ width: 44, flexShrink: 0, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>ALIVE</div>
+          {/* PTS header — matches row PTS column */}
+          <div style={{ width: 32, flexShrink: 0, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>PTS</div>
+          {/* ELM header — matches row ELIMS column */}
+          <div style={{ width: 32, flexShrink: 0, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>KILL</div>
         </div>
 
         {/* ══ ROWS ══ */}
@@ -454,7 +462,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
         <div style={{
           width: '100%', height: FOOTER_H, background: '#141418', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
-          padding: '0 12px', boxSizing: 'border-box',
+          padding: '0 12px 0 8px', boxSizing: 'border-box',
           borderTop: '2px solid #ff4e00',
         }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
