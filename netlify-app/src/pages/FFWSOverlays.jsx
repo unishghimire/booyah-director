@@ -183,13 +183,27 @@ export function EliminatedTeamBanner({ team, design }) {
 export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
 
   const prevElimRef   = useRef({});
-  const shownElimRef  = useRef(new Set());  // team IDs that already showed banner this match
+  const shownElimRef  = useRef(new Set());
   const [elimBanner, setElimBanner] = useState(null);
   const elimTimerRef  = useRef(null);
 
-  // Design tokens (kept for safety / custom color matching where needed, but we follow spec exactly)
   const accent  = '#ff4e00';
-  const txtCol  = '#FFFFFF';
+  const gold   = '#ffaa00';
+  const txtCol = '#FFFFFF';
+  const green  = '#7BC043';
+
+  // ── FFWS BROADCAST DIMENSIONS ──
+  const HEADER_H = 38;
+  const ROW_H    = 38;
+  const FOOTER_H = 30;
+  const PANEL_W  = 360;
+
+  // Column widths — MUST match between header and rows
+  const COL_RANK  = 28;
+  const COL_LOGO  = 30;
+  const COL_ALIVE = 52;
+  const COL_PTS   = 38;
+  const COL_KILL  = 38;
 
   const rows = useMemo(() => {
     return [...safeArray(teams)]
@@ -202,7 +216,6 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
         }
         const aliveCount = tp.filter(p => p.is_alive).length;
         return { ...team, slots, aliveCount, totalPlayers: tp.length,
-          // carry the player objects for the elim banner
           _players: tp.map(p => ({ name: p.name, is_alive: p.is_alive })),
         };
       })
@@ -213,7 +226,6 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       .slice(0, 12);
   }, [teams, players]);
 
-  // Reset elim tracking when match changes
   const matchId = currentMatch?.id;
   useEffect(() => {
     shownElimRef.current = new Set();
@@ -221,7 +233,6 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
     setElimBanner(null);
   }, [matchId]);
 
-  // Detect newly eliminated teams → show banner ONCE per team per match
   useEffect(() => {
     const queue = [];
     rows.forEach(team => {
@@ -229,11 +240,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       const isElim  = team.aliveCount === 0 && team.totalPlayers > 0;
       if (!wasElim && isElim && !shownElimRef.current.has(team.id)) {
         shownElimRef.current.add(team.id);
-        queue.push({
-          name: team.name,
-          logo_url: team.logo_url,
-          players: team._players,
-        });
+        queue.push({ name: team.name, logo_url: team.logo_url, players: team._players });
       }
       prevElimRef.current[team.id] = isElim;
     });
@@ -244,18 +251,10 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
     }
   }, [rows]);
 
-  const matchLabel  = currentMatch?.match_number ? 'MATCH ' + currentMatch.match_number : (design?.matchLabel || 'MATCH 1');
-  const dayLabel    = (design?.dayLabel || 'DAY 1').toUpperCase();
-  const brandLabel  = (design?.scoreboardBrand || 'EWC').toUpperCase();
-  const stageLabel  = (design?.stageLabel || 'GROUP STAGE').toUpperCase();
-
-  const green     = '#7BC043';
-
-  // ── FIXED DIMENSIONS FROM SPEC ──
-  const HEADER_H = 34; // height of SCOREBOARD header banner
-  const ROW_H    = 38; // 38px row height
-  const FOOTER_H = 28;
-  const PANEL_W  = 280; // wider 280px
+  const matchLabel = currentMatch?.match_number ? 'MATCH ' + currentMatch.match_number : (design?.matchLabel || 'MATCH 1');
+  const dayLabel   = (design?.dayLabel || 'DAY 1').toUpperCase();
+  const brandLabel = (design?.scoreboardBrand || 'EWC').toUpperCase();
+  const stageLabel = (design?.stageLabel || 'GROUP STAGE').toUpperCase();
 
   const displayRows = rows.length > 0
     ? rows
@@ -267,9 +266,25 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
         _isGhost: true,
       }));
 
+  // Shared column layout — used by BOTH header and rows for perfect alignment
+  const colRank  = { width: COL_RANK,  flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' };
+  const colLogo  = { width: COL_LOGO,  flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' };
+  const colName  = { flex: 1, paddingLeft: 8, overflow: 'hidden', display: 'flex', alignItems: 'center' };
+  const colAlive = { width: COL_ALIVE, flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 3 };
+  const colPts   = { width: COL_PTS,   flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' };
+  const colKill  = { width: COL_KILL,  flexShrink: 0, display: 'flex', alignItems: 'center', justifyContent: 'center' };
+
+  const hdrTxt = {
+    fontFamily: 'Teko, sans-serif',
+    fontSize: 14,
+    fontWeight: 700,
+    color: '#0c0c0e',
+    letterSpacing: '1.5px',
+    textTransform: 'uppercase',
+  };
+
   return (
     <>
-      {/* Eliminated team banner */}
       <EliminatedTeamBanner team={elimBanner} design={design} />
 
       <motion.div
@@ -287,80 +302,65 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
           display: 'flex',
           flexDirection: 'column',
           background: 'transparent',
+          filter: 'drop-shadow(0 4px 20px rgba(0,0,0,0.5))',
         }}
       >
-        {/* ══ ACCENT HEADER: angular clip-path banner with SCOREBOARD ══ */}
+        {/* ══ HEADER ══ */}
         <div style={{
           width: '100%',
           height: HEADER_H,
-          background: '#ff4e00',
+          background: 'linear-gradient(135deg, #ff4e00 0%, #ff6a1a 100%)',
           display: 'flex',
           alignItems: 'center',
           flexShrink: 0,
           padding: '0 12px 0 8px',
           boxSizing: 'border-box',
-          clipPath: 'polygon(12px 0, 100% 0, 100% 100%, 0 100%)',
+          clipPath: 'polygon(14px 0, 100% 0, 100% 100%, 0 100%)',
+          boxShadow: '0 0 12px rgba(255, 78, 0, 0.4)',
         }}>
-          {/* Rank spacer — matches row rank column */}
-          <div style={{ width: 20, flexShrink: 0, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>#</div>
-          {/* Logo spacer — matches row logo column */}
-          <div style={{ width: 26, flexShrink: 0 }} />
-          {/* SCOREBOARD title — matches row team name column (flex: 1) */}
-          <div style={{
-            flex: 1,
-            fontFamily: 'Teko, sans-serif',
-            fontSize: 22,
-            fontWeight: 800,
-            color: '#0c0c0e',
-            letterSpacing: '2px',
-            textTransform: 'uppercase',
-            paddingLeft: 6,
-          }}>
-            SCOREBOARD
+          <div style={colRank}><span style={hdrTxt}>#</span></div>
+          <div style={colLogo} />
+          <div style={colName}>
+            <span style={{ ...hdrTxt, fontSize: 22, fontWeight: 800, letterSpacing: '2px' }}>SCOREBOARD</span>
           </div>
-          {/* ALIVE header — matches row alive bars column */}
-          <div style={{ width: 44, flexShrink: 0, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>ALIVE</div>
-          {/* PTS header — matches row PTS column */}
-          <div style={{ width: 32, flexShrink: 0, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>PTS</div>
-          {/* ELM header — matches row ELIMS column */}
-          <div style={{ width: 32, flexShrink: 0, textAlign: 'center', fontFamily: 'Teko, sans-serif', fontSize: 13, fontWeight: 700, color: '#0c0c0e', letterSpacing: '1px' }}>KILL</div>
+          <div style={colAlive}><span style={hdrTxt}>ALIVE</span></div>
+          <div style={colPts}><span style={hdrTxt}>PTS</span></div>
+          <div style={colKill}><span style={hdrTxt}>KILL</span></div>
         </div>
 
         {/* ══ ROWS ══ */}
-        <div style={{ display: 'flex', flexDirection: 'column', gap: 0 }}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
           {displayRows.map((team, idx) => {
             const rank      = idx + 1;
             const isGhost   = !!team._isGhost;
             const isElim    = !isGhost && team.aliveCount === 0 && team.totalPlayers > 0;
 
-            // Rank 1-3 get gold/silver/bronze left accent border.
-            // Champion rush eligible teams get gold border with subtle glow.
-            const rankColor = rank === 1 ? '#ffaa00' : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'transparent';
+            const rankColor = rank === 1 ? gold : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'transparent';
             const isChampionRush = team.champion_rush_eligible === true;
-            
+
             let borderLeftStyle = '3px solid transparent';
             let boxShadowStyle = 'none';
             if (isChampionRush && !isElim && !isGhost) {
-              borderLeftStyle = '4px solid #ffaa00';
-              boxShadowStyle = '0 0 10px rgba(255,170,0,0.25)';
+              borderLeftStyle = '4px solid ' + gold;
+              boxShadowStyle = '0 0 10px rgba(255,170,0,0.3)';
             } else if (rank <= 3 && !isGhost) {
-              borderLeftStyle = `3.5px solid ${rankColor}`;
+              borderLeftStyle = '3.5px solid ' + rankColor;
             }
 
             return (
               <motion.div
                 key={team.id || idx}
-                initial={{ x: 50, opacity: 0 }}
-                animate={{ x: 0, opacity: isElim ? 0.28 : isGhost ? 0.15 : 1 }}
-                transition={{ duration: 0.35, delay: idx * 0.025, ease: [0.16, 1, 0.3, 1] }}
+                initial={{ x: 60, opacity: 0 }}
+                animate={{ x: 0, opacity: isElim ? 0.3 : isGhost ? 0.12 : 1 }}
+                transition={{ duration: 0.35, delay: idx * 0.03, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                   width: '100%',
                   height: ROW_H,
                   flexShrink: 0,
                   display: 'flex',
                   alignItems: 'center',
-                  background: '#0c0c0e',
-                  borderBottom: '1px solid rgba(255,255,255,0.05)',
+                  background: isGhost ? 'transparent' : '#0c0c0e',
+                  borderBottom: '1px solid rgba(255,255,255,0.04)',
                   borderLeft: borderLeftStyle,
                   boxShadow: boxShadowStyle,
                   padding: '0 12px 0 8px',
@@ -371,27 +371,28 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                 }}
               >
                 {/* Rank */}
-                <div style={{
-                  width: 20, flexShrink: 0, textAlign: 'center',
-                  fontFamily: 'Rajdhani, sans-serif', fontSize: 13, fontWeight: 700,
-                  color: isGhost ? 'rgba(255,255,255,0.15)' : isChampionRush ? '#ffaa00' : rank <= 3 ? rankColor : '#888888',
-                  textShadow: isChampionRush && !isGhost ? '0 0 6px rgba(255, 170, 0, 0.6)' : 'none',
-                }}>{rank}</div>
+                <div style={colRank}>
+                  <span style={{
+                    fontFamily: 'Teko, sans-serif', fontSize: 18, fontWeight: 700,
+                    color: isGhost ? 'rgba(255,255,255,0.1)' : isChampionRush ? gold : rank <= 3 ? rankColor : '#888888',
+                    textShadow: isChampionRush && !isGhost ? '0 0 6px rgba(255, 170, 0, 0.6)' : 'none',
+                  }}>{rank}</span>
+                </div>
 
                 {/* Logo */}
-                <div style={{ width: 26, flexShrink: 0, display: 'flex', justifyContent: 'center', alignItems: 'center' }}>
+                <div style={colLogo}>
                   {!isGhost && team.logo_url ? (
-                    <img src={team.logo_url} alt="" style={{ width: 20, height: 20, objectFit: 'contain', borderRadius: 0 }}
+                    <img src={team.logo_url} alt="" style={{ width: 22, height: 22, objectFit: 'contain' }}
                       onError={e => { e.target.style.display = 'none'; }} />
                   ) : (
                     <div style={{
-                      width: 20, height: 20, borderRadius: 0,
-                      background: 'rgba(255,255,255,0.05)',
-                      border: '1px solid rgba(255,255,255,0.07)',
+                      width: 22, height: 22,
+                      background: isGhost ? 'transparent' : 'rgba(255,255,255,0.04)',
+                      border: isGhost ? '1px dashed rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.06)',
                       display: 'flex', alignItems: 'center', justifyContent: 'center',
                     }}>
                       {!isGhost && (
-                        <span style={{ fontFamily: 'Teko', fontSize: 11, fontWeight: 900, color: 'rgba(255,255,255,0.25)' }}>
+                        <span style={{ fontFamily: 'Teko', fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.2)' }}>
                           {(team.name || 'T').charAt(0).toUpperCase()}
                         </span>
                       )}
@@ -401,34 +402,31 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
 
                 {/* Team name */}
                 <div style={{
-                  flex: 1, paddingLeft: 6,
-                  fontFamily: 'Rajdhani, sans-serif', fontSize: 12, fontWeight: 700,
-                  color: isGhost ? 'rgba(255,255,255,0.15)' : isElim ? 'rgba(255,255,255,0.3)' : txtCol,
+                  ...colName,
+                  fontFamily: 'Rajdhani, sans-serif', fontSize: 13, fontWeight: 700,
+                  color: isGhost ? 'rgba(255,255,255,0.08)' : isElim ? 'rgba(255,255,255,0.25)' : txtCol,
                   textTransform: 'uppercase', letterSpacing: '1px',
-                  overflow: 'hidden', textOverflow: 'ellipsis', whiteSpace: 'nowrap',
-                  position: 'relative',
+                  textOverflow: 'ellipsis', whiteSpace: 'nowrap', position: 'relative',
                 }}>
-                  {isGhost ? 'GHOST TEAM' : (team.name || 'TEAM')}
+                  {isGhost ? '' : (team.name || 'TEAM')}
                   {isElim && !isGhost && (
                     <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.3 }}
-                      style={{ position: 'absolute', left: 6, right: 0, top: '50%', height: 1.5, background: '#ff4e00', transformOrigin: 'left', opacity: 0.8 }} />
+                      style={{ position: 'absolute', left: 8, right: 0, top: '50%', height: 1.5, background: accent, transformOrigin: 'left', opacity: 0.7 }} />
                   )}
                 </div>
 
                 {/* Alive bars */}
-                <div style={{ width: 44, display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 2, flexShrink: 0 }}>
+                <div style={colAlive}>
                   {team.slots.map((slot, si) => {
                     const bg = isGhost
-                      ? 'rgba(255,255,255,0.04)'
-                      : slot.alive
-                        ? green
-                        : slot.name === null
-                          ? 'rgba(255,255,255,0.04)'
-                          : 'rgba(255,255,255,0.09)';
+                      ? 'rgba(255,255,255,0.03)'
+                      : slot.alive ? green
+                        : slot.name === null ? 'rgba(255,255,255,0.03)'
+                        : 'rgba(255,255,255,0.08)';
                     return (
                       <motion.div key={si} animate={{ backgroundColor: bg }} transition={{ duration: 0.25 }}
                         style={{
-                          width: 8, height: 18, borderRadius: 0, flexShrink: 0,
+                          width: 8, height: 18, flexShrink: 0,
                           boxShadow: !isGhost && slot.alive ? '0 0 4px ' + green : 'none',
                         }}
                       />
@@ -436,22 +434,22 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                   })}
                 </div>
 
-                {/* PTS */}
+                {/* Points */}
                 <div style={{
-                  width: 32, textAlign: 'center', flexShrink: 0,
-                  fontFamily: 'Rajdhani, sans-serif', fontSize: 14, fontWeight: 700,
-                  color: isGhost ? 'rgba(255,255,255,0.1)' : isElim ? 'rgba(255,255,255,0.3)' : txtCol,
+                  ...colPts,
+                  fontFamily: 'Teko, sans-serif', fontSize: 16, fontWeight: 700,
+                  color: isGhost ? 'rgba(255,255,255,0.06)' : isElim ? 'rgba(255,255,255,0.25)' : txtCol,
                 }}>
-                  {isGhost ? '0' : (team.total_tournament_points ?? 0)}
+                  {isGhost ? '' : (team.total_tournament_points ?? 0)}
                 </div>
 
-                {/* ELIMS */}
+                {/* Kills */}
                 <div style={{
-                  width: 32, textAlign: 'center', flexShrink: 0,
-                  fontFamily: 'Rajdhani, sans-serif', fontSize: 14, fontWeight: 700,
-                  color: isGhost ? 'rgba(255,255,255,0.1)' : isElim ? 'rgba(255,255,255,0.3)' : '#ff4e00',
+                  ...colKill,
+                  fontFamily: 'Teko, sans-serif', fontSize: 16, fontWeight: 700,
+                  color: isGhost ? 'rgba(255,255,255,0.06)' : isElim ? 'rgba(255,255,255,0.25)' : accent,
                 }}>
-                  {isGhost ? '0' : (team.total_tournament_kills ?? 0)}
+                  {isGhost ? '' : (team.total_tournament_kills ?? 0)}
                 </div>
               </motion.div>
             );
@@ -463,16 +461,17 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
           width: '100%', height: FOOTER_H, background: '#141418', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 12px 0 8px', boxSizing: 'border-box',
-          borderTop: '2px solid #ff4e00',
+          borderTop: '2px solid ' + accent,
+          clipPath: 'polygon(0 0, 100% 0, 100% 100%, 14px 100%)',
         }}>
-          <div style={{ display: 'flex', alignItems: 'center', gap: 5 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: 6 }}>
             {design?.logoUrl
               ? <img src={design.logoUrl} alt="" style={{ height: 16, objectFit: 'contain' }} onError={e => { e.target.style.display = 'none'; }} />
-              : <span style={{ fontFamily: 'Teko, sans-serif', fontSize: 16, fontWeight: 900, color: '#ff4e00', letterSpacing: '1px' }}>{brandLabel}</span>
+              : <span style={{ fontFamily: 'Teko, sans-serif', fontSize: 16, fontWeight: 900, color: accent, letterSpacing: '1px' }}>{brandLabel}</span>
             }
-            <span style={{ fontFamily: 'Teko, sans-serif', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>{stageLabel}</span>
+            <span style={{ fontFamily: 'Teko, sans-serif', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '1px' }}>{stageLabel}</span>
           </div>
-          <span style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '1px' }}>
+          <span style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '1px' }}>
             {dayLabel} · {matchLabel.toUpperCase()}
           </span>
         </div>

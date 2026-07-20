@@ -2275,6 +2275,19 @@ export default function Overlay() {
   const [searchParams]     = useSearchParams();
   const shareToken         = searchParams.get('token') || searchParams.get('shareToken') || '';
 
+  // Force transparent background for OBS browser source compatibility
+  useEffect(() => {
+    document.body.style.background = 'transparent';
+    document.documentElement.style.background = 'transparent';
+    document.body.style.margin = '0';
+    document.body.style.padding = '0';
+    document.body.style.overflow = 'hidden';
+    return () => {
+      document.body.style.background = '';
+      document.documentElement.style.background = '';
+    };
+  }, []);
+
   const { data, error, ready } = useOverlayPoll(shareToken);
 
   const {
