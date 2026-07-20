@@ -290,7 +290,7 @@ async function verifyToken(authHeader) {
 // ── MAIN HANDLER ─────────────────────────────────────
 
 const DEFAULT_DESIGN = {
-  accentColor: '#FF6B00', accentColor2: '#00D4FF', bgColor: '#060915',
+  accentColor: '#ff4e00', accentColor2: '#ffaa00', bgColor: '#0c0c0e',
   textColor: '#ffffff', tournamentName: 'BOOYAH CUP', tournamentSubtitle: 'GRAND FINALS',
   gameLabel: 'GAME', logoUrl: '', overlayStyle: 'default', fontStyle: 'orbitron',
   casters: [

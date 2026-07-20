@@ -107,6 +107,33 @@ function useOverlayPoll(shareToken) {
 ══════════════════════════════════════════════════ */
 
 // ── Theme token resolver
+// Fix known typos in design text values from the database
+const DESIGN_TEXT_FIXES = {
+  standingsSubtitle: { 'LEDEARBOARD': 'LEADERBOARD' },
+  standingsTitle:     { 'OVERALL STANDING': 'OVERALL STANDINGS' },
+  championTitle:      { 'CHAMPIOON': 'CHAMPION' },
+  castersSubtitle:   { 'OFFICAL CREW': 'OFFICIAL CREW' },
+  elimAlertLabel:    { 'SQUAD ELIMINITED': 'SQUAD ELIMINATED' },
+  gameIntroSubtitle:  { 'NEXPLAY CHAMPION SHIP GROUPSTAGE': 'NEXPLAY CHAMPIONSHIP GROUP STAGE' },
+  scheduleBrandText:  { 'NEXPLAY CHAMIONSHIP': 'NEXPLAY CHAMPIONSHIP' },
+  scoreboardSubtitle: { 'STANDING': 'STANDINGS' },
+  todayScheduleTitle: { 'TODAY SCHUDULE': 'TODAY SCHEDULE' },
+};
+
+function fixDesignText(design) {
+  if (!design) return design;
+  const fixed = { ...design };
+  for (const [key, fixes] of Object.entries(DESIGN_TEXT_FIXES)) {
+    const val = fixed[key];
+    if (typeof val === 'string' && fixes[val]) {
+      fixed[key] = fixes[val];
+    }
+  }
+  // Fix trailing spaces
+  if (typeof fixed.rosterTitle === 'string') fixed.rosterTitle = fixed.rosterTitle.trim();
+  return fixed;
+}
+
 function getTheme(design) {
   const style = design?.overlayStyle || 'default';
   const userAcc  = design?.accentColor  || null;
@@ -121,8 +148,9 @@ function getTheme(design) {
   };
 
   const t = { ...(presets[style] || presets.default) };
-  if (userAcc  && style === 'default') t.p = userAcc;
-  if (userAcc2 && style === 'default') t.s = userAcc2;
+  // Only allow custom colors for non-default styles — lock FFWS colors for default
+  if (userAcc  && style !== 'default') t.p = userAcc;
+  if (userAcc2 && style !== 'default') t.s = userAcc2;
   return t;
 }
 
@@ -2297,12 +2325,13 @@ export default function Overlay() {
     eliminations: _eliminations = [],
     currentMatch,
     overlayState,
-    design,
+    design:       _design,
     tournament,
     matches:      _matches      = [],
     nextScheduledMatch,
     championRush,
   } = data || {};
+  const design = fixDesignText(_design);
 
   const teams        = safeArray(_teams);
   const players      = safeArray(_players);

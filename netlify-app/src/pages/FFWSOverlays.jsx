@@ -483,8 +483,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
 /* ─── Theme helper for MatchInfoChip ─── */
 function getThemeInline(design) {
   const style = design?.overlayStyle || 'default';
-  const userAcc  = design?.accentColor  || null;
-  const userAcc2 = design?.accentColor2 || null;
+  // FFWS standard colors — always use these for 'default' style
   const presets = {
     default:  { p:'#ff4e00', s:'#ffaa00' },
     neon:     { p:'#7BC043', s:'#BF00FF' },
@@ -493,8 +492,11 @@ function getThemeInline(design) {
     retro:    { p:'#FF3030', s:'#ffaa00' },
   };
   const t = { ...(presets[style] || presets.default) };
-  if (userAcc  && style === 'default') t.p = userAcc;
-  if (userAcc2 && style === 'default') t.s = userAcc2;
+  // Only allow custom colors for non-default styles
+  const userAcc  = design?.accentColor;
+  const userAcc2 = design?.accentColor2;
+  if (userAcc  && style !== 'default') t.p = userAcc;
+  if (userAcc2 && style !== 'default') t.s = userAcc2;
   return t;
 }
 
