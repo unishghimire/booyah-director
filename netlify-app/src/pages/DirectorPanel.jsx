@@ -10,6 +10,7 @@ import { OVERLAYS, CopyBtn } from './OverlayLinks';
 import { SCREENS, GROUP_LABELS } from '@/components/control/ScreenSwitcher';
 import { useObsStore } from '@/lib/obsStore';
 import { obsService } from '@/lib/obsWebSocket';
+import LiveControlPanel from '@/components/control/LiveControlPanel';
 import {
   ExternalLink,
   Eye, Paintbrush, Settings2, Trophy, Star, Crown,
@@ -26,7 +27,7 @@ import {
 
 export default function DirectorPanel() {
   const { data, loading, refresh } = useOverlayData(true);
-  const [activeTab, setActiveTab] = useState('overlay');
+  const [activeTab, setActiveTab] = useState('live');
   const [busy, setBusy] = useState(null);
   const [mapSelect, setMapSelect] = useState('Bermuda');
   const [refreshing, setRefreshing] = useState(false);
@@ -278,6 +279,7 @@ export default function DirectorPanel() {
       ───────────────────────────────────────── */}
       <nav className="flex h-11 border-b border-white/5 bg-[#131127] flex-shrink-0">
         {[
+          { id: 'live', label: 'LIVE', icon: Radio },
           { id: 'overlay', label: 'OVERLAY', icon: Monitor },
           { id: 'match', label: 'MATCH', icon: Map },
           { id: 'standings', label: 'STANDINGS', icon: Trophy },
@@ -324,6 +326,22 @@ export default function DirectorPanel() {
         {!loading && (
           <>
             {/* OVERLAY TAB */}
+            {/* ── LIVE CONTROL TAB ── */}
+            {activeTab === 'live' && (
+              <SectionBoundary label="LIVE CONTROL">
+                <LiveControlPanel
+                  data={data}
+                  refresh={refresh}
+                  overlayApi={overlayApi}
+                  obsConnected={obsStatus === 'connected'}
+                  onSwitchScene={async (screen) => {
+                    await overlayApi.switchOverlayScreen({ screen });
+                    refresh();
+                  }}
+                />
+              </SectionBoundary>
+            )}
+
             {activeTab === 'overlay' && (
               <SectionBoundary label="OVERLAY LINKS">
                 <div className="flex flex-col gap-6 max-w-6xl mx-auto">
