@@ -8,7 +8,6 @@ import { useMemo, useState, useEffect, useRef } from 'react';
 import { safeArray } from '@/components/ErrorBoundary';
 import { MAPS, getMapImages } from '@/lib/maps';
 
-
 /* ─── Eliminated Team Banner — 4-player panel ─── */
 export function EliminatedTeamBanner({ team, design }) {
   // team = { name, logo_url, players: [{name, is_alive}, ...] }
@@ -19,12 +18,8 @@ export function EliminatedTeamBanner({ team, design }) {
   return (
     <AnimatePresence>
       {team && (
-        <motion.div
+        <div
           key={team.name}
-          initial={{ x: -200, opacity: 0 }}
-          animate={{ x: 0,    opacity: 1 }}
-          exit={{   x: -200, opacity: 0 }}
-          transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
           style={{
             position: 'absolute',
             bottom: 100,
@@ -70,9 +65,7 @@ export function EliminatedTeamBanner({ team, design }) {
           </div>
 
           {/* ── RIGHT panel: dark gunmetal panel with team name + 4 player cards in 2x2 grid ── */}
-          <motion.div
-            initial={{ scaleX: 0 }} animate={{ scaleX: 1 }}
-            transition={{ duration: 0.4, delay: 0.1, ease: [0.16, 1, 0.3, 1] }}
+          <div
             style={{
               width: 380,
               height: 160,
@@ -134,11 +127,8 @@ export function EliminatedTeamBanner({ team, design }) {
               {players.map((p, i) => {
                 const hasName = !!p.name;
                 return (
-                  <motion.div
+                  <div
                     key={i}
-                    initial={{ opacity: 0, y: 8 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.25, delay: 0.15 + i * 0.06 }}
                     style={{
                       display: 'flex', alignItems: 'center', gap: 6,
                       padding: '4px 8px',
@@ -163,7 +153,7 @@ export function EliminatedTeamBanner({ team, design }) {
                     }}>
                       {hasName ? p.name : '—'}
                     </span>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
@@ -173,8 +163,8 @@ export function EliminatedTeamBanner({ team, design }) {
               height: 2, marginTop: 6,
               background: 'linear-gradient(90deg, #ff4e00, #ffaa00, transparent)',
             }} />
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       )}
     </AnimatePresence>
   );
@@ -402,7 +392,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                 }}>
                   {isGhost ? '' : (team.name || 'TEAM')}
                   {isElim && !isGhost && (
-                    <motion.div initial={{ scaleX: 0 }} animate={{ scaleX: 1 }} transition={{ duration: 0.3 }}
+                    <div
                       style={{ position: 'absolute', left: 8, right: 0, top: '50%', height: 1.5, background: accent, transformOrigin: 'left', opacity: 0.7 }} />
                   )}
                 </div>
@@ -416,7 +406,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                         : slot.name === null ? 'rgba(255,255,255,0.03)'
                         : 'rgba(255,255,255,0.08)';
                     return (
-                      <motion.div key={si} animate={{ backgroundColor: bg }} transition={{ duration: 0.25 }}
+                      <div key={si}
                         style={{
                           width: 8, height: 18, flexShrink: 0,
                           boxShadow: !isGhost && slot.alive ? '0 0 4px ' + green : 'none',
@@ -503,10 +493,7 @@ export function MatchInfoChip({ currentMatch, design }) {
   const tName = (design?.tournamentName || 'BOOYAH').toUpperCase();
 
   return (
-    <motion.div
-      initial={{ x: 0, opacity: 1 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
+    <div
       style={{ position: 'absolute', left: 24, bottom: 32, zIndex: 10 }}
     >
       {/* Container with diagonal-cut accent bar */}
@@ -613,7 +600,7 @@ export function MatchInfoChip({ currentMatch, design }) {
           50% { opacity: 0.5; transform: scale(0.85); }
         }
       `}</style>
-    </motion.div>
+    </div>
   );
 }
 
@@ -664,10 +651,7 @@ export function GameIntroBanner({ currentMatch, design }) {
       }} />
 
       {/* Main Diagonal-Cut Banner with Framer Motion Entrance */}
-      <motion.div
-        initial={{ scaleY: 0, opacity: 0 }}
-        animate={{ scaleY: 1, opacity: 1 }}
-        transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      <div
         style={{
           width: 950,
           height: 140,
@@ -760,13 +744,10 @@ export function GameIntroBanner({ currentMatch, design }) {
             </span>
           )}
         </div>
-      </motion.div>
+      </div>
 
       {/* Map Badge Pill below the banner */}
-      <motion.div
-        initial={{ y: 30, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.5, delay: 0.4, ease: 'easeOut' }}
+      <div
         style={{
           background: 'rgba(9, 10, 15, 0.85)',
           border: '2px solid rgba(240, 168, 24, 0.45)',
@@ -798,13 +779,10 @@ export function GameIntroBanner({ currentMatch, design }) {
         }}>
           {mapName}
         </span>
-      </motion.div>
+      </div>
 
       {/* Tournament Branding Logo/Name in Top Left Corner */}
-      <motion.div
-        initial={{ x: -30, opacity: 0 }}
-        animate={{ x: 0, opacity: 1 }}
-        transition={{ duration: 0.6, delay: 0.2 }}
+      <div
         style={{
           position: 'absolute',
           top: 50,
@@ -833,14 +811,11 @@ export function GameIntroBanner({ currentMatch, design }) {
             {tName}
           </span>
         )}
-      </motion.div>
+      </div>
 
       {/* Sponsor logo bottom-right */}
       {sponsorLogo && (
-        <motion.img 
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 0.85 }}
-          transition={{ duration: 0.6, delay: 0.5 }}
+        <motion.img
           src={sponsorLogo} 
           alt="" 
           style={{
@@ -999,10 +974,7 @@ export function MatchScheduleGrid({ design }) {
         boxSizing: 'border-box',
       }}>
         {/* Header Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: -30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6 }}
+        <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -1068,11 +1040,10 @@ export function MatchScheduleGrid({ design }) {
                 onError={e => { e.target.style.display = 'none'; }} />
             </div>
           )}
-        </motion.div>
+        </div>
 
         {/* 6 Map Cards Horizontal Grid */}
-        <motion.div 
-          variants={containerVariants}
+        <div
           initial="hidden"
           animate="show"
           style={{
@@ -1090,15 +1061,8 @@ export function MatchScheduleGrid({ design }) {
             const mapImg = mapImages?.[mapName] || null;
 
             return (
-              <motion.div
+              <div
                 key={idx}
-                variants={cardVariants}
-                whileHover={{ 
-                  scale: 1.04, 
-                  y: -8, 
-                  boxShadow: '0 15px 35px rgba(255, 199, 0, 0.25), 0 0 15px rgba(255, 255, 255, 0.1)',
-                  borderColor: 'rgba(255, 199, 0, 0.8)'
-                }}
                 style={{
                   height: 480,
                   borderRadius: 16,
@@ -1249,13 +1213,10 @@ export function MatchScheduleGrid({ design }) {
               </div>
             );
           })}
-        </motion.div>
+        </div>
 
         {/* Footer Section */}
-        <motion.div 
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.6, delay: 0.3 }}
+        <div
           style={{
             display: 'flex',
             justifyContent: 'space-between',
@@ -1399,17 +1360,8 @@ export function PointRushStandings({ teams = [], design }) {
                 }
 
                 return (
-                  <motion.div
+                  <div
                     key={team.id || idx}
-                    initial={{ opacity: 0, x: 100 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 100 }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 120,
-                      damping: 18,
-                      delay: idx * 0.05
-                    }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -1508,7 +1460,7 @@ export function PointRushStandings({ teams = [], design }) {
                     }}>
                       {team.total_tournament_points || 0}
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
@@ -1548,17 +1500,8 @@ export function PointRushStandings({ teams = [], design }) {
                 const isRushEligible = team.champion_rush_eligible === true;
                 
                 return (
-                  <motion.div
+                  <div
                     key={team.id || idx}
-                    initial={{ opacity: 0, x: 100 }}
-                    animate={{ opacity: 1, x: 0 }}
-                    exit={{ opacity: 0, x: 100 }}
-                    transition={{
-                      type: 'spring',
-                      stiffness: 120,
-                      damping: 18,
-                      delay: (idx + 6) * 0.05
-                    }}
                     style={{
                       display: 'flex',
                       alignItems: 'center',
@@ -1657,7 +1600,7 @@ export function PointRushStandings({ teams = [], design }) {
                     }}>
                       {team.total_tournament_points || 0}
                     </div>
-                  </motion.div>
+                  </div>
                 );
               })}
             </div>
@@ -1792,7 +1735,7 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
       {/* Content */}
       <div style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', padding: '60px 80px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
         {/* Header */}
-        <motion.div initial={{ opacity: 0, y: -20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.5 }}
+        <div
           style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', borderBottom: `2px solid ${accent}30`, paddingBottom: 20, marginBottom: 30 }}>
           <div style={{ display: 'flex', alignItems: 'center', gap: 20 }}>
             {tLogo ? (
@@ -1817,19 +1760,18 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
             {/* Progress bar */}
             <div style={{ display: 'flex', alignItems: 'center', gap: 12 }}>
               <div style={{ width: 200, height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
-                <motion.div initial={{ width: 0 }} animate={{ width: `${progressPct}%` }} transition={{ duration: 1, delay: 0.5 }}
+                <div animate={{ width: `${progressPct}%` }}
                   style={{ height: '100%', background: `linear-gradient(90deg, ${accent}, ${accent2})`, borderRadius: 4, boxShadow: `0 0 10px ${accent}80` }} />
               </div>
               <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 800, color: accent }}>{completedMatches}/{totalMatches}</span>
             </div>
           </div>
-        </motion.div>
+        </div>
 
         {/* Stage columns */}
         <div style={{ flex: 1, display: 'flex', gap: 24, alignItems: 'stretch' }}>
           {stages.map((stage, si) => (
-            <motion.div key={si}
-              initial={{ opacity: 0, x: 30 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.5, delay: 0.2 + si * 0.15 }}
+            <div key={si}
               style={{ flex: 1, display: 'flex', flexDirection: 'column' }}>
               {/* Stage header */}
               <div style={{
@@ -1903,7 +1845,7 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
                   ));
                 })()}
               </div>
-            </motion.div>
+            </div>
           ))}
         </div>
 
@@ -1994,7 +1936,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
       <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 6, background: `linear-gradient(90deg, ${accent}, ${accent2}, ${gold})`, boxShadow: `0 0 20px ${accent}50` }} />
 
       {/* Content */}
-      <motion.div initial={{ opacity: 0, scale: 0.98 }} animate={{ opacity: 1, scale: 1 }} transition={{ duration: 0.6, ease: [0.16, 1, 0.3, 1] }}
+      <div
         style={{ position: 'relative', zIndex: 1, width: '100%', height: '100%', padding: '80px 100px', display: 'flex', flexDirection: 'column', boxSizing: 'border-box' }}>
 
         {/* Top section: Logo + Tournament name + Sponsor */}
@@ -2139,7 +2081,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
             FREE FIRE ESPORTS BROADCAST
           </span>
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
