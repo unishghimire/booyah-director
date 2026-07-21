@@ -175,7 +175,7 @@ export default function Settings() {
       <label className="font-orbitron text-[9px] text-gray-500 tracking-wider block mb-1.5">{label}</label>
       <input type={type} value={settings[field] || ''} onChange={e => setSettings(s => ({...s, [field]: type === 'number' ? +e.target.value : e.target.value}))}
         placeholder={placeholder}
-        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#FF6B00]/50 font-mono"
+        className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#7C3AED]/50 font-mono"
       />
     </div>
   );
@@ -196,7 +196,7 @@ export default function Settings() {
               onClick={() => setPaymentTab('esewa')}
               className={`flex items-center gap-2 px-4 py-2.5 font-orbitron text-[10px] font-black tracking-wider transition-all border-b-2 -mb-[1px] ${
                 paymentTab === 'esewa'
-                  ? 'border-[#FF6B00] text-white bg-[#FF6B00]/5'
+                  ? 'border-[#7C3AED] text-white bg-[#7C3AED]/5'
                   : 'border-transparent text-gray-500 hover:text-gray-300'
               }`}
             >
@@ -206,7 +206,7 @@ export default function Settings() {
               onClick={() => setPaymentTab('bank')}
               className={`flex items-center gap-2 px-4 py-2.5 font-orbitron text-[10px] font-black tracking-wider transition-all border-b-2 -mb-[1px] ${
                 paymentTab === 'bank'
-                  ? 'border-[#00D4FF] text-white bg-[#00D4FF]/5'
+                  ? 'border-[#3B82F6] text-white bg-[#3B82F6]/5'
                   : 'border-transparent text-gray-500 hover:text-gray-300'
               }`}
             >
@@ -385,7 +385,7 @@ export default function Settings() {
 
           {/* ImgBB Configuration */}
           <div className="pt-4 border-t border-white/5 space-y-3">
-            <div className="flex items-center gap-2 text-[#FF6B00]">
+            <div className="flex items-center gap-2 text-[#7C3AED]">
               <Key className="w-4 h-4" />
               <span className="font-orbitron text-[10px] font-black tracking-wider">IMAGE UPLOAD CONFIGURATION</span>
             </div>
@@ -396,10 +396,10 @@ export default function Settings() {
                 value={settings.imgbbApiKey || ''} 
                 onChange={e => setSettings(s => ({...s, imgbbApiKey: e.target.value}))}
                 placeholder="Paste your ImgBB API key here"
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#FF6B00]/50 font-mono"
+                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#7C3AED]/50 font-mono"
               />
               <p className="font-orbitron text-[8px] text-gray-500 mt-1.5 tracking-wider">
-                Used for QR code image uploads. Get your key at <a href="https://imgbb.com" target="_blank" rel="noopener noreferrer" className="text-[#00D4FF] hover:underline">imgbb.com</a>
+                Used for QR code image uploads. Get your key at <a href="https://imgbb.com" target="_blank" rel="noopener noreferrer" className="text-[#3B82F6] hover:underline">imgbb.com</a>
               </p>
             </div>
           </div>
@@ -408,7 +408,7 @@ export default function Settings() {
           <div className="pt-2">
             <button onClick={save} disabled={saving}
               className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-orbitron text-[11px] font-black text-white tracking-wider disabled:opacity-50"
-              style={{ background: 'linear-gradient(135deg, #FF6B00, #ff8c00)' }}>
+              style={{ background: 'linear-gradient(135deg, #7C3AED, #3B82F6)' }}>
               <Save className="w-4 h-4" /> {saving ? 'SAVING...' : 'SAVE SETTINGS'}
             </button>
           </div>
@@ -429,20 +429,20 @@ export default function Settings() {
           <div className="flex items-center gap-3">
             <input type="checkbox" id="maintenance" checked={settings.maintenanceMode}
               onChange={e => setSettings(s => ({...s, maintenanceMode: e.target.checked}))}
-              className="w-4 h-4 accent-[#FF6B00]"
+              className="w-4 h-4 accent-[#7C3AED]"
             />
             <label htmlFor="maintenance" className="font-orbitron text-[10px] text-gray-400">MAINTENANCE MODE</label>
           </div>
           <div className="flex items-center gap-3">
             <input type="checkbox" id="newregs" checked={settings.allowNewRegistrations}
               onChange={e => setSettings(s => ({...s, allowNewRegistrations: e.target.checked}))}
-              className="w-4 h-4 accent-[#FF6B00]"
+              className="w-4 h-4 accent-[#7C3AED]"
             />
             <label htmlFor="newregs" className="font-orbitron text-[10px] text-gray-400">ALLOW NEW REGISTRATIONS</label>
           </div>
           <button onClick={save} disabled={saving}
             className="flex items-center gap-2 px-5 py-2.5 rounded-lg font-orbitron text-[11px] font-black text-white tracking-wider disabled:opacity-50"
-            style={{ background: 'linear-gradient(135deg, #FF6B00, #ff8c00)' }}>
+            style={{ background: 'linear-gradient(135deg, #7C3AED, #3B82F6)' }}>
             <Save className="w-4 h-4" /> {saving ? 'SAVING...' : 'SAVE SETTINGS'}
           </button>
         </div>
@@ -460,7 +460,7 @@ export default function Settings() {
           </div>
           {loadingAdmins ? (
             <div className="flex items-center justify-center h-24">
-              <div className="h-6 w-6 rounded-full border-2 border-[#FF6B00]/20 border-t-[#FF6B00] animate-spin" />
+              <div className="h-6 w-6 rounded-full border-2 border-[#7C3AED]/20 border-t-[#7C3AED] animate-spin" />
             </div>
           ) : admins.length === 0 ? (
             <div className="text-center py-6 font-orbitron text-[10px] text-gray-600">NO ADMINS FOUND</div>

@@ -4,7 +4,7 @@ import Modal from '../components/Modal';
 import { adminFetch } from './Dashboard';
 import toast from 'react-hot-toast';
 
-const STATUS_COLORS = { active: '#22c55e', suspended: '#FF6B00', banned: '#ef4444' };
+const STATUS_COLORS = { active: '#22c55e', suspended: '#7C3AED', banned: '#ef4444' };
 const PLANS = { weekly: { label: 'Weekly', price: 299 }, monthly: { label: 'Monthly', price: 599 }, yearly: { label: 'Yearly', price: 2999 } };
 
 export default function Users() {
@@ -73,7 +73,7 @@ export default function Users() {
       <div className="relative mb-4">
         <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-500" />
         <input value={search} onChange={e => setSearch(e.target.value)} placeholder="Search users..."
-          className="w-full bg-[#0a0e1a] border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white outline-none focus:border-[#FF6B00]/50 font-mono"
+          className="w-full bg-[#0a0e1a] border border-white/10 rounded-lg pl-10 pr-4 py-2.5 text-sm text-white outline-none focus:border-[#7C3AED]/50 font-mono"
         />
       </div>
 
@@ -84,7 +84,7 @@ export default function Users() {
         </div>
         {loading ? (
           <div className="flex items-center justify-center h-32">
-            <div className="h-6 w-6 rounded-full border-2 border-[#FF6B00]/20 border-t-[#FF6B00] animate-spin" />
+            <div className="h-6 w-6 rounded-full border-2 border-[#7C3AED]/20 border-t-[#7C3AED] animate-spin" />
           </div>
         ) : filtered.length === 0 ? (
           <div className="text-center py-12 font-orbitron text-[10px] text-gray-600">NO USERS FOUND</div>
@@ -108,13 +108,13 @@ export default function Users() {
                   {isActive ? (sub.plan?.toUpperCase() || '—') : 'NO PLAN'}
                 </span>
                 {isActive && sub.discountPercent > 0 && (
-                  <span className="ml-2 text-[8px] text-[#FF6B00]">-{sub.discountPercent}%</span>
+                  <span className="ml-2 text-[8px] text-[#7C3AED]">-{sub.discountPercent}%</span>
                 )}
               </div>
               <div className="font-mono text-[10px] text-gray-400">{expiryDate}</div>
               <div className="flex gap-1">
                 <button onClick={() => { setSubModal(user.uid); setSelectedUser(user); setSubForm({ plan: sub?.plan || 'monthly', discountPercent: 0, notes: '' }); }}
-                  className="p-1.5 rounded border border-[#00D4FF]/30 text-[#00D4FF] hover:bg-[#00D4FF]/10 transition-all font-orbitron text-[9px] font-bold flex items-center gap-1" title="Extend/Assign Subscription">
+                  className="p-1.5 rounded border border-[#3B82F6]/30 text-[#3B82F6] hover:bg-[#3B82F6]/10 transition-all font-orbitron text-[9px] font-bold flex items-center gap-1" title="Extend/Assign Subscription">
                   <CreditCard className="w-3 h-3" /> EXTEND
                 </button>
                 {isActive && (
@@ -131,7 +131,7 @@ export default function Users() {
                 )}
                 {user.status !== 'suspended' && (
                   <button onClick={() => setStatus(user.uid, 'suspended')}
-                    className="p-1.5 rounded border border-[#FF6B00]/30 text-[#FF6B00] hover:bg-[#FF6B00]/10 transition-all" title="Suspend User">
+                    className="p-1.5 rounded border border-[#7C3AED]/30 text-[#7C3AED] hover:bg-[#7C3AED]/10 transition-all" title="Suspend User">
                     <UserX className="w-3 h-3" />
                   </button>
                 )}
@@ -171,7 +171,7 @@ export default function Users() {
             <div>
               <label className="font-orbitron text-[9px] text-gray-500 tracking-wider block mb-1.5">PLAN</label>
               <select value={subForm.plan} onChange={e => setSubForm(p => ({...p, plan: e.target.value}))}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#FF6B00]/50">
+                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#7C3AED]/50">
                 {Object.entries(PLANS).map(([k, v]) => (
                   <option key={k} value={k}>{v.label} — NPR {v.price}</option>
                 ))}
@@ -181,14 +181,14 @@ export default function Users() {
               <label className="font-orbitron text-[9px] text-gray-500 tracking-wider block mb-1.5">DISCOUNT (%)</label>
               <input type="number" min="0" max="100" value={subForm.discountPercent}
                 onChange={e => setSubForm(p => ({...p, discountPercent: +e.target.value}))}
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#FF6B00]/50"
+                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#7C3AED]/50"
               />
             </div>
             <div>
               <label className="font-orbitron text-[9px] text-gray-500 tracking-wider block mb-1.5">NOTES</label>
               <input value={subForm.notes} onChange={e => setSubForm(p => ({...p, notes: e.target.value}))}
                 placeholder="e.g. Beta user, manual payment..."
-                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#FF6B00]/50"
+                className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2.5 text-sm text-white outline-none focus:border-[#7C3AED]/50"
               />
             </div>
             <div className="rounded-lg bg-black/30 p-3 border border-white/5 font-orbitron text-[10px]">
@@ -198,7 +198,7 @@ export default function Users() {
             </div>
             <button onClick={assignSub}
               className="w-full py-3 rounded-lg font-orbitron text-[11px] font-black text-white tracking-widest"
-              style={{ background: 'linear-gradient(135deg, #FF6B00, #ff8c00)' }}>
+              style={{ background: 'linear-gradient(135deg, #7C3AED, #3B82F6)' }}>
               ASSIGN SUBSCRIPTION
             </button>
           </div>

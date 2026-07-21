@@ -4,7 +4,7 @@ import Modal from '../components/Modal';
 import { adminFetch } from './Dashboard';
 import toast from 'react-hot-toast';
 
-const PLAN_COLORS  = { weekly: '#FF6B00', monthly: '#00D4FF', yearly: '#22c55e' };
+const PLAN_COLORS  = { weekly: '#7C3AED', monthly: '#3B82F6', yearly: '#22c55e' };
 const PLAN_PRICES  = { weekly: 299, monthly: 599, yearly: 2999 };
 const PLAN_LABELS  = { weekly: 'WEEKLY', monthly: 'MONTHLY', yearly: 'YEARLY' };
 
@@ -70,7 +70,7 @@ export default function Subscriptions() {
   };
 
   const TABS = [
-    { key: 'requests', label: 'PENDING REQUESTS', count: pending.length, color: '#FF6B00' },
+    { key: 'requests', label: 'PENDING REQUESTS', count: pending.length, color: '#7C3AED' },
     { key: 'active',   label: 'ACTIVE SUBS',      count: active.length,  color: '#22c55e' },
     { key: 'expired',  label: 'EXPIRED',           count: expired.length, color: '#ef4444' },
   ];
@@ -91,7 +91,7 @@ export default function Subscriptions() {
       {/* Stat cards */}
       <div className="grid grid-cols-4 gap-4 mb-6">
         {[
-          ['PENDING',       pending.length,  '#FF6B00', Bell],
+          ['PENDING',       pending.length,  '#7C3AED', Bell],
           ['ACTIVE',        active.length,   '#22c55e', Crown],
           ['EXPIRING SOON', expiring.length, '#facc15', Calendar],
           ['EXPIRED',       expired.length,  '#ef4444', CreditCard],
@@ -128,7 +128,7 @@ export default function Subscriptions() {
 
       {loading ? (
         <div className="flex items-center justify-center h-40">
-          <div className="h-7 w-7 rounded-full border-2 border-[#FF6B00]/20 border-t-[#FF6B00] animate-spin" />
+          <div className="h-7 w-7 rounded-full border-2 border-[#7C3AED]/20 border-t-[#7C3AED] animate-spin" />
         </div>
       ) : (
         <div className="rounded-xl border border-white/5 bg-[#0a0e1a] overflow-hidden">
@@ -217,7 +217,7 @@ export default function Subscriptions() {
                   </span>
                   <p className="font-orbitron text-[10px] text-gray-300">NPR {u.subscription.price}</p>
                   <p className="font-mono text-[9px] text-gray-400">{new Date(u.subscription.expiresAt).toLocaleDateString()}</p>
-                  <p className="font-orbitron text-[10px]" style={{ color: u.subscription.discountPercent > 0 ? '#FF6B00' : '#555' }}>
+                  <p className="font-orbitron text-[10px]" style={{ color: u.subscription.discountPercent > 0 ? '#7C3AED' : '#555' }}>
                     {u.subscription.discountPercent > 0 ? `-${u.subscription.discountPercent}%` : '—'}
                   </p>
                 </div>

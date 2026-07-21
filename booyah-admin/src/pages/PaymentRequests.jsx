@@ -17,8 +17,8 @@ import { adminFetch } from './Dashboard';
 import toast from 'react-hot-toast';
 
 const PLAN_COLORS = { 
-  weekly: '#00D4FF', 
-  monthly: '#FF6B00', 
+  weekly: '#3B82F6', 
+  monthly: '#7C3AED', 
   yearly: '#a855f7' 
 };
 
@@ -118,7 +118,7 @@ export default function PaymentRequests() {
       <div className="mb-6 flex items-center justify-between">
         <div>
           <h1 className="font-orbitron text-lg font-black text-white tracking-wider flex items-center gap-2">
-            <Receipt className="w-5 h-5 text-[#FF6B00]" /> PAYMENT REQUESTS
+            <Receipt className="w-5 h-5 text-[#7C3AED]" /> PAYMENT REQUESTS
           </h1>
           <p className="font-orbitron text-[9px] text-gray-500 mt-1">APPROVE OR REJECT MANUAL TRANSACTIONS</p>
         </div>
@@ -134,7 +134,7 @@ export default function PaymentRequests() {
       {/* Tabs */}
       <div className="flex gap-2 mb-6 border-b border-white/5 pb-4">
         {[
-          { key: 'PENDING', label: 'PENDING', color: '#00D4FF' },
+          { key: 'PENDING', label: 'PENDING', color: '#3B82F6' },
           { key: 'APPROVED', label: 'APPROVED', color: '#22c55e' },
           { key: 'REJECTED', label: 'REJECTED', color: '#ef4444' }
         ].map(t => (
@@ -165,7 +165,7 @@ export default function PaymentRequests() {
       {/* Main List */}
       {loading ? (
         <div className="flex items-center justify-center h-60">
-          <div className="h-8 w-8 rounded-full border-2 border-[#00D4FF]/20 border-t-[#00D4FF] animate-spin" />
+          <div className="h-8 w-8 rounded-full border-2 border-[#3B82F6]/20 border-t-[#3B82F6] animate-spin" />
         </div>
       ) : currentList.length === 0 ? (
         <div className="text-center py-20 rounded-xl border border-white/5 bg-[#0a0e1a]/50">
@@ -175,7 +175,7 @@ export default function PaymentRequests() {
       ) : (
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {currentList.map((req) => {
-            const planColor = PLAN_COLORS[req.plan?.toLowerCase()] || '#00D4FF';
+            const planColor = PLAN_COLORS[req.plan?.toLowerCase()] || '#3B82F6';
             return (
               <div 
                 key={req.id || req.requestId} 
@@ -216,7 +216,7 @@ export default function PaymentRequests() {
                   <div className="grid grid-cols-2 gap-4 text-[11px] font-orbitron text-gray-400">
                     <div>
                       <span className="text-[8px] text-gray-500 block tracking-wider">AMOUNT</span>
-                      <span className="text-[#00D4FF] font-black text-xs">
+                      <span className="text-[#3B82F6] font-black text-xs">
                         NPR {req.finalPrice}
                         {req.promoDiscount > 0 && (
                           <span className="text-[9px] text-gray-500 font-normal block">
@@ -272,7 +272,7 @@ export default function PaymentRequests() {
                           href={req.screenshotUrl} 
                           target="_blank" 
                           rel="noopener noreferrer"
-                          className="inline-flex items-center gap-1 text-[10px] text-[#00D4FF] hover:underline font-orbitron font-black mt-1"
+                          className="inline-flex items-center gap-1 text-[10px] text-[#3B82F6] hover:underline font-orbitron font-black mt-1"
                         >
                           VIEW PROOF <ExternalLink className="w-3 h-3" />
                         </a>

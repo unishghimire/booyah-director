@@ -61,8 +61,8 @@ export default function Logs() {
   const getLevelStyle = (level) => {
     const lvl = (level || '').toUpperCase();
     if (lvl === 'ERROR') return { bg: 'bg-[#ef4444]/10', border: 'border-[#ef4444]/30', text: 'text-[#ef4444]' };
-    if (lvl === 'WARN') return { bg: 'bg-[#FF6B00]/10', border: 'border-[#FF6B00]/30', text: 'text-[#FF6B00]' };
-    return { bg: 'bg-[#00D4FF]/10', border: 'border-[#00D4FF]/30', text: 'text-[#00D4FF]' };
+    if (lvl === 'WARN') return { bg: 'bg-[#7C3AED]/10', border: 'border-[#7C3AED]/30', text: 'text-[#7C3AED]' };
+    return { bg: 'bg-[#3B82F6]/10', border: 'border-[#3B82F6]/30', text: 'text-[#3B82F6]' };
   };
 
   return (
@@ -88,7 +88,7 @@ export default function Logs() {
             onClick={() => setAutoRefresh(!autoRefresh)}
             className={`flex items-center gap-2 px-3 py-1.5 rounded-lg border text-[9px] font-black tracking-wider transition-all ${
               autoRefresh 
-                ? 'bg-[#00D4FF]/10 border-[#00D4FF]/30 text-[#00D4FF]' 
+                ? 'bg-[#3B82F6]/10 border-[#3B82F6]/30 text-[#3B82F6]' 
                 : 'bg-white/5 border-white/5 text-gray-400 hover:text-white'
             }`}
           >
@@ -112,7 +112,7 @@ export default function Logs() {
       {/* Filters */}
       <div className="flex items-center justify-between bg-[#0a0e1a] border border-white/5 p-3 rounded-xl">
         <div className="flex items-center gap-2">
-          <Filter className="w-3.5 h-3.5 text-[#FF6B00]" />
+          <Filter className="w-3.5 h-3.5 text-[#7C3AED]" />
           <span className="text-[9px] font-black text-gray-500 tracking-widest mr-2">FILTER LEVEL:</span>
           {['ALL', 'ERROR', 'WARN', 'INFO'].map((lvl) => (
             <button
@@ -120,7 +120,7 @@ export default function Logs() {
               onClick={() => setFilter(lvl)}
               className={`px-3 py-1 rounded-md text-[9px] font-black tracking-widest transition-all ${
                 filter === lvl
-                  ? 'bg-[#FF6B00] text-black'
+                  ? 'bg-[#7C3AED] text-black'
                   : 'bg-white/3 text-gray-400 hover:bg-white/5 hover:text-white'
               }`}
             >
@@ -136,7 +136,7 @@ export default function Logs() {
       {/* Logs List / Loading / Empty */}
       {loading ? (
         <div className="flex flex-col items-center justify-center py-20 gap-4">
-          <div className="h-8 w-8 rounded-full border-2 border-[#FF6B00]/20 border-t-[#FF6B00] animate-spin" />
+          <div className="h-8 w-8 rounded-full border-2 border-[#7C3AED]/20 border-t-[#7C3AED] animate-spin" />
           <p className="text-[10px] text-gray-500 tracking-widest">FETCHING DIAGNOSTICS...</p>
         </div>
       ) : filteredLogs.length === 0 ? (

@@ -13,13 +13,13 @@ export default function Header({ user }) {
   return (
     <div className="h-16 bg-[#0a0e1a] border-b border-white/5 flex items-center justify-between px-6 flex-shrink-0">
       <div className="flex items-center gap-2">
-        <Shield className="w-4 h-4 text-[#FF6B00]" />
+        <Shield className="w-4 h-4 text-[#7C3AED]" />
         <span className="font-orbitron text-[10px] text-gray-400 tracking-wider">ADMIN CONTROL CENTER</span>
       </div>
       <div className="flex items-center gap-4">
         <div className="text-right">
           <p className="font-orbitron text-[10px] text-white">{user?.email}</p>
-          <p className="font-orbitron text-[8px] text-[#FF6B00]">SUPER ADMIN</p>
+          <p className="font-orbitron text-[8px] text-[#7C3AED]">SUPER ADMIN</p>
         </div>
         <button
           onClick={handleLogout}

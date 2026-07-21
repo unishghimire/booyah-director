@@ -1,6 +1,6 @@
 import React from 'react';
 
-export default function StatCard({ title, value, sub, icon: Icon, accent = '#FF6B00' }) {
+export default function StatCard({ title, value, sub, icon: Icon, accent = '#7C3AED' }) {
   return (
     <div className="rounded-xl border border-white/5 bg-[#0a0e1a] p-5" style={{ borderLeft: `3px solid ${accent}` }}>
       <div className="flex items-start justify-between">
