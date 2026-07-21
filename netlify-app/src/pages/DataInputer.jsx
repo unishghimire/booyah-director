@@ -4,6 +4,7 @@ import React, { useState, useMemo } from 'react';
 import SheetImport from '@/components/control/SheetImport';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
+import { useObsStore } from '@/lib/obsStore';
 import {
   Crosshair, Users, Clock, RefreshCw, Search, AlertTriangle,
   Skull, Shield, Trash2
@@ -35,6 +36,126 @@ export default function DataInputer() {
   const [playerAdding, setPlayerAdding] = useState(false);
 
   // General busy state
+
+  // Staged vs Live data architecture
+  const [stagedData, setStagedData] = useState({
+    kills: {},      // { playerId: stagedKillCount }
+    placements: {}, // { teamId: stagedPlacement }
+    eliminations: [], // array of { playerId, timestamp }
+  });
+  const [pushingLive, setPushingLive] = useState(false);
+
+  const hasStagedChanges = useMemo(() => {
+    const hasKillDiff = players.some(p => {
+      const stagedKill = stagedData.kills[p.id];
+      return stagedKill !== undefined && stagedKill !== (p.current_match_kills || 0);
+    });
+    const hasPlacementDiff = Object.keys(stagedData.placements).length > 0;
+    const hasEliminationDiff = stagedData.eliminations.length > 0;
+    return hasKillDiff || hasPlacementDiff || hasEliminationDiff;
+  }, [stagedData, players]);
+
+  const handleDiscardChanges = () => {
+    setStagedData({
+      kills: {},
+      placements: {},
+      eliminations: [],
+    });
+    toast('Staged changes discarded', { icon: '🗑️' });
+  };
+
+  const handlePushToLive = async () => {
+    if (!currentMatch?.id) return toast.error('No active match');
+    setPushingLive(true);
+    let successCount = 0;
+    let errorCount = 0;
+    try {
+      // 1. Push staged kills
+      for (const p of players) {
+        const liveKills = p.current_match_kills || 0;
+        const stagedKills = stagedData.kills[p.id] !== undefined ? stagedData.kills[p.id] : liveKills;
+        if (stagedKills > liveKills) {
+          const diff = stagedKills - liveKills;
+          const team = teams.find(t => t.id === p.team_id);
+          for (let i = 0; i < diff; i++) {
+            try {
+              await overlayApi.addKill({
+                killer_player_id: p.id,
+                match_id: currentMatch.id,
+                tournament_id: currentMatch.tournament_id || '',
+                killer_name: p.name,
+                killer_team_name: team?.name || '',
+                killed_player_name: '',
+                killed_team_name: '',
+              });
+              successCount++;
+            } catch (err) {
+              console.error(err);
+              errorCount++;
+            }
+          }
+        }
+      }
+
+      // 2. Push staged eliminations
+      for (const elimItem of stagedData.eliminations) {
+        const p = players.find(x => x.id === elimItem.playerId);
+        if (p && p.is_alive) {
+          const team = teams.find(t => t.id === p.team_id);
+          try {
+            await overlayApi.eliminatePlayer({
+              player_id:   p.id,
+              match_id:    currentMatch.id,
+              player_name: p.name,
+              team_name:   team?.name || '',
+              tournament_id: currentMatch.tournament_id || '',
+            });
+            successCount++;
+          } catch (err) {
+            console.error(err);
+            errorCount++;
+          }
+        }
+      }
+
+      // 3. Push staged placements
+      for (const teamId of Object.keys(stagedData.placements)) {
+        const placementVal = stagedData.placements[teamId];
+        if (placementVal) {
+          try {
+            await overlayApi.setTeamPlacement({
+              team_id: teamId,
+              match_id: currentMatch.id,
+              placement: Number(placementVal),
+              tournament_id: tournament?.id,
+            });
+            successCount++;
+          } catch (err) {
+            console.error(err);
+            errorCount++;
+          }
+        }
+      }
+
+      if (errorCount > 0) {
+        toast.error(`Pushed changes: ${successCount} succeeded, ${errorCount} failed.`);
+      } else if (successCount > 0) {
+        toast.success(`Successfully pushed ${successCount} changes to live!`);
+      }
+
+      // Reset staged data after successful push
+      setStagedData({
+        kills: {},
+        placements: {},
+        eliminations: [],
+      });
+      refresh();
+    } catch (err) {
+      toast.error(err.message || 'Error pushing to live');
+    } finally {
+      setPushingLive(false);
+    }
+  };
 
   const state = data?.overlayState || {};
   const currentMatch = data?.currentMatch;
@@ -195,7 +316,12 @@ export default function DataInputer() {
               }
             >
               <Icon className="h-4 w-4" />
-              {t.label}
+              <span className="flex items-center gap-1.5">
+                {t.label}
+                {t.id === 'live' && hasStagedChanges && (
+                  <span className="h-2 w-2 rounded-full bg-amber-500 animate-pulse" title="Staged changes pending" />
+                )}
+              </span>
               {isActive && (
                 <div className="absolute bottom-0 left-0 right-0 h-[2px] bg-[#3B82F6]" />
               )}
@@ -220,6 +346,42 @@ export default function DataInputer() {
             {activeTab === 'live' && (
               <SectionBoundary label="LIVE INPUT">
               <div className="space-y-6">
+                {/* Staged Data Action Bar */}
+                {hasStagedChanges && (
+                  <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 rounded-xl border border-amber-500/30 bg-amber-500/5 p-4 animate-fadeIn">
+                    <div className="flex items-center gap-3">
+                      <div className="h-2 w-2 rounded-full bg-amber-500 animate-ping" />
+                      <div>
+                        <h4 className="font-orbitron text-xs font-black text-amber-500 uppercase tracking-wider">
+                          Staged Changes Pending
+                        </h4>
+                        <p className="text-[10px] text-gray-400 mt-0.5">
+                          You have modified player kills, eliminations, or placements. Push to make them live.
+                        </p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <button
+                        onClick={handleDiscardChanges}
+                        className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 font-orbitron text-[10px] font-black text-gray-300 hover:bg-white/10 transition-all"
+                      >
+                        DISCARD
+                      </button>
+                      <button
+                        onClick={handlePushToLive}
+                        disabled={pushingLive}
+                        className="flex items-center gap-1.5 rounded-lg bg-amber-500 px-4 py-1.5 font-orbitron text-[10px] font-black text-black hover:bg-amber-400 transition-all shadow-lg shadow-amber-500/10 disabled:opacity-50"
+                      >
+                        {pushingLive ? (
+                          <RefreshCw className="h-3 w-3 animate-spin" />
+                        ) : (
+                          'PUSH TO LIVE'
+                        )}
+                      </button>
+                    </div>
+                  </div>
+                )}
+
                 {/* Search bar */}
                 <div className="relative">
                   <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
@@ -259,6 +421,8 @@ export default function DataInputer() {
                         currentMatch={currentMatch}
                         tournament={tournament}
                         onAction={refresh}
+                        stagedData={stagedData}
+                        setStagedData={setStagedData}
                       />
                     );
                   })}
@@ -489,12 +653,40 @@ export default function DataInputer() {
                     <Skull className="h-4 w-4 text-[#ef4444]" />
                   </div>
                   <div className="space-y-2 max-h-[500px] overflow-y-auto">
-                    {eliminations.length === 0 ? (
+                    {stagedData.eliminations.length === 0 && eliminations.length === 0 ? (
                       <p className="text-center text-[11px] text-gray-600 py-6">
                         No eliminations logged in this match yet
                       </p>
                     ) : (
-                      safeArray(eliminations).map((e, idx) => (
+                      <>
+                        {/* Staged Eliminations */}
+                        {stagedData.eliminations.map((se) => {
+                          const player = players.find(p => p.id === se.playerId);
+                          if (!player) return null;
+                          return (
+                            <div
+                              key={`staged-${se.playerId}`}
+                              className="flex items-center justify-between bg-amber-500/5 border border-amber-500/20 p-3 rounded-lg text-xs animate-pulse"
+                            >
+                              <div className="flex items-center gap-2">
+                                <Skull className="h-3.5 w-3.5 text-amber-500" />
+                                <span className="font-orbitron font-bold text-white">
+                                  {player.name}
+                                </span>
+                                <span className="text-gray-600 font-bold">//</span>
+                                <span className="font-orbitron text-[10px] font-black text-amber-500">
+                                  PENDING ELIMINATION
+                                </span>
+                              </div>
+                              <span className="text-[9px] font-mono text-amber-500 font-bold">
+                                PENDING
+                              </span>
+                            </div>
+                          );
+                        })}
+
+                        {/* Live Eliminations */}
+                        {safeArray(eliminations).map((e, idx) => (
                         <div
                           key={idx}
                           className="flex items-center justify-between bg-red-950/5 border border-red-900/10 p-3 rounded-lg text-xs"
@@ -513,7 +705,8 @@ export default function DataInputer() {
                             {new Date(e.timestamp || e.created_at || Date.now()).toLocaleTimeString()}
                           </span>
                         </div>
-                      ))
+                      ))}
+                      </>
                     )}
                   </div>
                 </div>
@@ -538,32 +731,25 @@ function TeamInputCard({
   currentMatch,
   tournament,
   onAction,
+  stagedData,
+  setStagedData,
 }) {
-  const [placement, setPlacement] = useState('');
   const [busy, setBusy] = useState(false);
   const [showConfirmDelete, setShowConfirmDelete] = useState(false);
 
-  const handleSetPlacement = async () => {
-    if (!placement) return toast.error('Select placement rank');
-    if (!currentMatch?.id) return toast.error('Start a match first');
-    setBusy(true);
-    try {
-      const r = await overlayApi.setTeamPlacement({
-        team_id: team.id,
-        match_id: currentMatch.id,
-        placement: Number(placement),
-        tournament_id: tournament?.id,
-      });
-      toast.success(
-        `${team.name}: Placement #${placement} (+${r.placement_points || 0} pts)`
-      );
-      setPlacement('');
-      onAction();
-    } catch (err) {
-      toast.error(err.message || 'Error setting placement');
-    } finally {
-      setBusy(false);
-    }
+  const stagedPlacement = stagedData.placements[team.id] || '';
+  const isStagedPlacementDiff = stagedPlacement !== '';
+
+  const handleSelectPlacement = (val) => {
+    setStagedData(prev => {
+      const nextPlacements = { ...prev.placements };
+      if (!val) {
+        delete nextPlacements[team.id];
+      } else {
+        nextPlacements[team.id] = Number(val);
+      }
+      return { ...prev, placements: nextPlacements };
+    });
   };
 
   const handleDeleteTeam = async () => {
@@ -740,6 +926,8 @@ function TeamInputCard({
               teamColor={teamColor}
               currentMatch={currentMatch}
               onAction={onAction}
+              stagedData={stagedData}
+              setStagedData={setStagedData}
             />
           ))
         )}
@@ -765,14 +953,18 @@ function TeamInputCard({
 
       {/* Placement row (bottom) */}
       <div className="flex items-center gap-2 border-t border-white/[0.04] bg-black/20 px-3 py-2">
-        <Shield className="h-3.5 w-3.5 flex-shrink-0 text-gray-500" />
-        <span className="text-[9px] font-orbitron font-black text-gray-500 flex-shrink-0">
-          PLACEMENT
+        <Shield className={`h-3.5 w-3.5 flex-shrink-0 ${isStagedPlacementDiff ? 'text-amber-500' : 'text-gray-500'}`} />
+        <span className={`text-[9px] font-orbitron font-black flex-shrink-0 ${isStagedPlacementDiff ? 'text-amber-500' : 'text-gray-500'}`}>
+          PLACEMENT {isStagedPlacementDiff && '(STAGED)'}
         </span>
         <select
-          value={placement}
-          onChange={(e) => setPlacement(e.target.value)}
-          className="flex-1 rounded border border-white/10 bg-[#13131f] px-2 py-1 text-[11px] font-semibold text-white outline-none focus:border-[#3B82F6]/40"
+          value={stagedPlacement}
+          onChange={(e) => handleSelectPlacement(e.target.value)}
+          className={`flex-1 rounded border px-2 py-1 text-[11px] font-semibold outline-none transition-all ${
+            isStagedPlacementDiff
+              ? 'border-amber-500/30 bg-amber-500/5 text-amber-400 focus:border-amber-500/50'
+              : 'border-white/10 bg-[#13131f] text-white focus:border-[#3B82F6]/40'
+          }`}
         >
           <option value="">— rank —</option>
           {Array.from({ length: 12 }, (_, i) => i + 1).map((n) => (
@@ -781,14 +973,14 @@ function TeamInputCard({
             </option>
           ))}
         </select>
-        <button
-          onClick={handleSetPlacement}
-          disabled={busy || !placement}
-          className="rounded px-3 py-1 font-orbitron text-[10px] font-black text-black tracking-wider transition-all"
-          style={{ background: teamColor }}
-        >
-          SET
-        </button>
+        {isStagedPlacementDiff && (
+          <button
+            onClick={() => handleSelectPlacement('')}
+            className="rounded px-2 py-1 font-orbitron text-[9px] font-black border border-amber-500/30 bg-amber-500/10 text-amber-400 hover:bg-amber-500/20 active:scale-95 transition-all"
+          >
+            CLEAR
+          </button>
+        )}
       </div>
     </div>
   );
@@ -797,53 +989,25 @@ function TeamInputCard({
 /* ─────────────────────────────────────────
    PLAYER INPUT CARD COMPONENT
 ───────────────────────────────────────── */
-function PlayerInputCard({ player, team, teamColor, currentMatch, onAction }) {
+function PlayerInputCard({ player, team, teamColor, currentMatch, onAction, stagedData, setStagedData }) {
   const [busy, setBusy] = useState(null);
-  const alive = player.is_alive;
-  const kills = player.current_match_kills || 0;
 
-  const handleKill = async () => {
-    if (!currentMatch?.id) {
-      return toast.error('Start a match first in Director Panel');
-    }
-    setBusy('kill');
-    try {
-      const r = await overlayApi.addKill({
-        killer_player_id: player.id,
-        match_id: currentMatch.id,
-        tournament_id: currentMatch.tournament_id || '',
-        killer_name: player.name,
-        killer_team_name: team?.name || '',
-        killed_player_name: '',
-        killed_team_name: '',
-      });
-      toast.success(`+1 Kill for ${player.name}!`);
-      onAction();
-    } catch (err) {
-      toast.error(err.message || 'Error adding kill');
-    } finally {
-      setBusy(null);
-    }
-  };
+  const liveKills = player.current_match_kills || 0;
+  const stagedKills = stagedData.kills[player.id] !== undefined ? stagedData.kills[player.id] : liveKills;
+  const isStagedKillDiff = stagedKills !== liveKills;
 
-  const handleEliminate = async () => {
-    if (!currentMatch?.id) return toast.error('No active match');
-    setBusy('elim');
-    try {
-      await overlayApi.eliminatePlayer({
-        player_id:   player.id,
-        match_id:    currentMatch.id,
-        player_name: player.name,
-        team_name:   team?.name || '',
-        tournament_id: currentMatch.tournament_id || '',
-      });
-      toast(`Player "${player.name}" has been eliminated.`, { icon: '💀' });
-      onAction();
-    } catch (err) {
-      toast.error(err.message || 'Error eliminating player');
-    } finally {
-      setBusy(null);
-    }
+  const isPendingElim = stagedData.eliminations.some(e => e.playerId === player.id);
+  const stagedAlive = player.is_alive && !isPendingElim;
+
+  const handleEliminate = () => {
+    setStagedData(prev => {
+      if (prev.eliminations.some(e => e.playerId === player.id)) return prev;
+      return {
+        ...prev,
+        eliminations: [...prev.eliminations, { playerId: player.id, timestamp: Date.now() }]
+      };
+    });
+    toast(`Staged elimination for ${player.name}`, { icon: '💀' });
   };
 
   const handleRevive = async () => {
@@ -863,57 +1027,118 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction }) {
     <div
       className="rounded-lg border p-2.5 transition-all flex flex-col justify-between"
       style={{
-        borderColor: alive ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 68, 68, 0.1)',
-        background: alive ? 'rgba(255, 255, 255, 0.02)' : 'rgba(239, 68, 68, 0.02)',
-        opacity: alive ? 1 : 0.6,
+        borderColor: stagedAlive ? 'rgba(255, 255, 255, 0.06)' : 'rgba(239, 68, 68, 0.1)',
+        background: stagedAlive ? 'rgba(255, 255, 255, 0.02)' : 'rgba(239, 68, 68, 0.02)',
+        opacity: stagedAlive ? 1 : 0.6,
       }}
     >
       <div className="flex items-center justify-between gap-1.5 mb-2">
         <div className="flex items-center gap-1.5 min-w-0">
-          {alive ? (
+          {stagedAlive ? (
             <span className="h-1.5 w-1.5 rounded-full bg-[#7BC043] flex-shrink-0" />
           ) : (
             <span className="h-1.5 w-1.5 rounded-full bg-[#ef4444] flex-shrink-0" />
           )}
           <span
             className={`font-orbitron text-[10px] font-black truncate ${
-              alive ? 'text-white' : 'text-gray-500 line-through'
+              stagedAlive ? 'text-white' : 'text-gray-500 line-through'
             }`}
           >
             {player.name}
           </span>
         </div>
-        <span className="rounded bg-[#7C3AED]/10 border border-[#7C3AED]/20 px-1.5 py-0.5 font-mono text-[9px] font-bold text-[#7C3AED] tabular-nums">
-          {kills} K
+        <span className={`rounded px-1.5 py-0.5 font-mono text-[9px] font-bold tabular-nums border transition-all ${
+          isStagedKillDiff
+            ? 'bg-amber-500/10 border-amber-500/30 text-amber-400'
+            : 'bg-[#7C3AED]/10 border-[#7C3AED]/20 text-[#7C3AED]'
+        }`}>
+          {stagedKills} K {isStagedKillDiff && <span className="text-[8px] text-amber-500 font-normal">({liveKills})</span>}
         </span>
       </div>
 
-      {alive ? (
+      {stagedAlive ? (
         <div className="flex gap-1">
-          <button
-            onClick={handleKill}
-            disabled={busy !== null}
-            className="flex-1 rounded py-1 font-orbitron text-[9px] font-black text-black hover:brightness-110 active:scale-95 transition-all"
-            style={{ background: teamColor }}
-          >
-            {busy === 'kill' ? '...' : '+KILL'}
-          </button>
+          {/* Kill Stepper */}
+          <div className="flex-1 flex items-center bg-black/20 rounded border border-white/5 overflow-hidden">
+            <button
+              onClick={() => {
+                if (stagedKills > 0) {
+                  setStagedData(prev => {
+                    const nextKills = stagedKills - 1;
+                    const newKills = { ...prev.kills };
+                    if (nextKills === liveKills) {
+                      delete newKills[player.id];
+                    } else {
+                      newKills[player.id] = nextKills;
+                    }
+                    return { ...prev, kills: newKills };
+                  });
+                }
+              }}
+              disabled={stagedKills <= 0}
+              className="px-2 py-1 text-gray-400 hover:text-white hover:bg-white/5 active:scale-90 transition-all font-bold text-xs"
+            >
+              -
+            </button>
+            <span className={`flex-1 text-center font-orbitron text-[10px] font-black ${isStagedKillDiff ? 'text-amber-400' : 'text-white'}`}>
+              {stagedKills}
+            </span>
+            <button
+              onClick={() => {
+                setStagedData(prev => {
+                  const nextKills = stagedKills + 1;
+                  const newKills = { ...prev.kills };
+                  if (nextKills === liveKills) {
+                    delete newKills[player.id];
+                  } else {
+                    newKills[player.id] = nextKills;
+                  }
+                  return { ...prev, kills: newKills };
+                });
+              }}
+              className="px-2 py-1 text-gray-400 hover:text-white hover:bg-white/5 active:scale-90 transition-all font-bold text-xs"
+            >
+              +
+            </button>
+          </div>
           <button
             onClick={handleEliminate}
-            disabled={busy !== null}
             className="rounded border border-red-500/30 hover:bg-red-500/10 px-2 py-1 font-orbitron text-[9px] font-black text-[#ef4444] active:scale-95 transition-all"
           >
-            {busy === 'elim' ? '...' : 'ELIM'}
+            ELIM
           </button>
         </div>
       ) : (
-        <button
-          onClick={handleRevive}
-          disabled={busy !== null}
-          className="w-full rounded border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] py-1 font-orbitron text-[9px] font-black text-gray-400 active:scale-95 transition-all"
-        >
-          {busy === 'revive' ? '...' : 'REVIVE'}
-        </button>
+        <div className="w-full">
+          {isPendingElim ? (
+            <div className="flex flex-col gap-1 w-full">
+              <div className="flex items-center justify-between text-[9px] text-amber-500 font-orbitron font-bold px-2 py-1 bg-amber-500/10 border border-amber-500/20 rounded">
+                <span>💀 PENDING ELIM</span>
+                <span className="animate-pulse h-1.5 w-1.5 rounded-full bg-amber-500" />
+              </div>
+              <button
+                onClick={() => {
+                  setStagedData(prev => ({
+                    ...prev,
+                    eliminations: prev.eliminations.filter(e => e.playerId !== player.id)
+                  }));
+                  toast(`Cancelled staged elimination for ${player.name}`);
+                }}
+                className="w-full rounded border border-amber-500/30 bg-amber-500/5 hover:bg-amber-500/10 py-1 font-orbitron text-[9px] font-black text-amber-400 active:scale-95 transition-all"
+              >
+                UNDO ELIM
+              </button>
+            </div>
+          ) : (
+            <button
+              onClick={handleRevive}
+              disabled={busy !== null}
+              className="w-full rounded border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] py-1 font-orbitron text-[9px] font-black text-gray-400 active:scale-95 transition-all"
+            >
+              {busy === 'revive' ? '...' : 'REVIVE'}
+            </button>
+          )}
+        </div>
       )}
     </div>
   );
