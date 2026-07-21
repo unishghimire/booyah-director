@@ -38,11 +38,11 @@ function OverlayPreview({ url, label }) {
 
 export const OVERLAYS = [
   // Transparent overlays — sit on top of gameplay
-  { id: 'ff-scoreboard', label: 'FF SCOREBOARD',    icon: Monitor,    transparent: true,  desc: 'FFWS scoreboard + match info chip (dropdown + elim animations)' },
+  { id: 'ff-scoreboard', label: 'FF SCOREBOARD',    icon: Monitor,    transparent: true,  desc: 'NexOverlays scoreboard + match info chip (dropdown + elim animations)' },
   { id: 'standings',     label: 'FULL STANDINGS',   icon: Layers,     transparent: true,  desc: 'Full tournament points table' },
   // Full-scene replacements — solid background
-  { id: 'game-intro',    label: 'GAME INTRO',       icon: Gamepad2,   transparent: false, desc: 'FFWS game intro banner with map + match number' },
-  { id: 'schedule',      label: 'MAP SCHEDULE',     icon: Grid3x3,    transparent: false, desc: 'FFWS match schedule grid with all maps' },
+  { id: 'game-intro',    label: 'GAME INTRO',       icon: Gamepad2,   transparent: false, desc: 'NexOverlays game intro banner with map + match number' },
+  { id: 'schedule',      label: 'MAP SCHEDULE',     icon: Grid3x3,    transparent: false, desc: 'NexOverlays match schedule grid with all maps' },
   { id: 'teams',         label: 'TEAMS TODAY',      icon: Layers,     transparent: false, desc: 'Point Rush standings — dual column' },
   { id: 'casters',       label: 'CASTERS',           icon: Mic2,       transparent: false, desc: 'Caster & analyst profiles' },
   { id: 'mvp',           label: 'MVP REVEAL',        icon: Star,       transparent: false, desc: 'Match MVP player full-screen' },
