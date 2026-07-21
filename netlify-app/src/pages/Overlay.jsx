@@ -2396,7 +2396,7 @@ export default function Overlay() {
   const component = screens[screen] ?? screens[screen?.replace(/-/g,'_')] ?? null;
 
   return (
-    <div style={{ width:1920, height:1080, position:'relative', overflow:'hidden', background:'transparent' }}>
+    <div style={{ width:1920, height:1080, position:'relative', overflow:'hidden', background: screen === 'ff-scoreboard' || screen === 'ff_scoreboard' ? '#1a1a2e' : 'transparent' }}>
       {component}
       {/* Connection error badge — subtle, doesn't block OBS */}
       {error && (

@@ -287,11 +287,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
     <>
       <EliminatedTeamBanner team={elimBanner} design={design} />
 
-      <motion.div
-        initial={{ x: 0, opacity: 1 }}
-        animate={{ x: 0, opacity: 1 }}
-        exit={{ x: PANEL_W + 20, opacity: 0 }}
-        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+      <div
         style={{
           position: 'absolute',
           right: 20,
@@ -347,11 +343,8 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
             }
 
             return (
-              <motion.div
+              <div
                 key={team.id || idx}
-                initial={{ x: 0, opacity: isElim ? 0.3 : isGhost ? 0.12 : 1 }}
-                animate={{ x: 0, opacity: isElim ? 0.3 : isGhost ? 0.12 : 1 }}
-                transition={{ duration: 0.35, delay: idx * 0.03, ease: [0.16, 1, 0.3, 1] }}
                 style={{
                   width: '100%',
                   height: ROW_H,
@@ -450,7 +443,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                 }}>
                   {isGhost ? '' : (team.total_tournament_kills ?? 0)}
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </div>
@@ -474,7 +467,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
             {dayLabel} · {matchLabel.toUpperCase()}
           </span>
         </div>
-      </motion.div>
+      </div>
     </>
   );
 }
@@ -1253,7 +1246,7 @@ export function MatchScheduleGrid({ design }) {
                     {isRandom ? 'RANDOM SELECT' : 'CLASSIC MODE'}
                   </div>
                 </div>
-              </motion.div>
+              </div>
             );
           })}
         </motion.div>
@@ -1313,7 +1306,7 @@ export function MatchScheduleGrid({ design }) {
               LIVE OVERLAY V2.0
             </span>
           </div>
-        </motion.div>
+        </div>
       </div>
     </div>
   );
