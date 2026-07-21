@@ -288,7 +288,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       <EliminatedTeamBanner team={elimBanner} design={design} />
 
       <motion.div
-        initial={{ x: PANEL_W + 20, opacity: 0 }}
+        initial={{ x: 0, opacity: 1 }}
         animate={{ x: 0, opacity: 1 }}
         exit={{ x: PANEL_W + 20, opacity: 0 }}
         transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
@@ -302,7 +302,6 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
           display: 'flex',
           flexDirection: 'column',
           background: 'transparent',
-          filter: 'drop-shadow(0 4px 20px rgba(0,0,0,0.5))',
         }}
       >
         {/* ══ HEADER ══ */}
@@ -350,7 +349,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
             return (
               <motion.div
                 key={team.id || idx}
-                initial={{ x: 60, opacity: 0 }}
+                initial={{ x: 0, opacity: isElim ? 0.3 : isGhost ? 0.12 : 1 }}
                 animate={{ x: 0, opacity: isElim ? 0.3 : isGhost ? 0.12 : 1 }}
                 transition={{ duration: 0.35, delay: idx * 0.03, ease: [0.16, 1, 0.3, 1] }}
                 style={{
@@ -512,7 +511,7 @@ export function MatchInfoChip({ currentMatch, design }) {
 
   return (
     <motion.div
-      initial={{ x: -120, opacity: 0 }}
+      initial={{ x: 0, opacity: 1 }}
       animate={{ x: 0, opacity: 1 }}
       transition={{ duration: 0.5, delay: 0.8, ease: [0.16, 1, 0.3, 1] }}
       style={{ position: 'absolute', left: 24, bottom: 32, zIndex: 10 }}
