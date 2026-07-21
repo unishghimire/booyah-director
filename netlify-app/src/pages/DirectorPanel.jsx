@@ -65,20 +65,21 @@ export default function DirectorPanel() {
     toast.success('OBS Source URL copied!');
   };
 
-  // Preview/Take workflow
+  // Preview/Take workflow — OBS is the master controller
   const handleTake = async () => {
     if (!previewScreen || takeBusy) return;
     setTakeBusy(true);
     try {
+      // 1. Push data to overlays (Firebase RTDB → overlay browser sources in OBS)
       await overlayApi.switchOverlayScreen({ screen: previewScreen });
-      // Also switch OBS scene if connected
+      // 2. If OBS is connected, switch the OBS scene to match
       if (obsStatus === 'connected') {
         const screen = SCREENS.find(s => s.key === previewScreen);
         if (screen) {
-          try { await obsService.takeScene(screen.label); } catch {}
+          try { await obsService.takeScene(screen.label); } catch (e) { console.warn('OBS scene switch failed:', e.message); }
         }
       }
-      toast.success(`▶ ${previewScreen.replace(/_/g, ' ').toUpperCase()} is now LIVE!`);
+      toast.success(`>> ${previewScreen.replace(/_/g, ' ').toUpperCase()} is now LIVE!`);
       setPreviewScreen(null);
       refresh();
     } catch (err) {
