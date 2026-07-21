@@ -12,13 +12,19 @@ import { SCREENS, GROUP_LABELS } from '@/components/control/ScreenSwitcher';
 import { useObsStore } from '@/lib/obsStore';
 import { obsService } from '@/lib/obsWebSocket';
 import LiveControlPanel from '@/components/control/LiveControlPanel';
+import BroadcastDashboard from '@/components/control/BroadcastDashboard';
+import EventTimeline from '@/components/control/EventTimeline';
+import ThemeManager from '@/components/control/ThemeManager';
+import PlayerManager from '@/components/control/PlayerManager';
+import OCRRegionDesigner from '@/components/control/OCRRegionDesigner';
+
 import {
   ExternalLink,
   Eye, Paintbrush, Settings2, Trophy, Star, Crown,
   Monitor, Copy, Radio, CheckCircle2, ChevronRight,
   Layers, Map, Crosshair, AlertTriangle, LayoutList,
   Download, RefreshCw, Users, Sword, Shield, Flag,
-  Zap, Calendar, Mic2, Clock, BarChart2, Play
+  Zap, Calendar, Mic2, Clock, BarChart2, Play, Activity, Palette
 } from 'lucide-react';
 
 /* ─────────────────────────────────────────
@@ -28,7 +34,7 @@ import {
 
 export default function DirectorPanel() {
   const { data, loading, refresh } = useOverlayData(true);
-  const [activeTab, setActiveTab] = useState('live');
+  const [activeTab, setActiveTab] = useState('dashboard');
   const [busy, setBusy] = useState(null);
   const [mapSelect, setMapSelect] = useState('Bermuda');
   const [refreshing, setRefreshing] = useState(false);
@@ -280,12 +286,17 @@ export default function DirectorPanel() {
       ───────────────────────────────────────── */}
       <nav className="flex h-11 border-b border-white/5 bg-[#131127] flex-shrink-0">
         {[
+          { id: 'dashboard', label: 'DASHBOARD', icon: Activity },
           { id: 'live', label: 'LIVE', icon: Radio },
           { id: 'overlay', label: 'OVERLAY', icon: Monitor },
           { id: 'match', label: 'MATCH', icon: Map },
           { id: 'standings', label: 'STANDINGS', icon: Trophy },
+          { id: 'players', label: 'PLAYERS', icon: Users },
           { id: 'design', label: 'DESIGN', icon: Paintbrush },
+          { id: 'theme', label: 'THEME', icon: Palette },
           { id: 'assets', label: 'ASSETS', icon: Layers },
+          { id: 'ocr', label: 'OCR', icon: Crosshair },
+          { id: 'timeline', label: 'TIMELINE', icon: Clock },
           { id: 'setup', label: 'SETUP', icon: Settings2 },
         ].map((t) => {
           const isActive = activeTab === t.id;
@@ -849,6 +860,78 @@ export default function DirectorPanel() {
             )}
 
             {/* SETUP TAB */}
+
+            {activeTab === 'dashboard' && (
+              <SectionBoundary label="BROADCAST DASHBOARD">
+                <BroadcastDashboard
+                  data={data}
+                  refresh={refresh}
+                  overlayApi={overlayApi}
+                  obsConnected={obsStatus === 'connected'}
+                  onSwitchScene={async (screen) => {
+                    await overlayApi.switchOverlayScreen({ screen });
+                    refresh();
+                  }}
+                />
+              </SectionBoundary>
+            )}
+
+            {activeTab === 'players' && (
+              <SectionBoundary label="PLAYER MANAGEMENT">
+                <PlayerManager
+                  data={data}
+                  refresh={refresh}
+                  overlayApi={overlayApi}
+                />
+              </SectionBoundary>
+            )}
+
+            {activeTab === 'theme' && (
+              <SectionBoundary label="THEME MANAGER">
+                <ThemeManager
+                  currentTheme={(data?.design?.theme_id || 'nexplay')}
+                  onApplyTheme={async (theme) => {
+                    try {
+                      await overlayApi.saveDesign({
+                        theme_id: theme.id,
+                        primaryColor: theme.primary,
+                        secondaryColor: theme.secondary,
+                        bgColor: theme.bg,
+                        cardColor: theme.card,
+                        accentColor: theme.accent,
+                      });
+                      toast.success(`Theme: ${theme.name} applied!`);
+                      refresh();
+                    } catch (e) {
+                      toast.error(e.message);
+                    }
+                  }}
+                  tournament={data?.tournament}
+                />
+              </SectionBoundary>
+            )}
+
+            {activeTab === 'ocr' && (
+              <SectionBoundary label="OCR REGION DESIGNER">
+                <OCRRegionDesigner
+                  regions={[]}
+                  onSaveRegions={(regions) => {
+                    toast.success('OCR regions saved!');
+                  }}
+                />
+              </SectionBoundary>
+            )}
+
+            {activeTab === 'timeline' && (
+              <SectionBoundary label="EVENT TIMELINE">
+                <EventTimeline
+                  killEvents={data?.killFeed || []}
+                  eliminationEvents={data?.eliminations || []}
+                  matchEvents={[]}
+                  teams={data?.teams || []}
+                />
+              </SectionBoundary>
+            )}
             {activeTab === 'setup' && (
               <SectionBoundary label="TOURNAMENT CONFIGURATION">
                 <div className="max-w-4xl mx-auto space-y-6">

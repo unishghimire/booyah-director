@@ -218,3 +218,21 @@
 .sidebar-transition {
   transition: width 200ms ease, transform 200ms ease;
 }
+
+.form-input {
+  width: 100%;
+  padding: 8px 12px;
+  background: #0F1127;
+  border: 1px solid rgba(255,255,255,0.1);
+  border-radius: 8px;
+  color: #fff;
+  font-size: 11px;
+  outline: none;
+}
+.form-input:focus {
+  border-color: rgba(124,58,237,0.5);
+}
+.form-input::placeholder {
+  color: rgba(255,255,255,0.2);
+}
+
