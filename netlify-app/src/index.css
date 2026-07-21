@@ -208,3 +208,13 @@
 .nx-glow-text { animation: nx-glow-pulse 3s ease-in-out infinite; }
 .nx-fade-in { animation: nx-fade-in 0.5s ease-out; }
 .nx-scale-in { animation: nx-scale-in 0.4s ease-out; }
+
+/* Custom additions for OBS and Navigation Shell */
+.user-select-none {
+  user-select: none;
+  -webkit-user-select: none;
+}
+
+.sidebar-transition {
+  transition: width 200ms ease, transform 200ms ease;
+}
