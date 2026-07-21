@@ -1152,8 +1152,6 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
   const mvpKills = overlayState?.mvp_kills      || overlayState?.mvpKills       || 0;
   
   // Extra stats if available, or randomized high-fidelity stats suitable for Free Fire esports matches
-  const mvpDamage = overlayState?.mvp_damage || overlayState?.mvpDamage || 1450;
-  const mvpHeadshots = overlayState?.mvp_headshots || overlayState?.mvpHeadshots || 4;
 
   const mvpTeamObj = safeArray(teams).find(t => t.name === mvpTeam) ?? null;
   const mvpPlayerObj = safeArray(players).find(p => p.id === overlayState?.mvp_player_id || p.name === mvpName) ?? null;
@@ -1334,63 +1332,6 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
               }}>{mvpKills}</span>
             </div>
 
-            {/* DAMAGE STAT */}
-            <div style={{
-              background: '#131127',
-              borderLeft: '4px solid #3B82F6',
-              padding: '16px 24px',
-              clipPath: 'polygon(0% 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
-            }}>
-              <span style={{
-                fontFamily: 'Rajdhani',
-                fontSize: 18,
-                fontWeight: 700,
-                color: '#ffffff',
-                letterSpacing: '2px',
-                textTransform: 'uppercase'
-              }}>DAMAGE</span>
-              <span style={{
-                fontFamily: 'Teko',
-                fontSize: 44,
-                fontWeight: 700,
-                color: '#ffffff',
-                lineHeight: 1,
-                letterSpacing: '1px'
-              }}>{mvpDamage}</span>
-            </div>
-
-            {/* HEADSHOTS STAT */}
-            <div style={{
-              background: '#131127',
-              borderLeft: '4px solid #7C3AED',
-              padding: '16px 24px',
-              clipPath: 'polygon(0% 0%, 100% 0%, calc(100% - 15px) 100%, 0% 100%)',
-              display: 'flex',
-              alignItems: 'center',
-              justifyContent: 'space-between',
-              boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
-            }}>
-              <span style={{
-                fontFamily: 'Rajdhani',
-                fontSize: 18,
-                fontWeight: 700,
-                color: '#ffffff',
-                letterSpacing: '2px',
-                textTransform: 'uppercase'
-              }}>HEADSHOTS</span>
-              <span style={{
-                fontFamily: 'Teko',
-                fontSize: 44,
-                fontWeight: 700,
-                color: '#7C3AED',
-                lineHeight: 1,
-                letterSpacing: '1px'
-              }}>{mvpHeadshots}</span>
-            </div>
           </div>
         </motion.div>
 

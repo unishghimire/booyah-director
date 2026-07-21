@@ -306,7 +306,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
           <div style={colRank}><span style={hdrTxt}>#</span></div>
           <div style={colLogo} />
           <div style={colName}>
-            <span style={{ ...hdrTxt, fontSize: 22, fontWeight: 800, letterSpacing: '2px' }}>SCOREBOARD</span>
+            <span style={{ ...hdrTxt, fontSize: 13, fontWeight: 800, letterSpacing: '1.5px', whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis' }}>SCOREBOARD</span>
           </div>
           <div style={colAlive}><span style={hdrTxt}>ALIVE</span></div>
           <div style={colPts}><span style={hdrTxt}>PTS</span></div>
@@ -409,6 +409,8 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                       <div key={si}
                         style={{
                           width: 8, height: 18, flexShrink: 0,
+                          background: bg,
+                          borderRadius: 2,
                           boxShadow: !isGhost && slot.alive ? '0 0 4px ' + green : 'none',
                         }}
                       />
