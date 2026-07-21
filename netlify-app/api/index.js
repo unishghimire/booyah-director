@@ -869,16 +869,27 @@ module.exports = async (req, res) => {
         return err(400, 'Max 6 players per team');
       }
 
-      const player = {
+            const player = {
         id: genId(),
         team_id: team.id,
         tournament_id: body.tournament_id ? sanitizeString(body.tournament_id) : team.tournament_id,
         name: sanitizeString(body.name, 100),
-        role: sanitizeString(body.role || '', 50),
-        photo_url: sanitizeUrl(body.photo_url || ''),
+        role: sanitizeString(body.role || ', 50),
+        photo_url: sanitizeUrl(body.photo_url || '),
         is_alive: true,
-        current_match_kills: 0,
-        total_tournament_kills: 0,
+        current_match_kills: Number(body.current_match_kills) || 0,
+        total_tournament_kills: Number(body.total_tournament_kills) || 0,
+        real_name: body.real_name ? sanitizeString(body.real_name, 100) : ',
+        nationality: body.nationality ? sanitizeString(body.nationality, 100) : ',
+        dob: body.dob ? sanitizeString(body.dob, 50) : ',
+        instagram: body.instagram ? sanitizeString(body.instagram, 100) : ',
+        youtube: body.youtube ? sanitizeString(body.youtube, 100) : ',
+        twitter: body.twitter ? sanitizeString(body.twitter, 100) : ',
+        avg_kills_per_match: Number(body.avg_kills_per_match) || 0,
+        best_placement: Number(body.best_placement) || 0,
+        total_points: Number(body.total_points) || 0,
+        matches_played: Number(body.matches_played) || 0,
+        matches_won: Number(body.matches_won) || 0,
         created_at: new Date().toISOString()
       };
 
@@ -1137,14 +1148,36 @@ module.exports = async (req, res) => {
 
     // ── DELETE TEAM ───────────────────────────────────────────────────────
     // ── UPDATE PLAYER (photo, role, name) ──────────────────────────────────
-    if (route === 'updatePlayer') {
+        if (route === 'updatePlayer') {
       const missing = requireFields(body, ['player_id']);
       if (missing) return err(400, missing);
       const idx = db.players.findIndex(p => p.id === body.player_id);
       if (idx === -1) return err(404, 'Player not found');
-      if (body.name)      db.players[idx].name      = sanitizeString(body.name, 100);
-      if (body.role)      db.players[idx].role      = sanitizeString(body.role, 50);
-      if (body.photo_url !== undefined) db.players[idx].photo_url = sanitizeUrl(body.photo_url || '');
+      if (body.name !== undefined)      db.players[idx].name      = sanitizeString(body.name, 100);
+      if (body.role !== undefined)      db.players[idx].role      = sanitizeString(body.role, 50);
+      if (body.photo_url !== undefined) db.players[idx].photo_url = sanitizeUrl(body.photo_url || ');
+      
+      // Additional fields for NexPlay Broadcast Studio
+      if (body.real_name !== undefined) db.players[idx].real_name = sanitizeString(body.real_name, 100);
+      if (body.nationality !== undefined) db.players[idx].nationality = sanitizeString(body.nationality, 100);
+      if (body.team_id !== undefined) db.players[idx].team_id = sanitizeString(body.team_id, 100);
+      if (body.is_alive !== undefined) db.players[idx].is_alive = !!body.is_alive;
+      if (body.dob !== undefined) db.players[idx].dob = sanitizeString(body.dob, 50);
+      
+      // Social Handles
+      if (body.instagram !== undefined) db.players[idx].instagram = sanitizeString(body.instagram, 100);
+      if (body.youtube !== undefined) db.players[idx].youtube = sanitizeString(body.youtube, 100);
+      if (body.twitter !== undefined) db.players[idx].twitter = sanitizeString(body.twitter, 100);
+      
+      // Statistics
+      if (body.total_tournament_kills !== undefined) db.players[idx].total_tournament_kills = Number(body.total_tournament_kills) || 0;
+      if (body.current_match_kills !== undefined) db.players[idx].current_match_kills = Number(body.current_match_kills) || 0;
+      if (body.avg_kills_per_match !== undefined) db.players[idx].avg_kills_per_match = Number(body.avg_kills_per_match) || 0;
+      if (body.best_placement !== undefined) db.players[idx].best_placement = Number(body.best_placement) || 0;
+      if (body.total_points !== undefined) db.players[idx].total_points = Number(body.total_points) || 0;
+      if (body.matches_played !== undefined) db.players[idx].matches_played = Number(body.matches_played) || 0;
+      if (body.matches_won !== undefined) db.players[idx].matches_won = Number(body.matches_won) || 0;
+
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true, player: db.players[idx] });
@@ -1171,6 +1204,16 @@ module.exports = async (req, res) => {
       db.teams = db.teams.filter(t => t.id !== body.team_id);
       db.players = db.players.filter(p => p.team_id !== body.team_id);
       db.match_standings = db.match_standings.filter(s => s.team_id !== body.team_id);
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true });
+    }
+
+    if (route === 'deletePlayer') {
+      const missing = requireFields(body, ['player_id']);
+      if (missing) return err(400, missing);
+
+      db.players = db.players.filter(p => p.id !== body.player_id);
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true });

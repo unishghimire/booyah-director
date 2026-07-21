@@ -81,6 +81,7 @@ export const overlayApi = {
   updatePlayer:             (d) => call('updatePlayer', d),
   updateTeam:               (d) => call('updateTeam', d),
   deleteTeam:               (d) => call('deleteTeam', d),
+  deletePlayer:             (d) => call('deletePlayer', d),
   startNextMatch:           (d) => call('startNextMatch', d),
   updateMatchState:         (d) => call('updateMatchState', d),
   addKill:                  (d) => call('addKill', d),
