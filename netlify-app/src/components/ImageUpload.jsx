@@ -69,11 +69,11 @@ export default function ImageUpload({
           borderRadius: 12,
           borderWidth: 2,
           borderStyle: 'dashed',
-          borderColor: drag    ? '#ff4e00'
+          borderColor: drag    ? '#7C3AED'
                      : success ? '#22c55e'
-                     : (hover && value) ? '#ffaa0055'
+                     : (hover && value) ? '#3B82F655'
                      : 'rgba(255,255,255,0.08)',
-          background: drag    ? 'rgba(255,78,0,0.07)'
+          background: drag    ? 'rgba(124,58,237,0.07)'
                     : success ? 'rgba(34,197,94,0.07)'
                     : 'rgba(255,255,255,0.02)',
           minHeight: minH,
@@ -90,12 +90,12 @@ export default function ImageUpload({
         }}
       >
         {drag && (
-          <div style={{ position:'absolute', inset:0, boxShadow:'inset 0 0 20px rgba(255,78,0,0.2)', pointerEvents:'none', borderRadius:10 }} />
+          <div style={{ position:'absolute', inset:0, boxShadow:'inset 0 0 20px rgba(124,58,237,0.2)', pointerEvents:'none', borderRadius:10 }} />
         )}
 
         {uploading ? (
           <>
-            <Loader2 className="h-6 w-6 text-[#ff4e00] animate-spin" />
+            <Loader2 className="h-6 w-6 text-[#7C3AED] animate-spin" />
             <span className="font-orbitron text-[9px] text-gray-400 tracking-wider">UPLOADING...</span>
           </>
         ) : success ? (
@@ -113,8 +113,8 @@ export default function ImageUpload({
             />
             {hover && (
               <div style={{ position:'absolute', inset:0, background:'rgba(0,0,0,0.65)', borderRadius:8, display:'flex', flexDirection:'column', alignItems:'center', justifyContent:'center', gap:4 }}>
-                <Edit3 className="h-5 w-5 text-[#ffaa00]" />
-                <span className="font-orbitron text-[9px] text-[#ffaa00] tracking-wider">CHANGE IMAGE</span>
+                <Edit3 className="h-5 w-5 text-[#3B82F6]" />
+                <span className="font-orbitron text-[9px] text-[#3B82F6] tracking-wider">CHANGE IMAGE</span>
               </div>
             )}
           </div>

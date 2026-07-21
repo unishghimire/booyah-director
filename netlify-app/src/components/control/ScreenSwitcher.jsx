@@ -24,8 +24,8 @@ const SCREENS = [
 ];
 
 const GROUP_LABELS = {
-  scene:   { label: 'FULL SCENES',      color: '#ff4e00' },
-  overlay: { label: 'LIVE OVERLAYS',    color: '#ffaa00' },
+  scene:   { label: 'FULL SCENES',      color: '#7C3AED' },
+  overlay: { label: 'LIVE OVERLAYS',    color: '#3B82F6' },
 };
 
 export default function ScreenSwitcher({ currentScreen, onAction }) {
@@ -110,7 +110,7 @@ export default function ScreenSwitcher({ currentScreen, onAction }) {
         <div className="flex items-center justify-between">
           <h3 className="font-orbitron text-xs font-bold text-white">OVERLAY SCREEN</h3>
           <span className="font-orbitron text-[9px] text-gray-500 tracking-widest">
-            LIVE: <span className="text-[#ff4e00]">{(currentScreen || 'STANDBY').replace(/_/g, ' ').toUpperCase()}</span>
+            LIVE: <span className="text-[#7C3AED]">{(currentScreen || 'STANDBY').replace(/_/g, ' ').toUpperCase()}</span>
           </span>
         </div>
         {renderGroup(scenes, 'scene')}
