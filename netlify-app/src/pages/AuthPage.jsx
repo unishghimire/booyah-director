@@ -9,13 +9,13 @@ function GridBg() {
   return (
     <div style={{ position:'absolute', inset:0, overflow:'hidden', pointerEvents:'none' }}>
       {/* Grid lines */}
-      <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(rgba(255,78,0,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(255,170,0,0.04) 1px, transparent 1px)', backgroundSize:'72px 72px' }} />
+      <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(rgba(124,58,237,0.05) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.04) 1px, transparent 1px)', backgroundSize:'72px 72px' }} />
       {/* Orange radial glow top */}
-      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 900px 500px at 50% 0%, rgba(255,78,0,0.1), transparent)' }} />
+      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 900px 500px at 50% 0%, rgba(124,58,237,0.1), transparent)' }} />
       {/* Cyan radial glow bottom */}
-      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 700px 400px at 50% 100%, rgba(255,170,0,0.06), transparent)' }} />
+      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 700px 400px at 50% 100%, rgba(59,130,246,0.06), transparent)' }} />
       {/* Scan line animation */}
-      <div style={{ position:'absolute', left:0, right:0, height:1, background:'linear-gradient(90deg,transparent,rgba(255,78,0,0.4),transparent)', animation:'scan 4s linear infinite', top:0 }} />
+      <div style={{ position:'absolute', left:0, right:0, height:1, background:'linear-gradient(90deg,transparent,rgba(124,58,237,0.4),transparent)', animation:'scan 4s linear infinite', top:0 }} />
       <style>{`@keyframes scan{0%{top:0}100%{top:100%}}`}</style>
     </div>
   );
@@ -85,17 +85,17 @@ export default function AuthPage() {
         <div style={{ textAlign:'center', marginBottom:36 }}>
           <div style={{
             display:'inline-flex', width:72, height:72, borderRadius:20,
-            background:'linear-gradient(135deg,rgba(255,78,0,0.15),rgba(255,78,0,0.05))',
-            border:'1px solid rgba(255,78,0,0.4)',
+            background:'linear-gradient(135deg,rgba(124,58,237,0.15),rgba(124,58,237,0.05))',
+            border:'1px solid rgba(124,58,237,0.4)',
             alignItems:'center', justifyContent:'center', marginBottom:16,
-            boxShadow:'0 0 40px rgba(255,78,0,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
+            boxShadow:'0 0 40px rgba(124,58,237,0.2), inset 0 1px 0 rgba(255,255,255,0.05)',
           }}>
-            <Zap size={32} style={{ color:'#ff4e00' }} />
+            <Zap size={32} style={{ color:'#7C3AED' }} />
           </div>
           <h1 style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#fff', letterSpacing:'0.1em', margin:0 }}>
-            BOOYAH <span style={{ background:'linear-gradient(90deg,#ff4e00,#ffaa00)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>DIRECTOR</span>
+            NEXOVERLAYS <span style={{ background:'linear-gradient(90deg,#7C3AED,#3B82F6)', WebkitBackgroundClip:'text', WebkitTextFillColor:'transparent' }}>DIRECTOR</span>
           </h1>
-          <p style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,170,0,0.7)', letterSpacing:'0.3em', marginTop:6 }}>
+          <p style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(59,130,246,0.7)', letterSpacing:'0.3em', marginTop:6 }}>
             OFFICIAL TOURNAMENT BROADCAST SYSTEM
           </p>
           <div style={{ display:'flex', alignItems:'center', justifyContent:'center', gap:6, marginTop:10 }}>
@@ -111,8 +111,8 @@ export default function AuthPage() {
             width:'100%', display:'flex', alignItems:'center', justifyContent:'center', gap:12,
             padding:'14px 20px', borderRadius:14, marginBottom:16,
             background:'rgba(255,255,255,0.04)', backdropFilter:'blur(12px)',
-            border:'1px solid rgba(255,78,0,0.35)',
-            boxShadow:'0 0 20px rgba(255,78,0,0.08)',
+            border:'1px solid rgba(124,58,237,0.35)',
+            boxShadow:'0 0 20px rgba(124,58,237,0.08)',
             fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#fff', letterSpacing:'0.12em',
             cursor: loading ? 'not-allowed' : 'pointer', opacity: loading ? 0.6 : 1,
             transition:'all 0.2s',
@@ -146,7 +146,7 @@ export default function AuthPage() {
             {[['login','LOG IN'],['register','SIGN UP']].map(([m,label]) => (
               <button key={m} onClick={() => setMode(m)} style={{
                 flex:1, padding:'10px 0', fontFamily:'Orbitron', fontSize:10, fontWeight:900, letterSpacing:'0.1em',
-                background: mode === m ? 'linear-gradient(135deg,#ff4e00,#ff4e00)' : 'transparent',
+                background: mode === m ? 'linear-gradient(135deg,#7C3AED,#7C3AED)' : 'transparent',
                 color: mode === m ? '#fff' : 'rgba(255,255,255,0.35)',
                 border:'none', cursor:'pointer', transition:'all 0.2s',
               }}>{label}</button>
@@ -180,8 +180,8 @@ export default function AuthPage() {
             <button type="submit" disabled={loading} style={{
               padding:'13px', borderRadius:10, fontFamily:'Orbitron', fontSize:11, fontWeight:900,
               color:'#fff', letterSpacing:'0.12em', cursor: loading ? 'not-allowed' : 'pointer',
-              background:'linear-gradient(135deg,#ff4e00,#ff4e00)', border:'none',
-              boxShadow:'0 4px 20px rgba(255,78,0,0.4)', opacity: loading ? 0.6 : 1, transition:'all 0.2s', marginTop:4,
+              background:'linear-gradient(135deg,#7C3AED,#7C3AED)', border:'none',
+              boxShadow:'0 4px 20px rgba(124,58,237,0.4)', opacity: loading ? 0.6 : 1, transition:'all 0.2s', marginTop:4,
             }}>
               {loading ? 'LOADING...' : mode === 'login' ? 'ACCESS SYSTEM' : 'CREATE ACCOUNT'}
             </button>
@@ -189,7 +189,7 @@ export default function AuthPage() {
         </div>
 
         <p style={{ textAlign:'center', fontFamily:'Orbitron', fontSize:8, color:'rgba(255,255,255,0.15)', letterSpacing:'0.15em', marginTop:20 }}>
-          BOOYAH DIRECTOR v2.0 · OFFICIAL ESPORTS BROADCAST SYSTEM
+          NEXOVERLAYS v2.0 · OFFICIAL ESPORTS BROADCAST SYSTEM
         </p>
       </div>
     </div>

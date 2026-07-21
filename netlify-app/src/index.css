@@ -2,251 +2,208 @@
 @tailwind components;
 @tailwind utilities;
 
+/* ═══════════════════════════════════════════════════════════════════
+   NEXOVERLAYS DESIGN SYSTEM — Purple & Blue Esports Broadcast
+   ═══════════════════════════════════════════════════════════════════ */
+
+@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Teko:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap');
+
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 0 0% 3.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 0 0% 3.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 0 0% 3.9%;
-    --primary: 0 0% 9%;
+    --background: 240 30% 4%;
+    --foreground: 0 0% 98%;
+    --card: 240 25% 8%;
+    --card-foreground: 0 0% 98%;
+    --popover: 240 25% 8%;
+    --popover-foreground: 0 0% 98%;
+    --primary: 265 85% 60%;
     --primary-foreground: 0 0% 98%;
-    --secondary: 0 0% 96.1%;
-    --secondary-foreground: 0 0% 9%;
-    --muted: 0 0% 96.1%;
-    --muted-foreground: 0 0% 45.1%;
-    --accent: 0 0% 96.1%;
-    --accent-foreground: 0 0% 9%;
-    --destructive: 0 84.2% 60.2%;
+    --secondary: 240 20% 14%;
+    --secondary-foreground: 0 0% 98%;
+    --muted: 240 20% 14%;
+    --muted-foreground: 240 10% 55%;
+    --accent: 220 90% 56%;
+    --accent-foreground: 0 0% 98%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 89.8%;
-    --input: 0 0% 89.8%;
-    --ring: 0 0% 3.9%;
-    --chart-1: 12 76% 61%;
-    --chart-2: 173 58% 39%;
-    --chart-3: 197 37% 24%;
-    --chart-4: 43 74% 66%;
-    --chart-5: 27 87% 67%;
+    --border: 240 25% 16%;
+    --input: 240 25% 16%;
+    --ring: 265 85% 60%;
     --radius: 0.5rem;
-    --font-heading: ui-sans-serif, system-ui, sans-serif;
-    --font-body: ui-sans-serif, system-ui, sans-serif;
-    --font-display: ui-sans-serif, system-ui, sans-serif;
-    --font-mono: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
-    --sidebar-background: 0 0% 98%;
-    --sidebar-foreground: 240 5.3% 26.1%;
-    --sidebar-primary: 240 5.9% 10%;
-    --sidebar-primary-foreground: 0 0% 98%;
-    --sidebar-accent: 240 4.8% 95.9%;
-    --sidebar-accent-foreground: 240 5.9% 10%;
-    --sidebar-border: 220 13% 91%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --font-heading: 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
+    --font-body: 'Rajdhani', ui-sans-serif, system-ui, sans-serif;
+    --font-display: 'Orbitron', ui-sans-serif, system-ui, sans-serif;
+    --font-mono: 'Teko', ui-sans-serif, system-ui, sans-serif;
   }
 
   .dark {
-    --background: 0 0% 3.9%;
+    --background: 240 30% 4%;
     --foreground: 0 0% 98%;
-    --card: 0 0% 3.9%;
+    --card: 240 25% 8%;
     --card-foreground: 0 0% 98%;
-    --popover: 0 0% 3.9%;
+    --popover: 240 25% 8%;
     --popover-foreground: 0 0% 98%;
-    --primary: 0 0% 98%;
-    --primary-foreground: 0 0% 9%;
-    --secondary: 0 0% 14.9%;
+    --primary: 265 85% 60%;
+    --primary-foreground: 0 0% 98%;
+    --secondary: 240 20% 14%;
     --secondary-foreground: 0 0% 98%;
-    --muted: 0 0% 14.9%;
-    --muted-foreground: 0 0% 63.9%;
-    --accent: 0 0% 14.9%;
+    --muted: 240 20% 14%;
+    --muted-foreground: 240 10% 55%;
+    --accent: 220 90% 56%;
     --accent-foreground: 0 0% 98%;
-    --destructive: 0 62.8% 30.6%;
+    --destructive: 0 72% 51%;
     --destructive-foreground: 0 0% 98%;
-    --border: 0 0% 14.9%;
-    --input: 0 0% 14.9%;
-    --ring: 0 0% 83.1%;
-    --chart-1: 220 70% 50%;
-    --chart-2: 160 60% 45%;
-    --chart-3: 30 80% 55%;
-    --chart-4: 280 65% 60%;
-    --chart-5: 340 75% 55%;
-    --sidebar-background: 240 5.9% 10%;
-    --sidebar-foreground: 240 4.8% 95.9%;
-    --sidebar-primary: 224.3 76.3% 48%;
-    --sidebar-primary-foreground: 0 0% 100%;
-    --sidebar-accent: 240 3.7% 15.9%;
-    --sidebar-accent-foreground: 240 4.8% 95.9%;
-    --sidebar-border: 240 3.7% 15.9%;
-    --sidebar-ring: 217.2 91.2% 59.8%;
+    --border: 240 25% 16%;
+    --input: 240 25% 16%;
+    --ring: 265 85% 60%;
   }
 }
-
-
 
 @layer base {
-  * {
-    @apply border-border outline-ring/50;
-  }
-
-  body {
-    @apply bg-background text-foreground font-body;
-  }
+  * { @apply border-border outline-ring/50; }
+  body { @apply bg-background text-foreground font-body; }
 }
 
-/* ═══════════════════════════════════════════════════════════════════
-   FFWS BROADCAST DESIGN SYSTEM — Free Fire World Series Aesthetic
-   ═══════════════════════════════════════════════════════════════════ */
+/* ═════════════════════════════════════════════════════
+   NEXOVERLAYS COLOR TOKENS
+   ═════════════════════════════════════════════════════ */
+:root {
+  --nx-purple:       #7C3AED;
+  --nx-purple-bright:#9D5CFF;
+  --nx-purple-deep:  #5B21B6;
+  --nx-blue:         #3B82F6;
+  --nx-blue-bright:  #60A5FA;
+  --nx-blue-deep:    #1D4ED8;
+  --nx-bg-darkest:   #070611;
+  --nx-bg-dark:      #0D0B1A;
+  --nx-bg-card:      #131127;
+  --nx-bg-elevated:  #1A1830;
+  --nx-text-primary: #FFFFFF;
+  --nx-text-secondary: rgba(255,255,255,0.7);
+  --nx-text-muted:   rgba(255,255,255,0.4);
+  --nx-green:        #10B981;
+  --nx-red:          #EF4444;
+  --nx-gold:         #FBBF24;
+  --nx-border:       rgba(167,139,250,0.15);
+  --nx-border-med:   rgba(167,139,250,0.3);
+  --nx-glow-purple:  0 0 20px rgba(124,58,237,0.4);
+  --nx-glow-blue:    0 0 20px rgba(59,130,246,0.4);
+  --nx-grad-header:  linear-gradient(135deg, #7C3AED 0%, #3B82F6 100%);
+  --nx-grad-accent:  linear-gradient(90deg, #7C3AED, #3B82F6);
+  --nx-grad-bg:      linear-gradient(180deg, #0D0B1A 0%, #070611 100%);
+  --nx-grad-glow:    radial-gradient(ellipse 1200px 700px at 50% 30%, rgba(124,58,237,0.2) 0%, rgba(59,130,246,0.08) 40%, transparent 70%);
+}
 
-/* Google Fonts: Rajdhani (body/stats), Teko (headlines), Orbitron (labels) */
-@import url('https://fonts.googleapis.com/css2?family=Rajdhani:wght@400;500;600;700&family=Teko:wght@400;500;600;700&family=Orbitron:wght@400;700;900&display=swap');
-
-/* ===== Free Fire Overlay Fonts ===== */
+/* ═════════════════════════════════════════════════════
+   FONTS
+   ═════════════════════════════════════════════════════ */
 .font-orbitron { font-family: 'Orbitron', ui-sans-serif, system-ui, sans-serif; }
 .font-rajdhani { font-family: 'Rajdhani', ui-sans-serif, system-ui, sans-serif; }
 .font-teko     { font-family: 'Teko', ui-sans-serif, system-ui, sans-serif; }
 
-/* ===== FFWS Color System ===== */
-:root {
-  --ffws-carbon:    #0c0c0e;
-  --ffws-gunmetal:  #141418;
-  --ffws-orange:    #ff4e00;
-  --ffws-gold:      #ffaa00;
-  --ffws-cyan:      #ffaa00;  /* accent gold (renamed for compat) */
-  --ffws-green:     #7BC043;
-  --ffws-red:       #ff3333;
-  --ffws-text:      #ffffff;
-  --ffws-muted:     rgba(255,255,255,0.4);
-}
-
-/* ===== Clip-Path Utilities — Angular Cutouts ===== */
+/* ═════════════════════════════════════════════════════
+   CLIP-PATH UTILITIES
+   ═════════════════════════════════════════════════════ */
 .clip-angular-l    { clip-path: polygon(10px 0, 100% 0, 100% 100%, 0 100%); }
 .clip-angular-r    { clip-path: polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%); }
-.clip-angular-tl   { clip-path: polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%); }
-.clip-angular-tr   { clip-path: polygon(12px 0, 100% 0, 100% 100%, 0 100%); }
 .clip-angular-both { clip-path: polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%); }
 .clip-arrow-r      { clip-path: polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%); }
 .clip-arrow-l      { clip-path: polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 50%); }
-.clip-diagonal      { clip-path: polygon(0 0, 100% 0, 85% 100%, 0 100%); }
-.clip-diagonal-r    { clip-path: polygon(15% 0, 100% 0, 100% 100%, 0 100%); }
-.clip-hex           { clip-path: polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%); }
-.clip-tag           { clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 0 100%); }
+.clip-tag          { clip-path: polygon(0 0, calc(100% - 12px) 0, 100% 100%, 0 100%); }
 
-/* ===== FFWS Glow Effects ===== */
-.glow-orange { filter: drop-shadow(0 0 8px rgba(255, 78, 0, 0.6)); }
-.glow-gold   { filter: drop-shadow(0 0 8px rgba(255, 170, 0, 0.6)); }
-.glow-cyan   { filter: drop-shadow(0 0 8px rgba(255, 170, 0, 0.5)); }
-.glow-green  { filter: drop-shadow(0 0 6px rgba(123, 192, 67, 0.5)); }
+/* ═════════════════════════════════════════════════════
+   GLOW EFFECTS
+   ═════════════════════════════════════════════════════ */
+.glow-purple { filter: drop-shadow(0 0 8px rgba(124, 58, 237, 0.6)); }
+.glow-blue   { filter: drop-shadow(0 0 8px rgba(59, 130, 246, 0.6)); }
+.glow-green  { filter: drop-shadow(0 0 6px rgba(16, 185, 129, 0.5)); }
+.glow-gold   { filter: drop-shadow(0 0 8px rgba(251, 191, 36, 0.6)); }
 
-/* ===== Broadcast Animation Classes ===== */
-@keyframes ffws-sweep {
-  0%   { transform: translateX(-100%) skewX(-15deg); }
-  100% { transform: translateX(200%) skewX(-15deg); }
+/* ═════════════════════════════════════════════════════
+   TEXT GRADIENTS
+   ═════════════════════════════════════════════════════ */
+.text-gradient-purple {
+  background: linear-gradient(135deg, #9D5CFF 0%, #7C3AED 50%, #3B82F6 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
 }
-@keyframes ffws-pulse-border {
-  0%, 100% { box-shadow: 0 0 8px rgba(255, 78, 0, 0.3); }
-  50%      { box-shadow: 0 0 20px rgba(255, 78, 0, 0.7); }
-}
-@keyframes ffws-diagonal-glow {
-  0%   { transform: translate(-50%, -50%) rotate(-45deg) translateX(-200px); opacity: 0; }
-  50%  { opacity: 0.6; }
-  100% { transform: translate(-50%, -50%) rotate(-45deg) translateX(200px); opacity: 0; }
-}
-@keyframes ffws-hex-pulse {
-  0%, 100% { filter: drop-shadow(0 0 4px rgba(255, 78, 0, 0.4)); }
-  50%      { filter: drop-shadow(0 0 12px rgba(255, 78, 0, 0.8)); }
-}
-
-/* ===== FFWS Text Gradients ===== */
 .text-gradient-gold {
-  background: linear-gradient(135deg, #ffaa00 0%, #ff4e00 50%, #ff4e00 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  background: linear-gradient(135deg, #FBBF24 0%, #F59E0B 50%, #D97706 100%);
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
 }
 .text-gradient-silver {
   background: linear-gradient(135deg, #C0C0C0 0%, #909090 50%, #707070 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
 }
 .text-gradient-bronze {
   background: linear-gradient(135deg, #CD7F32 0%, #8B4513 50%, #6B3410 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
-}
-.text-gradient-orange {
-  background: linear-gradient(135deg, #ff4e00 0%, #ff4e00 50%, #ff4e00 100%);
-  -webkit-background-clip: text;
-  background-clip: text;
-  -webkit-text-fill-color: transparent;
-  color: transparent;
+  -webkit-background-clip: text; background-clip: text;
+  -webkit-text-fill-color: transparent; color: transparent;
 }
 
-/* ===== Overlay Animations ===== */
-@keyframes pulse-glow {
+/* ═════════════════════════════════════════════════════
+   ANIMATIONS
+   ═════════════════════════════════════════════════════ */
+@keyframes nx-sweep {
+  0%   { transform: translateX(-100%) skewX(-15deg); }
+  100% { transform: translateX(200%) skewX(-15deg); }
+}
+@keyframes nx-pulse-border {
+  0%, 100% { box-shadow: 0 0 8px rgba(124, 58, 237, 0.3); }
+  50%      { box-shadow: 0 0 20px rgba(124, 58, 237, 0.7); }
+}
+@keyframes nx-pulse-glow {
   0%, 100% { opacity: 1; filter: brightness(1); }
   50% { opacity: 0.8; filter: brightness(1.3); }
 }
-
-@keyframes slide-in-right {
+@keyframes nx-slide-right {
   from { opacity: 0; transform: translateX(60px); }
   to { opacity: 1; transform: translateX(0); }
 }
-
-@keyframes slide-in-up {
+@keyframes nx-slide-up {
   from { opacity: 0; transform: translateY(40px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes slide-down {
+@keyframes nx-slide-down {
   from { opacity: 0; transform: translateY(-80px); }
   to { opacity: 1; transform: translateY(0); }
 }
-
-@keyframes float-particle {
+@keyframes nx-float {
   0%, 100% { transform: translateY(0) scale(1); opacity: 0.4; }
   50% { transform: translateY(-30px) scale(1.5); opacity: 0.8; }
 }
-
-@keyframes confetti-fall {
+@keyframes nx-confetti {
   0% { transform: translateY(-20px) rotate(0deg); opacity: 1; }
   100% { transform: translateY(1100px) rotate(720deg); opacity: 0; }
 }
-
-@keyframes ticker-scroll {
-  0% { transform: translateX(0); }
-  100% { transform: translateX(-50%); }
+@keyframes nx-glow-pulse {
+  0%, 100% { box-shadow: 0 0 20px rgba(124,58,237,0.4); }
+  50% { box-shadow: 0 0 40px rgba(124,58,237,0.7); }
+}
+@keyframes nx-fade-in {
+  from { opacity: 0; } to { opacity: 1; }
+}
+@keyframes nx-scale-in {
+  from { opacity: 0; transform: scale(0.95); }
+  to { opacity: 1; transform: scale(1); }
 }
 
-@keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 20px rgba(249,115,22,0.4); }
-  50% { box-shadow: 0 0 40px rgba(249,115,22,0.7); }
-}
-
-/* ===== Overlay Canvas (OBS Browser Source) ===== */
-.overlay-canvas {
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-}
-.overlay-canvas::-webkit-scrollbar {
-  display: none;
-}
-/* FF Championship scrollbar */
-* { scrollbar-width: thin; scrollbar-color: rgba(255,78,0,0.3) rgba(255,255,255,0.03); }
+/* ═════════════════════════════════════════════════════
+   OVERLAY CANVAS (OBS Browser Source)
+   ═════════════════════════════════════════════════════ */
+.overlay-canvas { scrollbar-width: none; -ms-overflow-style: none; }
+.overlay-canvas::-webkit-scrollbar { display: none; }
+* { scrollbar-width: thin; scrollbar-color: rgba(124,58,237,0.3) rgba(255,255,255,0.03); }
 *::-webkit-scrollbar { width: 4px; height: 4px; }
 *::-webkit-scrollbar-track { background: rgba(255,255,255,0.03); }
-*::-webkit-scrollbar-thumb { background: rgba(255,78,0,0.4); border-radius: 2px; }
-*::-webkit-scrollbar-thumb:hover { background: rgba(255,78,0,0.7); }
+*::-webkit-scrollbar-thumb { background: rgba(124,58,237,0.4); border-radius: 2px; }
+*::-webkit-scrollbar-thumb:hover { background: rgba(124,58,237,0.7); }
+::selection { background: rgba(124,58,237,0.3); color: white; }
 
-/* FF Championship selection */
-::selection { background: rgba(255,78,0,0.3); color: white; }
-
-/* Pulse animation */
-@keyframes ff-pulse { 0%,100% { opacity:1; } 50% { opacity:0.4; } }
-.ff-pulse { animation: ff-pulse 2s ease-in-out infinite; }
-
-/* Glow text */
-@keyframes ff-glow { 0%,100% { text-shadow: 0 0 20px rgba(255,78,0,0.6); } 50% { text-shadow: 0 0 40px rgba(255,78,0,1), 0 0 80px rgba(255,78,0,0.4); } }
-.ff-glow-text { animation: ff-glow 3s ease-in-out infinite; }
+/* Pulse + glow helpers */
+.nx-pulse { animation: nx-pulse-glow 2s ease-in-out infinite; }
+.nx-glow-text { animation: nx-glow-pulse 3s ease-in-out infinite; }
+.nx-fade-in { animation: nx-fade-in 0.5s ease-out; }
+.nx-scale-in { animation: nx-scale-in 0.4s ease-out; }

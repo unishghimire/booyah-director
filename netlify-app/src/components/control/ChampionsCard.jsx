@@ -33,7 +33,7 @@ export default function ChampionsCard({ tournament, teams, onAction }) {
     setBusy('declare');
     try {
       await overlayApi.declareChampions({ tournament_id: tournament.id });
-      toast.success('BOOYAH! Champions declared!');
+      toast.success('NEXOVERLAYS! Champions declared!');
       onAction?.();
     } catch (err) { toast.error(`Declare: ${err.message}`); } finally { setBusy(null); }
   };
@@ -64,7 +64,7 @@ export default function ChampionsCard({ tournament, teams, onAction }) {
       )}
       <button onClick={handleBooyah} disabled={busy !== null}
         className="w-full rounded-md bg-gradient-to-r from-yellow-500 to-orange-600 py-1.5 text-[10px] font-black text-black hover:opacity-90 disabled:opacity-40">
-        {busy === 'declare' ? '...' : '🏆 BOOYAH!'}
+        {busy === 'declare' ? '...' : '🏆 NEXOVERLAYS!'}
       </button>
     </div>
   );

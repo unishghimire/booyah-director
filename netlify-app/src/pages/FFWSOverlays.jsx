@@ -39,7 +39,7 @@ export function EliminatedTeamBanner({ team, design }) {
           }}>
             <div style={{
               position: 'absolute', inset: 0,
-              background: '#ff4e00',
+              background: '#7C3AED',
               clipPath: 'polygon(0 0, 100% 0, 75% 100%, 0 100%)',
             }} />
             <div style={{
@@ -49,7 +49,7 @@ export function EliminatedTeamBanner({ team, design }) {
             }}>
               <div style={{
                 fontFamily: 'Teko, sans-serif', fontSize: 28, fontWeight: 900,
-                color: '#0c0c0e', lineHeight: 0.95, letterSpacing: '2px',
+                color: '#0D0B1A', lineHeight: 0.95, letterSpacing: '2px',
                 textTransform: 'uppercase',
               }}>
                 ELIMINATED
@@ -69,8 +69,8 @@ export function EliminatedTeamBanner({ team, design }) {
             style={{
               width: 380,
               height: 160,
-              background: '#141418',
-              borderLeft: '3px solid #ff4e00',
+              background: '#131127',
+              borderLeft: '3px solid #7C3AED',
               borderTop: '1px solid rgba(255,255,255,0.08)',
               borderBottom: '1px solid rgba(255,255,255,0.08)',
               boxSizing: 'border-box',
@@ -100,7 +100,7 @@ export function EliminatedTeamBanner({ team, design }) {
                   border: '1px solid rgba(255,255,255,0.1)',
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                 }}>
-                  <span style={{ fontFamily: 'Teko', fontSize: 14, fontWeight: 900, color: '#ff4e00' }}>
+                  <span style={{ fontFamily: 'Teko', fontSize: 14, fontWeight: 900, color: '#7C3AED' }}>
                     {(team.name || 'T').charAt(0).toUpperCase()}
                   </span>
                 </div>
@@ -115,7 +115,7 @@ export function EliminatedTeamBanner({ team, design }) {
               {/* red elim dot */}
               <div style={{
                 marginLeft: 'auto', width: 8, height: 8, borderRadius: '50%',
-                background: '#ff4e00', boxShadow: '0 0 8px rgba(255,78,0,0.8)', flexShrink: 0,
+                background: '#7C3AED', boxShadow: '0 0 8px rgba(124,58,237,0.8)', flexShrink: 0,
               }} />
             </div>
 
@@ -139,7 +139,7 @@ export function EliminatedTeamBanner({ team, design }) {
                     {/* skull / cross icon */}
                     {hasName && (
                       <svg width="12" height="12" viewBox="0 0 24 24" fill="none" style={{ flexShrink: 0 }}>
-                        <path d="M12 2C7.6 2 4 5.6 4 10v4l-2 2v2h4v2h4v-2h4v-2h4v-2l-2-2v-4c0-4.4-3.6-8-8-8z" fill="#ff4e00" opacity="0.9"/>
+                        <path d="M12 2C7.6 2 4 5.6 4 10v4l-2 2v2h4v2h4v-2h4v-2h4v-2l-2-2v-4c0-4.4-3.6-8-8-8z" fill="#7C3AED" opacity="0.9"/>
                         <circle cx="9" cy="10" r="1.5" fill="#000"/>
                         <circle cx="15" cy="10" r="1.5" fill="#000"/>
                       </svg>
@@ -161,7 +161,7 @@ export function EliminatedTeamBanner({ team, design }) {
             {/* bottom accent bar */}
             <div style={{
               height: 2, marginTop: 6,
-              background: 'linear-gradient(90deg, #ff4e00, #ffaa00, transparent)',
+              background: 'linear-gradient(90deg, #7C3AED, #3B82F6, transparent)',
             }} />
           </div>
         </div>
@@ -177,8 +177,8 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
   const [elimBanner, setElimBanner] = useState(null);
   const elimTimerRef  = useRef(null);
 
-  const accent  = '#ff4e00';
-  const gold   = '#ffaa00';
+  const accent  = '#7C3AED';
+  const gold   = '#3B82F6';
   const txtCol = '#FFFFFF';
   const green  = '#7BC043';
 
@@ -243,7 +243,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
 
   const matchLabel = currentMatch?.match_number ? 'MATCH ' + currentMatch.match_number : (design?.matchLabel || 'MATCH 1');
   const dayLabel   = (design?.dayLabel || 'DAY 1').toUpperCase();
-  const brandLabel = (design?.scoreboardBrand || 'EWC').toUpperCase();
+  const brandLabel = (design?.scoreboardBrand || 'NEXOVERLAYS').toUpperCase();
   const stageLabel = (design?.stageLabel || 'GROUP STAGE').toUpperCase();
 
   const displayRows = rows.length > 0
@@ -268,7 +268,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
     fontFamily: 'Teko, sans-serif',
     fontSize: 14,
     fontWeight: 700,
-    color: '#0c0c0e',
+    color: '#0D0B1A',
     letterSpacing: '1.5px',
     textTransform: 'uppercase',
   };
@@ -294,14 +294,14 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
         <div style={{
           width: '100%',
           height: HEADER_H,
-          background: 'linear-gradient(135deg, #ff4e00 0%, #ff6a1a 100%)',
+          background: 'linear-gradient(135deg, #7C3AED 0%, #9D5CFF 100%)',
           display: 'flex',
           alignItems: 'center',
           flexShrink: 0,
           padding: '0 12px 0 8px',
           boxSizing: 'border-box',
           clipPath: 'polygon(14px 0, 100% 0, 100% 100%, 0 100%)',
-          boxShadow: '0 0 12px rgba(255, 78, 0, 0.4)',
+          boxShadow: '0 0 12px rgba(124, 58, 237, 0.4)',
         }}>
           <div style={colRank}><span style={hdrTxt}>#</span></div>
           <div style={colLogo} />
@@ -327,7 +327,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
             let boxShadowStyle = 'none';
             if (isChampionRush && !isElim && !isGhost) {
               borderLeftStyle = '4px solid ' + gold;
-              boxShadowStyle = '0 0 10px rgba(255,170,0,0.3)';
+              boxShadowStyle = '0 0 10px rgba(59,130,246,0.3)';
             } else if (rank <= 3 && !isGhost) {
               borderLeftStyle = '3.5px solid ' + rankColor;
             }
@@ -341,7 +341,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                   flexShrink: 0,
                   display: 'flex',
                   alignItems: 'center',
-                  background: isGhost ? 'transparent' : '#0c0c0e',
+                  background: isGhost ? 'transparent' : '#0D0B1A',
                   borderBottom: '1px solid rgba(255,255,255,0.04)',
                   borderLeft: borderLeftStyle,
                   boxShadow: boxShadowStyle,
@@ -357,7 +357,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
                   <span style={{
                     fontFamily: 'Teko, sans-serif', fontSize: 18, fontWeight: 700,
                     color: isGhost ? 'rgba(255,255,255,0.1)' : isChampionRush ? gold : rank <= 3 ? rankColor : '#888888',
-                    textShadow: isChampionRush && !isGhost ? '0 0 6px rgba(255, 170, 0, 0.6)' : 'none',
+                    textShadow: isChampionRush && !isGhost ? '0 0 6px rgba(59, 130, 246, 0.6)' : 'none',
                   }}>{rank}</span>
                 </div>
 
@@ -440,7 +440,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
 
         {/* ══ FOOTER ══ */}
         <div style={{
-          width: '100%', height: FOOTER_H, background: '#141418', flexShrink: 0,
+          width: '100%', height: FOOTER_H, background: '#131127', flexShrink: 0,
           display: 'flex', alignItems: 'center', justifyContent: 'space-between',
           padding: '0 12px 0 8px', boxSizing: 'border-box',
           borderTop: '2px solid ' + accent,
@@ -467,11 +467,11 @@ function getThemeInline(design) {
   const style = design?.overlayStyle || 'default';
   // FFWS standard colors — always use these for 'default' style
   const presets = {
-    default:  { p:'#ff4e00', s:'#ffaa00' },
+    default:  { p:'#7C3AED', s:'#3B82F6' },
     neon:     { p:'#7BC043', s:'#BF00FF' },
     military: { p:'#9ABF30', s:'#C8A850' },
     minimal:  { p:'#FFFFFF', s:'#888888' },
-    retro:    { p:'#FF3030', s:'#ffaa00' },
+    retro:    { p:'#FF3030', s:'#3B82F6' },
   };
   const t = { ...(presets[style] || presets.default) };
   // Only allow custom colors for non-default styles
@@ -490,7 +490,7 @@ export function MatchInfoChip({ currentMatch, design }) {
   const mapName = currentMatch?.map_name || 'Bermuda';
   const matchNum = currentMatch?.match_number || 1;
   const tLogo = design?.logoUrl || null;
-  const tName = (design?.tournamentName || 'BOOYAH').toUpperCase();
+  const tName = (design?.tournamentName || 'NEXOVERLAYS').toUpperCase();
 
   return (
     <div
@@ -504,8 +504,8 @@ export function MatchInfoChip({ currentMatch, design }) {
       }}>
         {/* Gold accent bar — left edge */}
         <div style={{
-          width: 5, background: '#ffaa00',
-          boxShadow: '0 0 12px rgba(240,168,24,0.6)',
+          width: 5, background: '#3B82F6',
+          boxShadow: '0 0 12px rgba(59,130,246,0.6)',
           borderRadius: '3px 0 0 3px',
         }} />
 
@@ -551,7 +551,7 @@ export function MatchInfoChip({ currentMatch, design }) {
             <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.2em' }}>
               {(design?.matchInfoLabel || 'MATCH').toUpperCase()}
             </span>
-            <span style={{ fontFamily: 'Orbitron', fontSize: 16, fontWeight: 900, color: '#ffaa00', letterSpacing: '0.06em', lineHeight: 1 }}>
+            <span style={{ fontFamily: 'Orbitron', fontSize: 16, fontWeight: 900, color: '#3B82F6', letterSpacing: '0.06em', lineHeight: 1 }}>
               {String(matchNum).padStart(2, '0')}
             </span>
           </div>
@@ -609,7 +609,7 @@ export function GameIntroBanner({ currentMatch, design }) {
   const matchNum = currentMatch?.match_number || 1;
   const mapName = currentMatch?.map_name || 'Bermuda';
   const tLogo = design?.logoUrl || null;
-  const tName = design?.tournamentName || 'BOOYAH';
+  const tName = design?.tournamentName || 'NEXOVERLAYS';
   const sponsorLogo = design?.sponsorLogoUrl || null;
 
   return (
@@ -617,7 +617,7 @@ export function GameIntroBanner({ currentMatch, design }) {
       width: 1920,
       height: 1080,
       position: 'relative',
-      background: '#0c0c0e',
+      background: '#0D0B1A',
       backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(20, 24, 40, 0.9) 0%, rgba(5, 6, 12, 0.98) 100%)',
       overflow: 'hidden',
       color: '#fff',
@@ -666,8 +666,8 @@ export function GameIntroBanner({ currentMatch, design }) {
         <div style={{
           width: '65%',
           height: '100%',
-          background: 'linear-gradient(90deg, #141418 0%, #141418 100%)',
-          borderLeft: '4px solid #ffaa00',
+          background: 'linear-gradient(90deg, #131127 0%, #131127 100%)',
+          borderLeft: '4px solid #3B82F6',
           clipPath: 'polygon(0% 0%, 100% 0%, 88% 100%, 0% 100%)',
           display: 'flex',
           flexDirection: 'column',
@@ -693,13 +693,13 @@ export function GameIntroBanner({ currentMatch, design }) {
             fontFamily: 'Orbitron',
             fontSize: 64,
             fontWeight: 900,
-            color: '#ffaa00',
-            backgroundImage: 'linear-gradient(to bottom, #ffaa00 0%, #ffaa00 100%)',
+            color: '#3B82F6',
+            backgroundImage: 'linear-gradient(to bottom, #3B82F6 0%, #3B82F6 100%)',
             WebkitBackgroundClip: 'text',
             WebkitTextFillColor: 'transparent',
             letterSpacing: '0.05em',
             lineHeight: 1,
-            textShadow: '0 0 15px rgba(240, 168, 24, 0.2)'
+            textShadow: '0 0 15px rgba(59, 130, 246, 0.2)'
           }}>
             GAME {matchNum}
           </span>
@@ -750,7 +750,7 @@ export function GameIntroBanner({ currentMatch, design }) {
       <div
         style={{
           background: 'rgba(9, 10, 15, 0.85)',
-          border: '2px solid rgba(240, 168, 24, 0.45)',
+          border: '2px solid rgba(59, 130, 246, 0.45)',
           borderRadius: 30,
           padding: '10px 45px',
           display: 'flex',
@@ -766,8 +766,8 @@ export function GameIntroBanner({ currentMatch, design }) {
           width: 10,
           height: 10,
           borderRadius: '50%',
-          background: '#ffaa00',
-          boxShadow: '0 0 12px #ffaa00'
+          background: '#3B82F6',
+          boxShadow: '0 0 12px #3B82F6'
         }} />
         <span style={{
           fontFamily: 'Orbitron',
@@ -836,7 +836,7 @@ export function GameIntroBanner({ currentMatch, design }) {
 
 export function MatchScheduleGrid({ design }) {
   const tLogo = design?.logoUrl || null;
-  const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
+  const tName = design?.tournamentName || 'NEXOVERLAYS TOURNAMENT';
   const sponsorLogo = design?.sponsorLogoUrl || null;
   const mapImages = getMapImages();
   const scheduleMaps = ['Bermuda', 'Purgatory', 'Kalahari', 'Nexterra', 'Solara', 'RANDOM'];
@@ -873,7 +873,7 @@ export function MatchScheduleGrid({ design }) {
       height: 1080,
       position: 'relative',
       overflow: 'hidden',
-      background: 'radial-gradient(circle at 50% 40%, #141418 0%, #0c0c0e 80%, #0c0c0e 100%)',
+      background: 'radial-gradient(circle at 50% 40%, #131127 0%, #0D0B1A 80%, #0D0B1A 100%)',
       boxSizing: 'border-box',
     }}>
       {/* Hazard diagonal warning stripes in the corners */}
@@ -886,7 +886,7 @@ export function MatchScheduleGrid({ design }) {
         height: 180,
         transform: 'rotate(-45deg)',
         zIndex: 5,
-        backgroundImage: 'repeating-linear-gradient(-45deg, #ffaa00, #ffaa00 15px, #000 15px, #000 30px)',
+        backgroundImage: 'repeating-linear-gradient(-45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
         boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
         borderBottom: '4px solid #fff'
       }} />
@@ -900,7 +900,7 @@ export function MatchScheduleGrid({ design }) {
         height: 180,
         transform: 'rotate(45deg)',
         zIndex: 5,
-        backgroundImage: 'repeating-linear-gradient(45deg, #ffaa00, #ffaa00 15px, #000 15px, #000 30px)',
+        backgroundImage: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
         boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
         borderBottom: '4px solid #fff'
       }} />
@@ -914,7 +914,7 @@ export function MatchScheduleGrid({ design }) {
         height: 180,
         transform: 'rotate(45deg)',
         zIndex: 5,
-        backgroundImage: 'repeating-linear-gradient(45deg, #ffaa00, #ffaa00 15px, #000 15px, #000 30px)',
+        backgroundImage: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
         boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
         borderTop: '4px solid #fff'
       }} />
@@ -928,7 +928,7 @@ export function MatchScheduleGrid({ design }) {
         height: 180,
         transform: 'rotate(-45deg)',
         zIndex: 5,
-        backgroundImage: 'repeating-linear-gradient(-45deg, #ffaa00, #ffaa00 15px, #000 15px, #000 30px)',
+        backgroundImage: 'repeating-linear-gradient(-45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
         boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
         borderTop: '4px solid #fff'
       }} />
@@ -992,7 +992,7 @@ export function MatchScheduleGrid({ design }) {
               <div style={{
                 height: 80,
                 width: 80,
-                background: 'linear-gradient(135deg, #ffaa00, #ff4e00)',
+                background: 'linear-gradient(135deg, #3B82F6, #7C3AED)',
                 clipPath: 'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
                 display: 'flex',
                 alignItems: 'center',
@@ -1018,7 +1018,7 @@ export function MatchScheduleGrid({ design }) {
                 fontFamily: 'Orbitron',
                 fontSize: 14,
                 fontWeight: 700,
-                color: '#ffaa00',
+                color: '#3B82F6',
                 letterSpacing: '0.3em',
                 marginTop: 6,
                 textTransform: 'uppercase',
@@ -1085,7 +1085,7 @@ export function MatchScheduleGrid({ design }) {
                     position: 'absolute',
                     inset: 0,
                     zIndex: 0,
-                    background: 'radial-gradient(circle at center, #141418 0%, #0c0c0e 100%)',
+                    background: 'radial-gradient(circle at center, #131127 0%, #0D0B1A 100%)',
                   }}>
                     {/* Animated grid overlay inside Random card */}
                     <div style={{
@@ -1109,7 +1109,7 @@ export function MatchScheduleGrid({ design }) {
                       justifyContent: 'center',
                       boxShadow: '0 0 20px rgba(255, 199, 0, 0.1)'
                     }}>
-                      <span style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#ffaa00', opacity: 0.6 }}>?</span>
+                      <span style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#3B82F6', opacity: 0.6 }}>?</span>
                     </div>
                   </div>
                 ) : mapImg ? (
@@ -1126,7 +1126,7 @@ export function MatchScheduleGrid({ design }) {
                     position: 'absolute',
                     inset: 0,
                     zIndex: 0,
-                    background: 'linear-gradient(135deg, #141418, #0c0c0e)',
+                    background: 'linear-gradient(135deg, #131127, #0D0B1A)',
                   }} />
                 )}
 
@@ -1159,7 +1159,7 @@ export function MatchScheduleGrid({ design }) {
                   justifyContent: 'flex-start',
                 }}>
                   <div style={{
-                    background: 'linear-gradient(135deg, #ffaa00 0%, #ff4e00 100%)',
+                    background: 'linear-gradient(135deg, #3B82F6 0%, #7C3AED 100%)',
                     borderRadius: 4,
                     padding: '6px 14px',
                     boxShadow: '0 4px 12px rgba(255, 136, 0, 0.4)',
@@ -1201,7 +1201,7 @@ export function MatchScheduleGrid({ design }) {
                     fontFamily: 'Orbitron',
                     fontSize: 10,
                     fontWeight: 700,
-                    color: isRandom ? '#ff4e00' : '#ffaa00',
+                    color: isRandom ? '#7C3AED' : '#3B82F6',
                     letterSpacing: '0.2em',
                     marginTop: 6,
                     textTransform: 'uppercase',
@@ -1230,9 +1230,9 @@ export function MatchScheduleGrid({ design }) {
             <div style={{
               width: 12,
               height: 12,
-              background: '#ffaa00',
+              background: '#3B82F6',
               clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
-              boxShadow: '0 0 8px #ffaa00'
+              boxShadow: '0 0 8px #3B82F6'
             }} />
             <span style={{
               fontFamily: 'Orbitron',
@@ -1249,7 +1249,7 @@ export function MatchScheduleGrid({ design }) {
             fontFamily: 'Orbitron',
             fontSize: 13,
             fontWeight: 800,
-            color: '#ffaa00',
+            color: '#3B82F6',
             letterSpacing: '0.15em',
             textTransform: 'uppercase'
           }}>
@@ -1313,7 +1313,7 @@ export function PointRushStandings({ teams = [], design }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {/* Left Header */}
             <div style={{
-              background: '#ff4e00',
+              background: '#7C3AED',
               padding: '6px 16px',
               clipPath: 'polygon(0% 0%, 100% 0%, 88% 100%, 0% 100%)',
               height: 34,
@@ -1325,7 +1325,7 @@ export function PointRushStandings({ teams = [], design }) {
                 fontFamily: 'Teko, sans-serif',
                 fontSize: 22,
                 fontWeight: 600,
-                color: '#0c0c0e',
+                color: '#0D0B1A',
                 letterSpacing: '2px',
                 lineHeight: 1,
                 textTransform: 'uppercase'
@@ -1346,12 +1346,12 @@ export function PointRushStandings({ teams = [], design }) {
                 let rankBadgeBorder = '1px solid rgba(255, 255, 255, 0.1)';
                 
                 if (rank === 1) {
-                  rankBadgeBg = 'linear-gradient(135deg, #ffaa00, #ff4e00)';
-                  rankBadgeColor = '#0c0c0e';
+                  rankBadgeBg = 'linear-gradient(135deg, #3B82F6, #7C3AED)';
+                  rankBadgeColor = '#0D0B1A';
                   rankBadgeBorder = 'none';
                 } else if (rank === 2) {
                   rankBadgeBg = 'linear-gradient(135deg, #C0C0C0, #909090)';
-                  rankBadgeColor = '#0c0c0e';
+                  rankBadgeColor = '#0D0B1A';
                   rankBadgeBorder = 'none';
                 } else if (rank === 3) {
                   rankBadgeBg = 'linear-gradient(135deg, #CD7F32, #8B4513)';
@@ -1366,10 +1366,10 @@ export function PointRushStandings({ teams = [], design }) {
                       display: 'flex',
                       alignItems: 'center',
                       height: 46,
-                      background: '#141418',
+                      background: '#131127',
                       clipPath: 'polygon(6% 0%, 100% 0%, 100% 100%, 0% 100%)',
-                      border: isRushEligible ? '1.5px solid #ffaa00' : 'none',
-                      boxShadow: isRushEligible ? 'inset 0 0 8px rgba(255, 170, 0, 0.25)' : 'none',
+                      border: isRushEligible ? '1.5px solid #3B82F6' : 'none',
+                      boxShadow: isRushEligible ? 'inset 0 0 8px rgba(59, 130, 246, 0.25)' : 'none',
                       padding: '0 12px 0 16px',
                       position: 'relative',
                       boxSizing: 'border-box'
@@ -1454,7 +1454,7 @@ export function PointRushStandings({ teams = [], design }) {
                       fontFamily: 'Teko, sans-serif',
                       fontSize: 26,
                       fontWeight: 600,
-                      color: '#ff4e00',
+                      color: '#7C3AED',
                       textAlign: 'right',
                       minWidth: 36
                     }}>
@@ -1470,14 +1470,14 @@ export function PointRushStandings({ teams = [], design }) {
           <div style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             {/* Right Header */}
             <div style={{
-              background: '#0c0c0e',
+              background: '#0D0B1A',
               padding: '6px 16px',
               clipPath: 'polygon(0% 0%, 100% 0%, 100% 100%, 12% 100%)',
               height: 34,
               display: 'flex',
               alignItems: 'center',
               boxSizing: 'border-box',
-              borderLeft: '2px solid #ff4e00'
+              borderLeft: '2px solid #7C3AED'
             }}>
               <span style={{
                 fontFamily: 'Teko, sans-serif',
@@ -1506,10 +1506,10 @@ export function PointRushStandings({ teams = [], design }) {
                       display: 'flex',
                       alignItems: 'center',
                       height: 46,
-                      background: '#141418',
+                      background: '#131127',
                       clipPath: 'polygon(6% 0%, 100% 0%, 100% 100%, 0% 100%)',
-                      border: isRushEligible ? '1.5px solid #ffaa00' : 'none',
-                      boxShadow: isRushEligible ? 'inset 0 0 8px rgba(255, 170, 0, 0.25)' : 'none',
+                      border: isRushEligible ? '1.5px solid #3B82F6' : 'none',
+                      boxShadow: isRushEligible ? 'inset 0 0 8px rgba(59, 130, 246, 0.25)' : 'none',
                       padding: '0 12px 0 16px',
                       position: 'relative',
                       boxSizing: 'border-box'
@@ -1594,7 +1594,7 @@ export function PointRushStandings({ teams = [], design }) {
                       fontFamily: 'Teko, sans-serif',
                       fontSize: 26,
                       fontWeight: 600,
-                      color: '#ff4e00',
+                      color: '#7C3AED',
                       textAlign: 'right',
                       minWidth: 36
                     }}>
@@ -1609,21 +1609,21 @@ export function PointRushStandings({ teams = [], design }) {
 
         {/* BOTTOM BRANDING BAR with angular edges */}
         <div style={{
-          background: '#0c0c0e',
+          background: '#0D0B1A',
           height: 38,
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'space-between',
           padding: '0 24px',
           clipPath: 'polygon(2% 0%, 98% 0%, 100% 100%, 0% 100%)',
-          borderTop: '2px solid #ff4e00',
+          borderTop: '2px solid #7C3AED',
           boxSizing: 'border-box'
         }}>
           <span style={{
             fontFamily: 'Rajdhani, sans-serif',
             fontSize: 12,
             fontWeight: 700,
-            color: '#ffaa00',
+            color: '#3B82F6',
             letterSpacing: '2px',
             textTransform: 'uppercase'
           }}>
@@ -1648,12 +1648,12 @@ export function PointRushStandings({ teams = [], design }) {
 
 export function RoadmapOverlay({ tournament, matches = [], currentMatch, design }) {
   const tLogo = design?.logoUrl || null;
-  const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
+  const tName = design?.tournamentName || 'NEXOVERLAYS TOURNAMENT';
   const sponsorLogo = design?.sponsorLogoUrl || null;
   const sponsorLabel = design?.sponsorLabel || 'OFFICIAL SPONSOR';
-  const accent = '#ff4e00';
-  const accent2 = '#ffaa00';
-  const gold = '#ffaa00';
+  const accent = '#7C3AED';
+  const accent2 = '#3B82F6';
+  const gold = '#3B82F6';
 
   // Parse format_config to build the roadmap
   let formatConfig = null;
@@ -1722,7 +1722,7 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
   return (
     <div style={{
       width: 1920, height: 1080, position: 'relative', overflow: 'hidden',
-      background: 'radial-gradient(ellipse at 50% 30%, #141418 0%, #0c0c0e 70%, #0c0c0e 100%)',
+      background: 'radial-gradient(ellipse at 50% 30%, #131127 0%, #0D0B1A 70%, #0D0B1A 100%)',
       boxSizing: 'border-box', color: '#fff'
     }}>
       {/* Ambient glows */}
@@ -1780,7 +1780,7 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
               }}>
                 <div style={{
                   width: 36, height: 36, borderRadius: '50%',
-                  background: `linear-gradient(135deg, ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}, ${si === 0 ? accent2 : si === stages.length - 1 ? '#ff4e00' : accent})`,
+                  background: `linear-gradient(135deg, ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}, ${si === 0 ? accent2 : si === stages.length - 1 ? '#7C3AED' : accent})`,
                   display: 'flex', alignItems: 'center', justifyContent: 'center',
                   fontFamily: 'Orbitron', fontSize: 14, fontWeight: 900, color: '#fff',
                   boxShadow: `0 0 15px ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}60`
@@ -1855,7 +1855,7 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
             {stages.length} STAGES · {totalMatches} MATCHES · {completedMatches} COMPLETED
           </span>
           <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: accent, letterSpacing: '0.2em' }}>
-            BOOYAH DIRECTOR · TOURNAMENT ROADMAP
+            NEXOVERLAYS · TOURNAMENT ROADMAP
           </span>
         </div>
       </div>
@@ -1869,13 +1869,13 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
 // ─────────────────────────────────────────────────────────────────────────────
 export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMatch, design, championRush }) {
   const tLogo = design?.logoUrl || null;
-  const tName = design?.tournamentName || 'BOOYAH TOURNAMENT';
+  const tName = design?.tournamentName || 'NEXOVERLAYS TOURNAMENT';
   const tSubtitle = design?.tournamentSubtitle || 'FREE FIRE ESPORTS';
   const sponsorLogo = design?.sponsorLogoUrl || null;
   const sponsorLabel = design?.sponsorLabel || 'OFFICIAL SPONSOR';
-  const accent = '#ff4e00';
-  const accent2 = '#ffaa00';
-  const gold = '#ffaa00';
+  const accent = '#7C3AED';
+  const accent2 = '#3B82F6';
+  const gold = '#3B82F6';
 
   // Parse format config for stats
   let formatConfig = null;
@@ -1925,7 +1925,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
   return (
     <div style={{
       width: 1920, height: 1080, position: 'relative', overflow: 'hidden',
-      background: 'radial-gradient(ellipse at 30% 20%, #141418 0%, #0c0c0e 60%, #0c0c0e 100%)',
+      background: 'radial-gradient(ellipse at 30% 20%, #131127 0%, #0D0B1A 60%, #0D0B1A 100%)',
       boxSizing: 'border-box', color: '#fff'
     }}>
       {/* Ambient glows */}
@@ -1968,7 +1968,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
           <div style={{ flex: 1.2, display: 'flex', flexDirection: 'column', gap: 24 }}>
             {/* Current Match Card */}
             <div style={{
-              borderRadius: 20, border: `1px solid ${accent}30`, background: 'rgba(255, 78, 0, 0.04)',
+              borderRadius: 20, border: `1px solid ${accent}30`, background: 'rgba(124, 58, 237, 0.04)',
               padding: 32, position: 'relative', overflow: 'hidden',
             }}>
               {/* Glow effect */}
@@ -2075,7 +2075,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
         {/* Footer */}
         <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 24, marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
           <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.3em' }}>
-            BOOYAH DIRECTOR · EVENT DETAILS
+            NEXOVERLAYS · EVENT DETAILS
           </span>
           <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: accent, letterSpacing: '0.3em' }}>
             FREE FIRE ESPORTS BROADCAST

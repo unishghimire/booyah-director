@@ -124,17 +124,17 @@ function TeamCard({ team, players, currentMatch, tournament, onAction }) {
       </div>
 
       {/* Auto-calc preview: PPT + Kills×PPK = Total */}
-      <div className="mt-2 rounded-md border border-[#ff4e00]/20 bg-[#ff4e00]/5 px-2.5 py-2">
+      <div className="mt-2 rounded-md border border-[#7C3AED]/20 bg-[#7C3AED]/5 px-2.5 py-2">
         <div className="mb-1.5 flex items-center gap-1.5">
-          <Calculator className="h-3 w-3 text-[#ff4e00]" />
-          <span className="font-orbitron text-[8px] font-black uppercase tracking-wider text-[#ff4e00]">AUTO CALC</span>
+          <Calculator className="h-3 w-3 text-[#7C3AED]" />
+          <span className="font-orbitron text-[8px] font-black uppercase tracking-wider text-[#7C3AED]">AUTO CALC</span>
         </div>
         <div className="flex items-center justify-between gap-1 text-[10px] font-mono">
           <span className="text-cyan-400" title="Placement points">{placementPts}P</span>
           <span className="text-gray-500">+</span>
           <span className="text-green-400" title="Kills × points per kill">{totalKills}×{ppk}={killPts}K</span>
           <span className="text-gray-500">=</span>
-          <span className="font-bold text-[#ffaa00] text-xs">{autoTotal}</span>
+          <span className="font-bold text-[#3B82F6] text-xs">{autoTotal}</span>
         </div>
       </div>
 

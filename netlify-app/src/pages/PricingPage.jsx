@@ -6,15 +6,15 @@ import toast from 'react-hot-toast';
 
 const PLANS = [
   {
-    id: 'weekly', label: 'WEEKLY', price: 299, period: '/week', icon: Zap, color: '#ffaa00',
+    id: 'weekly', label: 'WEEKLY', price: 299, period: '/week', icon: Zap, color: '#3B82F6',
     features: ['Full Director Panel','Data Inputer Access','OBS Overlay System (9 scenes)','1 Active Tournament'],
   },
   {
-    id: 'monthly', label: 'MONTHLY', price: 599, period: '/month', icon: Star, color: '#ff4e00', popular: true,
+    id: 'monthly', label: 'MONTHLY', price: 599, period: '/month', icon: Star, color: '#7C3AED', popular: true,
     features: ['Everything in Weekly','Priority Support','Google Sheets Import','Multi-Match Management','Advanced Kill Feed'],
   },
   {
-    id: 'yearly', label: 'YEARLY', price: 2999, period: '/year', icon: Crown, color: '#ff4e00',
+    id: 'yearly', label: 'YEARLY', price: 2999, period: '/year', icon: Crown, color: '#7C3AED',
     badge: 'SAVE 58%',
     features: ['Everything in Monthly','Custom Branding & Logos','All Overlay Themes','Early Access Features','Caster Screen & Profiles','Best Value'],
   },
@@ -231,16 +231,16 @@ export default function PricingPage() {
   return (
     <div style={{ minHeight:'100vh', background:'#060915', position:'relative', overflow:'hidden', color: '#fff' }}>
       {/* Background Grid Accent */}
-      <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(rgba(255,78,0,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(255,170,0,0.03) 1px, transparent 1px)', backgroundSize:'80px 80px', pointerEvents:'none' }} />
-      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 1200px 600px at 50% 0%, rgba(255,78,0,0.07), transparent)', pointerEvents:'none' }} />
+      <div style={{ position:'absolute', inset:0, backgroundImage:'linear-gradient(rgba(124,58,237,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(59,130,246,0.03) 1px, transparent 1px)', backgroundSize:'80px 80px', pointerEvents:'none' }} />
+      <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 1200px 600px at 50% 0%, rgba(124,58,237,0.07), transparent)', pointerEvents:'none' }} />
 
       {/* Header */}
       <div style={{ position:'relative', zIndex:10, display:'flex', alignItems:'center', justifyContent:'space-between', padding:'16px 28px', borderBottom:'1px solid rgba(255,255,255,0.05)', backdropFilter:'blur(12px)', background:'rgba(6,9,21,0.8)' }}>
         <div style={{ display:'flex', alignItems:'center', gap:10 }}>
-          <div style={{ width:32, height:32, borderRadius:8, background:'rgba(255,78,0,0.15)', border:'1px solid rgba(255,78,0,0.35)', display:'flex', alignItems:'center', justifyContent:'center' }}>
-            <Zap size={16} style={{ color:'#ff4e00' }} />
+          <div style={{ width:32, height:32, borderRadius:8, background:'rgba(124,58,237,0.15)', border:'1px solid rgba(124,58,237,0.35)', display:'flex', alignItems:'center', justifyContent:'center' }}>
+            <Zap size={16} style={{ color:'#7C3AED' }} />
           </div>
-          <span style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:'#fff', letterSpacing:'0.08em' }}>BOOYAH DIRECTOR</span>
+          <span style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:900, color:'#fff', letterSpacing:'0.08em' }}>NEXOVERLAYS</span>
         </div>
         <div style={{ display:'flex', alignItems:'center', gap:20 }}>
           <span style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.35)', letterSpacing:'0.1em' }}>{user?.email}</span>
@@ -253,34 +253,34 @@ export default function PricingPage() {
       <div style={{ position:'relative', zIndex:10, maxWidth:1000, margin:'0 auto', padding:'48px 24px' }}>
         {/* Title */}
         <div style={{ textAlign:'center', marginBottom:40 }}>
-          <div style={{ display:'inline-flex', width:56, height:56, borderRadius:16, background:'rgba(255,78,0,0.12)', border:'1px solid rgba(255,78,0,0.3)', alignItems:'center', justifyContent:'center', marginBottom:16, boxShadow:'0 0 30px rgba(255,78,0,0.15)' }}>
-            <Crown size={26} style={{ color:'#ff4e00' }} />
+          <div style={{ display:'inline-flex', width:56, height:56, borderRadius:16, background:'rgba(124,58,237,0.12)', border:'1px solid rgba(124,58,237,0.3)', alignItems:'center', justifyContent:'center', marginBottom:16, boxShadow:'0 0 30px rgba(124,58,237,0.15)' }}>
+            <Crown size={26} style={{ color:'#7C3AED' }} />
           </div>
           <h1 style={{ fontFamily:'Orbitron', fontSize:28, fontWeight:900, color:'#fff', letterSpacing:'0.08em', margin:'0 0 8px' }}>CHOOSE YOUR PLAN</h1>
-          <p style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.35)', letterSpacing:'0.3em', margin:0 }}>SUBSCRIPTION REQUIRED TO ACCESS BOOYAH DIRECTOR</p>
+          <p style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.35)', letterSpacing:'0.3em', margin:0 }}>SUBSCRIPTION REQUIRED TO ACCESS NEXOVERLAYS</p>
         </div>
 
         {/* Step Indicator */}
         <div style={{ display: 'flex', justifyContent: 'center', alignItems: 'center', gap: 12, marginBottom: 40, fontFamily: 'Orbitron', fontSize: 11, fontWeight: 900, letterSpacing: '0.1em' }}>
-          <span style={{ color: step === 1 ? '#ff4e00' : 'rgba(255,255,255,0.35)' }}>1. PLAN</span>
+          <span style={{ color: step === 1 ? '#7C3AED' : 'rgba(255,255,255,0.35)' }}>1. PLAN</span>
           <span style={{ color: 'rgba(255,255,255,0.2)' }}>&gt;</span>
-          <span style={{ color: step === 2 ? '#ff4e00' : 'rgba(255,255,255,0.35)' }}>2. METHOD</span>
+          <span style={{ color: step === 2 ? '#7C3AED' : 'rgba(255,255,255,0.35)' }}>2. METHOD</span>
           <span style={{ color: 'rgba(255,255,255,0.2)' }}>&gt;</span>
-          <span style={{ color: step === 3 ? '#ff4e00' : 'rgba(255,255,255,0.35)' }}>3. UPLOAD</span>
+          <span style={{ color: step === 3 ? '#7C3AED' : 'rgba(255,255,255,0.35)' }}>3. UPLOAD</span>
           <span style={{ color: 'rgba(255,255,255,0.2)' }}>&gt;</span>
-          <span style={{ color: step === 4 ? '#ffaa00' : 'rgba(255,255,255,0.35)' }}>4. COMPLETE</span>
+          <span style={{ color: step === 4 ? '#3B82F6' : 'rgba(255,255,255,0.35)' }}>4. COMPLETE</span>
         </div>
 
         {/* Plan Summary shown at step 2, 3, 4 */}
         {step > 1 && (
-          <div style={{ background: 'rgba(255,78,0,0.05)', border: '1px solid rgba(255,78,0,0.25)', borderRadius: 16, padding: '16px 24px', marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', backdropFilter: 'blur(10px)' }}>
+          <div style={{ background: 'rgba(124,58,237,0.05)', border: '1px solid rgba(124,58,237,0.25)', borderRadius: 16, padding: '16px 24px', marginBottom: 32, display: 'flex', justifyContent: 'space-between', alignItems: 'center', backdropFilter: 'blur(10px)' }}>
             <div>
               <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>SELECTED PLAN</span>
-              <h3 style={{ fontFamily: 'Orbitron', fontSize: 18, fontWeight: 900, color: '#ff4e00', margin: '4px 0 0', letterSpacing: '0.05em' }}>{selectedPlan.label}</h3>
+              <h3 style={{ fontFamily: 'Orbitron', fontSize: 18, fontWeight: 900, color: '#7C3AED', margin: '4px 0 0', letterSpacing: '0.05em' }}>{selectedPlan.label}</h3>
             </div>
             <div style={{ textAlign: 'right' }}>
               <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>TOTAL AMOUNT</span>
-              <h3 style={{ fontFamily: 'Orbitron', fontSize: 18, fontWeight: 900, color: '#ffaa00', margin: '4px 0 0', letterSpacing: '0.05em' }}>NPR {finalPrice}</h3>
+              <h3 style={{ fontFamily: 'Orbitron', fontSize: 18, fontWeight: 900, color: '#3B82F6', margin: '4px 0 0', letterSpacing: '0.05em' }}>NPR {finalPrice}</h3>
             </div>
           </div>
         )}
@@ -297,7 +297,7 @@ export default function PricingPage() {
                 />
               </div>
               <button onClick={checkPromo} disabled={checking}
-                style={{ padding:'10px 20px', borderRadius:10, fontFamily:'Orbitron', fontSize:10, fontWeight:900, color:'#fff', background:'linear-gradient(135deg,#ff4e00,#ff4e00)', border:'none', cursor: checking ? 'not-allowed' : 'pointer', opacity: checking ? 0.6 : 1 }}>
+                style={{ padding:'10px 20px', borderRadius:10, fontFamily:'Orbitron', fontSize:10, fontWeight:900, color:'#fff', background:'linear-gradient(135deg,#7C3AED,#7C3AED)', border:'none', cursor: checking ? 'not-allowed' : 'pointer', opacity: checking ? 0.6 : 1 }}>
                 {checking ? 'CHECKING...' : 'APPLY'}
               </button>
               {promoResult && <span style={{ fontFamily:'Orbitron', fontSize:10, color:'#22c55e' }}>✓ SAVE NPR {promoResult.savings}!</span>}
@@ -313,15 +313,15 @@ export default function PricingPage() {
                   <div key={plan.id} onClick={() => setSelected(plan.id)}
                     style={{
                       position:'relative', borderRadius:20, padding:'28px 24px', cursor:'pointer',
-                      background: plan.popular ? 'rgba(255,78,0,0.05)' : 'rgba(10,14,26,0.8)',
-                      border: isSelected ? `1px solid ${plan.color}` : plan.popular ? '1px solid rgba(255,78,0,0.3)' : '1px solid rgba(255,255,255,0.07)',
-                      boxShadow: isSelected ? `0 0 30px ${plan.color}25` : plan.popular ? '0 0 20px rgba(255,78,0,0.08)' : 'none',
+                      background: plan.popular ? 'rgba(124,58,237,0.05)' : 'rgba(10,14,26,0.8)',
+                      border: isSelected ? `1px solid ${plan.color}` : plan.popular ? '1px solid rgba(124,58,237,0.3)' : '1px solid rgba(255,255,255,0.07)',
+                      boxShadow: isSelected ? `0 0 30px ${plan.color}25` : plan.popular ? '0 0 20px rgba(124,58,237,0.08)' : 'none',
                       backdropFilter:'blur(20px)', transition:'all 0.25s',
-                      backgroundImage: plan.popular ? 'repeating-linear-gradient(45deg,rgba(255,78,0,0.02) 0,rgba(255,78,0,0.02) 1px,transparent 1px,transparent 8px)' : 'none',
+                      backgroundImage: plan.popular ? 'repeating-linear-gradient(45deg,rgba(124,58,237,0.02) 0,rgba(124,58,237,0.02) 1px,transparent 1px,transparent 8px)' : 'none',
                     }}
                   >
                     {plan.popular && (
-                      <div style={{ position:'absolute', top:-13, left:'50%', transform:'translateX(-50%)', padding:'4px 16px', borderRadius:20, fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:'#fff', background:'linear-gradient(135deg,#ff4e00,#ff4e00)', whiteSpace:'nowrap', boxShadow:'0 4px 12px rgba(255,78,0,0.4)' }}>
+                      <div style={{ position:'absolute', top:-13, left:'50%', transform:'translateX(-50%)', padding:'4px 16px', borderRadius:20, fontFamily:'Orbitron', fontSize:8, fontWeight:900, color:'#fff', background:'linear-gradient(135deg,#7C3AED,#7C3AED)', whiteSpace:'nowrap', boxShadow:'0 4px 12px rgba(124,58,237,0.4)' }}>
                         MOST POPULAR
                       </div>
                     )}
@@ -384,7 +384,7 @@ export default function PricingPage() {
           <div style={{ background: 'rgba(10,14,26,0.8)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, padding: '32px', backdropFilter: 'blur(20px)' }}>
             {paymentInfoLoading ? (
               <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', justifyContent: 'center', minHeight: '200px', gap: '16px' }}>
-                <RefreshCw size={24} className="animate-spin" style={{ color: '#ff4e00', animation: 'spin 1.5s linear infinite' }} />
+                <RefreshCw size={24} className="animate-spin" style={{ color: '#7C3AED', animation: 'spin 1.5s linear infinite' }} />
                 <span style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', letterSpacing: '0.1em' }}>LOADING PAYMENT DETAILS...</span>
               </div>
             ) : (<>
@@ -394,16 +394,16 @@ export default function PricingPage() {
             <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 16, marginBottom: 32 }}>
               <button onClick={() => setPaymentMethod('esewa')}
                 style={{
-                  padding: '16px', borderRadius: 12, border: paymentMethod === 'esewa' ? '1px solid #ff4e00' : '1px solid rgba(255,255,255,0.08)',
-                  background: paymentMethod === 'esewa' ? 'rgba(255,78,0,0.08)' : 'rgba(255,255,255,0.02)',
+                  padding: '16px', borderRadius: 12, border: paymentMethod === 'esewa' ? '1px solid #7C3AED' : '1px solid rgba(255,255,255,0.08)',
+                  background: paymentMethod === 'esewa' ? 'rgba(124,58,237,0.08)' : 'rgba(255,255,255,0.02)',
                   fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', cursor: 'pointer', transition: 'all 0.2s'
                 }}>
                 eSewa QR / Wallet
               </button>
               <button onClick={() => setPaymentMethod('bank')}
                 style={{
-                  padding: '16px', borderRadius: 12, border: paymentMethod === 'bank' ? '1px solid #ff4e00' : '1px solid rgba(255,255,255,0.08)',
-                  background: paymentMethod === 'bank' ? 'rgba(255,78,0,0.08)' : 'rgba(255,255,255,0.02)',
+                  padding: '16px', borderRadius: 12, border: paymentMethod === 'bank' ? '1px solid #7C3AED' : '1px solid rgba(255,255,255,0.08)',
+                  background: paymentMethod === 'bank' ? 'rgba(124,58,237,0.08)' : 'rgba(255,255,255,0.02)',
                   fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', cursor: 'pointer', transition: 'all 0.2s'
                 }}>
                 Bank Transfer
@@ -416,15 +416,15 @@ export default function PricingPage() {
                 <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>SCAN QR CODE TO PAY</span>
                 {paymentInfo?.esewa?.qrUrl ? (
                   <img src={paymentInfo.esewa.qrUrl} alt="eSewa QR Code"
-                    style={{ width: 200, height: 200, borderRadius: 12, border: '4px solid #fff', boxShadow: '0 0 20px rgba(255,78,0,0.3)', objectFit: 'contain' }} />
+                    style={{ width: 200, height: 200, borderRadius: 12, border: '4px solid #fff', boxShadow: '0 0 20px rgba(124,58,237,0.3)', objectFit: 'contain' }} />
                 ) : (
                   <div style={{ width: 200, height: 200, display: 'flex', alignItems: 'center', justifyContent: 'center', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 12, fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)' }}>No QR uploaded yet</div>
                 )}
                 
                 <div style={{ textAlign: 'center' }}>
                   <p style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px' }}>Name: <strong style={{ color: '#fff', fontSize: 12 }}>{paymentInfo?.esewa?.name || ''}</strong></p>
-                  <p style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px' }}>eSewa Number: <strong style={{ color: '#ff4e00', fontSize: 13 }}>{paymentInfo?.esewa?.number || 'Contact admin'}</strong></p>
-                  <p style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: 0 }}>Exact Amount: <strong style={{ color: '#ffaa00', fontSize: 13 }}>NPR {finalPrice}</strong></p>
+                  <p style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: '0 0 4px' }}>eSewa Number: <strong style={{ color: '#7C3AED', fontSize: 13 }}>{paymentInfo?.esewa?.number || 'Contact admin'}</strong></p>
+                  <p style={{ fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.6)', margin: 0 }}>Exact Amount: <strong style={{ color: '#3B82F6', fontSize: 13 }}>NPR {finalPrice}</strong></p>
                 </div>
               </div>
             ) : (
@@ -433,11 +433,11 @@ export default function PricingPage() {
                   <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'center', gap: 8, marginBottom: 12 }}>
                     <span style={{ fontFamily: 'Orbitron', fontSize: 10, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.1em' }}>SCAN QR CODE TO PAY</span>
                     <img src={paymentInfo.bank.qrUrl} alt="Bank QR Code"
-                      style={{ width: 200, height: 200, borderRadius: 12, border: '4px solid #fff', boxShadow: '0 0 20px rgba(255,170,0,0.3)', objectFit: 'contain' }} />
+                      style={{ width: 200, height: 200, borderRadius: 12, border: '4px solid #fff', boxShadow: '0 0 20px rgba(59,130,246,0.3)', objectFit: 'contain' }} />
                   </div>
                 )}
                 <div style={{ width: '100%' }}>
-                  <h4 style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: '#ff4e00', letterSpacing: '0.05em', margin: '0 0 16px 0', textAlign: 'center' }}>BANK ACCOUNT DETAILS</h4>
+                  <h4 style={{ fontFamily: 'Orbitron', fontSize: 12, fontWeight: 900, color: '#7C3AED', letterSpacing: '0.05em', margin: '0 0 16px 0', textAlign: 'center' }}>BANK ACCOUNT DETAILS</h4>
                   <div style={{ display: 'flex', flexDirection: 'column', gap: 10, fontFamily: 'Orbitron', fontSize: 11, color: 'rgba(255,255,255,0.7)' }}>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
                       <span>Bank Name:</span>
@@ -449,7 +449,7 @@ export default function PricingPage() {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
                       <span>Account Number:</span>
-                      <strong style={{ color: '#ff4e00' }}>{paymentInfo?.bank?.accountNumber || '—'}</strong>
+                      <strong style={{ color: '#7C3AED' }}>{paymentInfo?.bank?.accountNumber || '—'}</strong>
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', borderBottom: '1px solid rgba(255,255,255,0.05)', paddingBottom: 6 }}>
                       <span>Branch:</span>
@@ -457,7 +457,7 @@ export default function PricingPage() {
                     </div>
                     <div style={{ display: 'flex', justifyContent: 'space-between', paddingTop: 6 }}>
                       <span>Amount to Transfer:</span>
-                      <strong style={{ color: '#ffaa00' }}>NPR {finalPrice}</strong>
+                      <strong style={{ color: '#3B82F6' }}>NPR {finalPrice}</strong>
                     </div>
                   </div>
                 </div>
@@ -519,8 +519,8 @@ export default function PricingPage() {
                 <button type="submit"
                   style={{
                     flex: 2, padding: '14px', borderRadius: 10, border: 'none',
-                    background: 'linear-gradient(135deg,#ff4e00,#ff4e00)', fontFamily: 'Orbitron', fontSize: 10, fontWeight: 900, color: '#fff', cursor: 'pointer',
-                    boxShadow: '0 4px 16px rgba(255,78,0,0.3)'
+                    background: 'linear-gradient(135deg,#7C3AED,#7C3AED)', fontFamily: 'Orbitron', fontSize: 10, fontWeight: 900, color: '#fff', cursor: 'pointer',
+                    boxShadow: '0 4px 16px rgba(124,58,237,0.3)'
                   }}>
                   SUBMIT PAYMENT DETAILS
                 </button>
@@ -533,7 +533,7 @@ export default function PricingPage() {
         {/* STEP 3 & 4: Status / Processing / Completed view */}
         {step === 3 && (
           <div style={{ background: 'rgba(10,14,26,0.8)', border: '1px solid rgba(255,255,255,0.08)', borderRadius: 24, padding: '40px', backdropFilter: 'blur(20px)', textAlign: 'center' }}>
-            <RefreshCw size={40} className="animate-spin" style={{ color: '#ff4e00', margin: '0 auto 24px', animation: 'spin 1.5s linear infinite' }} />
+            <RefreshCw size={40} className="animate-spin" style={{ color: '#7C3AED', margin: '0 auto 24px', animation: 'spin 1.5s linear infinite' }} />
             <h3 style={{ fontFamily: 'Orbitron', fontSize: 18, fontWeight: 900, color: '#fff', letterSpacing: '0.1em', marginBottom: 12 }}>
               {isUploading ? 'UPLOADING SCREENSHOT...' : 'SUBMITTING FOR VERIFICATION...'}
             </h3>
@@ -554,8 +554,8 @@ export default function PricingPage() {
             </p>
             <button onClick={resetFlow}
               style={{
-                padding: '12px 30px', borderRadius: 10, border: '1px solid #ff4e00',
-                background: 'rgba(255,78,0,0.05)', fontFamily: 'Orbitron', fontSize: 10, fontWeight: 900, color: '#ff4e00', cursor: 'pointer'
+                padding: '12px 30px', borderRadius: 10, border: '1px solid #7C3AED',
+                background: 'rgba(124,58,237,0.05)', fontFamily: 'Orbitron', fontSize: 10, fontWeight: 900, color: '#7C3AED', cursor: 'pointer'
               }}>
               VIEW PLANS / TRY AGAIN
             </button>
@@ -600,7 +600,7 @@ export default function PricingPage() {
                     </span>
                   )}
                 </div>
-                <span style={{ padding: '6px 14px', borderRadius: 20, fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, background: 'rgba(255,78,0,0.15)', color: '#ff4e00', border: '1px solid rgba(255,78,0,0.3)', boxShadow: '0 0 15px rgba(255,78,0,0.1)' }}>
+                <span style={{ padding: '6px 14px', borderRadius: 20, fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, background: 'rgba(124,58,237,0.15)', color: '#7C3AED', border: '1px solid rgba(124,58,237,0.3)', boxShadow: '0 0 15px rgba(124,58,237,0.1)' }}>
                   PAYMENT UNDER REVIEW
                 </span>
               </div>
@@ -637,8 +637,8 @@ export default function PricingPage() {
                 </div>
                 <button onClick={resetFlow}
                   style={{
-                    alignSelf: 'flex-start', padding: '8px 16px', borderRadius: 8, border: '1px solid #ff4e00',
-                    background: 'rgba(255,78,0,0.05)', fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: '#ff4e00', cursor: 'pointer'
+                    alignSelf: 'flex-start', padding: '8px 16px', borderRadius: 8, border: '1px solid #7C3AED',
+                    background: 'rgba(124,58,237,0.05)', fontFamily: 'Orbitron', fontSize: 9, fontWeight: 900, color: '#7C3AED', cursor: 'pointer'
                   }}>
                   TRY AGAIN
                 </button>

@@ -1,5 +1,5 @@
 // ─────────────────────────────────────────────────────
-// BOOYAH DIRECTOR API — Single-file bundle for Vercel
+// NEXOVERLAYS API — Single-file bundle for Vercel
 // All helpers inlined to avoid Vercel's single-file bundling limitation
 // ─────────────────────────────────────────────────────
 
@@ -711,7 +711,7 @@ module.exports = async (req, res) => {
       if (!broadcastCache[key]) {
         broadcastCache[key] = {
           tournament: { name: 'Untitled Tournament', logo: '', sponsor: '', sponsorLogo: '' },
-          theme: { preset: 'ffws-neon-orange', primaryColor: '#ff4e00', accentGlow: '#ffaa00', bgDark: '#0c0c0e', textMain: '#ffffff' },
+          theme: { preset: 'ffws-neon-orange', primaryColor: '#7C3AED', accentGlow: '#3B82F6', bgDark: '#0c0c0e', textMain: '#ffffff' },
           tournamentSettings: getDefaultTournamentSettings(),
           headstartPoints: {},
           matches: [],
@@ -2102,10 +2102,10 @@ module.exports = async (req, res) => {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({
             embeds: [{
-              title: '⚡ Booyah Director — Webhook Connected!',
+              title: '⚡ NexOverlays — Webhook Connected!',
               description: `Tournament **${t.name}** is now linked to this channel.\n\nStandings, MVP, and Champion announcements will appear here automatically.`,
               color: 0xFF6B00,
-              footer: { text: 'Booyah Director • Powered by Nexoverlays' },
+              footer: { text: 'NexOverlays • Powered by Nexoverlays' },
               timestamp: new Date().toISOString(),
             }]
           }),
@@ -2154,7 +2154,7 @@ module.exports = async (req, res) => {
               { name: 'Match', value: `\${tournament.current_match_number || 0} / \${tournament.total_matches}`, inline: true },
               { name: 'Teams', value: `\${teams.length}`, inline: true },
             ],
-            footer: { text: 'Booyah Director • Live Standings Update' },
+            footer: { text: 'NexOverlays • Live Standings Update' },
             timestamp: new Date().toISOString(),
           }]
         };
@@ -2195,7 +2195,7 @@ module.exports = async (req, res) => {
               { name: 'Tournament', value: tournament.name, inline: true },
               { name: 'Final Score', value: `\${champPts} pts`, inline: true },
             ],
-            footer: { text: 'Booyah Director • Tournament Complete' },
+            footer: { text: 'NexOverlays • Tournament Complete' },
             timestamp: new Date().toISOString(),
           }]
         };
@@ -2211,7 +2211,7 @@ module.exports = async (req, res) => {
               { name: 'Total Teams', value: `\${teams.length}`, inline: true },
               { name: 'Total Players', value: `\${players.length}`, inline: true },
             ],
-            footer: { text: 'Booyah Director • Team Lineup' },
+            footer: { text: 'NexOverlays • Team Lineup' },
             timestamp: new Date().toISOString(),
           }]
         };

@@ -16,7 +16,7 @@ const SCREENS = [
   { key: 'casters',           label: 'CASTERS',       icon: Mic2,         desc: 'Caster introduction',       group: 'scene' },
   { key: 'team_roster',       label: 'TEAM ROSTER',   icon: Users,        desc: 'Full team + player photo roster, auto-slides every 6s', group: 'scene' },
   { key: 'mvp',               label: 'MVP',           icon: Star,         desc: 'MVP spotlight screen',      group: 'scene' },
-  { key: 'champions',         label: 'BOOYAH!',       icon: Trophy,       desc: 'Champions reveal',          group: 'scene' },
+  { key: 'champions',         label: 'CHAMPIONS!',       icon: Trophy,       desc: 'Champions reveal',          group: 'scene' },
   // ── Transparent overlays (layer over gameplay) ──
   { key: 'ff-scoreboard',     label: 'FF SCOREBOARD', icon: Zap,         desc: 'FFWS scoreboard + match info chip (dropdown + elim animations)', group: 'overlay' },
   { key: 'standings',         label: 'STANDINGS',     icon: Trophy,       desc: 'Full tournament standings', group: 'overlay' },
