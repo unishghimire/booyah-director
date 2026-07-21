@@ -1,3 +1,4 @@
+import React, { useState, useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
@@ -11,7 +12,8 @@ import DataInputer from './pages/DataInputer';
 import Overlay from './pages/Overlay';
 import OverlayLinks from './pages/OverlayLinks';
 import { useOverlayData } from '@/lib/overlayApi';
-import { Clapperboard, Keyboard, Monitor, ExternalLink, Zap, LogOut } from 'lucide-react';
+import { Clapperboard, Keyboard, Monitor, ExternalLink, Zap, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
+import ConnectionStatusBar from '@/components/ConnectionStatusBar';
 
 const queryClient = new QueryClient({
   defaultOptions: {
@@ -43,45 +45,16 @@ function isSubscribed(user, subscription) {
   return subscription?.status === 'active' && getExpiresAt(subscription) > Date.now();
 }
 
-/* ── Navbar ─────────────────────────────────────────────────────────────────── */
-function NavBarContent() {
-  const loc = useLocation();
-
-  // Overlay routes — never show nav
-  if (loc.pathname.startsWith('/overlay')) return null;
-
-  // Wrap in its own boundary so a navbar crash doesn't kill the whole app
-  return (
-    <PanelBoundary label="NAV">
-      <NavBarInner loc={loc} />
-    </PanelBoundary>
-  );
-}
-
-function NavBarInner({ loc }) {
+/* ── Top Header ───────────────────────────────────────────────────────────── */
+function TopHeader() {
   const { user, subscription, logout } = useAuth();
-
-  // Not logged in — no nav
-  if (!user) return null;
-  // Not subscribed — no nav
-  if (!isSubscribed(user, subscription)) return null;
-
-  // Always call hook at top level (React rules)
   const { data: _navData } = useOverlayData(true);
   const currentScreenName = _navData?.overlayState?.current_screen
     ? _navData.overlayState.current_screen.replace(/_/g, ' ').toUpperCase()
     : 'STAND BY';
 
-  const tabs = [
-    { to: '/director',      label: 'DIRECTOR',     icon: Clapperboard, color: '#7C3AED' },
-    { to: '/overlay-links', label: 'OBS LINKS',    icon: Monitor,      color: '#3B82F6' },
-    { to: '/inputer',       label: 'DATA INPUTER', icon: Keyboard,     color: '#3B82F6' },
-  ];
-
-  const active = (to) => loc.pathname === to || (loc.pathname === '/' && to === '/director');
-
   return (
-    <nav className="relative flex items-center justify-between border-b border-white/10 bg-[#060912] px-4 py-2 flex-shrink-0">
+    <header className="relative flex items-center justify-between border-b border-white/10 bg-[#060912] px-4 py-3 flex-shrink-0 user-select-none">
       {/* Brand */}
       <div className="flex items-center gap-2.5">
         <div className="flex h-8 w-8 items-center justify-center rounded bg-gradient-to-br from-[#7C3AED] to-[#3B82F6]">
@@ -93,26 +66,9 @@ function NavBarInner({ loc }) {
         </div>
       </div>
 
-      {/* Tabs */}
-      <div className="flex items-center gap-2 bg-black/40 p-1 rounded-lg border border-white/5">
-        {tabs.map(({ to, label, icon: Icon, color }) => {
-          const isActive = active(to);
-          return (
-            <Link
-              key={to}
-              to={to}
-              className="flex items-center gap-2 px-4 py-1.5 rounded-[6px] transition-all"
-              style={isActive ? { background: `${color}18`, color } : { color: 'rgba(255,255,255,0.4)' }}
-            >
-              <Icon className="h-4 w-4" style={{ color: isActive ? color : 'rgba(255,255,255,0.4)' }} />
-              <span className="font-orbitron text-[11px] font-black tracking-wider">{label}</span>
-            </Link>
-          );
-        })}
-      </div>
-
       {/* Right: status + logout */}
       <div className="flex items-center gap-3">
+        {/* Screen Status */}
         <div className="flex items-center gap-2 rounded-full border border-[rgba(124,58,237,0.4)] bg-[#09090f] px-3 py-1">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7C3AED] opacity-75" />
@@ -123,25 +79,149 @@ function NavBarInner({ loc }) {
           </span>
         </div>
 
+        {/* OBS Source */}
         <a
           href="/overlay/scoreboard"
           target="_blank"
           rel="noopener noreferrer"
           className="flex items-center gap-1.5 rounded-lg border border-white/10 bg-[#0f0f1a] px-3 py-1.5 text-[10px] font-orbitron font-black text-[rgba(255,255,255,0.6)] hover:border-[#7C3AED]/40 hover:text-white transition-all"
         >
-          <Monitor className="h-3.5 w-3.5" /> OBS SOURCE <ExternalLink className="h-3 w-3" />
+          <Monitor className="h-3.5 w-3.5" /> <span className="hidden sm:inline">OBS SOURCE</span> <ExternalLink className="h-3 w-3" />
         </a>
 
+        {/* Logout */}
         <button
           onClick={() => { try { logout(); } catch {} }}
           className="flex items-center gap-1 text-[10px] font-orbitron text-gray-500 hover:text-red-400 transition-colors bg-[#0f0f1a] border border-white/10 px-3 py-1.5 rounded-lg font-black"
         >
-          <LogOut className="w-3.5 h-3.5" /> LOGOUT
+          <LogOut className="w-3.5 h-3.5" /> <span className="hidden sm:inline">LOGOUT</span>
         </button>
       </div>
 
       <div className="absolute bottom-0 left-0 right-0 h-[1px] bg-gradient-to-r from-[#7C3AED] via-transparent to-[#3B82F6]" />
-    </nav>
+    </header>
+  );
+}
+
+/* ── Bottom Bar ───────────────────────────────────────────────────────────── */
+function BottomBar({ loc }) {
+  const tabs = [
+    { to: '/director',      label: 'DIRECTOR',     icon: Clapperboard, color: '#7C3AED' },
+    { to: '/overlay-links', label: 'OBS LINKS',    icon: Monitor,      color: '#3B82F6' },
+    { to: '/inputer',       label: 'DATA INPUTER', icon: Keyboard,     color: '#3B82F6' },
+  ];
+
+  const active = (to) => loc.pathname === to || (loc.pathname === '/' && to === '/director');
+
+  return (
+    <div className="md:hidden border-t border-white/10 bg-[#060912] p-1.5 flex items-center justify-around user-select-none relative flex-shrink-0 z-10">
+      {tabs.map(({ to, label, icon: Icon, color }) => {
+        const isActive = active(to);
+        return (
+          <Link
+            key={to}
+            to={to}
+            className="flex flex-col items-center gap-1 px-3 py-1 rounded transition-all flex-1"
+            style={isActive ? { color } : { color: 'rgba(255,255,255,0.4)' }}
+          >
+            <Icon className="h-4 w-4" style={{ color: isActive ? color : 'rgba(255,255,255,0.4)' }} />
+            <span className="font-orbitron text-[9px] font-black tracking-wider text-center">{label}</span>
+          </Link>
+        );
+      })}
+    </div>
+  );
+}
+
+/* ── Shell Layout ────────────────────────────────────────────────────────── */
+function ShellLayout({ children }) {
+  const { user, subscription, loading } = useAuth();
+  const loc = useLocation();
+  const [isSidebarExpanded, setIsSidebarExpanded] = useState(() => {
+    return localStorage.getItem('sidebar_expanded') !== 'false';
+  });
+
+  const isOverlay = loc.pathname.startsWith('/overlay');
+  const hasShell = !loading && user && isSubscribed(user, subscription) && !isOverlay;
+
+  if (!hasShell) {
+    return (
+      <div className="flex h-screen flex-col bg-[#09090f] text-white overflow-hidden">
+        {children}
+      </div>
+    );
+  }
+
+  return (
+    <div className="flex h-screen flex-col bg-[#09090f] text-white overflow-hidden">
+      {/* 1. Global OBS Connection Status Bar */}
+      <ConnectionStatusBar />
+
+      {/* 2. Main layout grid with sidebar and right content panel */}
+      <div className="flex-1 flex overflow-hidden min-h-0">
+        {/* Left Sidebar on Desktop */}
+        <aside className={`hidden md:flex flex-col border-r border-white/10 bg-[#060912] sidebar-transition h-full flex-shrink-0 ${isSidebarExpanded ? 'w-[200px]' : 'w-[60px]'}`}>
+          <div className="flex h-14 items-center justify-between px-3 border-b border-white/5 user-select-none">
+            {isSidebarExpanded ? (
+              <span className="font-orbitron text-[10px] font-black tracking-widest text-white/40 pl-2">NAV SHELL</span>
+            ) : (
+              <span className="mx-auto"><Zap className="h-4 w-4 text-[#7C3AED]" /></span>
+            )}
+            <button
+              onClick={() => {
+                const nextVal = !isSidebarExpanded;
+                setIsSidebarExpanded(nextVal);
+                localStorage.setItem('sidebar_expanded', String(nextVal));
+              }}
+              className="flex h-8 w-8 items-center justify-center rounded hover:bg-white/5 text-white/60 hover:text-white transition-colors"
+            >
+              {isSidebarExpanded ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+            </button>
+          </div>
+
+          {/* Navigation Links */}
+          <nav className="flex-1 space-y-1.5 p-2 overflow-y-auto user-select-none">
+            {[
+              { to: '/director',      label: 'DIRECTOR',     icon: Clapperboard, color: '#7C3AED' },
+              { to: '/overlay-links', label: 'OBS LINKS',    icon: Monitor,      color: '#3B82F6' },
+              { to: '/inputer',       label: 'DATA INPUTER', icon: Keyboard,     color: '#3B82F6' },
+            ].map(({ to, label, icon: Icon, color }) => {
+              const isActive = loc.pathname === to || (loc.pathname === '/' && to === '/director');
+              return (
+                <Link
+                  key={to}
+                  to={to}
+                  className={`flex items-center gap-3 px-3 py-2.5 rounded-lg transition-all ${
+                    isActive ? 'bg-[#7C3AED]/10 text-[#7C3AED]' : 'text-white/40 hover:bg-white/5 hover:text-white/80'
+                  }`}
+                  title={label}
+                >
+                  <Icon className="h-4 w-4 shrink-0" style={{ color: isActive ? color : 'currentColor' }} />
+                  {isSidebarExpanded && (
+                    <span className="font-orbitron text-[11px] font-black tracking-wider whitespace-nowrap">
+                      {label}
+                    </span>
+                  )}
+                </Link>
+              );
+            })}
+          </nav>
+        </aside>
+
+        {/* Right Area: Top Header + Page Content + Bottom Mobile Navigation Bar */}
+        <div className="flex-1 flex flex-col overflow-hidden min-h-0">
+          <TopHeader />
+          
+          <main className="flex-1 overflow-hidden min-h-0 relative">
+            <PanelBoundary label="MAIN_CONTENT">
+              {children}
+            </PanelBoundary>
+          </main>
+
+          <BottomBar loc={loc} />
+        </div>
+      </div>
+    </div>
   );
 }
 
@@ -217,12 +297,9 @@ export default function App() {
         <ErrorBoundary label="APP">
           <AuthProvider>
             <ScrollToTop />
-            <div className="flex h-screen flex-col bg-[#09090f] text-white overflow-hidden">
-              <NavBarContent />
-              <div className="flex-1 overflow-hidden min-h-0">
-                <AppRoutes />
-              </div>
-            </div>
+            <ShellLayout>
+              <AppRoutes />
+            </ShellLayout>
           </AuthProvider>
         </ErrorBoundary>
       </Router>
