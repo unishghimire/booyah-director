@@ -4,3 +4,52 @@
 .netlify
 .vercel
 node_modules/
+
+# ── Cleanup: removed unnecessary files from tracking ──
+# Root-level duplicates (actual app is in netlify-app/)
+/src/
+/public/
+/index.html
+/package.json
+/package-lock.json
+/postcss.config.js
+/tailwind.config.js
+/vite.config.js
+/server.js
+/node_modules/
+
+# Old/abandoned projects
+/vercel-app/
+/netlify/
+/base44/
+
+# Dev artifacts
+/overlay_backup.jsx
+/color_report.md
+/fix_build.py
+/get_lines.py
+/run_transform.py
+/ref.png
+/database.json
+/data/
+/entities/
+/functions/
+/incoming_files/
+/.vercel-deploy
+
+# Documentation (moved to wiki/external)
+/FIREBASE_*
+/FIRESTORE_*
+/VERCEL_ENV_VARS.md
+
+# Env files — NEVER commit secrets
+*.env
+*.env.local
+*.env.example
+booyah-admin/.env.local
+booyah-admin/.env.example
+
+# Vercel local
+/.vercel/
+/booyah-admin/.vercel/
+/booyah-admin/.vercel-deploy
