@@ -4,6 +4,7 @@ import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
 import DesignStudio from '@/components/control/DesignStudio';
+import AssetManager from '@/components/control/AssetManager';
 import TournamentManager from '@/components/control/TournamentManager';
 import { useAuth } from '@/lib/AuthContext';
 import { OVERLAYS, CopyBtn } from './OverlayLinks';
@@ -284,6 +285,7 @@ export default function DirectorPanel() {
           { id: 'match', label: 'MATCH', icon: Map },
           { id: 'standings', label: 'STANDINGS', icon: Trophy },
           { id: 'design', label: 'DESIGN', icon: Paintbrush },
+          { id: 'assets', label: 'ASSETS', icon: Layers },
           { id: 'setup', label: 'SETUP', icon: Settings2 },
         ].map((t) => {
           const isActive = activeTab === t.id;
@@ -836,6 +838,13 @@ export default function DirectorPanel() {
             {activeTab === 'design' && (
               <SectionBoundary label="OVERLAY DESIGN STUDIO">
                 <DesignStudio overlayState={state} tournament={tournament} teams={teams} players={players} onAction={refresh} />
+              </SectionBoundary>
+            )}
+
+            {/* ASSETS TAB */}
+            {activeTab === 'assets' && (
+              <SectionBoundary label="STUDIO ASSET LIBRARY">
+                <AssetManager data={data} refresh={refresh} overlayApi={overlayApi} />
               </SectionBoundary>
             )}
 
