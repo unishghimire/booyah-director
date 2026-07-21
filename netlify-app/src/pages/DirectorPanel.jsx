@@ -7,6 +7,9 @@ import DesignStudio from '@/components/control/DesignStudio';
 import TournamentManager from '@/components/control/TournamentManager';
 import { useAuth } from '@/lib/AuthContext';
 import { OVERLAYS, CopyBtn } from './OverlayLinks';
+import { SCREENS, GROUP_LABELS } from '@/components/control/ScreenSwitcher';
+import { useObsStore } from '@/lib/obsStore';
+import { obsService } from '@/lib/obsWebSocket';
 import {
   ExternalLink,
   Eye, Paintbrush, Settings2, Trophy, Star, Crown,
@@ -29,6 +32,9 @@ export default function DirectorPanel() {
   const [refreshing, setRefreshing] = useState(false);
   const { shareToken } = useAuth();
   const [copied, setCopied] = useState(null);
+  const [previewScreen, setPreviewScreen] = useState(null);
+  const [takeBusy, setTakeBusy] = useState(false);
+  const obsStatus = useObsStore(s => s.connectionStatus);
 
   const state = data?.overlayState || {};
   const currentScreen = state.current_screen || 'setup_blank';
@@ -49,6 +55,29 @@ export default function DirectorPanel() {
     const url = `${window.location.origin}/overlay`;
     navigator.clipboard.writeText(url);
     toast.success('OBS Source URL copied!');
+  };
+
+  // Preview/Take workflow
+  const handleTake = async () => {
+    if (!previewScreen || takeBusy) return;
+    setTakeBusy(true);
+    try {
+      await overlayApi.switchOverlayScreen({ screen: previewScreen });
+      // Also switch OBS scene if connected
+      if (obsStatus === 'connected') {
+        const screen = SCREENS.find(s => s.key === previewScreen);
+        if (screen) {
+          try { await obsService.takeScene(screen.label); } catch {}
+        }
+      }
+      toast.success(`▶ ${previewScreen.replace(/_/g, ' ').toUpperCase()} is now LIVE!`);
+      setPreviewScreen(null);
+      refresh();
+    } catch (err) {
+      toast.error(err.message);
+    } finally {
+      setTakeBusy(false);
+    }
   };
 
   // Match control actions
@@ -298,6 +327,86 @@ export default function DirectorPanel() {
             {activeTab === 'overlay' && (
               <SectionBoundary label="OVERLAY LINKS">
                 <div className="flex flex-col gap-6 max-w-6xl mx-auto">
+                  {/* ── Scene Preview/Take Workflow ── */}
+                  <div className="rounded-xl border border-[#7C3AED]/20 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
+                    <div className="flex items-center justify-between mb-4">
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 bg-[#7C3AED] rounded-full animate-pulse" />
+                        <span className="font-orbitron text-[10px] font-black text-[#7C3AED] tracking-widest">SCENE CONTROL — PREVIEW / TAKE</span>
+                      </div>
+                      <div className="flex items-center gap-2">
+                        <span className="font-orbitron text-[9px] text-gray-500 tracking-widest">
+                          LIVE: <span className="text-[#22c55e]">{currentScreen.replace(/_/g, ' ').toUpperCase()}</span>
+                        </span>
+                        {obsStatus === 'connected' && (
+                          <span className="flex items-center gap-1 font-orbitron text-[9px] text-[#22c55e] tracking-wider">
+                            <span className="h-1.5 w-1.5 bg-[#22c55e] rounded-full" />OBS
+                          </span>
+                        )}
+                      </div>
+                    </div>
+                    {Object.entries(GROUP_LABELS).map(([groupKey, group]) => {
+                      const items = SCREENS.filter(s => s.group === groupKey);
+                      return (
+                        <div key={groupKey} className="mb-3 last:mb-0">
+                          <p className="font-orbitron text-[9px] font-black tracking-widest mb-2" style={{ color: group.color }}>
+                            {group.label}
+                          </p>
+                          <div className="grid gap-2" style={{ gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))' }}>
+                            {items.map(s => {
+                              const Icon = s.icon;
+                              const isLive = currentScreen === s.key;
+                              const isPreview = previewScreen === s.key;
+                              return (
+                                <button
+                                  key={s.key}
+                                  onClick={() => setPreviewScreen(s.key)}
+                                  title={s.desc}
+                                  className="user-select-none flex flex-col items-start rounded-lg px-3 py-2.5 text-left transition-all"
+                                  style={
+                                    isLive
+                                      ? { background: `${group.color}22`, border: `1px solid ${group.color}88`, boxShadow: `0 0 10px ${group.color}44` }
+                                      : isPreview
+                                      ? { background: 'rgba(59,130,246,0.10)', border: '1px solid rgba(59,130,246,0.6)', boxShadow: '0 0 8px rgba(59,130,246,0.2)' }
+                                      : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }
+                                  }
+                                >
+                                  <div className="flex items-center gap-1.5 w-full">
+                                    <Icon className="h-3.5 w-3.5 flex-shrink-0" style={{ color: isLive ? group.color : isPreview ? '#3B82F6' : 'rgba(255,255,255,0.4)' }} />
+                                    <span className="text-[10px] font-black tracking-wider truncate" style={{ color: isLive ? group.color : isPreview ? '#3B82F6' : 'rgba(255,255,255,0.7)' }}>
+                                      {s.label}
+                                    </span>
+                                    {isLive && <span className="ml-auto h-1.5 w-1.5 rounded-full bg-[#22c55e] flex-shrink-0" />}
+                                  </div>
+                                </button>
+                              );
+                            })}
+                          </div>
+                        </div>
+                      );
+                    })}
+                    {/* TAKE button */}
+                    <div className="mt-4 pt-3 border-t border-white/5">
+                      <button
+                        onClick={handleTake}
+                        disabled={!previewScreen || takeBusy}
+                        className={`user-select-none flex w-full items-center justify-center gap-2 rounded-lg px-4 py-3 font-orbitron text-xs font-black tracking-widest text-white transition-all disabled:opacity-30 disabled:cursor-not-allowed ${
+                          previewScreen && !takeBusy
+                            ? 'bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] hover:from-[#6D28D9] hover:to-[#2563EB] animate-pulse'
+                            : 'bg-[#7C3AED]/30'
+                        }`}
+                      >
+                        {takeBusy ? (
+                          <><RefreshCw className="h-4 w-4 animate-spin" /> TAKING...</>
+                        ) : previewScreen ? (
+                          <><Play className="h-4 w-4" /> TAKE: {previewScreen.replace(/_/g, ' ').toUpperCase()}</>
+                        ) : (
+                          <><Play className="h-4 w-4" /> SELECT A SCENE TO PREVIEW</>
+                        )}
+                      </button>
+                    </div>
+                  </div>
+
                   {/* OBS Setup Tip */}
                   <div className="rounded-xl border border-[#7C3AED]/20 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
                     <p className="font-orbitron text-[10px] font-black text-[#7C3AED] tracking-wider mb-2 flex items-center gap-1.5">

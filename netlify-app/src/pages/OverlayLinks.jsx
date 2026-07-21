@@ -1,6 +1,8 @@
 import React, { useState } from 'react';
 import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
-import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3, Eye, Map, Info } from 'lucide-react';
+import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3, Eye, EyeOff, Map, Info, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { useObsStore } from '@/lib/obsStore';
+import { obsService } from '@/lib/obsWebSocket';
 import { useAuth } from '@/lib/AuthContext';
 import toast from 'react-hot-toast';
 
@@ -32,6 +34,209 @@ function OverlayPreview({ url, label }) {
           />
         </div>
       )}
+    </div>
+  );
+}
+
+/* ═══ Masked Token Display ═══ */
+function MaskedToken({ token }) {
+  const [revealed, setRevealed] = useState(false);
+  const [copied, setCopied] = useState(false);
+  return (
+    <div className="flex items-center gap-2">
+      <code className="flex-1 truncate rounded-lg border border-white/5 bg-black/40 px-3 py-2 font-mono text-xs text-[#3B82F6]">
+        {revealed ? token : '••••••••••••••••'}
+      </code>
+      <button
+        onClick={() => setRevealed(!revealed)}
+        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-white transition-all"
+        title={revealed ? 'Hide' : 'Reveal'}
+      >
+        {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+      </button>
+      <button
+        onClick={() => {
+          navigator.clipboard.writeText(token).then(() => {
+            setCopied(true);
+            toast.success('Token copied to clipboard');
+            setTimeout(() => setCopied(false), 2000);
+          }).catch(() => toast.error('Failed to copy'));
+        }}
+        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-white transition-all"
+        title="Copy Token"
+      >
+        {copied ? <CheckCircle2 className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
+      </button>
+    </div>
+  );
+}
+
+/* ═══ OBS Connection Card ═══ */
+function OBSConnectionCard() {
+  const connectionStatus = useObsStore(s => s.connectionStatus);
+  const obsAddress = useObsStore(s => s.obsAddress);
+  const obsPassword = useObsStore(s => s.obsPassword);
+  const setObsConfig = useObsStore(s => s.setObsConfig);
+  const saveSettings = useObsStore(s => s.saveSettings);
+  const [addr, setAddr] = useState(obsAddress || 'localhost:4444');
+  const [pass, setPass] = useState(obsPassword || '');
+  const [connecting, setConnecting] = useState(false);
+
+  const statusColor = {
+    connected: '#22c55e',
+    connecting: '#f59e0b',
+    disconnected: '#ef4444',
+    error: '#ef4444',
+  }[connectionStatus] || '#ef4444';
+
+  const statusLabel = {
+    connected: 'CONNECTED',
+    connecting: 'CONNECTING...',
+    disconnected: 'DISCONNECTED',
+    error: 'ERROR',
+  }[connectionStatus] || 'DISCONNECTED';
+
+  const handleConnect = async () => {
+    setConnecting(true);
+    setObsConfig(addr, pass);
+    saveSettings();
+    try {
+      await obsService.connect(addr, pass);
+      toast.success('OBS WebSocket connected!');
+    } catch (err) {
+      toast.error('OBS connection failed: ' + (err.message || 'unknown'));
+    } finally {
+      setConnecting(false);
+    }
+  };
+
+  const handleDisconnect = () => {
+    obsService.disconnect();
+    toast('OBS WebSocket disconnected');
+  };
+
+  return (
+    <div className="rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
+      <div className="flex items-center justify-between mb-3">
+        <div className="flex items-center gap-2">
+          {connectionStatus === 'connected' ? <Wifi className="h-4 w-4 text-[#22c55e]" /> : <WifiOff className="h-4 w-4" style={{ color: statusColor }} />}
+          <span className="font-orbitron text-[10px] font-black text-gray-400 tracking-wider">OBS WEBSOCKET</span>
+        </div>
+        <div className="flex items-center gap-2">
+          <span className="h-2 w-2 rounded-full animate-pulse" style={{ background: statusColor }} />
+          <span className="font-orbitron text-[9px] font-black tracking-widest" style={{ color: statusColor }}>{statusLabel}</span>
+        </div>
+      </div>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        <div>
+          <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1">ADDRESS</label>
+          <input
+            value={addr}
+            onChange={e => setAddr(e.target.value)}
+            placeholder="localhost:4444"
+            className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 font-mono text-xs text-white outline-none focus:border-[#7C3AED]/50"
+          />
+        </div>
+        <div>
+          <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1">PASSWORD</label>
+          <input
+            type="password"
+            value={pass}
+            onChange={e => setPass(e.target.value)}
+            placeholder="••••••"
+            className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 font-mono text-xs text-white outline-none focus:border-[#7C3AED]/50"
+          />
+        </div>
+      </div>
+      {connectionStatus === 'connected' ? (
+        <button onClick={handleDisconnect} className="w-full rounded-lg border border-[#ef4444]/30 bg-[#ef4444]/10 px-4 py-2.5 font-orbitron text-[10px] font-black tracking-widest text-[#ef4444] hover:bg-[#ef4444]/20 transition-all">
+          DISCONNECT
+        </button>
+      ) : (
+        <button
+          onClick={handleConnect}
+          disabled={connecting}
+          className="w-full rounded-lg bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] px-4 py-2.5 font-orbitron text-[10px] font-black tracking-widest text-white hover:from-[#6D28D9] hover:to-[#2563EB] transition-all disabled:opacity-50"
+        >
+          {connecting ? 'CONNECTING...' : 'CONNECT TO OBS'}
+        </button>
+      )}
+    </div>
+  );
+}
+
+/* ═══ OBS Source Toggles ═══ */
+function OBSSourceToggles() {
+  const connectionStatus = useObsStore(s => s.connectionStatus);
+  const availableScenes = useObsStore(s => s.availableScenes);
+  const sources = useObsStore(s => s.sources);
+  const currentProgramScene = useObsStore(s => s.currentProgramScene);
+  const [expandedScene, setExpandedScene] = useState(null);
+
+  if (connectionStatus !== 'connected') {
+    return (
+      <div className="rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-xl p-6 text-center">
+        <WifiOff className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+        <p className="font-orbitron text-[10px] font-black text-gray-500 tracking-widest">OBS NOT CONNECTED</p>
+        <p className="text-xs text-gray-600 mt-1">Connect to OBS WebSocket above to control source visibility</p>
+      </div>
+    );
+  }
+
+  return (
+    <div className="rounded-xl border border-[#22c55e]/20 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
+      <div className="flex items-center justify-between mb-4">
+        <div className="flex items-center gap-2">
+          <Wifi className="h-4 w-4 text-[#22c55e]" />
+          <span className="font-orbitron text-[10px] font-black text-[#22c55e] tracking-widest">OBS SOURCE CONTROLS</span>
+        </div>
+        <button
+          onClick={() => obsService.refreshScenes()}
+          className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 font-orbitron text-[9px] font-black text-gray-400 hover:text-white transition-all"
+        >
+          <RefreshCw className="h-3 w-3" /> REFRESH
+        </button>
+      </div>
+      <div className="space-y-2">
+        {availableScenes.map(scene => {
+          const sceneSources = sources[scene] || [];
+          const isLive = currentProgramScene === scene;
+          const isExpanded = expandedScene === scene;
+          return (
+            <div key={scene} className="rounded-lg border border-white/5 bg-black/20 overflow-hidden">
+              <button
+                onClick={() => setExpandedScene(isExpanded ? null : scene)}
+                className="flex w-full items-center justify-between px-3 py-2.5 hover:bg-white/5 transition-all"
+              >
+                <div className="flex items-center gap-2">
+                  {isLive && <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e] animate-pulse" />}
+                  <span className="font-orbitron text-[10px] font-black tracking-wider" style={{ color: isLive ? '#22c55e' : 'rgba(255,255,255,0.7)' }}>
+                    {scene}
+                  </span>
+                  <span className="font-orbitron text-[8px] text-gray-600">({sceneSources.length} sources)</span>
+                </div>
+                <Eye className="h-3 w-3 text-gray-600" />
+              </button>
+              {isExpanded && sceneSources.length > 0 && (
+                <div className="border-t border-white/5 px-3 py-2 space-y-1">
+                  {sceneSources.map(src => (
+                    <button
+                      key={src.name}
+                      onClick={() => obsService.toggleSourceVisibility(scene, src.name)}
+                      className="flex w-full items-center justify-between py-1.5 hover:bg-white/5 rounded px-2 transition-all"
+                    >
+                      <span className="text-[11px] text-gray-400">{src.name}</span>
+                      {src.visible
+                        ? <Eye className="h-3.5 w-3.5 text-[#22c55e]" />
+                        : <EyeOff className="h-3.5 w-3.5 text-gray-600" />}
+                    </button>
+                  ))}
+                </div>
+              )}
+            </div>
+          );
+        })}
+      </div>
     </div>
   );
 }
@@ -79,8 +284,10 @@ export default function OverlayLinks() {
   const copy = (text, id) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopied(id);
-      toast.success('Copied!');
+      toast.success('Copied to clipboard');
       setTimeout(() => setCopied(null), 2000);
+    }).catch(() => {
+      toast.error('Failed to copy');
     });
   };
 
@@ -119,14 +326,14 @@ export default function OverlayLinks() {
         </div>
       </div>
 
-      {/* Your Share Token */}
+      {/* OBS WebSocket Connection */}
+      <OBSConnectionCard />
+
+      {/* Your Share Token (masked) */}
       {shareToken && (
         <div className="rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
           <p className="font-orbitron text-[10px] font-black text-gray-400 tracking-wider mb-2">YOUR UNIQUE SHARE TOKEN</p>
-          <div className="flex items-center gap-3">
-            <code className="flex-1 truncate rounded-lg border border-white/5 bg-black/40 px-3 py-2 font-mono text-xs text-[#3B82F6]">{shareToken}</code>
-            <CopyBtn text={shareToken} id="token" copied={copied} onCopy={copy} />
-          </div>
+          <MaskedToken token={shareToken} />
         </div>
       )}
 
@@ -253,6 +460,9 @@ export default function OverlayLinks() {
           })}
         </div>
       </div>
+
+      {/* OBS Source Visibility Controls */}
+      <OBSSourceToggles />
 
     </div>
   );

@@ -7,7 +7,7 @@ import {
 import { overlayApi } from '@/lib/overlayApi';
 import toast from 'react-hot-toast';
 
-const SCREENS = [
+export const SCREENS = [
   // ── Full-scene replacements (solid background) ──
   { key: 'maplabel',          label: 'MAP INTRO',     icon: Map,          desc: 'Map reveal + team list',    group: 'scene' },
   { key: 'game-intro',        label: 'GAME INTRO',    icon: Gamepad2,     desc: 'NexOverlays game intro banner',   group: 'scene' },
@@ -23,7 +23,7 @@ const SCREENS = [
   { key: 'elim_alert',        label: 'ELIM ALERT',    icon: AlertTriangle,desc: 'Last elimination popup',   group: 'overlay' },
 ];
 
-const GROUP_LABELS = {
+export const GROUP_LABELS = {
   scene:   { label: 'FULL SCENES',      color: '#7C3AED' },
   overlay: { label: 'LIVE OVERLAYS',    color: '#3B82F6' },
 };
