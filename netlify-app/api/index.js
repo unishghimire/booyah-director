@@ -1288,6 +1288,33 @@ module.exports = async (req, res) => {
     }
 
     // ── RESET DATABASE (OWNER ONLY) ───────────────────────────────────────
+    // ── APPLY HEADSTART POINTS ─────────────────────────────────────────────
+    if (route === 'applyHeadstartPoints') {
+      const missing = requireFields(body, ['tournament_id', 'team_id', 'points']);
+      if (missing) return err(400, missing);
+      const team = db.teams.find(t => t.id === body.team_id);
+      if (!team) return err(404, 'Team not found');
+      team.total_tournament_points = (team.total_tournament_points || 0) + Number(body.points);
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, team });
+    }
+
+    // ── UPDATE TOURNAMENT SETTINGS ──────────────────────────────────────────
+    if (route === 'updateTournamentSettings') {
+      const missing = requireFields(body, ['tournament_id']);
+      if (missing) return err(400, missing);
+      const t = db.tournaments.find(t => t.id === body.tournament_id);
+      if (!t) return err(404, 'Tournament not found');
+      if (body.name) t.name = sanitizeString(body.name, 200);
+      if (body.points_per_kill !== undefined) t.points_per_kill = Number(body.points_per_kill) || 0;
+      if (body.placement_points_config) t.placement_points_config = body.placement_points_config;
+      if (body.total_matches !== undefined) t.total_matches = Number(body.total_matches) || 0;
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, tournament: t });
+    }
+
     if (route === 'resetDatabase') {
       if (!isOwner) return err(403, 'Forbidden: Owner permission required');
       

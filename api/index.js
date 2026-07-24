@@ -1437,8 +1437,13 @@ module.exports = async (req, res) => {
         team_id: team.id,
         tournament_id: body.tournament_id ? sanitizeString(body.tournament_id) : team.tournament_id,
         name: sanitizeString(body.name, 100),
+        real_name: sanitizeString(body.real_name || '', 100),
         role: sanitizeString(body.role || '', 50),
-        photo_url: sanitizeUrl(body.photo_url || ''),
+        photo_url: sanitizeUrl(body.photo_url || body.portrait_url || ''),
+        nationality: sanitizeString(body.nationality || '', 50),
+        instagram: sanitizeString(body.instagram || '', 50),
+        youtube: sanitizeString(body.youtube || '', 50),
+        twitter: sanitizeString(body.twitter || '', 50),
         is_alive: true,
         current_match_kills: 0,
         total_tournament_kills: 0,
@@ -1913,9 +1918,19 @@ module.exports = async (req, res) => {
       if (missing) return err(400, missing);
       const idx = db.players.findIndex(p => p.id === body.player_id);
       if (idx === -1) return err(404, 'Player not found');
-      if (body.name)      db.players[idx].name      = sanitizeString(body.name, 100);
-      if (body.role)      db.players[idx].role      = sanitizeString(body.role, 50);
-      if (body.photo_url !== undefined) db.players[idx].photo_url = sanitizeUrl(body.photo_url || '');
+      if (body.name !== undefined)       db.players[idx].name        = sanitizeString(body.name, 100);
+      if (body.real_name !== undefined)  db.players[idx].real_name   = sanitizeString(body.real_name, 100);
+      if (body.role !== undefined)       db.players[idx].role        = sanitizeString(body.role, 50);
+      if (body.photo_url !== undefined)  db.players[idx].photo_url   = sanitizeUrl(body.photo_url || '');
+      if (body.portrait_url !== undefined) db.players[idx].photo_url = sanitizeUrl(body.portrait_url || '');
+      if (body.nationality !== undefined) db.players[idx].nationality = sanitizeString(body.nationality, 50);
+      if (body.instagram !== undefined)  db.players[idx].instagram   = sanitizeString(body.instagram, 50);
+      if (body.youtube !== undefined)    db.players[idx].youtube     = sanitizeString(body.youtube, 50);
+      if (body.twitter !== undefined)    db.players[idx].twitter     = sanitizeString(body.twitter, 50);
+      if (body.team_id) {
+        const newTeam = db.teams.find(t => t.id === body.team_id);
+        if (newTeam) db.players[idx].team_id = newTeam.id;
+      }
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true, player: db.players[idx] });

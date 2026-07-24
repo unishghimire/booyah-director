@@ -205,7 +205,7 @@ export default function PlayerManager({ data, refresh, overlayApi }) {
           onDelete={async () => {
             if (!confirm(`Delete ${editPlayer.name}?`)) return;
             try {
-              await overlayApi.updatePlayer({ player_id: editPlayer.id, is_deleted: true });
+              await overlayApi.deletePlayer({ player_id: editPlayer.id });
               toast.success('Player deleted');
               setEditPlayer(null);
               refresh?.();
