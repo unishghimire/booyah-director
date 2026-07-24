@@ -6,7 +6,8 @@ def extract_blocks(filepath):
     
     # We find all occurrences of "if (route ===" or "if (route ==="
     # and extract the full block by matching braces.
-    pattern = r'(if\s*\(\s*route\s*===.*?\n\s*\{)'
+    # Note: we need to handle case where route is checked in various ways, e.g. "if (route === 'xyz') {"
+    pattern = r'if\s*\(\s*route\s*===[^\{]*\{'
     matches = list(re.finditer(pattern, content))
     
     blocks = []
@@ -30,7 +31,7 @@ def extract_blocks(filepath):
         
         block_text = content[start_idx:curr_idx]
         # Extract the route names
-        route_matches = re.findall(r'route\s*===\s*\'([^\'\s]+)\'', m.group(1))
+        route_matches = re.findall(r'route\s*===\s*\'([^\'\s]+)\'', m.group(0))
         blocks.append({
             'routes': route_matches,
             'code': block_text,
