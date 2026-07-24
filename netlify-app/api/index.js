@@ -443,7 +443,8 @@ module.exports = async (req, res) => {
           current_match: null,
           kill_feed: [],
           eliminations: [],
-          standings: []
+          standings: [],
+          assets: []
         });
       }
 
@@ -511,7 +512,8 @@ module.exports = async (req, res) => {
           current_match: currentMatch,
           kill_feed: killFeed,
           eliminations,
-          standings
+          standings,
+          assets: db.assets || []
         });
       } catch (e) {
         return err(500, 'Database load error');
@@ -670,6 +672,7 @@ module.exports = async (req, res) => {
         sponsorLogoUrl:     sanitizeUrl(body.sponsorLogoUrl      !== undefined ? body.sponsorLogoUrl   : db.design?.sponsorLogoUrl, 300),
         sponsorName:        sanitizeString(body.sponsorName      !== undefined ? body.sponsorName      : db.design?.sponsorName, 100),
         backgrounds:        sanitizedBackgrounds,
+        soundConfig:          typeof body.soundConfig === 'object' && body.soundConfig ? body.soundConfig : (db.design?.soundConfig || {}),
         playerPhotos:       { ...existingPhotos, ...incomingPhotos },
         teamLogos:          { ...existingLogos,  ...incomingLogos  },
         mapImages:          { ...existingMaps,   ...incomingMaps   },

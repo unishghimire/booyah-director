@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import {
   Play, Pause, Square, RotateCcw, AlertTriangle, Plus, Minus,
   Skull, Heart, Crosshair, Trophy, Zap, Radio, Users, Target,
@@ -545,6 +545,21 @@ export default function LiveControlPanel({
   const teams = data?.teams || [];
   const players = data?.players || [];
   const currentScreen = data?.overlayState?.current_screen || 'setup_blank';
+  const soundConfig = data?.design?.soundConfig || {};
+  const masterVolume = soundConfig._masterVolume ?? 0.7;
+  const soundMuted = soundConfig._muted ?? false;
+  const audioRef = useRef(null);
+
+  const playEventSound = (eventKey) => {
+    if (soundMuted) return;
+    const cfg = soundConfig[eventKey];
+    if (!cfg?.url || cfg.enabled === false) return;
+    if (audioRef.current) { audioRef.current.pause(); audioRef.current = null; }
+    const audio = new Audio(cfg.url);
+    audio.volume = Math.min(cfg.volume ?? 0.8, 1) * masterVolume;
+    audio.play().catch(() => {});
+    audioRef.current = audio;
+  };
 
   const handleStartMatch = async (payload) => {
     await api.startNextMatch(payload);
@@ -597,6 +612,8 @@ export default function LiveControlPanel({
 
   const handleEvent = async (key) => {
     try {
+      // Play sound locally for the operator
+      playEventSound(key);
       // Trigger auto-reverting event overlay
       await api.triggerEvent({ event_type: key });
       toast.success(`Event: ${key.replace(/_/g, ' ').toUpperCase()} triggered`);
@@ -609,6 +626,7 @@ export default function LiveControlPanel({
 
   const handleZone = async (zone) => {
     try {
+      playEventSound('safe_zone');
       await api.triggerEvent({ event_type: 'safe_zone', zone_number: zone, duration: 4000 });
       toast.success(`Safe Zone ${zone} triggered`);
       refresh();

@@ -510,7 +510,8 @@ module.exports = async (req, res) => {
           current_match: null,
           kill_feed: [],
           eliminations: [],
-          standings: []
+          standings: [],
+          assets: []
         });
       }
 
@@ -632,7 +633,8 @@ module.exports = async (req, res) => {
           },
           kill_feed: killFeed,
           eliminations,
-          standings
+          standings,
+          assets: db.assets || []
         });
       } catch (e) {
         return err(500, 'Database load error');

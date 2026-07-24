@@ -30,6 +30,7 @@ import {
   AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';
+import { uploadImage } from '../../lib/imageUpload';
 
 // ─── Constants & Category Configuration ───
 const CATEGORIES = [
@@ -181,8 +182,21 @@ const INITIAL_ASSETS = [
 ];
 
 export default function AssetManager({ data, refresh, overlayApi }) {
-  // Asset state initialized with custom samples
-  const [assets, setAssets] = useState(INITIAL_ASSETS);
+  // Asset state loaded from Firebase, fallback to sample data
+  const [assets, setAssets] = useState([]);
+  const [loadedFromDb, setLoadedFromDb] = useState(false);
+
+  // Load assets from Firebase on mount
+  useEffect(() => {
+    if (data?.assets && data.assets.length > 0) {
+      setAssets(data.assets);
+      setLoadedFromDb(true);
+    } else if (!loadedFromDb && data) {
+      // No assets in DB yet — start empty
+      setAssets([]);
+      setLoadedFromDb(true);
+    }
+  }, [data?.assets]);
   const [uploadingFiles, setUploadingFiles] = useState([]);
   const [selectedCategory, setSelectedCategory] = useState('ALL');
   const [searchQuery, setSearchQuery] = useState('');
@@ -207,8 +221,15 @@ export default function AssetManager({ data, refresh, overlayApi }) {
 
   // Category change within detail modal
   const handleAssetCategoryChange = (assetId, newCategory) => {
-    setAssets(prev => prev.map(a => a.id === assetId ? { ...a, category: newCategory } : a));
-    // Also update current preview asset to reflect live
+    setAssets(prev => {
+      const updated = prev.map(a => a.id === assetId ? { ...a, category: newCategory } : a);
+      // Persist the changed asset
+      const changed = updated.find(a => a.id === assetId);
+      if (changed && overlayApi?.saveAsset) {
+        overlayApi.saveAsset(changed).catch(e => console.error('Failed to persist category change:', e));
+      }
+      return updated;
+    });
     if (previewAsset && previewAsset.id === assetId) {
       setPreviewAsset(prev => ({ ...prev, category: newCategory }));
     }
@@ -264,12 +285,23 @@ export default function AssetManager({ data, refresh, overlayApi }) {
   };
 
   // Delete asset handler
-  const handleDeleteAsset = (assetId, name) => {
+  const handleDeleteAsset = async (assetId, name) => {
+    // Optimistic UI update
     setAssets(prev => prev.filter(a => a.id !== assetId));
     if (previewAsset && previewAsset.id === assetId) {
       setPreviewAsset(null);
     }
-    toast.success(`Deleted asset: ${name}`);
+    // Persist deletion to Firebase
+    try {
+      if (overlayApi?.deleteAsset) {
+        await overlayApi.deleteAsset({ id: assetId });
+      }
+      toast.success(`Deleted asset: ${name}`);
+    } catch (error) {
+      toast.error(`Failed to delete: ${error.message || 'Unknown error'}`);
+      // Reload from server to restore state
+      if (refresh) refresh();
+    }
   };
 
   // Drag-and-drop file upload handlers
@@ -298,9 +330,10 @@ export default function AssetManager({ data, refresh, overlayApi }) {
     }
   };
 
-  // File Upload Simulator
-  const handleFiles = (files) => {
-    const newUploads = Array.from(files).map((file, index) => ({
+  // Real file upload — images go to ImgBB, non-images use object URL for preview
+  const handleFiles = async (files) => {
+    const fileArray = Array.from(files);
+    const newUploads = fileArray.map((file, index) => ({
       id: `upload-${Date.now()}-${index}`,
       name: file.name,
       size: file.size,
@@ -310,42 +343,63 @@ export default function AssetManager({ data, refresh, overlayApi }) {
 
     setUploadingFiles(prev => [...prev, ...newUploads]);
 
-    newUploads.forEach(upload => {
-      let currentProgress = 0;
-      const interval = setInterval(() => {
-        // Mock progress speed increments
-        currentProgress += Math.floor(Math.random() * 15) + 12;
-        if (currentProgress >= 100) {
-          currentProgress = 100;
-          clearInterval(interval);
+    for (const upload of newUploads) {
+      const detectedCat = detectCategory(upload.file);
+      const isImage = upload.file.type.startsWith('image/');
 
-          // Build preview URL
-          const objectUrl = URL.createObjectURL(upload.file);
-          const detectedCat = detectCategory(upload.file);
+      try {
+        // Update progress to "uploading"
+        setUploadingFiles(prev =>
+          prev.map(u => u.id === upload.id ? { ...u, progress: 30 } : u)
+        );
 
-          const newAsset = {
-            id: `asset-${Date.now()}-${Math.random()}`,
-            name: upload.file.name,
-            category: detectedCat,
-            size: upload.file.size,
-            url: objectUrl,
-            type: upload.file.type || 'application/octet-stream',
-            dimensions: detectedCat.includes('IMAGE') || detectedCat === 'LOGOS' || detectedCat === 'SPONSORS' ? '1920 x 1080' : 'N/A',
-            date: new Date().toISOString(),
-            tags: ['uploaded', 'local'],
-            usedIn: ['Custom Overlay Screen']
-          };
+        let assetUrl = '';
+        let assetThumb = '';
 
-          setAssets(prev => [newAsset, ...prev]);
-          setUploadingFiles(prev => prev.filter(u => u.id !== upload.id));
-          toast.success(`${upload.name} uploaded successfully!`);
+        if (isImage) {
+          // Upload to ImgBB for permanent CDN URL
+          const result = await uploadImage(upload.file, upload.file.name.replace(/\.[^.]+$/, ''));
+          assetUrl = result.url;
+          assetThumb = result.thumb || '';
         } else {
-          setUploadingFiles(prev =>
-            prev.map(u => u.id === upload.id ? { ...u, progress: currentProgress } : u)
-          );
+          // Non-image files (video, audio, fonts) — use blob URL for local preview
+          // These would need a different hosting solution for production use
+          assetUrl = URL.createObjectURL(upload.file);
+          toast(`${upload.name}: Non-image files use local preview. Upload to a CDN for production use.`, { icon: '⚠️' });
         }
-      }, 180 + Math.random() * 120);
-    });
+
+        setUploadingFiles(prev =>
+          prev.map(u => u.id === upload.id ? { ...u, progress: 90 } : u)
+        );
+
+        const newAsset = {
+          id: `asset-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`,
+          name: upload.file.name,
+          category: detectedCat,
+          size: upload.file.size,
+          url: assetUrl,
+          thumb: assetThumb,
+          type: upload.file.type || 'application/octet-stream',
+          dimensions: isImage ? '1920 x 1080' : 'N/A',
+          date: new Date().toISOString(),
+          tags: ['uploaded', isImage ? 'imgbb' : 'local'],
+          usedIn: []
+        };
+
+        // Persist to Firebase
+        if (overlayApi?.saveAsset) {
+          await overlayApi.saveAsset(newAsset);
+        }
+
+        setAssets(prev => [newAsset, ...prev]);
+        setUploadingFiles(prev => prev.filter(u => u.id !== upload.id));
+        toast.success(`${upload.name} uploaded successfully!`);
+      } catch (error) {
+        console.error('Upload error:', error);
+        setUploadingFiles(prev => prev.filter(u => u.id !== upload.id));
+        toast.error(`Failed to upload ${upload.name}: ${error.message || 'Unknown error'}`);
+      }
+    }
   };
 
   // Category counts computed dynamically
