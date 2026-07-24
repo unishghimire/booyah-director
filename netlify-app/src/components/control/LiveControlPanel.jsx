@@ -231,10 +231,10 @@ function TeamControlGrid({ teams, players, onKill, onEliminate, onRevive, onPlac
                   </button>
                   <span className="font-orbitron text-sm font-black text-[#3B82F6] w-6 text-center">{team.total_tournament_kills || 0}</span>
                   <button
-                    onClick={() => {}} // TODO: decrement
+                    onClick={() => handleDecrementKill(team)}
                     className="flex h-7 w-7 items-center justify-center rounded bg-red-500/10 border border-red-500/20 hover:bg-red-500/20 transition-all"
                   >
-                    <Minus className="h-3.5 w-3.5 text-red-400" />
+                    <Minus className="h-3.5 h-3.5 text-red-400" />
                   </button>
                 </div>
                 {/* Points */}
