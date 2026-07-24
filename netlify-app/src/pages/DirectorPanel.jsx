@@ -20,6 +20,7 @@ import OCRRegionDesigner from '@/components/control/OCRRegionDesigner';
 import SoundManager from '@/components/control/SoundManager';
 import AnimationLibrary from '@/components/control/AnimationLibrary';
 import { useUndoRedo } from '@/lib/useUndoRedo';
+import { ROLES, getRoleConfig, canAccessTab } from '@/lib/roles';
 
 import {
   ExternalLink,
@@ -46,7 +47,27 @@ export default function DirectorPanel() {
   const [copied, setCopied] = useState(null);
   const [previewScreen, setPreviewScreen] = useState(null);
   const [takeBusy, setTakeBusy] = useState(false);
+  const [tournamentList, setTournamentList] = useState([]);
+  const [showTournamentSwitcher, setShowTournamentSwitcher] = useState(false);
+  const [userRole, setUserRole] = useState('admin');
+  const [isOwner, setIsOwner] = useState(false);
   const obsStatus = useObsStore(s => s.connectionStatus);
+  const roleConfig = getRoleConfig(userRole, isOwner);
+
+  // Load tournament list and user role on mount
+  useEffect(() => {
+    (async () => {
+      try {
+        const [tRes, rRes] = await Promise.all([
+          overlayApi.listTournaments(),
+          overlayApi.getUserRole(),
+        ]);
+        if (tRes?.tournaments) setTournamentList(tRes.tournaments);
+        if (rRes?.role) setUserRole(rRes.role);
+        if (rRes?.isOwner) setIsOwner(true);
+      } catch (e) { /* ignore on first load */ }
+    })();
+  }, []);
 
   const state = data?.overlayState || {};
   const currentScreen = state.current_screen || 'setup_blank';
@@ -55,6 +76,19 @@ export default function DirectorPanel() {
   const teams = data?.teams || [];
   const players = data?.players || [];
   const standings = data?.standings || [];
+
+  const handleSwitchTournament = async (tid) => {
+    try {
+      await overlayApi.switchTournament({ tournament_id: tid });
+      setShowTournamentSwitcher(false);
+      await refresh();
+      const tRes = await overlayApi.listTournaments();
+      if (tRes?.tournaments) setTournamentList(tRes.tournaments);
+      toast.success('Tournament switched!');
+    } catch (e) {
+      toast.error('Failed to switch tournament');
+    }
+  };
 
   const handleRefresh = async () => {
     setRefreshing(true);
@@ -272,21 +306,66 @@ export default function DirectorPanel() {
          TOP HEADER BAR — 64px
       ───────────────────────────────────────── */}
       <header className="flex h-16 items-center justify-between border-b border-[rgba(124,58,237,0.15)] bg-[#131127] px-5 flex-shrink-0 relative">
-        {/* Left: Tournament name */}
-        <div className="flex items-center gap-3">
+        {/* Left: Tournament switcher */}
+        <div className="flex items-center gap-3 relative">
           <div className="h-6 w-[4px] bg-[#7C3AED]" style={{ filter: "drop-shadow(0 0 4px rgba(124,58,237,0.6))" }} />
-          <div className="leading-none">
-            <h1 className="font-orbitron text-sm font-black uppercase tracking-wider text-white">
-              {tournament?.name || 'CHAMPIONSHIP TOUR'}
-            </h1>
+          <button
+            onClick={() => roleConfig.canSwitchTournament && setShowTournamentSwitcher(s => !s)}
+            className="leading-none text-left group"
+          >
+            <div className="flex items-center gap-2">
+              <h1 className="font-orbitron text-sm font-black uppercase tracking-wider text-white">
+                {tournament?.name || 'CHAMPIONSHIP TOUR'}
+              </h1>
+              {roleConfig.canSwitchTournament && tournamentList.length > 1 && (
+                <ChevronDown className="h-3 w-3 text-gray-500 group-hover:text-[#7C3AED] transition-colors" />
+              )}
+            </div>
             <p className="font-orbitron text-[9px] font-bold text-gray-500 tracking-widest mt-1">
-              MATCH {(tournament?.current_match_number || 0) + 1} // ACTIVE
+              MATCH {(tournament?.current_match_number || 0) + 1} // {tournament?.status?.toUpperCase() || 'ACTIVE'}
             </p>
-          </div>
+          </button>
+          {/* Tournament dropdown */}
+          {showTournamentSwitcher && roleConfig.canSwitchTournament && (
+            <>
+              <div className="fixed inset-0 z-40" onClick={() => setShowTournamentSwitcher(false)} />
+              <div className="absolute top-full left-0 mt-2 z-50 w-72 rounded-xl border border-white/10 bg-[#131127] shadow-2xl overflow-hidden">
+                <div className="px-3 py-2 border-b border-white/5">
+                  <span className="font-orbitron text-[9px] font-black tracking-widest text-gray-500">SWITCH TOURNAMENT</span>
+                </div>
+                <div className="max-h-64 overflow-y-auto">
+                  {tournamentList.length === 0 ? (
+                    <div className="px-3 py-4 text-center text-xs text-gray-500">No tournaments found</div>
+                  ) : tournamentList.map(t => (
+                    <button
+                      key={t.id}
+                      onClick={() => handleSwitchTournament(t.id)}
+                      className="w-full px-3 py-2.5 flex items-center justify-between hover:bg-[#7C3AED]/10 transition-colors text-left border-b border-white/5 last:border-0"
+                    >
+                      <div>
+                        <p className="text-sm font-semibold text-white">{t.name || 'Untitled'}</p>
+                        <p className="text-[10px] text-gray-500">{t.team_count || 0} teams · {t.match_count || 0} matches</p>
+                      </div>
+                      {t.id === tournament?.id && (
+                        <span className="w-2 h-2 rounded-full bg-[#7C3AED]" />
+                      )}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            </>
+          )}
         </div>
 
-        {/* Center: Live indicator pill */}
-        <div className="flex items-center gap-2 border border-[rgba(124,58,237,0.3)] bg-[#0D0B1A] px-4 py-1.5">
+        {/* Center: Role badge + Live indicator */}
+        <div className="flex items-center gap-3">
+          <span
+            className="font-orbitron text-[9px] font-black tracking-widest px-2.5 py-1 rounded"
+            style={{ background: `${roleConfig.color}15`, color: roleConfig.color, border: `1px solid ${roleConfig.color}30` }}
+          >
+            {roleConfig.label.toUpperCase()}
+          </span>
+          <div className="flex items-center gap-2 border border-[rgba(124,58,237,0.3)] bg-[#0D0B1A] px-4 py-1.5">
           <span className="relative flex h-2 w-2">
             <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-[#7C3AED] opacity-75"></span>
             <span className="relative inline-flex h-2 w-2 rounded-full bg-[#7C3AED]"></span>
@@ -294,6 +373,7 @@ export default function DirectorPanel() {
           <span className="font-orbitron text-[10px] font-black tracking-widest text-[#7C3AED]">
             LIVE: {currentScreen.replace(/_/g, ' ').toUpperCase()}
           </span>
+          </div>
         </div>
 
         {/* Right: Actions */}
@@ -337,7 +417,7 @@ export default function DirectorPanel() {
           { id: 'ocr', label: 'OCR', icon: Crosshair },
           { id: 'timeline', label: 'TIMELINE', icon: Clock },
           { id: 'setup', label: 'SETUP', icon: Settings2 },
-        ].map((t) => {
+        ].filter(t => canAccessTab(userRole, t.id, isOwner)).map((t) => {
           const isActive = activeTab === t.id;
           const Icon = t.icon;
           return (
@@ -1021,6 +1101,45 @@ export default function DirectorPanel() {
 
                   {/* Tournament setup form */}
                   <TournamentManager />
+
+                  {/* Role Management */}
+                  <div className="mt-6 bg-slate-900/60 border border-slate-800 rounded-xl p-5">
+                    <h3 className="font-orbitron text-[10px] font-black tracking-widest text-[#7C3AED] mb-4">USER ROLE & PERMISSIONS</h3>
+                    <div className="mb-3">
+                      <p className="text-xs text-gray-500 mb-2">Current role: <span className="font-bold" style={{ color: roleConfig.color }}>{roleConfig.label}</span></p>
+                      <p className="text-[11px] text-gray-600">{roleConfig.description}</p>
+                    </div>
+                    <div className="grid grid-cols-1 gap-2">
+                      {Object.entries(ROLES).map(([key, r]) => (
+                        <button
+                          key={key}
+                          onClick={async () => {
+                            if (!isOwner) { toast.error('Only the owner can change roles'); return; }
+                            try {
+                              await overlayApi.setUserRole(key);
+                              setUserRole(key);
+                              toast.success(`Role changed to ${r.label}`);
+                            } catch (e) { toast.error('Failed to change role'); }
+                          }}
+                          className="flex items-center justify-between p-3 rounded-lg border transition-all text-left"
+                          style={userRole === key
+                            ? { borderColor: r.color + '60', background: r.color + '10' }
+                            : { borderColor: 'rgba(255,255,255,0.05)', background: 'transparent' }
+                          }
+                        >
+                          <div>
+                            <p className="text-sm font-semibold" style={{ color: r.color }}>{r.label}</p>
+                            <p className="text-[10px] text-gray-500">{r.description}</p>
+                          </div>
+                          <div className="flex items-center gap-2">
+                            <span className="text-[9px] font-mono text-gray-600">{r.tabs.length} tabs</span>
+                            {userRole === key && <span className="w-2 h-2 rounded-full" style={{ background: r.color }} />}
+                          </div>
+                        </button>
+                      ))}
+                    </div>
+                    {!isOwner && <p className="mt-3 text-[10px] text-gray-600">Only the owner can change roles.</p>}
+                  </div>
                 </div>
               </SectionBoundary>
             )}

@@ -536,6 +536,25 @@ module.exports = async (req, res) => {
       }
     }
 
+    // ── GET USER ROLE ────────────────────────────────────────────────────
+    if (route === 'getUserRole') {
+      const profile = db.user_profile || {};
+      const role = isOwner ? 'admin' : (profile.role || 'admin');
+      return ok({ role, isOwner });
+    }
+
+    // ── SET USER ROLE ─────────────────────────────────────────────────────
+    if (route === 'setUserRole') {
+      if (!isOwner) return err(403, 'Forbidden: Only the owner can set roles');
+      const role = sanitizeString(body.role || '', 30);
+      const validRoles = ['admin', 'operator', 'observer', 'referee', 'producer'];
+      if (!validRoles.includes(role)) return err(400, 'Invalid role');
+      if (!db.user_profile) db.user_profile = {};
+      db.user_profile.role = role;
+      await saveDb(uid, db);
+      return ok({ success: true, role });
+    }
+
     // ─── AUTHENTICATION REQUIRED FOR ALL OTHER ROUTES ───
     const authHeader = req.headers.authorization || req.headers.Authorization || '';
     const user = await verifyToken(authHeader);
