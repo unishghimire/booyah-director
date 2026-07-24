@@ -16,7 +16,7 @@
  */
 
 import React from 'react';
-import { AlertTriangle, RefreshCw, RotateCcw } from 'lucide-react';
+import { AlertTriangle, RotateCcw } from 'lucide-react';
 
 /* ══════════════════════════════════════════════════
    BASE ERROR BOUNDARY CLASS

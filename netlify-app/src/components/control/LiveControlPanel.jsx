@@ -1,9 +1,9 @@
-import React, { useState, useMemo, useCallback } from 'react';
+import React, { useState, useMemo } from 'react';
 import {
   Play, Pause, Square, RotateCcw, AlertTriangle, Plus, Minus,
   Skull, Heart, Crosshair, Trophy, Zap, Radio, Users, Target,
-  ChevronDown, ChevronUp, Eye, EyeOff, Star, Crown, Bell,
-  Activity, Gamepad2, Volume2, VolumeX, RefreshCw
+  ChevronDown, ChevronUp, Star, Crown,
+  Activity, Gamepad2, RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { overlayApi } from '@/lib/overlayApi';

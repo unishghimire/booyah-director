@@ -14,14 +14,13 @@
  *  8. Live preview   — mini preview bar
  */
 import React, { useState, useEffect } from 'react';
-import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import { overlayApi } from '@/lib/overlayApi';
 import { getPins, setPins } from '@/lib/auth';
 import toast from 'react-hot-toast';
 import {
   Paintbrush, Check, Layers, Type, Eye, Mic2,
   Lock, RefreshCw, Save, RotateCcw, Map,
-  Image, FolderOpen, BotMessageSquare, Send, TestTube2, Link, CheckCircle2, Trash2, Trophy, Users, BarChart3, Star, Zap
+  Image, FolderOpen, BotMessageSquare, TestTube2, Link, Trash2, Trophy, Users, BarChart3, Star, Zap
 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
 import { MAPS } from '@/lib/maps';
