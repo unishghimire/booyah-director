@@ -874,15 +874,15 @@ module.exports = async (req, res) => {
         team_id: team.id,
         tournament_id: body.tournament_id ? sanitizeString(body.tournament_id) : team.tournament_id,
         name: sanitizeString(body.name, 100),
-        role: sanitizeString(body.role || ', 50),
-        photo_url: sanitizeUrl(body.photo_url || '),
+        role: sanitizeString(body.role || '', 50),
+        photo_url: sanitizeUrl(body.photo_url || ''),
         is_alive: true,
         current_match_kills: Number(body.current_match_kills) || 0,
         total_tournament_kills: Number(body.total_tournament_kills) || 0,
-        real_name: body.real_name ? sanitizeString(body.real_name, 100) : ',
-        nationality: body.nationality ? sanitizeString(body.nationality, 100) : ',
-        dob: body.dob ? sanitizeString(body.dob, 50) : ',
-        instagram: body.instagram ? sanitizeString(body.instagram, 100) : ',
+        real_name: body.real_name ? sanitizeString(body.real_name, 100) : '',
+        nationality: body.nationality ? sanitizeString(body.nationality, 100) : '',
+        dob: body.dob ? sanitizeString(body.dob, 50) : '',
+        instagram: body.instagram ? sanitizeString(body.instagram, 100) : '',
         youtube: body.youtube ? sanitizeString(body.youtube, 100) : ',
         twitter: body.twitter ? sanitizeString(body.twitter, 100) : ',
         avg_kills_per_match: Number(body.avg_kills_per_match) || 0,
@@ -1155,7 +1155,7 @@ module.exports = async (req, res) => {
       if (idx === -1) return err(404, 'Player not found');
       if (body.name !== undefined)      db.players[idx].name      = sanitizeString(body.name, 100);
       if (body.role !== undefined)      db.players[idx].role      = sanitizeString(body.role, 50);
-      if (body.photo_url !== undefined) db.players[idx].photo_url = sanitizeUrl(body.photo_url || ');
+      if (body.photo_url !== undefined) db.players[idx].photo_url = sanitizeUrl(body.photo_url || '');
       
       // Additional fields for NexPlay Broadcast Studio
       if (body.real_name !== undefined) db.players[idx].real_name = sanitizeString(body.real_name, 100);

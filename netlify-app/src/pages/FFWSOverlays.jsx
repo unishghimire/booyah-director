@@ -6,7 +6,7 @@
 import { motion, AnimatePresence } from 'framer-motion';
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { safeArray } from '@/components/ErrorBoundary';
-import { MAPS, getMapImages } from '@/lib/maps';
+import { getMapImages } from '@/lib/maps';
 
 /* ─── Eliminated Team Banner — 4-player panel ─── */
 export function EliminatedTeamBanner({ team, design }) {

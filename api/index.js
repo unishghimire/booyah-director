@@ -1962,6 +1962,18 @@ module.exports = async (req, res) => {
     }
 
 
+
+    // ── DELETE PLAYER ─────────────────────────────────────────────────────
+    if (route === 'deletePlayer') {
+      const missing = requireFields(body, ['player_id']);
+      if (missing) return err(400, missing);
+
+      db.players = db.players.filter(p => p.id !== body.player_id);
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true });
+    }
+
     // ── REVIVE PLAYER ─────────────────────────────────────────────────────
     if (route === 'revivePlayer') {
       const missing = requireFields(body, ['player_id']);

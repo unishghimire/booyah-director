@@ -2291,6 +2291,8 @@ export default function Overlay() {
     ),
     standings:       <FullStandings teams={teams} design={design} />,
     full_standings:  <FullStandings teams={teams} design={design} />,
+    killfeed:       <KillFeedScreen killFeed={killFeed} design={design} />,
+    kill_feed:      <KillFeedScreen killFeed={killFeed} design={design} />,
     maplabel:        <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
     map_label:       <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
     'today-matches': <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />,

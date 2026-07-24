@@ -4,7 +4,6 @@ import React, { useState, useMemo } from 'react';
 import SheetImport from '@/components/control/SheetImport';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
-import { useObsStore } from '@/lib/obsStore';
 import {
   Crosshair, Users, Clock, RefreshCw, Search, AlertTriangle,
   Skull, Shield, Trash2

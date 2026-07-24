@@ -10,20 +10,20 @@ export default defineConfig({
   },
   build: {
     outDir: 'dist',
-    sourcemap: false,          // no sourcemaps in prod — security + size
-    minify: 'esbuild',         // fastest minifier
+    sourcemap: false,
+    minify: 'esbuild',
     target: 'es2020',
     rollupOptions: {
       output: {
-        // Split vendor chunks for better caching
         manualChunks: {
           'react-vendor':    ['react', 'react-dom', 'react-router-dom'],
           'firebase-vendor': ['firebase/app', 'firebase/auth', 'firebase/database'],
           'ui-vendor':       ['lucide-react', 'react-hot-toast', '@tanstack/react-query'],
+          'motion-vendor':   ['framer-motion'],
+          'obs-vendor':      ['obs-websocket-js', 'zustand'],
         },
       },
     },
-    // Warn if any chunk > 500kB
     chunkSizeWarningLimit: 500,
   },
   server: {

@@ -2,10 +2,14 @@
   "version": 2,
   "buildCommand": "cd netlify-app && npm install && npm run build",
   "outputDirectory": "netlify-app/dist",
+  "functions": {
+    "api/index.js": {
+      "maxDuration": 30,
+      "runtime": "nodejs24.x"
+    }
+  },
   "rewrites": [
     { "source": "/api/:path*", "destination": "/api/index.js" },
-    { "source": "/controller.html", "destination": "/controller.html" },
-    { "source": "/overlay.html", "destination": "/overlay.html" },
-    { "source": "/((?!api/|controller.html|overlay.html).*)", "destination": "/index.html" }
+    { "source": "/((?!api/).*)", "destination": "/index.html" }
   ]
 }

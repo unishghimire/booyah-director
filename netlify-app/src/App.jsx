@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
@@ -7,10 +7,17 @@ import ScrollToTop from '@/components/ScrollToTop';
 import { ErrorBoundary, PanelBoundary } from '@/components/ErrorBoundary';
 import AuthPage from '@/pages/AuthPage';
 import PricingPage from '@/pages/PricingPage';
-import DirectorPanel from './pages/DirectorPanel';
-import DataInputer from './pages/DataInputer';
-import Overlay from './pages/Overlay';
-import OverlayLinks from './pages/OverlayLinks';
+import { lazy, Suspense } from 'react';
+const DirectorPanel = lazy(() => import('./pages/DirectorPanel'));
+const DataInputer   = lazy(() => import('./pages/DataInputer'));
+const Overlay       = lazy(() => import('./pages/Overlay'));
+const OverlayLinks  = lazy(() => import('./pages/OverlayLinks'));
+
+const PageLoader = () => (
+  <div className="flex h-screen items-center justify-center bg-[#060915]">
+    <div className="h-10 w-10 rounded-full border-4 border-[#7C3AED]/20 border-t-[#7C3AED] animate-spin" />
+  </div>
+);
 import { useOverlayData } from '@/lib/overlayApi';
 import { Clapperboard, Keyboard, Monitor, ExternalLink, Zap, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
 import ConnectionStatusBar from '@/components/ConnectionStatusBar';
@@ -257,7 +264,7 @@ function AppRoutes() {
     return (
       <Routes>
         <Route path="/overlay" element={<Navigate to="/overlay/blank" replace />} />
-        <Route path="/overlay/:screen" element={<PanelBoundary label="OVERLAY"><Overlay /></PanelBoundary>} />
+        <Route path="/overlay/:screen" element={<PanelBoundary label="OVERLAY"><Suspense fallback={<PageLoader />}><Overlay /></Suspense></PanelBoundary>} />
         <Route path="*" element={<PanelBoundary label="AUTH"><AuthPage /></PanelBoundary>} />
       </Routes>
     );
@@ -268,7 +275,7 @@ function AppRoutes() {
     return (
       <Routes>
         <Route path="/overlay" element={<Navigate to="/overlay/blank" replace />} />
-        <Route path="/overlay/:screen" element={<PanelBoundary label="OVERLAY"><Overlay /></PanelBoundary>} />
+        <Route path="/overlay/:screen" element={<PanelBoundary label="OVERLAY"><Suspense fallback={<PageLoader />}><Overlay /></Suspense></PanelBoundary>} />
         <Route path="*" element={<PanelBoundary label="PRICING"><PricingPage /></PanelBoundary>} />
       </Routes>
     );
@@ -278,11 +285,11 @@ function AppRoutes() {
   return (
     <Routes>
       <Route path="/" element={<Navigate to="/director" replace />} />
-      <Route path="/director"      element={<PanelBoundary label="DIRECTOR"><DirectorPanel /></PanelBoundary>} />
-      <Route path="/inputer"       element={<PanelBoundary label="DATA INPUTER"><DataInputer /></PanelBoundary>} />
+      <Route path="/director"      element={<PanelBoundary label="DIRECTOR"><Suspense fallback={<PageLoader />}><DirectorPanel /></Suspense></PanelBoundary>} />
+      <Route path="/inputer"       element={<PanelBoundary label="DATA INPUTER"><Suspense fallback={<PageLoader />}><DataInputer /></Suspense></PanelBoundary>} />
       <Route path="/overlay"       element={<Navigate to="/overlay/blank" replace />} />
-      <Route path="/overlay/:screen" element={<PanelBoundary label="OVERLAY"><Overlay /></PanelBoundary>} />
-      <Route path="/overlay-links" element={<PanelBoundary label="OBS LINKS"><OverlayLinks /></PanelBoundary>} />
+      <Route path="/overlay/:screen" element={<PanelBoundary label="OVERLAY"><Suspense fallback={<PageLoader />}><Overlay /></Suspense></PanelBoundary>} />
+      <Route path="/overlay-links" element={<PanelBoundary label="OBS LINKS"><Suspense fallback={<PageLoader />}><OverlayLinks /></Suspense></PanelBoundary>} />
       <Route path="/control-panel" element={<Navigate to="/director" replace />} />
       <Route path="*"              element={<Navigate to="/director" replace />} />
     </Routes>

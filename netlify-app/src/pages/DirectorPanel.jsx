@@ -1,5 +1,5 @@
-import { MAP_IMAGES, MAPS } from '@/lib/maps';
-import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
+import { MAPS } from '@/lib/maps';
+import { SectionBoundary, PanelBoundary } from '@/components/ErrorBoundary';
 import React, { useState } from 'react';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
