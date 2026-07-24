@@ -1,0 +1,264 @@
+=== API/INDEX.JS BLOCKS ===
+Found 50 block handlers in api/index.js
+Routes: ['getOverlayData'] (Lines 425-627)
+Routes: ['registerUser'] (Lines 630-669)
+Routes: ['broadcastState'] (Lines 786-789)
+Routes: ['broadcastSave'] (Lines 792-799)
+Routes: ['settingsUpdate'] (Lines 802-807)
+
+=== NETLIFY-APP/API/INDEX.JS BLOCKS ===
+Found 40 block handlers in netlify-app/api/index.js
+Routes: ['getOverlayData'] (Lines 358-506)
+Routes: ['registerUser'] (Lines 509-522)
+Routes: ['checkSubscription'] (Lines 550-566)
+Routes: ['getShareToken'] (Lines 569-594)
+Routes: ['generateShareToken'] (Lines 597-616)
+=== AUDIT FOR api/index.js ===
+Routes: ['getOverlayData'] (L425-627)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+  Query fields: ['shareToken', 'token', 'uid']
+Routes: ['registerUser'] (L630-669)
+  Has Try: True | Saves DB: True | Uses Sanitization: False
+Routes: ['broadcastState'] (L786-789)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['broadcastSave'] (L792-799)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['settingsUpdate'] (L802-807)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['headstartAssign'] (L810-821)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['headstartManual'] (L824-832)
+  Has Try: False | Saves DB: False | Uses Sanitization: True
+Routes: ['matchSubmit'] (L835-854)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+  Body fields: ['match']
+  [WARNING] May be missing sanitization for fields: ['match']
+Routes: ['standings'] (L857-864)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['requestSubscription'] (L894-920)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['submitPayment'] (L923-1023)
+  Has Try: True | Saves DB: False | Uses Sanitization: True
+  Body fields: ['displayName', 'email', 'paymentMethod', 'plan', 'promoCode', 'screenshotUrl', 'transactionId', 'uid']
+Routes: ['getPaymentStatus'] (L1026-1063)
+  Has Try: True | Saves DB: False | Uses Sanitization: True
+  Query fields: ['uid']
+Routes: ['checkSubscription'] (L1067-1083)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+Routes: ['getShareToken'] (L1086-1111)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+Routes: ['generateShareToken'] (L1114-1133)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+Routes: ['saveDesign', 'updateDesign'] (L1136-1166)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['accentColor', 'accentColor2', 'bgColor', 'casters', 'fontStyle', 'gameLabel', 'logoUrl', 'organizerName', 'overlayStyle', 'sponsorLogoUrl', 'textColor', 'tournamentName', 'tournamentSubtitle']
+Routes: ['getDesign'] (L1168-1170)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['initializeTournament', 'createTournament'] (L1173-1274)
+  Has Try: True | Saves DB: True | Uses Sanitization: True
+  Body fields: ['champion_rush_threshold', 'format_config', 'name', 'placement_points_config', 'points_per_kill', 'total_matches']
+Routes: ['listTournaments', 'getTournaments'] (L1277-1330)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+Routes: ['getTournaments'] (L1326-1328)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['switchTournament'] (L1333-1349)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+Routes: ['deleteTournament'] (L1352-1380)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+Routes: ['addTeam'] (L1383-1421)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['logo_url', 'player_names', 'team_name', 'tournament_id']
+Routes: ['addPlayer'] (L1424-1457)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['instagram', 'name', 'nationality', 'photo_url', 'portrait_url', 'real_name', 'role', 'team_id', 'tournament_id', 'twitter', 'youtube']
+Routes: ['startNextMatch', 'startMatch'] (L1460-1510)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['map_name', 'tournament_id']
+Routes: ['updateMatchState'] (L1513-1528)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['match_id', 'state']
+Routes: ['addKill'] (L1531-1567)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['killed_player_name', 'killed_team_name', 'killer_name', 'killer_player_id', 'killer_team_name', 'match_id', 'tournament_id']
+Routes: ['eliminatePlayer'] (L1570-1664)
+  Has Try: True | Saves DB: True | Uses Sanitization: True
+  Body fields: ['match_id', 'player_id', 'player_name', 'team_id', 'team_name', 'tournament_id']
+Routes: ['setTeamPlacement'] (L1667-1713)
+  Has Try: True | Saves DB: True | Uses Sanitization: True
+  Body fields: ['match_id', 'placement', 'placement_points_config', 'team_id', 'team_name', 'tournament_id']
+Routes: ['calculateMVP'] (L1716-1732)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+  Body fields: ['match_id']
+  [WARNING] May be missing sanitization for fields: ['match_id']
+Routes: ['switchOverlayScreen'] (L1736-1746)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['screen']
+Routes: ['setMVPAndShowScreen', 'setMVP'] (L1749-1765)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['kills', 'player_id', 'player_name', 'team_name']
+Routes: ['setChampionAndShowScreen', 'setChampion'] (L1768-1779)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['team_id', 'team_name', 'total_points']
+Routes: ['applyHeadstartPoints'] (L1783-1818)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['headstart_points', 'previous_stage_standings', 'tournament_id']
+Routes: ['updateTournamentSettings'] (L1821-1841)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['champion_rush_threshold', 'name', 'points_per_kill', 'tournament_id']
+Routes: ['declareChampions'] (L1844-1912)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+  Body fields: ['tournament_id']
+  [WARNING] May be missing sanitization for fields: ['tournament_id']
+Routes: ['updatePlayer'] (L1916-1937)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['instagram', 'name', 'nationality', 'photo_url', 'player_id', 'portrait_url', 'real_name', 'role', 'team_id', 'twitter', 'youtube']
+Routes: ['updateTeam'] (L1940-1951)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['color', 'logo_url', 'team_id', 'team_name']
+Routes: ['deleteTeam'] (L1953-1963)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+  Body fields: ['team_id']
+  [WARNING] May be missing sanitization for fields: ['team_id']
+Routes: ['updateTeamLogo'] (L1966-1977)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['logo_url', 'team_id']
+Routes: ['deletePlayer'] (L1982-1990)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+  Body fields: ['player_id']
+  [WARNING] May be missing sanitization for fields: ['player_id']
+Routes: ['revivePlayer'] (L1993-2024)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+  Body fields: ['match_id', 'player_id']
+  [WARNING] May be missing sanitization for fields: ['match_id', 'player_id']
+Routes: ['resetMatch'] (L2027-2042)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+Routes: ['updateTournament'] (L2045-2066)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['discord_channel_name', 'discord_webhook_url', 'name', 'placement_points_config', 'points_per_kill', 'status', 'total_matches', 'tournament_id']
+Routes: ['resetDatabase'] (L2069-2099)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+Routes: ['saveDiscordWebhook'] (L2103-2117)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+Routes: ['testDiscordWebhook'] (L2120-2148)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+Routes: ['postDiscord'] (L2151-2264)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+  Body fields: ['champion_logo', 'champion_name', 'champion_points', 'mvp_kills', 'mvp_name', 'mvp_photo', 'mvp_team']
+  [WARNING] May be missing sanitization for fields: ['champion_logo', 'champion_name', 'champion_points', 'mvp_kills', 'mvp_name', 'mvp_photo', 'mvp_team']
+Routes: ['validatePromo'] (L2266-2295)
+  Has Try: True | Saves DB: False | Uses Sanitization: True
+  Body fields: ['code', 'plan']
+Routes: ['importFromSheet'] (L2298-2386)
+  Has Try: True | Saves DB: True | Uses Sanitization: True
+
+=== AUDIT FOR netlify-app/api/index.js ===
+Routes: ['getOverlayData'] (L358-506)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+  Query fields: ['shareToken', 'token', 'uid']
+Routes: ['registerUser'] (L509-522)
+  Has Try: True | Saves DB: True | Uses Sanitization: False
+Routes: ['checkSubscription'] (L550-566)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+Routes: ['getShareToken'] (L569-594)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+Routes: ['generateShareToken'] (L597-616)
+  Has Try: True | Saves DB: False | Uses Sanitization: False
+Routes: ['saveDesign', 'updateDesign'] (L619-668)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['accentColor', 'accentColor2', 'backgrounds', 'bgColor', 'casters', 'fontStyle', 'gameLabel', 'logoUrl', 'mapImages', 'organizerName', 'overlayStyle', 'playerPhotos', 'sponsorLogoUrl', 'sponsorName', 'teamLogos', 'textColor', 'tournamentName', 'tournamentSubtitle']
+Routes: ['getDesign'] (L670-672)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['initializeTournament', 'createTournament'] (L675-730)
+  Has Try: True | Saves DB: True | Uses Sanitization: True
+  Body fields: ['name', 'placement_points_config', 'points_per_kill', 'total_matches']
+Routes: ['listTournaments', 'getTournaments'] (L733-767)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['getTournaments'] (L763-765)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+Routes: ['switchTournament'] (L770-786)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+Routes: ['deleteTournament'] (L789-817)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+Routes: ['addTeam'] (L820-858)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['logo_url', 'player_names', 'team_name', 'tournament_id']
+Routes: ['addPlayer'] (L861-900)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['avg_kills_per_match', 'best_placement', 'current_match_kills', 'dob', 'instagram', 'matches_played', 'matches_won', 'name', 'nationality', 'photo_url', 'real_name', 'role', 'team_id', 'total_points', 'total_tournament_kills', 'tournament_id', 'twitter', 'youtube']
+Routes: ['startNextMatch', 'startMatch'] (L903-930)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['map_name', 'tournament_id']
+Routes: ['updateMatchState'] (L933-948)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['match_id', 'state']
+Routes: ['addKill'] (L951-987)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['killed_player_name', 'killed_team_name', 'killer_name', 'killer_player_id', 'killer_team_name', 'match_id', 'tournament_id']
+Routes: ['eliminatePlayer'] (L990-1018)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['match_id', 'player_id', 'player_name', 'team_name', 'tournament_id']
+Routes: ['setTeamPlacement'] (L1021-1067)
+  Has Try: True | Saves DB: True | Uses Sanitization: True
+  Body fields: ['match_id', 'placement', 'placement_points_config', 'team_id', 'team_name', 'tournament_id']
+Routes: ['calculateMVP'] (L1070-1086)
+  Has Try: False | Saves DB: False | Uses Sanitization: False
+  Body fields: ['match_id']
+  [WARNING] May be missing sanitization for fields: ['match_id']
+Routes: ['switchOverlayScreen'] (L1090-1100)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['screen']
+Routes: ['setMVPAndShowScreen', 'setMVP'] (L1103-1119)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['kills', 'player_id', 'player_name', 'team_name']
+Routes: ['setChampionAndShowScreen', 'setChampion'] (L1122-1133)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['team_id', 'team_name', 'total_points']
+Routes: ['declareChampions'] (L1136-1147)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+  Body fields: ['tournament_id']
+  [WARNING] May be missing sanitization for fields: ['tournament_id']
+Routes: ['updatePlayer'] (L1151-1184)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['avg_kills_per_match', 'best_placement', 'current_match_kills', 'dob', 'instagram', 'is_alive', 'matches_played', 'matches_won', 'name', 'nationality', 'photo_url', 'player_id', 'real_name', 'role', 'team_id', 'total_points', 'total_tournament_kills', 'twitter', 'youtube']
+Routes: ['updateTeam'] (L1187-1198)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['color', 'logo_url', 'team_id', 'team_name']
+Routes: ['deleteTeam'] (L1200-1210)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+  Body fields: ['team_id']
+  [WARNING] May be missing sanitization for fields: ['team_id']
+Routes: ['deletePlayer'] (L1212-1220)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+  Body fields: ['player_id']
+  [WARNING] May be missing sanitization for fields: ['player_id']
+Routes: ['updateTeamLogo'] (L1223-1234)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['logo_url', 'team_id']
+Routes: ['revivePlayer'] (L1238-1249)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+  Body fields: ['player_id']
+  [WARNING] May be missing sanitization for fields: ['player_id']
+Routes: ['resetMatch'] (L1252-1267)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+Routes: ['updateTournament'] (L1270-1288)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['name', 'placement_points_config', 'points_per_kill', 'status', 'total_matches', 'tournament_id']
+Routes: ['applyHeadstartPoints'] (L1292-1301)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['points', 'team_id']
+Routes: ['updateTournamentSettings'] (L1304-1316)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+  Body fields: ['name', 'placement_points_config', 'points_per_kill', 'total_matches', 'tournament_id']
+Routes: ['resetDatabase'] (L1318-1348)
+  Has Try: False | Saves DB: True | Uses Sanitization: False
+Routes: ['validatePromo'] (L1351-1380)
+  Has Try: True | Saves DB: False | Uses Sanitization: True
+  Body fields: ['code', 'plan']
+Routes: ['importFromSheet'] (L1383-1471)
+  Has Try: True | Saves DB: True | Uses Sanitization: True
+Routes: ['saveDiscordWebhook'] (L1474-1484)
+  Has Try: False | Saves DB: True | Uses Sanitization: True
+Routes: ['testDiscordWebhook'] (L1487-1515)
+  Has Try: True | Saves DB: False | Uses Sanitization: True
+Routes: ['postDiscord'] (L1518-1580)
+  Has Try: True | Saves DB: False | Uses Sanitization: True
