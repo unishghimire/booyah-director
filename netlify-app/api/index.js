@@ -673,6 +673,7 @@ module.exports = async (req, res) => {
         sponsorName:        sanitizeString(body.sponsorName      !== undefined ? body.sponsorName      : db.design?.sponsorName, 100),
         backgrounds:        sanitizedBackgrounds,
         soundConfig:          typeof body.soundConfig === 'object' && body.soundConfig ? body.soundConfig : (db.design?.soundConfig || {}),
+        animationConfig:      typeof body.animationConfig === 'object' && body.animationConfig ? body.animationConfig : (db.design?.animationConfig || {}),
         playerPhotos:       { ...existingPhotos, ...incomingPhotos },
         teamLogos:          { ...existingLogos,  ...incomingLogos  },
         mapImages:          { ...existingMaps,   ...incomingMaps   },

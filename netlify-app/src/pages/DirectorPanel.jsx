@@ -18,12 +18,13 @@ import ThemeManager from '@/components/control/ThemeManager';
 import PlayerManager from '@/components/control/PlayerManager';
 import OCRRegionDesigner from '@/components/control/OCRRegionDesigner';
 import SoundManager from '@/components/control/SoundManager';
+import AnimationLibrary from '@/components/control/AnimationLibrary';
 
 import {
   ExternalLink,
   Eye, Paintbrush, Settings2, Trophy, Star, Crown,
   Monitor, Copy, Radio, CheckCircle2, ChevronRight,
-  Layers, Map, Crosshair, AlertTriangle, LayoutList, Volume2,
+  Layers, Map, Crosshair, AlertTriangle, LayoutList, Volume2, Film,
   Download, RefreshCw, Users, Sword, Shield, Flag,
   Zap, Calendar, Mic2, Clock, BarChart2, Play, Activity, Palette
 } from 'lucide-react';
@@ -130,7 +131,7 @@ export default function DirectorPanel() {
 
       const key = e.key.toLowerCase();
       // Tab switching with 1-9, 0, -, =
-      const tabKeys = { '1': 'dashboard', '2': 'live', '3': 'overlay', '4': 'match', '5': 'standings', '6': 'players', '7': 'design', '8': 'theme', '9': 'assets', 's': 'sound', '0': 'ocr', '-': 'timeline', '=': 'setup' };
+      const tabKeys = { '1': 'dashboard', '2': 'live', '3': 'overlay', '4': 'match', '5': 'standings', '6': 'players', '7': 'design', '8': 'theme', '9': 'assets', 's': 'sound', 'a': 'animations', '0': 'ocr', '-': 'timeline', '=': 'setup' };
       if (tabKeys[key]) { e.preventDefault(); setActiveTab(tabKeys[key]); return; }
 
       // R = refresh
@@ -318,6 +319,7 @@ export default function DirectorPanel() {
           { id: 'theme', label: 'THEME', icon: Palette },
           { id: 'assets', label: 'ASSETS', icon: Layers },
           { id: 'sound', label: 'SOUND', icon: Volume2 },
+          { id: 'animations', label: 'ANIM', icon: Film },
           { id: 'ocr', label: 'OCR', icon: Crosshair },
           { id: 'timeline', label: 'TIMELINE', icon: Clock },
           { id: 'setup', label: 'SETUP', icon: Settings2 },
@@ -886,6 +888,13 @@ export default function DirectorPanel() {
             {activeTab === 'sound' && (
               <SectionBoundary label="SOUND MANAGER">
                 <SoundManager data={data} overlayApi={overlayApi} refresh={refresh} />
+              </SectionBoundary>
+            )}
+
+            {/* ANIMATION LIBRARY TAB */}
+            {activeTab === 'animations' && (
+              <SectionBoundary label="ANIMATION LIBRARY">
+                <AnimationLibrary data={data} overlayApi={overlayApi} refresh={refresh} />
               </SectionBoundary>
             )}
 
