@@ -1253,6 +1253,16 @@ module.exports = async (req, res) => {
       if (body.matches_played !== undefined) db.players[idx].matches_played = Number(body.matches_played) || 0;
       if (body.matches_won !== undefined) db.players[idx].matches_won = Number(body.matches_won) || 0;
 
+      // Phase 4: Live Match Detail Controls
+      if (body.health !== undefined)      db.players[idx].health      = Math.max(0, Math.min(200, Number(body.health) || 0));
+      if (body.armor !== undefined)       db.players[idx].armor       = sanitizeString(body.armor, 20);
+      if (body.helmet !== undefined)      db.players[idx].helmet      = sanitizeString(body.helmet, 20);
+      if (body.backpack !== undefined)    db.players[idx].backpack    = sanitizeString(body.backpack, 20);
+      if (body.weapon !== undefined)     db.players[idx].weapon      = sanitizeString(body.weapon, 100);
+      if (body.revives !== undefined)     db.players[idx].revives     = Number(body.revives) || 0;
+      if (body.assists !== undefined)     db.players[idx].assists     = Number(body.assists) || 0;
+      if (body.status !== undefined)      db.players[idx].status      = sanitizeString(body.status, 30);
+
       db.overlay_state.last_updated_at = new Date().toISOString();
       await saveDb(uid, db);
       return ok({ success: true, player: db.players[idx] });
@@ -1422,7 +1432,34 @@ module.exports = async (req, res) => {
       return ok({ success: true, message: 'Match data reset successfully' });
     }
 
-    // ── VALIDATE PROMO ────────────────────────────────────────────────────
+    // ── RESTORE STATE (Undo/Redo) ────────────────────────────────────────
+    if (route === 'restoreState') {
+      if (!isOwner) return err(403, 'Forbidden: Owner permission required');
+      if (!body.state || typeof body.state !== 'object') return err(400, 'state object is required');
+      
+      // Merge with default to ensure all fields exist
+      const def = getDefaultDb();
+      const restored = {
+        ...def,
+        ...body.state,
+        overlay_state: { ...def.overlay_state, ...(body.state.overlay_state || {}) },
+        design: { ...def.design, ...(body.state.design || {}) },
+        tournaments:        Array.isArray(body.state.tournaments)        ? body.state.tournaments        : [],
+        teams:              Array.isArray(body.state.teams)              ? body.state.teams              : [],
+        players:           Array.isArray(body.state.players)            ? body.state.players            : [],
+        matches:            Array.isArray(body.state.matches)            ? body.state.matches            : [],
+        match_standings:    Array.isArray(body.state.match_standings)    ? body.state.match_standings    : [],
+        kill_events:        Array.isArray(body.state.kill_events)        ? body.state.kill_events        : [],
+        elimination_events: Array.isArray(body.state.elimination_events) ? body.state.elimination_events : [],
+        assets:             Array.isArray(body.state.assets)             ? body.state.assets             : [],
+      };
+      
+      restored.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, restored);
+      return ok({ success: true, message: 'State restored successfully' });
+    }
+
+    // ── VALIDATE PROMO ────────────────────────────────────────────────────────────
     if (route === 'validatePromo') {
       const code = sanitizeString(body.code || '', 50).toUpperCase();
       const plan = sanitizeString(body.plan || '', 20).toLowerCase();

@@ -293,6 +293,10 @@ function PlayerDetailModal({ player, team, onClose, onSave, onDelete }) {
   const [form, setForm] = useState({
     name: player.name || '', real_name: player.real_name || '', nationality: player.nationality || '',
     team_id: player.team_id || '', instagram: player.instagram || '', youtube: player.youtube || '', twitter: player.twitter || '',
+    // Phase 4: Live Match Detail Controls
+    health: player.health ?? 200, armor: player.armor || 'none', helmet: player.helmet || 'none',
+    backpack: player.backpack || 'none', weapon: player.weapon || '', revives: player.revives || 0,
+    assists: player.assists || 0, status: player.status || (player.is_alive ? 'alive' : 'eliminated'),
   });
   return (
     <Modal onClose={onClose} title="PLAYER DETAILS">
@@ -313,11 +317,35 @@ function PlayerDetailModal({ player, team, onClose, onSave, onDelete }) {
         </div>
 
         {/* Stats */}
-        <div className="grid grid-cols-3 gap-2">
-          <StatBox label="TOURNAMENT KILLS" value={player.total_tournament_kills || 0} color="#3B82F6" />
+        <div className="grid grid-cols-4 gap-2">
+          <StatBox label="TOURN. KILLS" value={player.total_tournament_kills || 0} color="#3B82F6" />
           <StatBox label="MATCH KILLS" value={player.current_match_kills || 0} color="#7C3AED" />
-          <StatBox label="STATUS" value={player.is_alive ? 'ALIVE' : 'OUT'} color={player.is_alive ? '#22c55e' : '#ef4444'} />
+          <StatBox label="ASSISTS" value={player.assists || 0} color="#eab308" />
+          <StatBox label="REVIVES" value={player.revives || 0} color="#22c55e" />
         </div>
+        {/* Live Status Bar */}
+        {(player.health !== undefined || player.weapon || player.armor) && (
+          <div className="flex items-center gap-3 p-2 rounded-lg" style={{ background: '#0F1127' }}>
+            {player.health !== undefined && (
+              <div className="flex items-center gap-1.5">
+                <Heart className="w-3 h-3 text-red-400" />
+                <span className="text-xs font-bold text-white" style={{ fontFamily: 'Teko, sans-serif' }}>{player.health}HP</span>
+              </div>
+            )}
+            {player.weapon && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] text-white/40">WEAPON:</span>
+                <span className="text-xs text-white/80">{player.weapon}</span>
+              </div>
+            )}
+            {player.armor && player.armor !== 'none' && (
+              <div className="flex items-center gap-1.5">
+                <span className="text-[9px] text-white/40">ARMOR:</span>
+                <span className="text-xs text-white/80 uppercase">{player.armor}</span>
+              </div>
+            )}
+          </div>
+        )}
 
         {/* Editable Fields */}
         <div className="flex flex-col gap-3">
@@ -328,6 +356,57 @@ function PlayerDetailModal({ player, team, onClose, onSave, onDelete }) {
             <Field label="INSTAGRAM"><input value={form.instagram} onChange={e => setForm({...form, instagram: e.target.value})} placeholder="@handle" className="form-input" /></Field>
             <Field label="YOUTUBE"><input value={form.youtube} onChange={e => setForm({...form, youtube: e.target.value})} placeholder="@channel" className="form-input" /></Field>
             <Field label="TWITTER/X"><input value={form.twitter} onChange={e => setForm({...form, twitter: e.target.value})} placeholder="@handle" className="form-input" /></Field>
+          </div>
+        </div>
+
+        {/* Phase 4: Live Match Detail Controls */}
+        <div className="border-t border-white/10 pt-3 mt-2">
+          <p className="font-orbitron text-[8px] font-black tracking-widest text-purple-400 mb-3">LIVE MATCH DETAILS</p>
+          {/* Health */}
+          <div className="mb-3">
+            <div className="flex items-center justify-between mb-1">
+              <label className="font-orbitron text-[8px] font-black tracking-widest text-white/40">HEALTH</label>
+              <span className="text-sm font-bold" style={{ color: form.health > 100 ? '#22c55e' : form.health > 50 ? '#eab308' : '#ef4444', fontFamily: 'Teko, sans-serif' }}>{form.health} HP</span>
+            </div>
+            <input type="range" min="0" max="200" value={form.health} onChange={e => setForm({...form, health: parseInt(e.target.value)})} className="w-full accent-purple-500" />
+          </div>
+          {/* Gear Grid */}
+          <div className="grid grid-cols-2 gap-2 mb-3">
+            <Field label="ARMOR">
+              <select value={form.armor} onChange={e => setForm({...form, armor: e.target.value})} className="form-input">
+                <option value="none">None</option><option value="lv1">Level 1</option><option value="lv2">Level 2</option><option value="lv3">Level 3</option>
+              </select>
+            </Field>
+            <Field label="HELMET">
+              <select value={form.helmet} onChange={e => setForm({...form, helmet: e.target.value})} className="form-input">
+                <option value="none">None</option><option value="lv1">Level 1</option><option value="lv2">Level 2</option><option value="lv3">Level 3</option>
+              </select>
+            </Field>
+            <Field label="BACKPACK">
+              <select value={form.backpack} onChange={e => setForm({...form, backpack: e.target.value})} className="form-input">
+                <option value="none">None</option><option value="lv1">Level 1</option><option value="lv2">Level 2</option><option value="lv3">Level 3</option>
+              </select>
+            </Field>
+            <Field label="STATUS">
+              <select value={form.status} onChange={e => setForm({...form, status: e.target.value})} className="form-input">
+                <option value="alive">Alive</option><option value="knocked">Knocked</option><option value="reviving">Reviving</option><option value="eliminated">Eliminated</option>
+              </select>
+            </Field>
+          </div>
+          {/* Weapon */}
+          <div className="mb-3">
+            <Field label="PRIMARY WEAPON">
+              <input value={form.weapon} onChange={e => setForm({...form, weapon: e.target.value})} placeholder="e.g. AK47, M1014, MP40..." className="form-input" />
+            </Field>
+          </div>
+          {/* Combat Stats */}
+          <div className="grid grid-cols-2 gap-2">
+            <Field label="REVIVES">
+              <input type="number" min="0" value={form.revives} onChange={e => setForm({...form, revives: parseInt(e.target.value) || 0})} className="form-input" />
+            </Field>
+            <Field label="ASSISTS">
+              <input type="number" min="0" value={form.assists} onChange={e => setForm({...form, assists: parseInt(e.target.value) || 0})} className="form-input" />
+            </Field>
           </div>
         </div>
 

@@ -19,12 +19,13 @@ import PlayerManager from '@/components/control/PlayerManager';
 import OCRRegionDesigner from '@/components/control/OCRRegionDesigner';
 import SoundManager from '@/components/control/SoundManager';
 import AnimationLibrary from '@/components/control/AnimationLibrary';
+import { useUndoRedo } from '@/lib/useUndoRedo';
 
 import {
   ExternalLink,
   Eye, Paintbrush, Settings2, Trophy, Star, Crown,
   Monitor, Copy, Radio, CheckCircle2, ChevronRight,
-  Layers, Map, Crosshair, AlertTriangle, LayoutList, Volume2, Film,
+  Layers, Map, Crosshair, AlertTriangle, LayoutList, Volume2, Film, Undo2, Redo2, History,
   Download, RefreshCw, Users, Sword, Shield, Flag,
   Zap, Calendar, Mic2, Clock, BarChart2, Play, Activity, Palette
 } from 'lucide-react';
@@ -36,6 +37,7 @@ import {
 
 export default function DirectorPanel() {
   const { data, loading, refresh } = useOverlayData(true);
+  const { undo, redo, canUndo, canRedo, history, undoDepth, redoDepth } = useUndoRedo(data, overlayApi, refresh);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [busy, setBusy] = useState(null);
   const [mapSelect, setMapSelect] = useState('Bermuda');
@@ -134,7 +136,19 @@ export default function DirectorPanel() {
       const tabKeys = { '1': 'dashboard', '2': 'live', '3': 'overlay', '4': 'match', '5': 'standings', '6': 'players', '7': 'design', '8': 'theme', '9': 'assets', 's': 'sound', 'a': 'animations', '0': 'ocr', '-': 'timeline', '=': 'setup' };
       if (tabKeys[key]) { e.preventDefault(); setActiveTab(tabKeys[key]); return; }
 
-      // R = refresh
+      // Ctrl+Z = undo, Ctrl+Y / Ctrl+Shift+Z = redo
+    if ((e.ctrlKey || e.metaKey) && key === 'z' && !e.shiftKey) {
+      e.preventDefault();
+      if (canUndo) undo();
+      return;
+    }
+    if ((e.ctrlKey || e.metaKey) && (key === 'y' || (key === 'z' && e.shiftKey))) {
+      e.preventDefault();
+      if (canRedo) redo();
+      return;
+    }
+
+    // R = refresh
       if (key === 'r') { e.preventDefault(); refresh(); return; }
     };
     window.addEventListener('keydown', handleKey);

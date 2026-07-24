@@ -102,6 +102,7 @@ export const overlayApi = {
   updateTournament:         (d) => call('updateTournament', d),
   importFromSheet:          (d) => call('importFromSheet', d),
   resetDatabase:            ()  => call('resetDatabase'),
+  restoreState:            (s) => call('restoreState', { state: s }),
   getShareToken:            ()  => call('getShareToken', {}, 'GET'),
   updateTeamLogo:           (d) => call('updateTeamLogo', d),
   saveAsset:                (d) => call('saveAsset', d),
