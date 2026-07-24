@@ -53,3 +53,6 @@ booyah-admin/.env.example
 /.vercel/
 /booyah-admin/.vercel/
 /booyah-admin/.vercel-deploy
+.npm/
+__pycache__/
+.cache/
