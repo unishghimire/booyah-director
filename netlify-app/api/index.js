@@ -129,6 +129,7 @@ async function loadDb(uid) {
       match_standings:    Array.isArray(data.match_standings)    ? data.match_standings    : [],
       kill_events:        Array.isArray(data.kill_events)        ? data.kill_events        : [],
       elimination_events: Array.isArray(data.elimination_events) ? data.elimination_events : [],
+      assets:             Array.isArray(data.assets)             ? data.assets             : [],
     };
     _memStore.set(uid, merged); // cache for this invocation
     return merged;
@@ -177,6 +178,7 @@ function getDefaultDb() {
     match_standings:    [],
     kill_events:        [],
     elimination_events: [],
+    assets:             [],
     overlay_state: {
       id: 'singleton',
       tournament_id: null,
@@ -680,6 +682,43 @@ module.exports = async (req, res) => {
 
     if (route === 'getDesign') {
       return ok({ design: db.design || DEFAULT_DESIGN });
+    }
+
+
+    // ── ASSET MANAGEMENT ────────────────────────────────────────────────────
+    if (route === 'saveAsset') {
+      const id = body.id || genId();
+      const sanitizedAsset = {
+        id,
+        name:        sanitizeString(body.name || 'Untitled', 100),
+        category:    sanitizeString(body.category || 'LOGOS', 50),
+        url:         sanitizeUrl(body.url || '', 500),
+        thumb:       sanitizeUrl(body.thumb || '', 500),
+        type:        sanitizeString(body.type || 'image/png', 100),
+        size:        parseInt(body.size) || 0,
+        dimensions:  sanitizeString(body.dimensions || 'N/A', 50),
+        tags:        Array.isArray(body.tags) ? body.tags.slice(0, 10).map(t => sanitizeString(t, 30)) : [],
+        usedIn:      Array.isArray(body.usedIn) ? body.usedIn.slice(0, 10).map(t => sanitizeString(t, 50)) : [],
+        date:        body.date || new Date().toISOString(),
+      };
+      
+      if (!Array.isArray(db.assets)) db.assets = [];
+      const existingIdx = db.assets.findIndex(a => a.id === id);
+      if (existingIdx >= 0) {
+        db.assets[existingIdx] = sanitizedAsset;
+      } else {
+        db.assets.unshift(sanitizedAsset);
+      }
+      await saveDb(uid, db);
+      return ok({ success: true, asset: sanitizedAsset, assets: db.assets });
+    }
+
+    if (route === 'deleteAsset') {
+      const assetId = sanitizeString(body.id, 100);
+      if (!Array.isArray(db.assets)) db.assets = [];
+      db.assets = db.assets.filter(a => a.id !== assetId);
+      await saveDb(uid, db);
+      return ok({ success: true, assets: db.assets });
     }
 
     // ── CREATE / INITIALIZE TOURNAMENT ────────────────────────────────────
