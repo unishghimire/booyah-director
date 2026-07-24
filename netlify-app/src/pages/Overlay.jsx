@@ -1144,6 +1144,109 @@ function EliminationAlert({ eliminations = [], design }) {
 }
 
 /* ══════════════════════════════════════════════════
+/* ══════════════════════════════════════════════════
+   EVENT BANNER: Dynamic event overlays (First Blood, Multi-Kills, etc.)
+   Auto-reverting — triggered by control panel, reverts after 5s
+══════════════════════════════════════════════════ */
+const EVENT_CONFIG = {
+  first_blood:  { label: 'FIRST BLOOD',   color: '#ef4444' },
+  double_kill:  { label: 'DOUBLE KILL',   color: '#f59e0b' },
+  triple_kill:  { label: 'TRIPLE KILL',   color: '#8b5cf6' },
+  quadra_kill:  { label: 'QUADRA KILL',   color: '#3B82F6' },
+  penta_kill:   { label: 'PENTA KILL',    color: '#7C3AED' },
+  team_wipe:    { label: 'TEAM WIPE',     color: '#ec4899' },
+  airdrop:      { label: 'AIRDROP',       color: '#22c55e' },
+  final_circle: { label: 'FINAL CIRCLE',  color: '#ef4444' },
+  safe_zone:    { label: 'SAFE ZONE',     color: '#3B82F6' },
+  match_point:  { label: 'MATCH POINT',   color: '#f59e0b' },
+  winner:       { label: 'WINNER',        color: '#22c55e' },
+  mvp:          { label: 'MVP',           color: '#7C3AED' },
+};
+
+function EventBanner({ overlayState = {}, design }) {
+  const eventType = overlayState?.event_type || '';
+  const eventData = overlayState?.event_data || {};
+  const config = EVENT_CONFIG[eventType] || { label: eventType.toUpperCase(), color: '#7C3AED' };
+  const primary = tok.acc(design);
+  const playerName = eventData?.player_name || '';
+  const teamName = eventData?.team_name || '';
+  const zoneNum = eventData?.zone_number || 0;
+
+  return (
+    <div style={{ position:'absolute', top:0, left:0, width:1920, height:1080, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
+      <motion.div
+        initial={{ scale:0.3, opacity:0 }}
+        animate={{ scale:1, opacity:1 }}
+        exit={{ scale:1.5, opacity:0 }}
+        transition={{ duration:0.5, type:'spring', bounce:0.4 }}
+        style={{ position:'relative' }}
+      >
+        <motion.div
+          initial={{ opacity:0 }}
+          animate={{ opacity:[0,0.6,0.3,0.6] }}
+          transition={{ duration:2, repeat:Infinity }}
+          style={{
+            position:'absolute', inset:-100,
+            background:`radial-gradient(circle, ${config.color}40 0%, transparent 70%)`,
+            filter:'blur(40px)',
+          }}
+        />
+        <div style={{
+          background:'#0D0B1A',
+          border:`3px solid ${config.color}`,
+          borderRadius:16,
+          padding:'40px 80px',
+          textAlign:'center',
+          boxShadow:`0 0 60px ${config.color}60, inset 0 0 30px ${config.color}15`,
+          position:'relative',
+        }}>
+          <div style={{ position:'absolute', top:0, left:'10%', right:'10%', height:3, background:config.color, borderRadius:2 }} />
+          <motion.div
+            initial={{ y:20, opacity:0 }}
+            animate={{ y:0, opacity:1 }}
+            transition={{ delay:0.2 }}
+            style={{ fontFamily:'Orbitron', fontSize:72, fontWeight:900, color:config.color, textShadow:`0 0 30px ${config.color}80`, letterSpacing:'0.05em', marginBottom:8 }}
+          >
+            {config.label}
+          </motion.div>
+          {playerName && (
+            <motion.div
+              initial={{ y:10, opacity:0 }}
+              animate={{ y:0, opacity:1 }}
+              transition={{ delay:0.4 }}
+              style={{ fontFamily:'Orbitron', fontSize:28, fontWeight:700, color:'#fff', letterSpacing:'0.1em' }}
+            >
+              {playerName}
+            </motion.div>
+          )}
+          {teamName && (
+            <motion.div
+              initial={{ y:10, opacity:0 }}
+              animate={{ y:0, opacity:1 }}
+              transition={{ delay:0.5 }}
+              style={{ fontFamily:'Rajdhani', fontSize:20, color:primary, letterSpacing:'0.2em', marginTop:4 }}
+            >
+              {teamName}
+            </motion.div>
+          )}
+          {eventType === 'safe_zone' && zoneNum > 0 && (
+            <motion.div
+              initial={{ scale:0, opacity:0 }}
+              animate={{ scale:1, opacity:1 }}
+              transition={{ delay:0.3, type:'spring' }}
+              style={{ fontFamily:'Teko', fontSize:120, fontWeight:700, color:config.color, lineHeight:1 }}
+            >
+              ZONE {zoneNum}
+            </motion.div>
+          )}
+          <div style={{ position:'absolute', bottom:0, left:'10%', right:'10%', height:3, background:config.color, borderRadius:2 }} />
+        </div>
+      </motion.div>
+    </div>
+  );
+}
+/* ══════════════════════════════════════════════════
+
    SCREEN 11: MVP (MATCH REVEAL)
 ══════════════════════════════════════════════════ */
 function MVPScreen({ players = [], teams = [], design, overlayState }) {
@@ -2332,6 +2435,18 @@ export default function Overlay() {
       </>
     ),
     roadmap:         <RoadmapOverlay tournament={tournament} matches={matches} currentMatch={currentMatch} design={design} />,
+    'event-first_blood':  <EventBanner overlayState={overlayState} design={design} />,
+    'event-double_kill':  <EventBanner overlayState={overlayState} design={design} />,
+    'event-triple_kill':  <EventBanner overlayState={overlayState} design={design} />,
+    'event-quadra_kill':  <EventBanner overlayState={overlayState} design={design} />,
+    'event-penta_kill':   <EventBanner overlayState={overlayState} design={design} />,
+    'event-team_wipe':    <EventBanner overlayState={overlayState} design={design} />,
+    'event-airdrop':      <EventBanner overlayState={overlayState} design={design} />,
+    'event-final_circle': <EventBanner overlayState={overlayState} design={design} />,
+    'event-safe_zone':    <EventBanner overlayState={overlayState} design={design} />,
+    'event-match_point':  <EventBanner overlayState={overlayState} design={design} />,
+    'event-winner':       <EventBanner overlayState={overlayState} design={design} />,
+    'event-mvp':          <EventBanner overlayState={overlayState} design={design} />,
     'event-details': <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} championRush={championRush} />,
     event_details:   <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} championRush={championRush} />,
   };

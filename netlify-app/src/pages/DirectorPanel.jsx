@@ -1,6 +1,6 @@
 import { MAPS } from '@/lib/maps';
 import { SectionBoundary, PanelBoundary } from '@/components/ErrorBoundary';
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import { useOverlayData, overlayApi } from '@/lib/overlayApi';
 import DesignStudio from '@/components/control/DesignStudio';
@@ -119,6 +119,26 @@ export default function DirectorPanel() {
   // MVP actions
   const [mvpBusy, setMvpBusy] = useState(null);
   const [mvpResult, setMvpResult] = useState(null);
+
+  // ── Keyboard Shortcuts (Phase 3) ──
+  useEffect(() => {
+    const handleKey = (e) => {
+      // Ignore if typing in an input/textarea
+      if (e.target.tagName === 'INPUT' || e.target.tagName === 'TEXTAREA' || e.target.isContentEditable) return;
+      if (e.ctrlKey || e.metaKey || e.altKey) return;
+
+      const key = e.key.toLowerCase();
+      // Tab switching with 1-9, 0, -, =
+      const tabKeys = { '1': 'dashboard', '2': 'live', '3': 'overlay', '4': 'match', '5': 'standings', '6': 'players', '7': 'design', '8': 'theme', '9': 'assets', '0': 'ocr', '-': 'timeline', '=': 'setup' };
+      if (tabKeys[key]) { e.preventDefault(); setActiveTab(tabKeys[key]); return; }
+
+      // R = refresh
+      if (key === 'r') { e.preventDefault(); refresh(); return; }
+    };
+    window.addEventListener('keydown', handleKey);
+    return () => window.removeEventListener('keydown', handleKey);
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
+
   const storedMvp = state.mvp_player_name ? {
     player_id: state.mvp_player_id,
     name: state.mvp_player_name,

@@ -596,17 +596,26 @@ export default function LiveControlPanel({
   };
 
   const handleEvent = async (key) => {
-    // For now, switch overlay screen to match the event
-    // Future: trigger specific animation overlays
-    if (key === 'first_blood') await onSwitchScene('ff-scoreboard');
-    else if (key === 'winner') await onSwitchScene('champions');
-    else if (key === 'mvp') await onSwitchScene('mvp');
-    else await onSwitchScene('ff-scoreboard');
+    try {
+      // Trigger auto-reverting event overlay
+      await api.triggerEvent({ event_type: key });
+      toast.success(`Event: ${key.replace(/_/g, ' ').toUpperCase()} triggered`);
+      refresh();
+    } catch (e) {
+      toast.error('Failed to trigger event');
+      console.error(e);
+    }
   };
 
   const handleZone = async (zone) => {
-    // Future: trigger zone animation overlay
-    toast.info(`Zone ${zone} — animation overlay coming soon`);
+    try {
+      await api.triggerEvent({ event_type: 'safe_zone', zone_number: zone, duration: 4000 });
+      toast.success(`Safe Zone ${zone} triggered`);
+      refresh();
+    } catch (e) {
+      toast.error('Failed to trigger zone');
+      console.error(e);
+    }
   };
 
   return (
