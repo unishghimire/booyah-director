@@ -252,6 +252,26 @@ export default function DirectorPanel() {
     }
   };
 
+  const handleResetMatch = async () => {
+    if (!currentMatch) { toast.error('No active match to reset'); return; }
+    if (!confirm('Reset current match? This will clear all kills, eliminations, and placements for this match.')) return;
+    try {
+      await overlayApi.resetMatch({ match_id: currentMatch.id });
+      refresh();
+      toast.success('Match reset successfully');
+    } catch (e) { toast.error('Failed to reset match'); }
+  };
+
+  const handleResetDatabase = async () => {
+    if (!confirm('⚠️ DANGER: This will permanently delete ALL tournaments, teams, players, and match data. This cannot be undone. Continue?')) return;
+    if (!confirm('Are you absolutely sure? This is your final warning.')) return;
+    try {
+      await overlayApi.resetDatabase();
+      refresh();
+      toast.success('Database reset to defaults');
+    } catch (e) { toast.error('Failed to reset database'); }
+  };
+
   const declareTournamentFinished = async () => {
     if (!tournament?.id) return toast.error('No active tournament');
     setChampBusy('declare');
@@ -797,6 +817,18 @@ export default function DirectorPanel() {
                         );
                       })}
                     </div>
+
+                    {/* Reset Match - Danger Zone */}
+                    <div className="mt-6 pt-4 border-t border-white/5">
+                      <button
+                        onClick={handleResetMatch}
+                        disabled={!currentMatch}
+                        className="flex items-center gap-2 rounded-lg border border-red-500/30 bg-red-500/5 px-4 py-2.5 font-orbitron text-[10px] font-black tracking-wider text-red-400 hover:bg-red-500/10 disabled:opacity-30 transition-all"
+                      >
+                        <RotateCcw className="h-3.5 w-3.5" />
+                        RESET MATCH DATA (UNDO ALL KILLS/ELIMS)
+                      </button>
+                    </div>
                   </div>
                 )}
 
@@ -1139,6 +1171,19 @@ export default function DirectorPanel() {
                       ))}
                     </div>
                     {!isOwner && <p className="mt-3 text-[10px] text-gray-600">Only the owner can change roles.</p>}
+                  </div>
+
+                  {/* Danger Zone */}
+                  <div className="mt-6 bg-red-950/20 border border-red-500/20 rounded-xl p-5">
+                    <h3 className="font-orbitron text-[10px] font-black tracking-widest text-red-400 mb-4">⚠ DANGER ZONE</h3>
+                    <p className="text-xs text-gray-500 mb-4">Permanently delete all tournament data. This action cannot be undone.</p>
+                    <button
+                      onClick={handleResetDatabase}
+                      className="flex items-center gap-2 rounded-lg border border-red-500/40 bg-red-500/10 px-4 py-2.5 font-orbitron text-[10px] font-black tracking-wider text-red-400 hover:bg-red-500/20 transition-all"
+                    >
+                      <Trash2 className="h-3.5 w-3.5" />
+                      RESET ENTIRE DATABASE
+                    </button>
                   </div>
                 </div>
               </SectionBoundary>

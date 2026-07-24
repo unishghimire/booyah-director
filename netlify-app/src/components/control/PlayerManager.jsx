@@ -1,4 +1,4 @@
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useRef } from 'react';
 import toast from 'react-hot-toast';
 import {
   Users, Search, Plus, Edit2, Trash2, X, Download, Upload,
@@ -67,6 +67,54 @@ export default function PlayerManager({ data, refresh, overlayApi }) {
     toast.success('Players exported to CSV');
   };
 
+  const fileInputRef = useRef(null);
+
+  const handleImport = async (e) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+    try {
+      const text = await file.text();
+      const lines = text.split('\n').filter(l => l.trim());
+      if (lines.length < 2) { toast.error('File must have a header row and at least one player'); return; }
+
+      // Parse CSV header
+      const headers = lines[0].split(',').map(h => h.trim().toLowerCase());
+      const nameIdx = headers.indexOf('nickname') >= 0 ? headers.indexOf('nickname') : headers.indexOf('name');
+      const teamIdx = headers.indexOf('team');
+
+      if (nameIdx < 0) { toast.error('CSV must have a "Nickname" or "Name" column'); return; }
+
+      let imported = 0;
+      for (let i = 1; i < lines.length; i++) {
+        const cols = lines[i].split(',').map(c => c.trim());
+        const playerName = cols[nameIdx];
+        const teamName = teamIdx >= 0 ? cols[teamIdx] : '';
+
+        if (!playerName) continue;
+
+        // Find team by name (fuzzy match)
+        const team = Object.values(teamMap).find(t =>
+          t.name?.toLowerCase().includes(teamName.toLowerCase()) || teamName.toLowerCase().includes(t.name?.toLowerCase())
+        );
+
+        if (team) {
+          await overlayApi.addPlayer({ name: playerName, team_id: team.id, tournament_id: team.tournament_id });
+          imported++;
+        }
+      }
+
+      if (imported > 0) {
+        toast.success(`Imported ${imported} player${imported !== 1 ? 's' : ''}`);
+      } else {
+        toast.error('No players imported — check team names match your tournament teams');
+      }
+    } catch (err) {
+      toast.error('Failed to import file');
+    }
+    // Reset input so same file can be re-selected
+    if (fileInputRef.current) fileInputRef.current.value = '';
+  };
+
   return (
     <div className="flex flex-col gap-3 p-4 h-full overflow-y-auto" style={{ background: '#04060E' }}>
       {/* HEADER */}
@@ -83,9 +131,16 @@ export default function PlayerManager({ data, refresh, overlayApi }) {
           <button onClick={handleExport} className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-blue-500/15 border border-blue-500/30 text-blue-300 font-orbitron text-[9px] font-bold tracking-wider hover:bg-blue-500/25 transition-all">
             <Download className="w-3 h-3" /> EXPORT
           </button>
-          <button onClick={() => toast('Import feature coming soon', { icon: 'ℹ️' })} className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/5 border border-white/10 text-white/60 font-orbitron text-[9px] font-bold tracking-wider hover:bg-white/10 transition-all">
+          <button onClick={() => fileInputRef.current?.click()} className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/5 border border-white/10 text-white/60 font-orbitron text-[9px] font-bold tracking-wider hover:bg-white/10 transition-all">
             <Upload className="w-3 h-3" /> IMPORT
           </button>
+          <input
+            ref={fileInputRef}
+            type="file"
+            accept=".csv,.json"
+            className="hidden"
+            onChange={handleImport}
+          />
           <div className="flex rounded border border-white/10 overflow-hidden">
             <button onClick={() => setViewMode('grid')} className={`p-1.5 ${viewMode === 'grid' ? 'bg-purple-500/20 text-purple-300' : 'text-white/40 hover:bg-white/5'}`}><Grid3x3 className="w-3 h-3" /></button>
             <button onClick={() => setViewMode('roster')} className={`p-1.5 ${viewMode === 'roster' ? 'bg-purple-500/20 text-purple-300' : 'text-white/40 hover:bg-white/5'}`}><List className="w-3 h-3" /></button>
