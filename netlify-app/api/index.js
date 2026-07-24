@@ -447,6 +447,17 @@ module.exports = async (req, res) => {
 
       try {
         const db = await loadDb(uid);
+
+        // ── AUTO-REVERT: if current_screen is an event/zone screen and revert_at passed, revert ──
+        if (db.overlay_state && db.overlay_state.revert_at && new Date(db.overlay_state.revert_at) < new Date()) {
+          db.overlay_state.current_screen = db.overlay_state.previous_screen || 'ff-scoreboard';
+          db.overlay_state.revert_at = null;
+          db.overlay_state.event_type = null;
+          db.overlay_state.event_data = null;
+          db.overlay_state.last_updated_at = new Date().toISOString();
+          await saveDb(uid, db);
+        }
+
         const tournament = db.tournaments.find(t => t.status === 'active') || db.tournaments[db.tournaments.length - 1] || null;
         if (!tournament) {
           return ok({
@@ -883,8 +894,8 @@ module.exports = async (req, res) => {
         nationality: body.nationality ? sanitizeString(body.nationality, 100) : '',
         dob: body.dob ? sanitizeString(body.dob, 50) : '',
         instagram: body.instagram ? sanitizeString(body.instagram, 100) : '',
-        youtube: body.youtube ? sanitizeString(body.youtube, 100) : ',
-        twitter: body.twitter ? sanitizeString(body.twitter, 100) : ',
+        youtube: body.youtube ? sanitizeString(body.youtube, 100) : '',
+        twitter: body.twitter ? sanitizeString(body.twitter, 100) : '',
         avg_kills_per_match: Number(body.avg_kills_per_match) || 0,
         best_placement: Number(body.best_placement) || 0,
         total_points: Number(body.total_points) || 0,
@@ -1087,6 +1098,27 @@ module.exports = async (req, res) => {
 
 
     // ── SWITCH OVERLAY SCREEN ──────────────────────────────────────────────
+    // ── TRIGGER EVENT (auto-reverting event overlay) ────────────────────────
+    if (route === 'triggerEvent') {
+      const missing = requireFields(body, ['event_type']);
+      if (missing) return err(400, missing);
+      const eventType = sanitizeString(body.event_type, 50);
+      const eventData = {
+        player_name: sanitizeString(body.player_name || '', 100),
+        team_name: sanitizeString(body.team_name || '', 100),
+        zone_number: Number(body.zone_number) || 0,
+      };
+      const duration = Number(body.duration) || 5000;
+      db.overlay_state.previous_screen = db.overlay_state.current_screen || 'ff-scoreboard';
+      db.overlay_state.current_screen = 'event-' + eventType;
+      db.overlay_state.event_type = eventType;
+      db.overlay_state.event_data = eventData;
+      db.overlay_state.revert_at = new Date(Date.now() + duration).toISOString();
+      db.overlay_state.last_updated_at = new Date().toISOString();
+      await saveDb(uid, db);
+      return ok({ success: true, current_screen: db.overlay_state.current_screen });
+    }
+
     if (route === 'switchOverlayScreen') {
       const missing = requireFields(body, ['screen']);
       if (missing) return err(400, missing);

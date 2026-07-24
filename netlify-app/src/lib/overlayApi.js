@@ -92,6 +92,7 @@ export const overlayApi = {
   setMVPAndShowScreen:      (d) => call('setMVPAndShowScreen', d),
   setChampionAndShowScreen: (d) => call('setChampionAndShowScreen', d),
   switchOverlayScreen:      (d) => call('switchOverlayScreen', d),
+  triggerEvent:             (d) => call('triggerEvent', d),
   declareChampions:         (d) => call('declareChampions', d),
   applyHeadstartPoints:     (d) => call('applyHeadstartPoints', d),
   updateTournamentSettings: (d) => call('updateTournamentSettings', d),
