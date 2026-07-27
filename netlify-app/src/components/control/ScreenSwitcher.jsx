@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import {
   Monitor, Map, Crosshair, AlertTriangle, Star, Trophy,
-  LayoutList, Users, Mic2, Flag, Calendar, Eye, Gamepad2, Grid3x3, Zap
+  LayoutList, Users, Mic2, Flag, Calendar, Eye, Gamepad2, Grid3x3, Zap,
+  Clock, Crown, Info, Skull
 } from 'lucide-react';
 import { overlayApi } from '@/lib/overlayApi';
 import toast from 'react-hot-toast';
