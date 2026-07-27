@@ -790,7 +790,7 @@ export default function DesignStudio(props) {
             <button
               type="button"
               onClick={() => upd("pointRush", { ...design?.pointRush, hazardTape: !(design?.pointRush?.hazardTape !== false) })}
-              className={`relative w-12 h-6 rounded-full transition-colors ${(design?.pointRush?.hazardTape !== false) ? 'bg-orange-500' : 'bg-gray-700'}`}>
+              className={`relative w-12 h-6 rounded-full transition-colors ${(design?.pointRush?.hazardTape !== false) ? 'bg-[#7C3AED]' : 'bg-gray-700'}`}>
               <span className={`absolute top-0.5 w-5 h-5 rounded-full bg-white transition-transform ${(design?.pointRush?.hazardTape !== false) ? 'translate-x-6' : 'translate-x-0.5'}`} />
             </button>
           </div>
@@ -841,7 +841,7 @@ export default function DesignStudio(props) {
         <p className="mb-3 text-[10px] text-gray-500">Enter a new 4-digit PIN to change it. Leave blank to keep current.</p>
         <div className="grid grid-cols-2 gap-3 mb-3">
           <div>
-            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-orange-500">Director PIN</label>
+            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-[#7C3AED]">Director PIN</label>
             <input type="password" value={pins.director} onChange={e => { if (e.target.value.length <= 4 && /^\d*$/.test(e.target.value)) setPinsState(p=>({...p, director:e.target.value})); }}
               placeholder="New 4-digit PIN" maxLength={4}
               className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-black text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 tracking-[0.5em]" />

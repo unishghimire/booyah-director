@@ -17,7 +17,7 @@
 
 import { useParams, useSearchParams } from 'react-router-dom';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { AnimatePresence, motion } from 'framer-motion';
+// framer-motion removed from overlays — CSS animations only (prevents opacity:0 OBS bug)
 import { Skull, Star, Crown, Zap, Calendar, Users, MapPin, Award, XCircle, Mic2, Shield, Flame } from 'lucide-react';
 import { MAP_IMAGES, getMapImages, setCustomMapImages } from '@/lib/maps';
 import { safeArray } from '@/components/ErrorBoundary';
@@ -460,11 +460,8 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
     : 'STANDBY';
 
   return (
-    <motion.div
-      initial={{ x: 100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      transition={{ duration: 0.4 }}
-      style={{ position:'absolute', right:40, top:80, width:400, zIndex:10 }}
+    <div
+      style={{ position:'absolute', right:40, top:80, width:400, zIndex:10, animation:'nxSlideInRight 0.4s ease-out' }}
     >
       <ThemedPanel design={design}>
         {/* ── Header ── */}
@@ -591,7 +588,7 @@ function FFBoard({ teams = [], players = [], currentMatch, design }) {
           </div>
         </div>
       </ThemedPanel>
-    </motion.div>
+    </div>
   );
 }
 
@@ -635,10 +632,7 @@ function FullStandings({ teams = [], design }) {
           </div>
         </div>
 
-        <motion.div
-          initial={{ y: 20, opacity: 0 }}
-          animate={{ y: 0, opacity: 1 }}
-          transition={{ duration: 0.4 }}
+        <div
         >
           <ThemedPanel design={design} style={{ width:'100%', maxHeight:700 }}>
             {/* Headers */}
@@ -691,7 +685,7 @@ function FullStandings({ teams = [], design }) {
               )}
             </div>
           </ThemedPanel>
-        </motion.div>
+        </div>
       </div>
       </ThemedBackground>
     </ScreenBackground>
@@ -715,14 +709,9 @@ function KillFeedScreen({ killFeed = [], design }) {
           <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:primary, letterSpacing:'0.15em' }}>BATTLE FEED</span>
         </div>
         <div style={{ display:'flex', flexDirection:'column', padding:'4px 0' }}>
-          <AnimatePresence initial={false}>
+          
             {activeKills.map((kill, idx) => (
-              <motion.div
-                key={kill.id || `${kill.killer_name}-${kill.timestamp}-${idx}`}
-                initial={{ x:-40, opacity:0 }}
-                animate={{ x:0, opacity:1 }}
-                exit={{ x:40, opacity:0 }}
-                transition={{ duration:0.3 }}
+              <div key={kill.id || `${kill.killer_name}-${kill.timestamp}-${idx}`}>
                 style={{
                   display:'flex', alignItems:'center', padding:'10px 16px', gap:10,
                   borderBottom:'1px solid rgba(255,255,255,0.03)',
@@ -749,9 +738,9 @@ function KillFeedScreen({ killFeed = [], design }) {
                 <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:'rgba(255,255,255,0.6)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:120 }}>
                   {kill.killed_player_name || kill.killed || '???'}
                 </span>
-              </motion.div>
+              </div>
             ))}
-          </AnimatePresence>
+          
           {activeKills.length===0 && (
             <div style={{ height:60, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.15em' }}>
               WAITING FOR COMBAT...
@@ -803,14 +792,11 @@ function PreMatchMap({ match, teams = [], design }) {
         <div style={{ display:'flex', gap:80, alignItems:'center', flex:1, margin:'40px 0' }}>
           <div style={{ flex:1.2 }}>
             <span style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:secondary, letterSpacing:'0.4em' }}>NEXT MAP</span>
-            <motion.h1
-              initial={{ scale:0.85, opacity:0 }}
-              animate={{ scale:1, opacity:1 }}
-              transition={{ type:'spring', stiffness:120 }}
+            <h1
               style={{ fontFamily:'Orbitron', fontSize:110, fontWeight:900, color:'#fff', lineHeight:0.9, margin:'12px 0 32px', textShadow:`0 0 40px ${primary}50`, textTransform:'uppercase', letterSpacing:'0.05em' }}
             >
               {mapName}
-            </motion.h1>
+            </h1>
             <div style={{ display:'flex', gap:40 }}>
               <div style={{ borderLeft:`3px solid ${primary}`, paddingLeft:16 }}>
                 <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em' }}>TEAMS IN LOBBY</div>
@@ -1110,12 +1096,8 @@ function EliminationAlert({ eliminations = [], design }) {
 
   return (
     <div style={{ position:'absolute', bottom:60, left:'50%', transform:'translateX(-50%)', width:640, zIndex:10 }}>
-      <AnimatePresence mode="wait">
-        <motion.div key={latest.id || latest.timestamp}
-          initial={{ y:30, opacity:0, scale:0.95 }}
-          animate={{ y:0, opacity:1, scale:1 }}
-          exit={{ y:-20, opacity:0, scale:1.02 }}
-          transition={{ duration:0.3, type:'spring' }}
+      
+        <div key={latest.id || latest.timestamp}>
         >
           <ThemedPanel design={design}>
             <div style={{ display:'flex', alignItems:'center', padding:'12px 24px', gap:20 }}>
@@ -1137,8 +1119,8 @@ function EliminationAlert({ eliminations = [], design }) {
               </div>
             </div>
           </ThemedPanel>
-        </motion.div>
-      </AnimatePresence>
+        </div>
+      
     </div>
   );
 }
@@ -1174,17 +1156,10 @@ function EventBanner({ overlayState = {}, design }) {
 
   return (
     <div style={{ position:'absolute', top:0, left:0, width:1920, height:1080, display:'flex', alignItems:'center', justifyContent:'center', overflow:'hidden' }}>
-      <motion.div
-        initial={{ scale:0.3, opacity:0 }}
-        animate={{ scale:1, opacity:1 }}
-        exit={{ scale:1.5, opacity:0 }}
-        transition={{ duration:0.5, type:'spring', bounce:0.4 }}
+      <div
         style={{ position:'relative' }}
       >
-        <motion.div
-          initial={{ opacity:0 }}
-          animate={{ opacity:[0,0.6,0.3,0.6] }}
-          transition={{ duration:2, repeat:Infinity }}
+        <div
           style={{
             position:'absolute', inset:-100,
             background:`radial-gradient(circle, ${config.color}40 0%, transparent 70%)`,
@@ -1201,47 +1176,35 @@ function EventBanner({ overlayState = {}, design }) {
           position:'relative',
         }}>
           <div style={{ position:'absolute', top:0, left:'10%', right:'10%', height:3, background:config.color, borderRadius:2 }} />
-          <motion.div
-            initial={{ y:20, opacity:0 }}
-            animate={{ y:0, opacity:1 }}
-            transition={{ delay:0.2 }}
+          <div
             style={{ fontFamily:'Orbitron', fontSize:72, fontWeight:900, color:config.color, textShadow:`0 0 30px ${config.color}80`, letterSpacing:'0.05em', marginBottom:8 }}
           >
             {config.label}
-          </motion.div>
+          </div>
           {playerName && (
-            <motion.div
-              initial={{ y:10, opacity:0 }}
-              animate={{ y:0, opacity:1 }}
-              transition={{ delay:0.4 }}
+            <div
               style={{ fontFamily:'Orbitron', fontSize:28, fontWeight:700, color:'#fff', letterSpacing:'0.1em' }}
             >
               {playerName}
-            </motion.div>
+            </div>
           )}
           {teamName && (
-            <motion.div
-              initial={{ y:10, opacity:0 }}
-              animate={{ y:0, opacity:1 }}
-              transition={{ delay:0.5 }}
+            <div
               style={{ fontFamily:'Rajdhani', fontSize:20, color:primary, letterSpacing:'0.2em', marginTop:4 }}
             >
               {teamName}
-            </motion.div>
+            </div>
           )}
           {eventType === 'safe_zone' && zoneNum > 0 && (
-            <motion.div
-              initial={{ scale:0, opacity:0 }}
-              animate={{ scale:1, opacity:1 }}
-              transition={{ delay:0.3, type:'spring' }}
+            <div
               style={{ fontFamily:'Teko', fontSize:120, fontWeight:700, color:config.color, lineHeight:1 }}
             >
               ZONE {zoneNum}
-            </motion.div>
+            </div>
           )}
           <div style={{ position:'absolute', bottom:0, left:'10%', right:'10%', height:3, background:config.color, borderRadius:2 }} />
         </div>
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -1274,10 +1237,7 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
         overflow: 'hidden'
       }}>
         <style>{}</style>
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        <div
           style={{
             background: '#0D0B1A',
             border: '2px solid #7C3AED',
@@ -1309,7 +1269,7 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
           }}>
             AWAITING MATCH CONFIRMATION
           </div>
-        </motion.div>
+        </div>
       </div>
     );
   }
@@ -1334,10 +1294,7 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
         zIndex: 1
       }}>
         {/* LEFT SIDE (45% width) */}
-        <motion.div
-          initial={{ x: -600, opacity: 0 }}
-          animate={{ x: 0, opacity: 1 }}
-          transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
+        <div
           style={{
             width: '45%',
             height: '100%',
@@ -1436,13 +1393,10 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
             </div>
 
           </div>
-        </motion.div>
+        </div>
 
         {/* RIGHT SIDE (55% width) */}
-        <motion.div
-          initial={{ scale: 0.9, opacity: 0 }}
-          animate={{ scale: 1, opacity: 1 }}
-          transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+        <div
           style={{
             width: '55%',
             height: '100%',
@@ -1539,14 +1493,11 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
               </div>
             )}
           </div>
-        </motion.div>
+        </div>
       </div>
 
       {/* Bottom Sponsor / Tournament Branding Bar */}
-      <motion.div
-        initial={{ y: 100, opacity: 0 }}
-        animate={{ y: 0, opacity: 1 }}
-        transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
+      <div
         style={{
           position: 'absolute',
           bottom: 20,
@@ -1594,7 +1545,7 @@ function MVPScreen({ players = [], teams = [], design, overlayState }) {
             FREE FIRE ESPORTS
           </div>
         )}
-      </motion.div>
+      </div>
     </div>
   );
 }
@@ -1860,11 +1811,7 @@ function TeamRosterCard({ team, primary, secondary, design }) {
   const roster       = safeArray(team.roster || []);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, scale: 0.9, y: 30 }}
-      animate={{ opacity: 1, scale: 1, y: 0 }}
-      exit={{ opacity: 0, scale: 0.9, y: -30 }}
-      transition={{ duration: 0.5, ease: "easeOut" }}
+    <div
       style={{
         borderRadius: 12,
         border: '1.5px solid rgba(255, 255, 255, 0.12)',
@@ -1887,7 +1834,7 @@ function TeamRosterCard({ team, primary, secondary, design }) {
         right: 0,
         width: 60,
         height: 60,
-        background: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 5px, #000 5px, #000 10px)',
+        background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(59,130,246,0.15))',
         opacity: 0.15,
         clipPath: 'polygon(100% 0, 0 0, 100% 100%)',
         pointerEvents: 'none',
@@ -2081,7 +2028,7 @@ function TeamRosterCard({ team, primary, secondary, design }) {
           );
         })}
       </div>
-    </motion.div>
+    </div>
   );
 }
 
@@ -2124,37 +2071,33 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
       height: 1080,
       position: 'relative',
       overflow: 'hidden',
-      background: 'linear-gradient(135deg, #7C3AED 0%, #3B82F6 50%, #7C3AED 100%)',
+      background: 'linear-gradient(180deg, #04060E 0%, #0D0B1A 50%, #04060E 100%)',
       color: '#ffffff',
       display: 'flex',
       flexDirection: 'column',
       boxSizing: 'border-box',
     }}>
-      {/* Yellow/Black hazard diagonal stripes top-left */}
+      {/* Subtle purple glow accent top-left */}
       <div style={{
         position: 'absolute',
-        top: -100,
-        left: -100,
-        width: 300,
-        height: 300,
-        background: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
-        transform: 'rotate(-15deg)',
-        opacity: 0.35,
-        boxShadow: '0 0 50px rgba(0, 0, 0, 0.5)',
+        top: -200,
+        left: -200,
+        width: 500,
+        height: 500,
+        background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)',
+        pointerEvents: 'none',
         zIndex: 1,
       }} />
 
-      {/* Yellow/Black hazard stripes bottom-right */}
+      {/* Subtle blue glow accent bottom-right */}
       <div style={{
         position: 'absolute',
-        bottom: -100,
-        right: -100,
-        width: 300,
-        height: 300,
-        background: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
-        transform: 'rotate(-15deg)',
-        opacity: 0.35,
-        boxShadow: '0 0 50px rgba(0, 0, 0, 0.5)',
+        bottom: -200,
+        right: -200,
+        width: 500,
+        height: 500,
+        background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)',
+        pointerEvents: 'none',
         zIndex: 1,
       }} />
 
@@ -2277,7 +2220,7 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
           flex: 1,
           margin: '40px 0',
         }}>
-          <AnimatePresence mode="wait">
+          
             {currentSlide.map((team, idx) => (
               <TeamRosterCard
                 key={`${slideIdx}-${team.id || idx}`}
@@ -2297,7 +2240,7 @@ function TeamRosterScreen({ teams = [], players = [], design }) {
                 }}
               />
             ))}
-          </AnimatePresence>
+          
         </div>
 
         {/* Sponsor/Tournament Branding Footer */}
@@ -2455,6 +2398,14 @@ export default function Overlay() {
 
   return (
     <div style={{ width:1920, height:1080, position:'relative', overflow:'hidden', background: 'transparent' }}>
+      <style>{`
+        @keyframes nxSlideInRight { from { transform: translateX(100px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+        @keyframes nxSlideInLeft { from { transform: translateX(-40px); opacity: 0 } to { transform: translateX(0); opacity: 1 } }
+        @keyframes nxFadeInUp { from { transform: translateY(20px); opacity: 0 } to { transform: translateY(0); opacity: 1 } }
+        @keyframes nxFadeIn { from { opacity: 0 } to { opacity: 1 } }
+        @keyframes nxScaleIn { from { transform: scale(0.8); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+        @keyframes nxPopIn { from { transform: scale(0.9); opacity: 0 } to { transform: scale(1); opacity: 1 } }
+      `}</style>
       {component}
       {/* Connection error badge — subtle, doesn't block OBS */}
       {error && (

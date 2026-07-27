@@ -3,7 +3,7 @@
  * New screens: GameIntroBanner, MatchScheduleGrid, PointRushStandings
  * Upgrades: FFBoardV2, MatchInfoChip
  */
-import { motion, AnimatePresence } from 'framer-motion';
+// framer-motion removed — CSS animations only (prevents opacity:0 OBS bug)
 import { useMemo, useState, useEffect, useRef } from 'react';
 import { safeArray } from '@/components/ErrorBoundary';
 import { getMapImages } from '@/lib/maps';
@@ -15,9 +15,8 @@ export function EliminatedTeamBanner({ team, design }) {
   // pad to 4 slots
   while (players.length < 4) players.push({ name: null });
 
+  if (!team) return null;
   return (
-    <AnimatePresence>
-      {team && (
         <div
           key={team.name}
           style={{
@@ -165,8 +164,6 @@ export function EliminatedTeamBanner({ team, design }) {
             }} />
           </div>
         </div>
-      )}
-    </AnimatePresence>
   );
 }
 
@@ -180,7 +177,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
   const accent  = '#7C3AED';
   const gold   = '#3B82F6';
   const txtCol = '#FFFFFF';
-  const green  = '#7BC043';
+  const green  = '#10B981';
 
   // ── FFWS BROADCAST DIMENSIONS ──
   const HEADER_H = 38;
@@ -320,7 +317,7 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
             const isGhost   = !!team._isGhost;
             const isElim    = !isGhost && team.aliveCount === 0 && team.totalPlayers > 0;
 
-            const rankColor = rank === 1 ? gold : rank === 2 ? '#C0C0C0' : rank === 3 ? '#CD7F32' : 'transparent';
+            const rankColor = rank === 1 ? gold : rank === 2 ? '#A0A0B0' : rank === 3 ? '#B87333' : 'transparent';
             const isChampionRush = team.champion_rush_eligible === true;
 
             let borderLeftStyle = '3px solid transparent';
@@ -470,7 +467,7 @@ function getThemeInline(design) {
   // FFWS standard colors — always use these for 'default' style
   const presets = {
     default:  { p:'#7C3AED', s:'#3B82F6' },
-    neon:     { p:'#7BC043', s:'#BF00FF' },
+    neon:     { p:'#10B981', s:'#7C3AED' },
     military: { p:'#9ABF30', s:'#C8A850' },
     minimal:  { p:'#FFFFFF', s:'#888888' },
     retro:    { p:'#FF3030', s:'#3B82F6' },
@@ -683,7 +680,7 @@ export function GameIntroBanner({ currentMatch, design }) {
             fontFamily: 'Orbitron',
             fontSize: 12,
             fontWeight: 800,
-            color: '#888888',
+            color: 'rgba(255,255,255,0.4)',
             letterSpacing: '0.45em',
             textTransform: 'uppercase',
             marginBottom: 4
@@ -817,7 +814,7 @@ export function GameIntroBanner({ currentMatch, design }) {
 
       {/* Sponsor logo bottom-right */}
       {sponsorLogo && (
-        <motion.img
+        <img
           src={sponsorLogo} 
           alt="" 
           style={{
@@ -1352,11 +1349,11 @@ export function PointRushStandings({ teams = [], design }) {
                   rankBadgeColor = '#0D0B1A';
                   rankBadgeBorder = 'none';
                 } else if (rank === 2) {
-                  rankBadgeBg = 'linear-gradient(135deg, #C0C0C0, #909090)';
+                  rankBadgeBg = 'linear-gradient(135deg, #A0A0B0, #909090)';
                   rankBadgeColor = '#0D0B1A';
                   rankBadgeBorder = 'none';
                 } else if (rank === 3) {
-                  rankBadgeBg = 'linear-gradient(135deg, #CD7F32, #8B4513)';
+                  rankBadgeBg = 'linear-gradient(135deg, #B87333, #8B4513)';
                   rankBadgeColor = '#ffffff';
                   rankBadgeBorder = 'none';
                 }
@@ -1820,8 +1817,8 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
                               {/* Status dot */}
                               <div style={{
                                 width: 10, height: 10, borderRadius: '50%', flexShrink: 0,
-                                background: isDone ? '#7BC043' : isCurrent ? accent : 'rgba(255,255,255,0.15)',
-                                boxShadow: isDone ? '0 0 8px #7BC04380' : isCurrent ? `0 0 8px ${accent}80` : 'none',
+                                background: isDone ? '#10B981' : isCurrent ? accent : 'rgba(255,255,255,0.15)',
+                                boxShadow: isDone ? '0 0 8px #10B98180' : isCurrent ? `0 0 8px ${accent}80` : 'none',
                               }} />
                               {/* Match number */}
                               <span style={{
@@ -1837,7 +1834,7 @@ export function RoadmapOverlay({ tournament, matches = [], currentMatch, design 
                               }}>{m.map}</span>
                               {/* State badge */}
                               {isCurrent && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: accent, letterSpacing: '0.15em', background: `${accent}15`, padding: '2px 8px', borderRadius: 4 }}>LIVE</span>}
-                              {isDone && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#7BC043', letterSpacing: '0.15em' }}>DONE</span>}
+                              {isDone && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#10B981', letterSpacing: '0.15em' }}>DONE</span>}
                               {isScheduled && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.15em' }}>—</span>}
                             </div>
                           );
@@ -1999,7 +1996,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
                     )}
                     <div>
                       <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', marginBottom: 6 }}>STATUS</div>
-                      <div style={{ fontFamily: 'Orbitron', fontSize: 28, fontWeight: 900, color: currentState === 'in_game' ? '#7BC043' : accent, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{currentState.replace('_', ' ')}</div>
+                      <div style={{ fontFamily: 'Orbitron', fontSize: 28, fontWeight: 900, color: currentState === 'in_game' ? '#10B981' : accent, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{currentState.replace('_', ' ')}</div>
                     </div>
                   </div>
                 </>
@@ -2040,7 +2037,7 @@ export function EventDetailsOverlay({ tournament, currentMatch, nextScheduledMat
                 <div style={{ display: 'flex', gap: 12 }}>
                   {topPlacements.map(([pos, pts]) => (
                     <div key={pos} style={{ flex: 1, textAlign: 'center', borderRadius: 10, padding: '12px 8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
-                      <div style={{ fontFamily: 'Orbitron', fontSize: 22, fontWeight: 900, color: pos === '1' ? gold : pos === '2' ? '#c0c0c0' : pos === '3' ? '#cd7f32' : '#fff' }}>#{pos}</div>
+                      <div style={{ fontFamily: 'Orbitron', fontSize: 22, fontWeight: 900, color: pos === '1' ? gold : pos === '2' ? '#A0A0B0' : pos === '3' ? '#B87333' : '#fff' }}>#{pos}</div>
                       <div style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>{pts} PTS</div>
                     </div>
                   ))}

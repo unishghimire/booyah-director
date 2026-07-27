@@ -292,8 +292,8 @@ async function verifyToken(authHeader) {
 // ── MAIN HANDLER ─────────────────────────────────────
 
 const DEFAULT_DESIGN = {
-  accentColor: '#ff4e00', accentColor2: '#ffaa00', bgColor: '#0c0c0e',
-  textColor: '#ffffff', tournamentName: 'BOOYAH CUP', tournamentSubtitle: 'GRAND FINALS',
+  accentColor: '#7C3AED', accentColor2: '#3B82F6', bgColor: '#060915',
+  textColor: '#ffffff', tournamentName: 'NEXOVERLAYS', tournamentSubtitle: 'GRAND FINALS',
   gameLabel: 'GAME', logoUrl: '', overlayStyle: 'default', fontStyle: 'orbitron',
   casters: [
     { name: 'CASTER ONE', role: 'SHOUTCASTER', handle: '@caster1', photo: '' },
