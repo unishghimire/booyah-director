@@ -47,7 +47,7 @@ const OVERLAY_STYLES = [
   {
     key: 'default',
     label: 'Dual Border (Default)',
-    desc: 'Orange & cyan dual-corner glass panels. The original AAA esports style.',
+    desc: 'Purple & blue dual-corner glass panels. The NexOverlays AAA esports style.',
     preview: { p:'#7C3AED', s:'#3B82F6', corner:'dual' },
   },
   {
@@ -98,7 +98,7 @@ function Section({ title, icon: Icon, children }) {
     <div className="rounded-xl border border-white/10 bg-[#0f0f1a] overflow-hidden">
       <button onClick={() => setOpen(o=>!o)}
         className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-white/5 transition-all border-b border-white/5">
-        <Icon className="h-3.5 w-3.5 text-orange-400" />
+        <Icon className="h-3.5 w-3.5 text-[#7C3AED]" />
         <span className="font-orbitron text-[11px] font-black text-white tracking-wider">{title}</span>
         <span className="ml-auto text-gray-600 text-xs">{open ? '▲' : '▼'}</span>
       </button>
@@ -143,7 +143,7 @@ function BackgroundsSection({ design, upd }) {
             onClick={() => setActiveTab(t.key.toUpperCase())}
             className={`px-3 py-1.5 text-[10px] font-orbitron font-bold tracking-wider rounded-lg transition-all ${
               activeTab === t.key.toUpperCase()
-                ? "bg-orange-500/10 text-orange-400 border border-orange-500/20"
+                ? "bg-[#7C3AED]/10 text-[#7C3AED] border border-[#7C3AED]/20"
                 : "text-gray-400 hover:text-white hover:bg-white/5 border border-transparent"
             }`}
           >
@@ -241,7 +241,7 @@ function ImageManagementSection({ design, upd, teams = [], players = [] }) {
                 <div key={player.id} className="flex items-center justify-between gap-4 p-2 rounded-lg bg-white/2 hover:bg-white/5 transition-all">
                   <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                     <span className="font-orbitron text-xs font-bold text-white truncate">{player.name}</span>
-                    <span className="inline-block self-start text-[8px] font-black tracking-wider px-1.5 py-0.5 rounded bg-orange-500/10 text-orange-400 uppercase font-orbitron">{teamBadge}</span>
+                    <span className="inline-block self-start text-[8px] font-black tracking-wider px-1.5 py-0.5 rounded bg-[#7C3AED]/10 text-[#7C3AED] uppercase font-orbitron">{teamBadge}</span>
                   </div>
                   <div className="w-[180px]">
                     <ImageUpload
@@ -528,7 +528,7 @@ export default function DesignStudio(props) {
         <div className="grid grid-cols-3 gap-2">
           {FONTS.map(f => (
             <button key={f.key} onClick={() => upd('fontStyle', f.key)}
-              className={`rounded-xl py-3 text-center transition-all border ${design?.fontStyle === f.key ? 'border-orange-500 bg-orange-500/20 text-orange-300' : 'border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}>
+              className={`rounded-xl py-3 text-center transition-all border ${design?.fontStyle === f.key ? 'border-[#7C3AED] bg-[#7C3AED]/20 text-[#9D5CFF]' : 'border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}>
               <p className="text-base font-black" style={{ fontFamily: f.key === 'impact' ? 'Impact' : f.key === 'rajdhani' ? 'Rajdhani' : 'Orbitron' }}>ESPORT</p>
               <p className="mt-0.5 text-[9px] opacity-70">{f.label}</p>
             </button>
@@ -663,7 +663,7 @@ export default function DesignStudio(props) {
             <div key={key}>
               <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">{label}</label>
               <input value={design?.[key] || ''} onChange={e => upd(key, e.target.value)} placeholder={placeholder}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/40 transition-colors" />
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
             </div>
           ))}
 
@@ -718,7 +718,7 @@ export default function DesignStudio(props) {
             <div key={key}>
               <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">{label}</label>
               <input value={design?.[key] || ''} onChange={e => upd(key, e.target.value)} placeholder={placeholder}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/40 transition-colors" />
+                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
             </div>
           ))}
         </div>
@@ -736,7 +736,7 @@ export default function DesignStudio(props) {
             <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Header Title</label>
             <input value={design?.pointRush?.headerText || ''} onChange={e => upd("pointRush", { ...design?.pointRush, headerText: e.target.value })}
               placeholder="POINT RUSH STANDINGS"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/40 transition-colors" />
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
           </div>
 
           {/* Footer text */}
@@ -744,7 +744,7 @@ export default function DesignStudio(props) {
             <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Footer Text</label>
             <input value={design?.pointRush?.footerText || ''} onChange={e => upd("pointRush", { ...design?.pointRush, footerText: e.target.value })}
               placeholder="#Rise to THE SUMMIT"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/40 transition-colors" />
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
           </div>
 
           {/* Gradient colors */}
@@ -757,7 +757,7 @@ export default function DesignStudio(props) {
                   <input type="color" value={design?.pointRush?.gradientStart || '#1e3a8a'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientStart: e.target.value })}
                     className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
                   <input value={design?.pointRush?.gradientStart || '#1e3a8a'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientStart: e.target.value })}
-                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-orange-500/30" />
+                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-[#7C3AED]/30" />
                 </div>
               </div>
               <div>
@@ -766,7 +766,7 @@ export default function DesignStudio(props) {
                   <input type="color" value={design?.pointRush?.gradientMid || '#7c3aed'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientMid: e.target.value })}
                     className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
                   <input value={design?.pointRush?.gradientMid || '#7c3aed'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientMid: e.target.value })}
-                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-orange-500/30" />
+                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-[#7C3AED]/30" />
                 </div>
               </div>
               <div>
@@ -775,7 +775,7 @@ export default function DesignStudio(props) {
                   <input type="color" value={design?.pointRush?.gradientEnd || '#ec4899'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientEnd: e.target.value })}
                     className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
                   <input value={design?.pointRush?.gradientEnd || '#ec4899'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientEnd: e.target.value })}
-                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-orange-500/30" />
+                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-[#7C3AED]/30" />
                 </div>
               </div>
             </div>
@@ -817,13 +817,13 @@ export default function DesignStudio(props) {
               <div className="grid grid-cols-3 gap-2">
                 <input value={c?.name || ''} onChange={e => updCaster(i, 'name', e.target.value)}
                   placeholder={`Name ${i+1}`}
-                  className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/30" />
+                  className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/30" />
                 <input value={c?.handle || ''} onChange={e => updCaster(i, 'handle', e.target.value)}
                   placeholder="@handle"
-                  className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/30" />
+                  className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/30" />
                 <input value={c?.role || ''} onChange={e => updCaster(i, 'role', e.target.value)}
                   placeholder="PLAY-BY-PLAY"
-                  className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-orange-500/30" />
+                  className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/30" />
               </div>
               <ImageUpload
                 value={c?.photo || ''}
@@ -844,7 +844,7 @@ export default function DesignStudio(props) {
             <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-orange-500">Director PIN</label>
             <input type="password" value={pins.director} onChange={e => { if (e.target.value.length <= 4 && /^\d*$/.test(e.target.value)) setPinsState(p=>({...p, director:e.target.value})); }}
               placeholder="New 4-digit PIN" maxLength={4}
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-black text-white placeholder-gray-600 outline-none focus:border-orange-500/40 tracking-[0.5em]" />
+              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-black text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 tracking-[0.5em]" />
           </div>
           <div>
             <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-blue-400">Inputer PIN</label>

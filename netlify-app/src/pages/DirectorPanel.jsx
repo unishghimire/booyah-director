@@ -25,10 +25,11 @@ import { ROLES, getRoleConfig, canAccessTab } from '@/lib/roles';
 import {
   ExternalLink,
   Eye, Paintbrush, Settings2, Trophy, Star, Crown,
-  Monitor, Copy, Radio, CheckCircle2, ChevronRight,
+  Monitor, Copy, Radio, CheckCircle2, ChevronRight, ChevronDown,
   Layers, Map, Crosshair, AlertTriangle, LayoutList, Volume2, Film, Undo2, Redo2, History,
   Download, RefreshCw, Users, Sword, Shield, Flag,
-  Zap, Calendar, Mic2, Clock, BarChart2, Play, Activity, Palette
+  Zap, Calendar, Mic2, Clock, BarChart2, Play, Activity, Palette,
+  RotateCcw, Trash2
 } from 'lucide-react';
 
 /* ─────────────────────────────────────────
@@ -400,7 +401,7 @@ export default function DirectorPanel() {
         <div className="flex items-center gap-2">
           <button
             onClick={handleCopyOBS}
-            className="flex items-center gap-1.5 rounded-md border border-white/10 bg-[#13131f] px-3.5 py-2 font-orbitron text-[10px] font-black tracking-widest text-white hover:border-[#7C3AED]/40 hover:bg-[#7C3AED]/10 transition-all"
+            className="flex items-center gap-1.5 rounded-md border border-white/10 bg-[#131127] px-3.5 py-2 font-orbitron text-[10px] font-black tracking-widest text-white hover:border-[#7C3AED]/40 hover:bg-[#7C3AED]/10 transition-all"
           >
             <Copy className="h-3.5 w-3.5 text-[#7C3AED]" />
             COPY OBS SOURCE
@@ -408,7 +409,7 @@ export default function DirectorPanel() {
           <button
             onClick={handleRefresh}
             disabled={refreshing}
-            className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-[#13131f] text-gray-400 hover:text-white transition-all disabled:opacity-50"
+            className="flex h-9 w-9 items-center justify-center rounded-md border border-white/10 bg-[#131127] text-gray-400 hover:text-white transition-all disabled:opacity-50"
           >
             <RefreshCw className={`h-4 w-4 ${refreshing ? 'animate-spin text-[#7C3AED]' : ''}`} />
           </button>
@@ -755,7 +756,7 @@ export default function DirectorPanel() {
                       <button
                         disabled={busy === 'start_match'}
                         onClick={startMatch}
-                        className="flex w-full items-center justify-center gap-2 bg-[#7C3AED] px-4 py-3 font-orbitron text-[11px] font-black tracking-wider text-white hover:bg-[#ff8533] disabled:opacity-50 transition-all"
+                        className="flex w-full items-center justify-center gap-2 bg-[#7C3AED] px-4 py-3 font-orbitron text-[11px] font-black tracking-wider text-white hover:bg-[#9D5CFF] disabled:opacity-50 transition-all"
                       >
                         <Play className="h-4 w-4" />
                         START MATCH #{ (tournament?.current_match_number || 0) + 1 }
@@ -854,7 +855,7 @@ export default function DirectorPanel() {
                       <button
                         onClick={triggerMVPOverlay}
                         disabled={mvpBusy === 'show' || !mvp}
-                        className="flex-1 rounded-lg bg-[#7C3AED] px-4 py-3 font-orbitron text-[10px] font-black tracking-wider text-white hover:bg-[#ff8533] disabled:opacity-50"
+                        className="flex-1 rounded-lg bg-[#7C3AED] px-4 py-3 font-orbitron text-[10px] font-black tracking-wider text-white hover:bg-[#9D5CFF] disabled:opacity-50"
                       >
                         {mvpBusy === 'show' ? 'SENDING...' : '2. TRIGGER MVP OVERLAY'}
                       </button>
@@ -898,7 +899,7 @@ export default function DirectorPanel() {
                         <button
                           disabled={champBusy === t.id}
                           onClick={() => revealChampions(t)}
-                          className="rounded bg-[#7C3AED] px-2.5 py-1.5 font-orbitron text-[9px] font-black tracking-wider text-white hover:bg-[#ff8533]"
+                          className="rounded bg-[#7C3AED] px-2.5 py-1.5 font-orbitron text-[9px] font-black tracking-wider text-white hover:bg-[#9D5CFF]"
                         >
                           {champBusy === t.id ? 'REVEALING...' : 'REVEAL'}
                         </button>
@@ -937,7 +938,7 @@ export default function DirectorPanel() {
                       <div className="flex items-center gap-1.5 rounded-lg border border-[#7C3AED]/20 bg-[#7C3AED]/5 px-2.5 py-1.5">
                         <span className="text-[9px] font-black uppercase tracking-wider text-[#7C3AED]">AUTO CALC</span>
                         <span className="text-[10px] font-mono text-gray-400">
-                          <span className="text-cyan-400">PPT</span> + <span className="text-green-400">Kills×PPK</span> = <span className="text-orange-400">Total</span>
+                          <span className="text-cyan-400">PPT</span> + <span className="text-green-400">Kills×PPK</span> = <span className="text-amber-400">Total</span>
                         </span>
                       </div>
                     </div>
@@ -953,7 +954,7 @@ export default function DirectorPanel() {
                           <th className="py-3 px-4 text-center">NEXOVERLAYS</th>
                           <th className="py-3 px-4 text-center text-cyan-400" title="Placement Points">PPT</th>
                           <th className="py-3 px-4 text-center text-green-400" title="Kills × Points Per Kill">KILL PTS</th>
-                          <th className="py-3 px-4 text-center text-orange-400">TOTAL</th>
+                          <th className="py-3 px-4 text-center text-amber-400">TOTAL</th>
                         </tr>
                       </thead>
                       <tbody className="divide-y divide-white/5 text-xs">
@@ -964,7 +965,7 @@ export default function DirectorPanel() {
                           const totalPts = team.total_tournament_points || 0;
                           const placementPts = totalPts - killPts;
                           return (
-                          <tr key={team.id} className={`hover:bg-white/[0.02] ${index === 0 ? 'bg-orange-500/5' : ''}`}>
+                          <tr key={team.id} className={`hover:bg-white/[0.02] ${index === 0 ? 'bg-amber-500/5' : ''}`}>
                             <td className="py-3 px-4 text-center font-orbitron font-black text-gray-400">
                               {index + 1}
                             </td>
@@ -983,7 +984,7 @@ export default function DirectorPanel() {
                             <td className="py-3 px-4 text-center font-mono text-green-400" title={`${totalKills} kills × ${ppk} PPK`}>
                               {totalKills}×{ppk}={killPts}
                             </td>
-                            <td className="py-3 px-4 text-center font-orbitron font-black text-orange-400" title={`${placementPts}PPT + ${killPts} Kill Pts = ${totalPts}`}>
+                            <td className="py-3 px-4 text-center font-orbitron font-black text-amber-400" title={`${placementPts}PPT + ${killPts} Kill Pts = ${totalPts}`}>
                               {totalPts}
                             </td>
                           </tr>
@@ -1116,7 +1117,7 @@ export default function DirectorPanel() {
                     <div className="flex flex-wrap gap-3">
                       <button
                         onClick={handleDownloadJSON}
-                        className="flex-1 min-w-[200px] flex items-center justify-center gap-2 rounded-lg bg-[#7C3AED] px-4 py-3 font-orbitron text-[11px] font-black tracking-wider text-white hover:bg-[#ff8533] transition-all"
+                        className="flex-1 min-w-[200px] flex items-center justify-center gap-2 rounded-lg bg-[#7C3AED] px-4 py-3 font-orbitron text-[11px] font-black tracking-wider text-white hover:bg-[#9D5CFF] transition-all"
                       >
                         <Download className="h-4 w-4" />
                         EXPORT TOURNAMENT JSON

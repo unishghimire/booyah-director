@@ -193,8 +193,8 @@ function getDefaultDb() {
       last_updated_at: new Date().toISOString(),
     },
     design: {
-      accentColor:      '#FF6B00',
-      accentColor2:     '#00D4FF',
+      accentColor:      '#7C3AED',
+      accentColor2:     '#3B82F6',
       bgColor:          '#060915',
       textColor:        '#ffffff',
       tournamentName:   'BOOYAH CUP',
@@ -1656,7 +1656,7 @@ module.exports = async (req, res) => {
           embeds: [{
             title: '✅ Booyah Director Connected',
             description: `Webhook verified for **${sanitizeString(tournament_name || 'Tournament', 100)}**. You're all set to post updates!`,
-            color: 0xFF6B00,
+            color: 0x7C3AED,
             footer: { text: 'Booyah Director Overlay System' },
             timestamp: new Date().toISOString(),
           }]
@@ -1692,7 +1692,7 @@ module.exports = async (req, res) => {
       const teams = db.teams.filter(t => t.tournament_id === tournament_id);
       const players = db.players.filter(p => p.tournament_id === tournament_id);
       const overlayState = db.overlay_state || {};
-      const acc = 0xFF6B00;
+      const acc = 0x7C3AED;
 
       let payload;
       if (type === 'standings') {
