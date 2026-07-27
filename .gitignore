@@ -56,3 +56,4 @@ booyah-admin/.env.example
 .npm/
 __pycache__/
 .cache/
+blobs/
