@@ -1059,38 +1059,6 @@ module.exports = async (req, res) => {
       return ok({ success: true, kill });
     }
 
-    // ── REMOVE LAST KILL (undo kill) ──────────────────────────────────────
-    if (route === 'removeLastKill') {
-      const missing = requireFields(body, ['match_id', 'killer_player_id']);
-      if (missing) return err(400, missing);
-
-      // Find the most recent kill by this player in this match
-      const killsByPlayer = db.kill_events
-        .filter(k => k.match_id === body.match_id && k.killer_player_id === body.killer_player_id)
-        .sort((a, b) => new Date(b.timestamp) - new Date(a.timestamp));
-
-      if (killsByPlayer.length === 0) return err(404, 'No kills found for this player');
-
-      const lastKill = killsByPlayer[0];
-      // Remove the kill event
-      db.kill_events = db.kill_events.filter(k => k.id !== lastKill.id);
-
-      // Decrement player kills
-      const pIdx = db.players.findIndex(p => p.id === body.killer_player_id);
-      if (pIdx !== -1) {
-        db.players[pIdx].current_match_kills = Math.max(0, (db.players[pIdx].current_match_kills || 0) - 1);
-        db.players[pIdx].total_tournament_kills = Math.max(0, (db.players[pIdx].total_tournament_kills || 0) - 1);
-      }
-
-      // Recalc team totals
-      const tid = lastKill.tournament_id;
-      recalcTeamTotals(db, tid);
-
-      db.overlay_state.last_updated_at = new Date().toISOString();
-      await saveDb(uid, db);
-      return ok({ success: true, removed_kill: lastKill });
-    }
-
     // ── ELIMINATE PLAYER ──────────────────────────────────────────────────
     if (route === 'eliminatePlayer') {
       const missing = requireFields(body, ['match_id', 'player_id']);
