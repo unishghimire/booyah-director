@@ -16,6 +16,7 @@ import BroadcastDashboard from '@/components/control/BroadcastDashboard';
 import EventTimeline from '@/components/control/EventTimeline';
 import ThemeManager from '@/components/control/ThemeManager';
 import PlayerManager from '@/components/control/PlayerManager';
+import OrsConfigSection from '@/components/control/OrsConfigSection';
 import SoundManager from '@/components/control/SoundManager';
 import AnimationLibrary from '@/components/control/AnimationLibrary';
 import { useUndoRedo } from '@/lib/useUndoRedo';
@@ -1160,6 +1161,10 @@ export default function DirectorPanel() {
                     </div>
                     {!isOwner && <p className="mt-3 text-[10px] text-gray-600">Only the owner can change roles.</p>}
                   </div>
+
+
+                  {/* ORS API Configuration */}
+                  <OrsConfigSection />
 
                   {/* Danger Zone */}
                   <div className="mt-6 bg-red-950/20 border border-red-500/20 rounded-xl p-5">
