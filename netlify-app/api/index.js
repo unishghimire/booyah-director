@@ -1599,6 +1599,40 @@ module.exports = async (req, res) => {
       }
     }
 
+    // ── getMatchData: Full match data for a specific match or all matches ──
+    if (route === 'getMatchData') {
+      const matchId = body.match_id;
+      if (matchId) {
+        // Return specific match data
+        const match = db.matches.find(m => m.id === matchId);
+        if (!match) return err(404, 'Match not found');
+        return ok({
+          match,
+          standings: db.match_standings.filter(s => s.match_id === matchId).sort((a, b) => (a.placement || 999) - (b.placement || 999)),
+          kills: db.kill_events.filter(k => k.match_id === matchId).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)),
+          eliminations: db.elimination_events.filter(e => e.match_id === matchId).sort((a, b) => new Date(a.timestamp) - new Date(b.timestamp)),
+        });
+      }
+      // Return all matches with summaries
+      const matches = db.matches
+        .filter(m => m.tournament_id === (body.tournament_id || db.tournament?.id))
+        .sort((a, b) => (a.match_number || 0) - (b.match_number || 0))
+        .map(m => {
+          const mStandings = db.match_standings.filter(s => s.match_id === m.id);
+          const mKills = db.kill_events.filter(k => k.match_id === m.id);
+          const mElims = db.elimination_events.filter(e => e.match_id === m.id);
+          return {
+            ...m,
+            team_count: mStandings.length,
+            total_kills: mKills.length,
+            total_eliminations: mElims.length,
+            standings: mStandings.sort((a, b) => (a.placement || 999) - (b.placement || 999)),
+            top_team: mStandings.sort((a, b) => (a.total_match_points || 0) - (b.total_match_points || 0))[0] || null,
+          };
+        });
+      return ok({ matches });
+    }
+
     return err(404, `Unknown route: ${route}`);
   } catch (e) {
     return err(500, 'Internal Server Error');

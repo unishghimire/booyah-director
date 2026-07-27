@@ -54,6 +54,16 @@ export const ROLES = {
     canCreateTournament: false,
     canSwitchTournament: true,
   },
+  data_inputer: {
+    label: 'Data Inputer',
+    description: 'Data entry — teams, players, scores, match results',
+    color: '#06b6d4',
+    tabs: ['dashboard', 'match', 'players', 'standings'],
+    canEdit: true,
+    canDelete: false,
+    canCreateTournament: false,
+    canSwitchTournament: true,
+  },
 };
 
 export const DEFAULT_ROLE = 'admin';
