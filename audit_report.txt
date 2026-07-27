@@ -1,0 +1,1582 @@
+========================================================================
+OVERLAY STYLE CONSISTENCY AUDIT REPORT
+========================================================================
+
+1. FRAMER-MOTION USAGE:
+-----------------------
+framer-motion is completely REMOVED from both Overlay.jsx and FFWSOverlays.jsx.
+Both files now explicitly state that they use CSS animations only (prevents OBS bug).
+
+2. SUMMARY OF COMPONENTS:
+-------------------------
+- FullStandings (Overlay.jsx:598-697):
+  * Uses ThemedPanel: True
+  * Fonts specified: Orbitron, Rajdhani
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 21 instances
+
+- KillFeedScreen (Overlay.jsx:698-757):
+  * Uses ThemedPanel: True
+  * Fonts specified: Orbitron
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 4 instances
+
+- PreMatchMap (Overlay.jsx:758-843):
+  * Uses ThemedPanel: False
+  * Fonts specified: Orbitron
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 6 instances
+
+- TodaysMatches (Overlay.jsx:844-907):
+  * Uses ThemedPanel: True
+  * Fonts specified: Orbitron, Rajdhani
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 9 instances
+
+- TeamsToday (Overlay.jsx:908-972):
+  * Uses ThemedPanel: True
+  * Fonts specified: Orbitron
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 2 instances
+
+- CastersScreen (Overlay.jsx:973-1044):
+  * Uses ThemedPanel: True
+  * Fonts specified: Orbitron
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 2 instances
+
+- UpcomingMap (Overlay.jsx:1045-1084):
+  * Uses ThemedPanel: True
+  * Fonts specified: Orbitron
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 5 instances
+
+- EliminationAlert (Overlay.jsx:1085-1147):
+  * Uses ThemedPanel: True
+  * Fonts specified: Orbitron
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 19 instances
+
+- EventBanner (Overlay.jsx:1148-1214):
+  * Uses ThemedPanel: False
+  * Fonts specified: Orbitron, Rajdhani, Teko
+  * Uses Design Tokens (accent/theme): False
+  * Hardcoded colors found: 2 instances
+
+- MVPScreen (Overlay.jsx:1215-1555):
+  * Uses ThemedPanel: False
+  * Fonts specified: Rajdhani, Teko
+  * Uses Design Tokens (accent/theme): True
+  * WARNING: Uses old orange colors: 1 instances!
+  * Hardcoded colors found: 25 instances
+
+- ChampionsScreen (Overlay.jsx:1556-1770):
+  * Uses ThemedPanel: False
+  * Fonts specified: Orbitron, Rajdhani
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 50 instances
+
+- TeamRosterCard (Overlay.jsx:1808-2034):
+  * Uses ThemedPanel: False
+  * Fonts specified: Orbitron, Rajdhani
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 20 instances
+
+- TeamRosterScreen (Overlay.jsx:2035-2287):
+  * Uses ThemedPanel: False
+  * Fonts specified: Orbitron, Rajdhani
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 22 instances
+
+- EliminatedTeamBanner (FFWSOverlays.jsx:12-169):
+  * Uses ThemedPanel: False
+  * Fonts specified: Rajdhani, Teko
+  * Uses Design Tokens (accent/theme): True
+  * WARNING: Uses old orange colors: 1 instances!
+  * Hardcoded colors found: 20 instances
+
+- FFBoardV2 (FFWSOverlays.jsx:170-484):
+  * Uses ThemedPanel: False
+  * Fonts specified: Rajdhani, Teko
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 40 instances
+
+- MatchInfoChip (FFWSOverlays.jsx:485-606):
+  * Uses ThemedPanel: False
+  * Fonts specified: Orbitron, Rajdhani
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 9 instances
+
+- GameIntroBanner (FFWSOverlays.jsx:607-835):
+  * Uses ThemedPanel: False
+  * Fonts specified: Orbitron
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 24 instances
+
+- MatchScheduleGrid (FFWSOverlays.jsx:836-1274):
+  * Uses ThemedPanel: False
+  * Fonts specified: Orbitron
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 61 instances
+
+- PointRushStandings (FFWSOverlays.jsx:1275-1647):
+  * Uses ThemedPanel: False
+  * Fonts specified: Rajdhani, Teko
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 32 instances
+
+- RoadmapOverlay (FFWSOverlays.jsx:1648-1868):
+  * Uses ThemedPanel: False
+  * Fonts specified: Orbitron
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 30 instances
+
+- EventDetailsOverlay (FFWSOverlays.jsx:1869-2088):
+  * Uses ThemedPanel: False
+  * Fonts specified: Orbitron
+  * Uses Design Tokens (accent/theme): True
+  * Hardcoded colors found: 38 instances
+
+
+3. DETAILED COMPONENT AUDIT:
+----------------------------
+========================================================================
+COMPONENT: FullStandings (Overlay.jsx:598-697)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 600: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const rankColors = ['#3B82F6','#C0C0C0','#CD7F32'];
+    - Line 600: #C0C0C0 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const rankColors = ['#3B82F6','#C0C0C0','#CD7F32'];
+    - Line 600: #CD7F32 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const rankColors = ['#3B82F6','#C0C0C0','#CD7F32'];
+    - Line 643: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ width:100, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#3B82F6', letterSpacing:'0.15em' }}>PPT</div>
+    - Line 645: #7BC043 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ width:120, textAlign:'center', fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'#7BC043', letterSpacing:'0.15em' }}>KILL PTS</div>
+    - Line 656: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const crBorder = crEligible ? '4px solid #3B82F6' : `4px solid ${rank<=3?rankColors[rank-1]:'transparent'}`;
+    - Line 660: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ width:60, textAlign:'center', fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:crEligible ? '#3B82F6' : rc, textShadow: crEligible ? '0 0 8px rgba(255, 199, 0, 0.5)' : 'none' }}>#{rank}{crEligible && <span style={{ fontSize: 9, marginLeft: 2 }}>🏆</span>}</div>
+    - Line 673: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ width:100, textAlign:'center', fontFamily:'Rajdhani', fontSize:18, fontWeight:900, color:'#3B82F6' }}>{ppt}</div>
+    - Line 675: #7BC043 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ width:120, textAlign:'center', fontFamily:'Rajdhani', fontSize:18, fontWeight:900, color:'#7BC043' }}>{killPts}</div>
+    - Line 626: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>SPONSORED BY</span>
+    - Line 630: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em' }}>{tok.name(design)}</div>
+    - Line 640: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ width:60, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', textAlign:'center', letterSpacing:'0.15em' }}>RANK</div>
+    - Line 642: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ flex:1, fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', paddingLeft:16, letterSpacing:'0.15em' }}>TEAM NAME</div>
+    - Line 654: rgba(124, 58, 237,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: const rowBg = rank===1 ? 'rgba(124, 58, 237,0.06)' : rank===2 ? 'rgba(59,130,246,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
+    - Line 654: rgba(59,130,246,0.04) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: const rowBg = rank===1 ? 'rgba(124, 58, 237,0.06)' : rank===2 ? 'rgba(59,130,246,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
+    - Line 654: rgba(255,255,255,0.01) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: const rowBg = rank===1 ? 'rgba(124, 58, 237,0.06)' : rank===2 ? 'rgba(59,130,246,0.04)' : idx%2===0 ? 'rgba(255,255,255,0.01)' : 'transparent';
+    - Line 657: rgba(255, 199, 0, 0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: const crBg = crEligible ? 'rgba(255, 199, 0, 0.08)' : rowBg;
+    - Line 659: rgba(255,255,255,0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div key={team.id||idx} style={{ display:'flex', alignItems:'center', height:52, background:crBg, borderBottom:'1px solid rgba(255,255,255,0.03)', borderLeft:crBorder, padding:'0 24px', boxShadow: crEligible ? 'inset 0 0 10px rgba(255, 199, 0, 0.1)' : 'none' }}>
+    - Line 659: rgba(255, 199, 0, 0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div key={team.id||idx} style={{ display:'flex', alignItems:'center', height:52, background:crBg, borderBottom:'1px solid rgba(255,255,255,0.03)', borderLeft:crBorder, padding:'0 24px', boxShadow: crEligible ? 'inset 0 0 10px rgba(255, 199, 0, 0.1)' : 'none' }}>
+    - Line 660: rgba(255, 199, 0, 0.5) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ width:60, textAlign:'center', fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:crEligible ? '#3B82F6' : rc, textShadow: crEligible ? '0 0 8px rgba(255, 199, 0, 0.5)' : 'none' }}>#{rank}{crEligible && <span style={{ fontSize: 9, marginLeft: 2 }}>🏆</span>}</div>
+    - Line 684: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ padding:'60px 0', textAlign:'center', fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>NO STANDINGS DATA YET</div>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 607: const bgUrl = design?.backgrounds?.standings || '';
+    - Line 639: <div style={{ display:'flex', alignItems:'center', height:48, background:t.headerBg, borderBottom:`2px solid ${primary}44`, padding:'0 24px' }}>
+    - Line 659: <div key={team.id||idx} style={{ display:'flex', alignItems:'center', height:52, background:crBg, borderBottom:'1px solid rgba(255,255,255,0.03)', borderLeft:crBorder, padding:'0 24px', boxShadow: crEligible ? 'inset 0 0 10px rgba(255, 199, 0, 0.1)' : 'none' }}>
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron, Rajdhani
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: KillFeedScreen (Overlay.jsx:698-757)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 717: rgba(255,255,255,0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: borderBottom:'1px solid rgba(255,255,255,0.03)',
+    - Line 718: rgba(124, 58, 237,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: idx===0 ? `rgba(124, 58, 237,0.08)` : 'transparent',
+    - Line 738: rgba(255,255,255,0.6) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:12, fontWeight:900, color:'rgba(255,255,255,0.6)', overflow:'hidden', textOverflow:'ellipsis', whiteSpace:'nowrap', maxWidth:120 }}>
+    - Line 745: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ height:60, display:'flex', alignItems:'center', justifyContent:'center', fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.15em' }}>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 707: <div style={{ height: 48, background: 'rgba(0,0,0,0.8)', borderBottom: `1px solid ${primary}44`, display: 'flex', alignItems: 'center', padding: '0 16px' }}>
+    - Line 718: background: idx===0 ? `rgba(124, 58, 237,0.08)` : 'transparent',
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: PreMatchMap (Overlay.jsx:758-843)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 814: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ width:'100%', height:'100%', background:`linear-gradient(135deg,#131127,#131127)`, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
+    - Line 814: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ width:'100%', height:'100%', background:`linear-gradient(135deg,#131127,#131127)`, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
+    - Line 802: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em' }}>TEAMS IN LOBBY</div>
+    - Line 806: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em' }}>BATTLEGROUND</div>
+    - Line 831: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ display:'flex', justifyContent:'space-between', borderTop:'1px solid rgba(255,255,255,0.08)', paddingTop:16 }}>
+    - Line 832: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em' }}>NEXOVERLAYS TOURNAMENT OVERLAY SYSTEM</span>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 777: <div style={{ width:40, height:40, borderRadius:'50%', background:`${primary}22`, border:`1px solid ${primary}`, display:'flex', alignItems:'center', justifyContent:'center' }}>
+    - Line 786: <div style={{ background:`${primary}18`, border:`1px solid ${primary}66`, padding:'8px 24px', borderRadius:6, fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:primary, letterSpacing:'0.1em' }}>
+    - Line 814: <div style={{ width:'100%', height:'100%', background:`linear-gradient(135deg,#131127,#131127)`, display:'flex', alignItems:'center', justifyContent:'center', position:'relative' }}>
+    - Line 826: <div style={{ position:'absolute', inset:0, background:`linear-gradient(135deg,${primary}15,transparent)` }} />
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: TodaysMatches (Overlay.jsx:844-907)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 873: rgba(124, 58, 237,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <ThemedPanel design={design} key={idx} style={{ width:280, height:380, background: isLive ? 'rgba(124, 58, 237,0.06)' : 'rgba(6,9,18,0.85)' }}>
+    - Line 873: rgba(6,9,18,0.85) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <ThemedPanel design={design} key={idx} style={{ width:280, height:380, background: isLive ? 'rgba(124, 58, 237,0.06)' : 'rgba(6,9,18,0.85)' }}>
+    - Line 876: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:900, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>{m.matchNumber||`MATCH 0${idx+1}`}</span>
+    - Line 877: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:900, padding:'3px 10px', borderRadius:4, background: isLive ? primary : isDone ? 'rgba(255,255,255,0.08)' : `${secondary}18`, color: isLive ? '#000' : isDone ? 'rgba(255,255,255,0.4)' : secondary }}>
+    - Line 877: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:900, padding:'3px 10px', borderRadius:4, background: isLive ? primary : isDone ? 'rgba(255,255,255,0.08)' : `${secondary}18`, color: isLive ? '#000' : isDone ? 'rgba(255,255,255,0.4)' : secondary }}>
+    - Line 885: rgba(255,255,255,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ borderTop:'1px solid rgba(255,255,255,0.06)', paddingTop:16, display:'flex', justifyContent:'space-between', alignItems:'center' }}>
+    - Line 886: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>EST TIME</span>
+    - Line 895: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ display:'flex', justifyContent:'space-between', borderTop:'1px solid rgba(255,255,255,0.08)', paddingTop:16 }}>
+    - Line 896: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.2em' }}>NEXOVERLAYS TOURNAMENT OVERLAY SYSTEM</span>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 873: <ThemedPanel design={design} key={idx} style={{ width:280, height:380, background: isLive ? 'rgba(124, 58, 237,0.06)' : 'rgba(6,9,18,0.85)' }}>
+    - Line 877: <span style={{ fontFamily:'Orbitron', fontSize:9, fontWeight:900, padding:'3px 10px', borderRadius:4, background: isLive ? primary : isDone ? 'rgba(255,255,255,0.08)' : `${secondary}18`, color: isLive ? '#000' : isDone ? 'rgba(255,255,255,0.4)' : secondary }}>
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron, Rajdhani
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: TeamsToday (Overlay.jsx:908-972)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 911: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: return Array.from({length:12}, (_,i) => ({ name:`TEAM ${i+1}`, color:'#7C3AED' }));
+    - Line 935: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:7, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>SPONSORED BY</span>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 918: const bgUrl = design?.backgrounds?.teams || '';
+    - Line 949: <div style={{ width:72, height:72, borderRadius:'50%', border:`2px solid ${primary}`, boxShadow:`0 0 20px ${primary}33`, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,0,0,0.5)' }}>
+    - Line 961: <div style={{ height: 44, background:`${primary}15`, border:`1px solid ${primary}44`, borderRadius:8, display:'flex', alignItems:'center', justifyContent:'center', gap:12, fontFamily:'Orbitron', fontSize:11, color:'#fff', letterSpacing:'0.1em' }}>
+    - Line 962: <span style={{ width:8, height:8, borderRadius:'50%', background:primary }} />
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: CastersScreen (Overlay.jsx:973-1044)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 1027: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:12, color:'rgba(255,255,255,0.4)', letterSpacing:'0.15em' }}>{c.handle||''}</span>
+    - Line 1033: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ textAlign:'center', fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.25em' }}>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 1011: <div style={{ width:140, height:140, borderRadius:'50%', border:`3px solid ${cColor}`, boxShadow:`0 0 30px ${cColor}44`, overflow:'hidden', marginBottom:28, background:'rgba(0,0,0,0.6)', display:'flex', alignItems:'center', justifyContent:'center', flexShrink:0 }}>
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: UpcomingMap (Overlay.jsx:1045-1084)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 1057: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ width:110, height:64, borderRadius:8, overflow:'hidden', border:`1px solid ${primary}44`, flexShrink:0, background:'#131127' }}>
+    - Line 1058: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)', position:'relative', background:'#131127' }}>
+    - Line 1058: rgba(255,255,255,0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)', position:'relative', background:'#131127' }}>
+    - Line 1058: rgba(255,255,255,0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)', position:'relative', background:'#131127' }}>
+    - Line 1069: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.25em', marginBottom:2 }}>{(design?.upcomingMapLabel || 'UPCOMING BATTLEGROUND').toUpperCase()}</div>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 1057: <div style={{ width:110, height:64, borderRadius:8, overflow:'hidden', border:`1px solid ${primary}44`, flexShrink:0, background:'#131127' }}>
+    - Line 1058: <div style={{ width:'100%', height:'100%', display:'flex', alignItems:'center', justifyContent:'center', backgroundImage:'repeating-linear-gradient(45deg,rgba(255,255,255,0.03) 0,rgba(255,255,255,0.03) 1px,transparent 1px,transparent 8px)', position:'relative', background:'#131127' }}>
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: EliminationAlert (Overlay.jsx:1085-1147)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 1104: #ef4444 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ width:40, height:40, borderRadius:'50%', background:'rgba(239,68,68,0.1)', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid #ef4444' }}>
+    - Line 1105: #ef4444 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <Flame size={20} style={{ color:'#ef4444' }} />
+    - Line 1118: #ef4444 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ fontFamily:'Orbitron', fontSize:16, fontWeight:900, color:'#ef4444', letterSpacing:'0.15em' }}>OUT</div>
+    - Line 1134: #ef4444 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: first_blood:  { label: 'FIRST BLOOD',   color: '#ef4444' },
+    - Line 1135: #f59e0b (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: double_kill:  { label: 'DOUBLE KILL',   color: '#f59e0b' },
+    - Line 1136: #8b5cf6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: triple_kill:  { label: 'TRIPLE KILL',   color: '#8b5cf6' },
+    - Line 1137: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: quadra_kill:  { label: 'QUADRA KILL',   color: '#3B82F6' },
+    - Line 1138: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: penta_kill:   { label: 'PENTA KILL',    color: '#7C3AED' },
+    - Line 1139: #ec4899 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: team_wipe:    { label: 'TEAM WIPE',     color: '#ec4899' },
+    - Line 1140: #22c55e (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: airdrop:      { label: 'AIRDROP',       color: '#22c55e' },
+    - Line 1141: #ef4444 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: final_circle: { label: 'FINAL CIRCLE',  color: '#ef4444' },
+    - Line 1142: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: safe_zone:    { label: 'SAFE ZONE',     color: '#3B82F6' },
+    - Line 1143: #f59e0b (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: match_point:  { label: 'MATCH POINT',   color: '#f59e0b' },
+    - Line 1144: #22c55e (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: winner:       { label: 'WINNER',        color: '#22c55e' },
+    - Line 1145: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: mvp:          { label: 'MVP',           color: '#7C3AED' },
+    - Line 1092: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.3)', letterSpacing:'0.2em' }}>MONITORING COMBAT...</span>
+    - Line 1104: rgba(239,68,68,0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ width:40, height:40, borderRadius:'50%', background:'rgba(239,68,68,0.1)', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid #ef4444' }}>
+    - Line 1108: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily:'Orbitron', fontSize:9, color:'rgba(255,255,255,0.4)', letterSpacing:'0.25em', marginBottom:2 }}>{(design?.elimAlertLabel || 'TEAM SQUAD ELIMINATED').toUpperCase()}</div>
+    - Line 1117: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily:'Orbitron', fontSize:10, color:'rgba(255,255,255,0.4)', letterSpacing:'0.1em' }}>STATUS</div>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 1104: <div style={{ width:40, height:40, borderRadius:'50%', background:'rgba(239,68,68,0.1)', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid #ef4444' }}>
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: EventBanner (Overlay.jsx:1148-1214)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? No
+  * Hardcoded colors found:
+    - Line 1151: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const config = EVENT_CONFIG[eventType] || { label: eventType.toUpperCase(), color: '#7C3AED' };
+    - Line 1170: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background:'#0D0B1A',
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 1165: background:`radial-gradient(circle, ${config.color}40 0%, transparent 70%)`,
+    - Line 1170: background:'#0D0B1A',
+    - Line 1178: <div style={{ position:'absolute', top:0, left:'10%', right:'10%', height:3, background:config.color, borderRadius:2 }} />
+    - Line 1205: <div style={{ position:'absolute', bottom:0, left:'10%', right:'10%', height:3, background:config.color, borderRadius:2 }} />
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron, Rajdhani, Teko
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: MVPScreen (Overlay.jsx:1215-1555)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 1242: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#0D0B1A',
+    - Line 1243: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: border: '2px solid #7C3AED',
+    - Line 1265: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#7C3AED',
+    - Line 1301: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #0D0B1A 0%, #131127 100%)',
+    - Line 1301: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #0D0B1A 0%, #131127 100%)',
+    - Line 1302: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: borderRight: '4px solid #7C3AED',
+    - Line 1318: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6',
+    - Line 1326: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <span style={{ width: 8, height: 8, backgroundColor: '#7C3AED', display: 'inline-block' }}></span>
+    - Line 1339: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(to right, #ffffff 30%, #7C3AED 100%)',
+    - Line 1350: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#7C3AED',
+    - Line 1351: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#0D0B1A',
+    - Line 1368: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#131127',
+    - Line 1369: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: borderLeft: '4px solid #7C3AED',
+    - Line 1389: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6',
+    - Line 1427: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: border: '2px solid #7C3AED',
+    - Line 1489: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6'
+    - Line 1507: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#131127',
+    - Line 1509: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: borderLeft: '4px solid #7C3AED',
+    - Line 1542: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6',
+    - Line 1375: rgba(0,0,0,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 4px 15px rgba(0,0,0,0.3)'
+    - Line 1416: rgba(124,58,237,0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'linear-gradient(90deg, transparent 30%, rgba(124,58,237,0.15) 50%, transparent 70%)',
+    - Line 1426: rgba(20,20,24,0.6) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(20,20,24,0.6)',
+    - Line 1431: rgba(124,58,237,0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 50px rgba(124,58,237,0.2)',
+    - Line 1438: rgba(59,130,246,0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '1px solid rgba(59,130,246,0.2)',
+    - Line 1508: rgba(255,255,255,0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '1px solid rgba(255,255,255,0.1)',
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Found 1 occurrences of orange/amber colors! These must be updated to purple #7C3AED / blue #3B82F6.
+    - Line 1330: Orange
+      Code: {/* Large MVP Text with Orange Gradient */}
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 1233: background: 'transparent',
+    - Line 1242: background: '#0D0B1A',
+    - Line 1281: background: 'transparent',
+    - Line 1287: {/* Grid background structure */}
+    - Line 1301: background: 'linear-gradient(135deg, #0D0B1A 0%, #131127 100%)',
+    - Line 1326: <span style={{ width: 8, height: 8, backgroundColor: '#7C3AED', display: 'inline-block' }}></span>
+    - Line 1339: background: 'linear-gradient(to right, #ffffff 30%, #7C3AED 100%)',
+    - Line 1350: background: '#7C3AED',
+    - Line 1368: background: '#131127',
+    - Line 1409: {/* Slow-moving animated diagonal background glow */}
+    - Line 1416: background: 'linear-gradient(90deg, transparent 30%, rgba(124,58,237,0.15) 50%, transparent 70%)',
+    - Line 1426: background: 'rgba(20,20,24,0.6)',
+    - Line 1443: {/* Display Team Logo as background watermark if loaded */}
+    - Line 1507: background: '#131127',
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Rajdhani, Teko
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: ChampionsScreen (Overlay.jsx:1556-1770)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 1599: #7C3AED88 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: @keyframes cGlow{0%,100%{text-shadow:0 0 30px #7C3AED88,0 0 60px #7C3AED44}50%{text-shadow:0 0 50px #7C3AEDCC,0 0 100px #7C3AED66}}
+    - Line 1599: #7C3AED44 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: @keyframes cGlow{0%,100%{text-shadow:0 0 30px #7C3AED88,0 0 60px #7C3AED44}50%{text-shadow:0 0 50px #7C3AEDCC,0 0 100px #7C3AED66}}
+    - Line 1599: #7C3AEDCC (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: @keyframes cGlow{0%,100%{text-shadow:0 0 30px #7C3AED88,0 0 60px #7C3AED44}50%{text-shadow:0 0 50px #7C3AEDCC,0 0 100px #7C3AED66}}
+    - Line 1599: #7C3AED66 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: @keyframes cGlow{0%,100%{text-shadow:0 0 30px #7C3AED88,0 0 60px #7C3AED44}50%{text-shadow:0 0 50px #7C3AEDCC,0 0 100px #7C3AED66}}
+    - Line 1605: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, #0D0B1A 0%, #0D0B1A 50%, #0D0B1A 100%)', zIndex:0 }} />
+    - Line 1605: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, #0D0B1A 0%, #0D0B1A 50%, #0D0B1A 100%)', zIndex:0 }} />
+    - Line 1605: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, #0D0B1A 0%, #0D0B1A 50%, #0D0B1A 100%)', zIndex:0 }} />
+    - Line 1612: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const cols = ['#7C3AED','#3B82F6','#ffffff','#7C3AED','#7C3AED','#ffffff'];
+    - Line 1612: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const cols = ['#7C3AED','#3B82F6','#ffffff','#7C3AED','#7C3AED','#ffffff'];
+    - Line 1612: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const cols = ['#7C3AED','#3B82F6','#ffffff','#7C3AED','#7C3AED','#ffffff'];
+    - Line 1612: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const cols = ['#7C3AED','#3B82F6','#ffffff','#7C3AED','#7C3AED','#ffffff'];
+    - Line 1629: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: : <div style={{ fontFamily:'Orbitron', fontSize:14, fontWeight:900, color:'#7C3AED', letterSpacing:'0.2em' }}>{(design?.tournamentName||'NEXOVERLAYS').toUpperCase()}</div>
+    - Line 1659: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:'linear-gradient(90deg, #7C3AED, #3B82F6)', borderRadius:'10px 10px 0 0' }} />
+    - Line 1659: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:'linear-gradient(90deg, #7C3AED, #3B82F6)', borderRadius:'10px 10px 0 0' }} />
+    - Line 1661: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ position:'absolute', top:0, left:0, width:12, height:12, borderTop:'2px solid #7C3AED', borderLeft:'2px solid #7C3AED', borderRadius:'10px 0 0 0' }} />
+    - Line 1661: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ position:'absolute', top:0, left:0, width:12, height:12, borderTop:'2px solid #7C3AED', borderLeft:'2px solid #7C3AED', borderRadius:'10px 0 0 0' }} />
+    - Line 1662: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ position:'absolute', top:0, right:0, width:12, height:12, borderTop:'2px solid #3B82F6', borderRight:'2px solid #3B82F6', borderRadius:'0 10px 0 0' }} />
+    - Line 1662: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ position:'absolute', top:0, right:0, width:12, height:12, borderTop:'2px solid #3B82F6', borderRight:'2px solid #3B82F6', borderRadius:'0 10px 0 0' }} />
+    - Line 1674: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: : <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(124, 58, 237,0.15)', border:'1px solid rgba(124, 58, 237,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#7C3AED' }}>{(winnerName||'C').charAt(0)}</span></div>
+    - Line 1688: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'#7C3AED', letterSpacing:'0.1em', marginTop:2, opacity:0.85 }}>
+    - Line 1701: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: border:'3px solid #7C3AED',
+    - Line 1708: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: : <span style={{ fontFamily:'Orbitron', fontSize:26, fontWeight:900, color:'#7C3AED' }}>{(winnerName||'C').charAt(0)}</span>
+    - Line 1718: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background:'linear-gradient(90deg, #7C3AED 0%, #7C3AED 30%, #ffffff 50%, #7C3AED 70%, #3B82F6 100%)',
+    - Line 1718: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background:'linear-gradient(90deg, #7C3AED 0%, #7C3AED 30%, #ffffff 50%, #7C3AED 70%, #3B82F6 100%)',
+    - Line 1718: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background:'linear-gradient(90deg, #7C3AED 0%, #7C3AED 30%, #ffffff 50%, #7C3AED 70%, #3B82F6 100%)',
+    - Line 1718: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background:'linear-gradient(90deg, #7C3AED 0%, #7C3AED 30%, #ffffff 50%, #7C3AED 70%, #3B82F6 100%)',
+    - Line 1733: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: { label:'PPT',       value:placementPts, color:'#7C3AED' },
+    - Line 1734: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: { label:'KILLS',     value:totalKills,   color:'#3B82F6' },
+    - Line 1735: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: { label:'KILL PTS',  value:killPts,      color:'#7C3AED' },
+    - Line 1606: rgba(0,120,255,0.22) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 1400px 800px at 50% 35%, rgba(0,120,255,0.22) 0%, rgba(0,60,180,0.08) 40%, transparent 70%)', zIndex:0 }} />
+    - Line 1606: rgba(0,60,180,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 1400px 800px at 50% 35%, rgba(0,120,255,0.22) 0%, rgba(0,60,180,0.08) 40%, transparent 70%)', zIndex:0 }} />
+    - Line 1608: rgba(0,0,0,0.85) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ position:'absolute', bottom:0, left:0, right:0, height:300, background:'linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%)', zIndex:0 }} />
+    - Line 1633: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: : <div style={{ fontFamily:'Orbitron', fontSize:11, fontWeight:700, color:'rgba(255,255,255,0.3)', letterSpacing:'0.15em' }}>{(design?.tournamentSubtitle||'GRAND FINALS').toUpperCase()}</div>
+    - Line 1653: rgba(0,100,220,0.18) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background:'linear-gradient(180deg, rgba(0,100,220,0.18) 0%, rgba(0,50,140,0.08) 60%, rgba(0,0,0,0.6) 100%)',
+    - Line 1653: rgba(0,50,140,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background:'linear-gradient(180deg, rgba(0,100,220,0.18) 0%, rgba(0,50,140,0.08) 60%, rgba(0,0,0,0.6) 100%)',
+    - Line 1655: rgba(124, 58, 237,0.30) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border:'1px solid rgba(124, 58, 237,0.30)',
+    - Line 1656: rgba(0,120,255,0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow:`0 0 30px rgba(0,120,255,0.15), inset 0 1px 0 rgba(124, 58, 237,0.25)`,
+    - Line 1656: rgba(124, 58, 237,0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow:`0 0 30px rgba(0,120,255,0.15), inset 0 1px 0 rgba(124, 58, 237,0.25)`,
+    - Line 1671: rgba(0,40,120,0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ position:'absolute', top:0, left:0, right:0, bottom:48, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,40,120,0.2)' }}>
+    - Line 1674: rgba(124, 58, 237,0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: : <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(124, 58, 237,0.15)', border:'1px solid rgba(124, 58, 237,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#7C3AED' }}>{(winnerName||'C').charAt(0)}</span></div>
+    - Line 1674: rgba(124, 58, 237,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: : <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(124, 58, 237,0.15)', border:'1px solid rgba(124, 58, 237,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#7C3AED' }}>{(winnerName||'C').charAt(0)}</span></div>
+    - Line 1680: rgba(0,5,20,0.95) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ position:'absolute', bottom:0, left:0, right:0, height:100, background:'linear-gradient(0deg, rgba(0,5,20,0.95) 0%, transparent 100%)' }} />
+    - Line 1702: rgba(124, 58, 237,0.5) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow:'0 0 40px rgba(124, 58, 237,0.5), 0 0 80px rgba(0,100,255,0.25)',
+    - Line 1702: rgba(0,100,255,0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow:'0 0 40px rgba(124, 58, 237,0.5), 0 0 80px rgba(0,100,255,0.25)',
+    - Line 1704: rgba(0,20,60,0.8) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background:'rgba(0,20,60,0.8)',
+    - Line 1725: rgba(124, 58, 237,0.7) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily:'Orbitron', fontSize:13, fontWeight:700, color:'rgba(124, 58, 237,0.7)', letterSpacing:'0.5em', marginTop:10, textTransform:'uppercase' }}>
+    - Line 1731: rgba(124, 58, 237,0.18) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ display:'flex', gap:40, marginTop:22, paddingTop:18, borderTop:'1px solid rgba(124, 58, 237,0.18)', animation:'cTitleIn 0.6s ease 0.8s both' }}>
+    - Line 1748: rgba(124, 58, 237,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ height:1, background:'linear-gradient(90deg, transparent, rgba(124, 58, 237,0.4), transparent)' }} />
+    - Line 1749: rgba(1,5,16,0.85) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ display:'flex', justifyContent:'space-around', alignItems:'center', padding:'14px 60px', background:'rgba(1,5,16,0.85)', backdropFilter:'blur(8px)' }}>
+    - Line 1756: rgba(124, 58, 237,0.5) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily:'Orbitron', fontSize:8, fontWeight:700, color:'rgba(124, 58, 237,0.5)', letterSpacing:'0.2em' }}>{item.label}</div>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 1562: const bgUrl = design?.backgrounds?.champion || '';
+    - Line 1601: @keyframes cShimmer{0%{background-position:-200% 0}100%{background-position:200% 0}}
+    - Line 1605: <div style={{ position:'absolute', inset:0, background:'linear-gradient(180deg, #0D0B1A 0%, #0D0B1A 50%, #0D0B1A 100%)', zIndex:0 }} />
+    - Line 1606: <div style={{ position:'absolute', inset:0, background:'radial-gradient(ellipse 1400px 800px at 50% 35%, rgba(0,120,255,0.22) 0%, rgba(0,60,180,0.08) 40%, transparent 70%)', zIndex:0 }} />
+    - Line 1608: <div style={{ position:'absolute', bottom:0, left:0, right:0, height:300, background:'linear-gradient(0deg, rgba(0,0,0,0.85) 0%, transparent 100%)', zIndex:0 }} />
+    - Line 1617: background:cols[i%cols.length],
+    - Line 1653: background:'linear-gradient(180deg, rgba(0,100,220,0.18) 0%, rgba(0,50,140,0.08) 60%, rgba(0,0,0,0.6) 100%)',
+    - Line 1659: <div style={{ position:'absolute', top:0, left:0, right:0, height:3, background:'linear-gradient(90deg, #7C3AED, #3B82F6)', borderRadius:'10px 10px 0 0' }} />
+    - Line 1671: <div style={{ position:'absolute', top:0, left:0, right:0, bottom:48, display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(0,40,120,0.2)' }}>
+    - Line 1674: : <div style={{ width:60, height:60, borderRadius:'50%', background:'rgba(124, 58, 237,0.15)', border:'1px solid rgba(124, 58, 237,0.3)', display:'flex', alignItems:'center', justifyContent:'center' }}><span style={{ fontFamily:'Orbitron', fontSize:22, fontWeight:900, color:'#7C3AED' }}>{(winnerName||'C').charAt(0)}</span></div>
+    - Line 1680: <div style={{ position:'absolute', bottom:0, left:0, right:0, height:100, background:'linear-gradient(0deg, rgba(0,5,20,0.95) 0%, transparent 100%)' }} />
+    - Line 1704: background:'rgba(0,20,60,0.8)',
+    - Line 1718: background:'linear-gradient(90deg, #7C3AED 0%, #7C3AED 30%, #ffffff 50%, #7C3AED 70%, #3B82F6 100%)',
+    - Line 1719: backgroundSize:'200% auto',
+    - Line 1748: <div style={{ height:1, background:'linear-gradient(90deg, transparent, rgba(124, 58, 237,0.4), transparent)' }} />
+    - Line 1749: <div style={{ display:'flex', justifyContent:'space-around', alignItems:'center', padding:'14px 60px', background:'rgba(1,5,16,0.85)', backdropFilter:'blur(8px)' }}>
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron, Rajdhani
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: TeamRosterCard (Overlay.jsx:1808-2034)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 1901: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6',
+    - Line 1817: rgba(255, 255, 255, 0.12) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '1.5px solid rgba(255, 255, 255, 0.12)',
+    - Line 1818: rgba(255, 255, 255, 0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)',
+    - Line 1818: rgba(255, 255, 255, 0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)',
+    - Line 1824: rgba(0, 0, 0, 0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+    - Line 1824: rgba(255, 255, 255, 0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 20px 50px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.1)',
+    - Line 1837: rgba(124,58,237,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(59,130,246,0.15))',
+    - Line 1837: rgba(59,130,246,0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(59,130,246,0.15))',
+    - Line 1849: rgba(255, 255, 255, 0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: borderBottom: '1px solid rgba(255, 255, 255, 0.08)',
+    - Line 1856: rgba(255, 255, 255, 0.8) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '2px solid rgba(255, 255, 255, 0.8)',
+    - Line 1857: rgba(0, 0, 0, 0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(0, 0, 0, 0.3)',
+    - Line 1862: rgba(255, 255, 255, 0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 15px rgba(255, 255, 255, 0.2)',
+    - Line 1891: rgba(0, 0, 0, 0.5) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: textShadow: '0 2px 4px rgba(0, 0, 0, 0.5)',
+    - Line 1944: rgba(255, 255, 255, 0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: player ? '2.5px solid #ffffff' : '2.5px dashed rgba(255, 255, 255, 0.15)',
+    - Line 1945: rgba(255, 255, 255, 0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: player ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+    - Line 1946: rgba(0, 0, 0, 0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: player ? '0 4px 12px rgba(0, 0, 0, 0.3)' : 'none',
+    - Line 1972: rgba(255, 255, 255, 0.7) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(255, 255, 255, 0.7)',
+    - Line 1982: rgba(255, 255, 255, 0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(255, 255, 255, 0.15)',
+    - Line 1993: rgba(239, 68, 68, 0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(239, 68, 68, 0.4)',
+    - Line 2016: rgba(255, 255, 255, 0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: player ? '#ffffff' : 'rgba(255, 255, 255, 0.25)',
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 1818: background: 'linear-gradient(135deg, rgba(255, 255, 255, 0.08) 0%, rgba(255, 255, 255, 0.03) 100%)',
+    - Line 1837: background: 'linear-gradient(135deg, rgba(124,58,237,0.3), rgba(59,130,246,0.15))',
+    - Line 1857: background: 'rgba(0, 0, 0, 0.3)',
+    - Line 1945: background: player ? 'rgba(255, 255, 255, 0.05)' : 'transparent',
+    - Line 1993: background: 'rgba(239, 68, 68, 0.4)',
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron, Rajdhani
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: TeamRosterScreen (Overlay.jsx:2035-2287)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 2074: #04060E (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(180deg, #04060E 0%, #0D0B1A 50%, #04060E 100%)',
+    - Line 2074: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(180deg, #04060E 0%, #0D0B1A 50%, #04060E 100%)',
+    - Line 2074: #04060E (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(180deg, #04060E 0%, #0D0B1A 50%, #04060E 100%)',
+    - Line 2167: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6',
+    - Line 2201: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6',
+    - Line 2203: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: border: '2px solid #3B82F6',
+    - Line 2087: rgba(124,58,237,0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)',
+    - Line 2099: rgba(59,130,246,0.12) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)',
+    - Line 2108: rgba(255, 255, 255, 0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
+    - Line 2108: rgba(255, 255, 255, 0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
+    - Line 2138: rgba(0,0,0,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: style={{ height: 75, objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}
+    - Line 2146: rgba(0,0,0,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: style={{ height: 75, objectFit: 'contain', filter: 'drop-shadow(0 4px 8px rgba(0,0,0,0.3))' }}
+    - Line 2159: rgba(0,0,0,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: textShadow: '0 4px 10px rgba(0,0,0,0.4)',
+    - Line 2171: rgba(0,0,0,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: textShadow: '0 2px 4px rgba(0,0,0,0.4)',
+    - Line 2189: rgba(255, 255, 255, 0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: i === slideIdx ? '#ffffff' : 'rgba(255, 255, 255, 0.3)',
+    - Line 2206: rgba(252, 211, 77, 0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(252, 211, 77, 0.1)',
+    - Line 2207: rgba(252, 211, 77, 0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 15px rgba(252, 211, 77, 0.2)',
+    - Line 2238: rgba(255, 255, 255, 0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '1.5px dashed rgba(255, 255, 255, 0.08)',
+    - Line 2239: rgba(255, 255, 255, 0.02) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(255, 255, 255, 0.02)',
+    - Line 2251: rgba(255, 255, 255, 0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: borderTop: '1px solid rgba(255, 255, 255, 0.1)',
+    - Line 2258: rgba(255, 255, 255, 0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(255, 255, 255, 0.4)',
+    - Line 2268: rgba(255, 255, 255, 0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(255, 255, 255, 0.4)',
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 2038: const bgUrl     = design?.backgrounds?.teams || '';
+    - Line 2074: background: 'linear-gradient(180deg, #04060E 0%, #0D0B1A 50%, #04060E 100%)',
+    - Line 2087: background: 'radial-gradient(circle, rgba(124,58,237,0.15) 0%, transparent 70%)',
+    - Line 2099: background: 'radial-gradient(circle, rgba(59,130,246,0.12) 0%, transparent 70%)',
+    - Line 2108: backgroundImage: 'linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px), linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px)',
+    - Line 2109: backgroundSize: '40px 40px',
+    - Line 2189: background: i === slideIdx ? '#ffffff' : 'rgba(255, 255, 255, 0.3)',
+    - Line 2206: background: 'rgba(252, 211, 77, 0.1)',
+    - Line 2239: background: 'rgba(255, 255, 255, 0.02)',
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron, Rajdhani
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: EliminatedTeamBanner (FFWSOverlays.jsx:12-169)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 41: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#7C3AED',
+    - Line 51: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#0D0B1A', lineHeight: 0.95, letterSpacing: '2px',
+    - Line 71: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#131127',
+    - Line 72: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: borderLeft: '3px solid #7C3AED',
+    - Line 102: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <span style={{ fontFamily: 'Teko', fontSize: 14, fontWeight: 900, color: '#7C3AED' }}>
+    - Line 117: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#7C3AED', boxShadow: '0 0 8px rgba(124,58,237,0.8)', flexShrink: 0,
+    - Line 141: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <path d="M12 2C7.6 2 4 5.6 4 10v4l-2 2v2h4v2h4v-2h4v-2h4v-2l-2-2v-4c0-4.4-3.6-8-8-8z" fill="#7C3AED" opacity="0.9"/>
+    - Line 163: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(90deg, #7C3AED, #3B82F6, transparent)',
+    - Line 163: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(90deg, #7C3AED, #3B82F6, transparent)',
+    - Line 58: rgba(12,12,14,0.65) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(12,12,14,0.65)', marginTop: 2,
+    - Line 73: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: borderTop: '1px solid rgba(255,255,255,0.08)',
+    - Line 74: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: borderBottom: '1px solid rgba(255,255,255,0.08)',
+    - Line 86: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: borderBottom: '1px solid rgba(255,255,255,0.08)',
+    - Line 98: rgba(255,255,255,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(255,255,255,0.06)',
+    - Line 99: rgba(255,255,255,0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '1px solid rgba(255,255,255,0.1)',
+    - Line 117: rgba(124,58,237,0.8) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: '#7C3AED', boxShadow: '0 0 8px rgba(124,58,237,0.8)', flexShrink: 0,
+    - Line 134: rgba(255,255,255,0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: hasName ? 'rgba(255,255,255,0.03)' : 'transparent',
+    - Line 135: rgba(255,255,255,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: hasName ? '1px solid rgba(255,255,255,0.06)' : '1px solid transparent',
+    - Line 148: rgba(255,255,255,0.5) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: hasName ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.12)',
+    - Line 148: rgba(255,255,255,0.12) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: hasName ? 'rgba(255,255,255,0.5)' : 'rgba(255,255,255,0.12)',
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Found 1 occurrences of orange/amber colors! These must be updated to purple #7C3AED / blue #3B82F6.
+    - Line 31: orange
+      Code: {/* ── LEFT panel: angular clip-path diagonal with 'ELIMINATED' on orange background ── */}
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 31: {/* ── LEFT panel: angular clip-path diagonal with 'ELIMINATED' on orange background ── */}
+    - Line 41: background: '#7C3AED',
+    - Line 71: background: '#131127',
+    - Line 98: background: 'rgba(255,255,255,0.06)',
+    - Line 117: background: '#7C3AED', boxShadow: '0 0 8px rgba(124,58,237,0.8)', flexShrink: 0,
+    - Line 134: background: hasName ? 'rgba(255,255,255,0.03)' : 'transparent',
+    - Line 163: background: 'linear-gradient(90deg, #7C3AED, #3B82F6, transparent)',
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Rajdhani, Teko
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: FFBoardV2 (FFWSOverlays.jsx:170-484)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 177: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const accent  = '#7C3AED';
+    - Line 178: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const gold   = '#3B82F6';
+    - Line 180: #10B981 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const green  = '#10B981';
+    - Line 268: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#0D0B1A',
+    - Line 294: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #7C3AED 0%, #9D5CFF 100%)',
+    - Line 294: #9D5CFF (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #7C3AED 0%, #9D5CFF 100%)',
+    - Line 320: #A0A0B0 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const rankColor = rank === 1 ? gold : rank === 2 ? '#A0A0B0' : rank === 3 ? '#B87333' : 'transparent';
+    - Line 320: #B87333 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const rankColor = rank === 1 ? gold : rank === 2 ? '#A0A0B0' : rank === 3 ? '#B87333' : 'transparent';
+    - Line 341: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: isGhost ? 'transparent' : '#0D0B1A',
+    - Line 356: #888888 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: isGhost ? 'rgba(255,255,255,0.1)' : isChampionRush ? gold : rank <= 3 ? rankColor : '#888888',
+    - Line 442: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: width: '100%', height: FOOTER_H, background: '#131127', flexShrink: 0,
+    - Line 469: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: default:  { p:'#7C3AED', s:'#3B82F6' },
+    - Line 469: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: default:  { p:'#7C3AED', s:'#3B82F6' },
+    - Line 470: #10B981 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: neon:     { p:'#10B981', s:'#7C3AED' },
+    - Line 470: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: neon:     { p:'#10B981', s:'#7C3AED' },
+    - Line 471: #9ABF30 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: military: { p:'#9ABF30', s:'#C8A850' },
+    - Line 471: #C8A850 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: military: { p:'#9ABF30', s:'#C8A850' },
+    - Line 472: #888888 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: minimal:  { p:'#FFFFFF', s:'#888888' },
+    - Line 473: #FF3030 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: retro:    { p:'#FF3030', s:'#3B82F6' },
+    - Line 473: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: retro:    { p:'#FF3030', s:'#3B82F6' },
+    - Line 301: rgba(124, 58, 237, 0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 12px rgba(124, 58, 237, 0.4)',
+    - Line 327: rgba(59,130,246,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadowStyle = '0 0 10px rgba(59,130,246,0.3)';
+    - Line 342: rgba(255,255,255,0.04) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: borderBottom: '1px solid rgba(255,255,255,0.04)',
+    - Line 356: rgba(255,255,255,0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: isGhost ? 'rgba(255,255,255,0.1)' : isChampionRush ? gold : rank <= 3 ? rankColor : '#888888',
+    - Line 357: rgba(59, 130, 246, 0.6) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: textShadow: isChampionRush && !isGhost ? '0 0 6px rgba(59, 130, 246, 0.6)' : 'none',
+    - Line 369: rgba(255,255,255,0.04) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: isGhost ? 'transparent' : 'rgba(255,255,255,0.04)',
+    - Line 370: rgba(255,255,255,0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: isGhost ? '1px dashed rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.06)',
+    - Line 370: rgba(255,255,255,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: isGhost ? '1px dashed rgba(255,255,255,0.05)' : '1px solid rgba(255,255,255,0.06)',
+    - Line 374: rgba(255,255,255,0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Teko', fontSize: 12, fontWeight: 900, color: 'rgba(255,255,255,0.2)' }}>
+    - Line 386: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: isGhost ? 'rgba(255,255,255,0.08)' : isElim ? 'rgba(255,255,255,0.25)' : txtCol,
+    - Line 386: rgba(255,255,255,0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: isGhost ? 'rgba(255,255,255,0.08)' : isElim ? 'rgba(255,255,255,0.25)' : txtCol,
+    - Line 401: rgba(255,255,255,0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: ? 'rgba(255,255,255,0.03)'
+    - Line 403: rgba(255,255,255,0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: : slot.name === null ? 'rgba(255,255,255,0.03)'
+    - Line 404: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: : 'rgba(255,255,255,0.08)';
+    - Line 422: rgba(255,255,255,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: isGhost ? 'rgba(255,255,255,0.06)' : isElim ? 'rgba(255,255,255,0.25)' : txtCol,
+    - Line 422: rgba(255,255,255,0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: isGhost ? 'rgba(255,255,255,0.06)' : isElim ? 'rgba(255,255,255,0.25)' : txtCol,
+    - Line 431: rgba(255,255,255,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: isGhost ? 'rgba(255,255,255,0.06)' : isElim ? 'rgba(255,255,255,0.25)' : accent,
+    - Line 431: rgba(255,255,255,0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: isGhost ? 'rgba(255,255,255,0.06)' : isElim ? 'rgba(255,255,255,0.25)' : accent,
+    - Line 453: rgba(255,255,255,0.35) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Teko, sans-serif', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '1px' }}>{stageLabel}</span>
+    - Line 455: rgba(255,255,255,0.35) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Rajdhani, sans-serif', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '1px' }}>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 287: background: 'transparent',
+    - Line 294: background: 'linear-gradient(135deg, #7C3AED 0%, #9D5CFF 100%)',
+    - Line 341: background: isGhost ? 'transparent' : '#0D0B1A',
+    - Line 369: background: isGhost ? 'transparent' : 'rgba(255,255,255,0.04)',
+    - Line 393: style={{ position: 'absolute', left: 8, right: 0, top: '50%', height: 1.5, background: accent, transformOrigin: 'left', opacity: 0.7 }} />
+    - Line 409: background: bg,
+    - Line 442: width: '100%', height: FOOTER_H, background: '#131127', flexShrink: 0,
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Rajdhani, Teko
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: MatchInfoChip (FFWSOverlays.jsx:485-606)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 506: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: width: 5, background: '#3B82F6',
+    - Line 553: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <span style={{ fontFamily: 'Orbitron', fontSize: 16, fontWeight: 900, color: '#3B82F6', letterSpacing: '0.06em', lineHeight: 1 }}>
+    - Line 502: rgba(0,0,0,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: filter: 'drop-shadow(0 4px 12px rgba(0,0,0,0.3))',
+    - Line 507: rgba(59,130,246,0.6) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 12px rgba(59,130,246,0.6)',
+    - Line 516: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '1px solid rgba(255,255,255,0.08)',
+    - Line 550: rgba(255,255,255,0.35) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.2em' }}>
+    - Line 559: rgba(255,255,255,0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.1)' }} />
+    - Line 563: rgba(255,255,255,0.35) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 700, color: 'rgba(255,255,255,0.35)', letterSpacing: '0.2em' }}>
+    - Line 572: rgba(255,255,255,0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.1)' }} />
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 506: width: 5, background: '#3B82F6',
+    - Line 514: background: 'transparent',
+    - Line 527: background: `linear-gradient(90deg, transparent, ${primary}44, transparent)`,
+    - Line 534: background: `${primary}15`,
+    - Line 541: background: primary,
+    - Line 559: <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.1)' }} />
+    - Line 572: <div style={{ width: 1, height: 32, background: 'rgba(255,255,255,0.1)' }} />
+    - Line 588: width: 14, background: `linear-gradient(135deg, ${primary} 0%, ${secondary} 100%)`,
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron, Rajdhani
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: GameIntroBanner (FFWSOverlays.jsx:607-835)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 619: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#0D0B1A',
+    - Line 668: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(90deg, #131127 0%, #131127 100%)',
+    - Line 668: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(90deg, #131127 0%, #131127 100%)',
+    - Line 669: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: borderLeft: '4px solid #3B82F6',
+    - Line 695: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6',
+    - Line 696: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: backgroundImage: 'linear-gradient(to bottom, #3B82F6 0%, #3B82F6 100%)',
+    - Line 696: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: backgroundImage: 'linear-gradient(to bottom, #3B82F6 0%, #3B82F6 100%)',
+    - Line 711: #ef4444 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #ef4444 0%, #ef4444 100%)',
+    - Line 711: #ef4444 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #ef4444 0%, #ef4444 100%)',
+    - Line 768: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#3B82F6',
+    - Line 769: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: boxShadow: '0 0 12px #3B82F6'
+    - Line 620: rgba(20, 24, 40, 0.9) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(20, 24, 40, 0.9) 0%, rgba(5, 6, 12, 0.98) 100%)',
+    - Line 620: rgba(5, 6, 12, 0.98) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(20, 24, 40, 0.9) 0%, rgba(5, 6, 12, 0.98) 100%)',
+    - Line 633: rgba(255, 255, 255, 0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+    - Line 646: rgba(197, 15, 33, 0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'radial-gradient(ellipse at center, rgba(197, 15, 33, 0.15) 0%, rgba(0, 0, 0, 0) 70%)',
+    - Line 646: rgba(0, 0, 0, 0) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'radial-gradient(ellipse at center, rgba(197, 15, 33, 0.15) 0%, rgba(0, 0, 0, 0) 70%)',
+    - Line 660: rgba(0, 0, 0, 0.65) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: filter: 'drop-shadow(0px 15px 35px rgba(0, 0, 0, 0.65))',
+    - Line 683: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(255,255,255,0.4)',
+    - Line 701: rgba(59, 130, 246, 0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: textShadow: '0 0 15px rgba(59, 130, 246, 0.2)'
+    - Line 728: rgba(0,0,0,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: filter: 'drop-shadow(0px 4px 8px rgba(0,0,0,0.4))'
+    - Line 751: rgba(9, 10, 15, 0.85) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(9, 10, 15, 0.85)',
+    - Line 752: rgba(59, 130, 246, 0.45) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '2px solid rgba(59, 130, 246, 0.45)',
+    - Line 760: rgba(0, 0, 0, 0.5) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 4px 20px rgba(0, 0, 0, 0.5)',
+    - Line 827: rgba(0,0,0,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: filter: 'drop-shadow(0px 2px 4px rgba(0,0,0,0.3))'
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 619: background: '#0D0B1A',
+    - Line 620: backgroundImage: 'radial-gradient(circle at 50% 50%, rgba(20, 24, 40, 0.9) 0%, rgba(5, 6, 12, 0.98) 100%)',
+    - Line 628: {/* Subtle particle / grid background layer */}
+    - Line 633: backgroundImage: 'radial-gradient(rgba(255, 255, 255, 0.15) 1px, transparent 1px)',
+    - Line 634: backgroundSize: '24px 24px',
+    - Line 638: {/* Red ambient background glows */}
+    - Line 646: background: 'radial-gradient(ellipse at center, rgba(197, 15, 33, 0.15) 0%, rgba(0, 0, 0, 0) 70%)',
+    - Line 668: background: 'linear-gradient(90deg, #131127 0%, #131127 100%)',
+    - Line 696: backgroundImage: 'linear-gradient(to bottom, #3B82F6 0%, #3B82F6 100%)',
+    - Line 711: background: 'linear-gradient(135deg, #ef4444 0%, #ef4444 100%)',
+    - Line 751: background: 'rgba(9, 10, 15, 0.85)',
+    - Line 768: background: '#3B82F6',
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: MatchScheduleGrid (FFWSOverlays.jsx:836-1274)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 875: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(circle at 50% 40%, #131127 0%, #0D0B1A 80%, #0D0B1A 100%)',
+    - Line 875: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(circle at 50% 40%, #131127 0%, #0D0B1A 80%, #0D0B1A 100%)',
+    - Line 875: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(circle at 50% 40%, #131127 0%, #0D0B1A 80%, #0D0B1A 100%)',
+    - Line 888: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: backgroundImage: 'repeating-linear-gradient(-45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 888: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: backgroundImage: 'repeating-linear-gradient(-45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 902: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: backgroundImage: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 902: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: backgroundImage: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 916: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: backgroundImage: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 916: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: backgroundImage: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 930: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: backgroundImage: 'repeating-linear-gradient(-45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 930: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: backgroundImage: 'repeating-linear-gradient(-45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 994: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #3B82F6, #7C3AED)',
+    - Line 994: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #3B82F6, #7C3AED)',
+    - Line 1020: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6',
+    - Line 1087: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(circle at center, #131127 0%, #0D0B1A 100%)',
+    - Line 1087: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(circle at center, #131127 0%, #0D0B1A 100%)',
+    - Line 1111: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <span style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 900, color: '#3B82F6', opacity: 0.6 }}>?</span>
+    - Line 1128: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #131127, #0D0B1A)',
+    - Line 1128: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #131127, #0D0B1A)',
+    - Line 1161: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #3B82F6 0%, #7C3AED 100%)',
+    - Line 1161: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'linear-gradient(135deg, #3B82F6 0%, #7C3AED 100%)',
+    - Line 1203: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: isRandom ? '#7C3AED' : '#3B82F6',
+    - Line 1203: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: isRandom ? '#7C3AED' : '#3B82F6',
+    - Line 1232: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#3B82F6',
+    - Line 1234: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: boxShadow: '0 0 8px #3B82F6'
+    - Line 1251: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6',
+    - Line 889: rgba(255, 199, 0, 0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
+    - Line 903: rgba(255, 199, 0, 0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
+    - Line 917: rgba(255, 199, 0, 0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
+    - Line 931: rgba(255, 199, 0, 0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 20px rgba(0,0,0,0.8), 0 0 30px rgba(255, 199, 0, 0.2)',
+    - Line 939: rgba(255,255,255,0.01) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px)',
+    - Line 939: rgba(255,255,255,0.01) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px)',
+    - Line 939: rgba(255,255,255,0.01) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px)',
+    - Line 939: rgba(255,255,255,0.01) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px)',
+    - Line 951: rgba(255, 199, 0, 0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'radial-gradient(circle, rgba(255, 199, 0, 0.03) 0%, transparent 70%)',
+    - Line 960: rgba(0, 150, 255, 0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'radial-gradient(circle, rgba(0, 150, 255, 0.03) 0%, transparent 70%)',
+    - Line 981: rgba(255, 255, 255, 0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: borderBottom: '3px solid rgba(255, 255, 255, 0.08)',
+    - Line 988: rgba(255,255,255,0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <img src={tLogo} alt="" style={{ height: 80, objectFit: 'contain', filter: 'drop-shadow(0 0 12px rgba(255,255,255,0.2))' }}
+    - Line 999: rgba(255,85,0,0.5) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 15px rgba(255,85,0,0.5)'
+    - Line 1012: rgba(255,255,255,0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: textShadow: '0 0 20px rgba(255,255,255,0.1), 0 0 40px rgba(255,255,255,0.05)'
+    - Line 1012: rgba(255,255,255,0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: textShadow: '0 0 20px rgba(255,255,255,0.1), 0 0 40px rgba(255,255,255,0.05)'
+    - Line 1029: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ color: 'rgba(255,255,255,0.3)' }}>//</span>
+    - Line 1037: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.2em' }}>OFFICIAL SPONSOR</span>
+    - Line 1038: rgba(255,255,255,0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <img src={sponsorLogo} alt="" style={{ height: 50, objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.15))' }}
+    - Line 1070: rgba(255,255,255,0.12) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '1.5px solid rgba(255,255,255,0.12)',
+    - Line 1071: rgba(10, 8, 28, 0.6) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(10, 8, 28, 0.6)',
+    - Line 1073: rgba(255,255,255,0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 10px 30px rgba(0,0,0,0.5), inset 0 0 20px rgba(255,255,255,0.03)',
+    - Line 1093: rgba(255, 199, 0, 0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'repeating-linear-gradient(45deg, rgba(255, 199, 0, 0.05) 0px, rgba(255, 199, 0, 0.05) 10px, transparent 10px, transparent 20px)',
+    - Line 1093: rgba(255, 199, 0, 0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'repeating-linear-gradient(45deg, rgba(255, 199, 0, 0.05) 0px, rgba(255, 199, 0, 0.05) 10px, transparent 10px, transparent 20px)',
+    - Line 1104: rgba(255, 199, 0, 0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '2px dashed rgba(255, 199, 0, 0.3)',
+    - Line 1109: rgba(255, 199, 0, 0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 0 20px rgba(255, 199, 0, 0.1)'
+    - Line 1137: rgba(18, 16, 35, 0) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'linear-gradient(rgba(18, 16, 35, 0) 60%, rgba(6, 4, 15, 0.95) 95%)',
+    - Line 1137: rgba(6, 4, 15, 0.95) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: backgroundImage: 'linear-gradient(rgba(18, 16, 35, 0) 60%, rgba(6, 4, 15, 0.95) 95%)',
+    - Line 1148: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+    - Line 1164: rgba(255, 136, 0, 0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: '0 4px 12px rgba(255, 136, 0, 0.4)',
+    - Line 1165: rgba(255, 255, 255, 0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '1px solid rgba(255, 255, 255, 0.2)',
+    - Line 1193: rgba(0,0,0,0.9) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: textShadow: '0 2px 10px rgba(0,0,0,0.9)',
+    - Line 1207: rgba(0,0,0,0.9) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: textShadow: '0 2px 5px rgba(0,0,0,0.9)',
+    - Line 1223: rgba(255, 255, 255, 0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: borderTop: '1px solid rgba(255, 255, 255, 0.08)',
+    - Line 1240: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(255,255,255,0.4)',
+    - Line 1263: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(255,255,255,0.3)',
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 875: background: 'radial-gradient(circle at 50% 40%, #131127 0%, #0D0B1A 80%, #0D0B1A 100%)',
+    - Line 888: backgroundImage: 'repeating-linear-gradient(-45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 902: backgroundImage: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 916: backgroundImage: 'repeating-linear-gradient(45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 930: backgroundImage: 'repeating-linear-gradient(-45deg, #3B82F6, #3B82F6 15px, #000 15px, #000 30px)',
+    - Line 939: backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.01) 0px, rgba(255,255,255,0.01) 1px, transparent 1px, transparent 80px)',
+    - Line 951: background: 'radial-gradient(circle, rgba(255, 199, 0, 0.03) 0%, transparent 70%)',
+    - Line 960: background: 'radial-gradient(circle, rgba(0, 150, 255, 0.03) 0%, transparent 70%)',
+    - Line 994: background: 'linear-gradient(135deg, #3B82F6, #7C3AED)',
+    - Line 1071: background: 'rgba(10, 8, 28, 0.6)',
+    - Line 1087: background: 'radial-gradient(circle at center, #131127 0%, #0D0B1A 100%)',
+    - Line 1093: backgroundImage: 'repeating-linear-gradient(45deg, rgba(255, 199, 0, 0.05) 0px, rgba(255, 199, 0, 0.05) 10px, transparent 10px, transparent 20px)',
+    - Line 1119: backgroundImage: "url(" + mapImg + ")",
+    - Line 1120: backgroundSize: 'cover',
+    - Line 1121: backgroundPosition: 'center',
+    - Line 1128: background: 'linear-gradient(135deg, #131127, #0D0B1A)',
+    - Line 1137: backgroundImage: 'linear-gradient(rgba(18, 16, 35, 0) 60%, rgba(6, 4, 15, 0.95) 95%)',
+    - Line 1148: background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent)',
+    - Line 1161: background: 'linear-gradient(135deg, #3B82F6 0%, #7C3AED 100%)',
+    - Line 1232: background: '#3B82F6',
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: PointRushStandings (FFWSOverlays.jsx:1275-1647)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 1315: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#7C3AED',
+    - Line 1327: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#0D0B1A',
+    - Line 1348: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: rankBadgeBg = 'linear-gradient(135deg, #3B82F6, #7C3AED)';
+    - Line 1348: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: rankBadgeBg = 'linear-gradient(135deg, #3B82F6, #7C3AED)';
+    - Line 1349: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: rankBadgeColor = '#0D0B1A';
+    - Line 1352: #A0A0B0 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: rankBadgeBg = 'linear-gradient(135deg, #A0A0B0, #909090)';
+    - Line 1352: #909090 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: rankBadgeBg = 'linear-gradient(135deg, #A0A0B0, #909090)';
+    - Line 1353: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: rankBadgeColor = '#0D0B1A';
+    - Line 1356: #B87333 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: rankBadgeBg = 'linear-gradient(135deg, #B87333, #8B4513)';
+    - Line 1356: #8B4513 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: rankBadgeBg = 'linear-gradient(135deg, #B87333, #8B4513)';
+    - Line 1368: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#131127',
+    - Line 1370: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: border: isRushEligible ? '1.5px solid #3B82F6' : 'none',
+    - Line 1456: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#7C3AED',
+    - Line 1472: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#0D0B1A',
+    - Line 1479: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: borderLeft: '2px solid #7C3AED'
+    - Line 1508: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#131127',
+    - Line 1510: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: border: isRushEligible ? '1.5px solid #3B82F6' : 'none',
+    - Line 1596: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#7C3AED',
+    - Line 1611: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: '#0D0B1A',
+    - Line 1618: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: borderTop: '2px solid #7C3AED',
+    - Line 1625: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: color: '#3B82F6',
+    - Line 1343: rgba(255, 255, 255, 0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: let rankBadgeBg = 'rgba(255, 255, 255, 0.05)';
+    - Line 1345: rgba(255, 255, 255, 0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: let rankBadgeBorder = '1px solid rgba(255, 255, 255, 0.1)';
+    - Line 1371: rgba(59, 130, 246, 0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: isRushEligible ? 'inset 0 0 8px rgba(59, 130, 246, 0.25)' : 'none',
+    - Line 1409: rgba(255, 255, 255, 0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(255, 255, 255, 0.1)',
+    - Line 1443: rgba(255,255,255,0.6) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(255,255,255,0.6)',
+    - Line 1511: rgba(59, 130, 246, 0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: boxShadow: isRushEligible ? 'inset 0 0 8px rgba(59, 130, 246, 0.25)' : 'none',
+    - Line 1521: rgba(255, 255, 255, 0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(255, 255, 255, 0.05)',
+    - Line 1522: rgba(255, 255, 255, 0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: '1px solid rgba(255, 255, 255, 0.1)',
+    - Line 1549: rgba(255, 255, 255, 0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: 'rgba(255, 255, 255, 0.1)',
+    - Line 1583: rgba(255,255,255,0.6) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(255,255,255,0.6)',
+    - Line 1635: rgba(255,255,255,0.6) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: 'rgba(255,255,255,0.6)',
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 1292: background: 'transparent',
+    - Line 1315: background: '#7C3AED',
+    - Line 1368: background: '#131127',
+    - Line 1381: background: rankBadgeBg,
+    - Line 1409: background: 'rgba(255, 255, 255, 0.1)',
+    - Line 1472: background: '#0D0B1A',
+    - Line 1508: background: '#131127',
+    - Line 1521: background: 'rgba(255, 255, 255, 0.05)',
+    - Line 1549: background: 'rgba(255, 255, 255, 0.1)',
+    - Line 1611: background: '#0D0B1A',
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Rajdhani, Teko
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: RoadmapOverlay (FFWSOverlays.jsx:1648-1868)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 1653: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const accent = '#7C3AED';
+    - Line 1654: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const accent2 = '#3B82F6';
+    - Line 1655: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const gold = '#3B82F6';
+    - Line 1724: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(ellipse at 50% 30%, #131127 0%, #0D0B1A 70%, #0D0B1A 100%)',
+    - Line 1724: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(ellipse at 50% 30%, #131127 0%, #0D0B1A 70%, #0D0B1A 100%)',
+    - Line 1724: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(ellipse at 50% 30%, #131127 0%, #0D0B1A 70%, #0D0B1A 100%)',
+    - Line 1782: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: `linear-gradient(135deg, ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}, ${si === 0 ? accent2 : si === stages.length - 1 ? '#7C3AED' : accent})`,
+    - Line 1820: #10B981 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: isDone ? '#10B981' : isCurrent ? accent : 'rgba(255,255,255,0.15)',
+    - Line 1821: #10B98180 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: boxShadow: isDone ? '0 0 8px #10B98180' : isCurrent ? `0 0 8px ${accent}80` : 'none',
+    - Line 1837: #10B981 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: {isDone && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: '#10B981', letterSpacing: '0.15em' }}>DONE</span>}
+    - Line 1732: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.3) 0px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.3) 0px, transparent 1px, transparent 80px)', pointerEvents: 'none' }} />
+    - Line 1732: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.3) 0px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.3) 0px, transparent 1px, transparent 80px)', pointerEvents: 'none' }} />
+    - Line 1741: rgba(255,255,255,0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <img src={tLogo} alt="" style={{ height: 64, objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.2))' }} onError={e => { e.target.style.display = 'none'; }} />
+    - Line 1755: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Orbitron', fontSize: 9, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.2em' }}>{sponsorLabel.toUpperCase()}</span>
+    - Line 1761: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ width: 200, height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+    - Line 1789: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.2em' }}>{stage.matches.length} MATCHES</div>
+    - Line 1803: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div key={di} style={{ borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 12 }}>
+    - Line 1803: rgba(255,255,255,0.02) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div key={di} style={{ borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 12 }}>
+    - Line 1804: rgba(255,255,255,0.5) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 800, color: 'rgba(255,255,255,0.5)', letterSpacing: '0.25em', textTransform: 'uppercase', marginBottom: 10 }}>{dayName}</div>
+    - Line 1813: rgba(0,255,100,0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: isCurrent ? `${accent}15` : isDone ? 'rgba(0,255,100,0.05)' : 'rgba(255,255,255,0.01)',
+    - Line 1813: rgba(255,255,255,0.01) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: isCurrent ? `${accent}15` : isDone ? 'rgba(0,255,100,0.05)' : 'rgba(255,255,255,0.01)',
+    - Line 1814: rgba(0,255,100,0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: isCurrent ? `1px solid ${accent}80` : isDone ? '1px solid rgba(0,255,100,0.2)' : '1px solid rgba(255,255,255,0.06)',
+    - Line 1814: rgba(255,255,255,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: border: isCurrent ? `1px solid ${accent}80` : isDone ? '1px solid rgba(0,255,100,0.2)' : '1px solid rgba(255,255,255,0.06)',
+    - Line 1820: rgba(255,255,255,0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: background: isDone ? '#10B981' : isCurrent ? accent : 'rgba(255,255,255,0.15)',
+    - Line 1826: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: isDone ? 'rgba(255,255,255,0.4)' : isCurrent ? accent : '#fff',
+    - Line 1832: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: isDone ? 'rgba(255,255,255,0.3)' : isCurrent ? '#fff' : 'rgba(255,255,255,0.7)',
+    - Line 1832: rgba(255,255,255,0.7) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: color: isDone ? 'rgba(255,255,255,0.3)' : isCurrent ? '#fff' : 'rgba(255,255,255,0.7)',
+    - Line 1838: rgba(255,255,255,0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: {isScheduled && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.15em' }}>—</span>}
+    - Line 1852: rgba(255,255,255,0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+    - Line 1853: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.2em' }}>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 1724: background: 'radial-gradient(ellipse at 50% 30%, #131127 0%, #0D0B1A 70%, #0D0B1A 100%)',
+    - Line 1728: <div style={{ position: 'absolute', top: '10%', left: '50%', transform: 'translateX(-50%)', width: 1200, height: 400, background: `radial-gradient(ellipse, ${accent}15 0%, transparent 70%)`, filter: 'blur(60px)', pointerEvents: 'none' }} />
+    - Line 1729: <div style={{ position: 'absolute', bottom: '5%', left: '20%', width: 600, height: 300, background: `radial-gradient(ellipse, ${accent2}10 0%, transparent 70%)`, filter: 'blur(50px)', pointerEvents: 'none' }} />
+    - Line 1732: <div style={{ position: 'absolute', inset: 0, opacity: 0.04, backgroundImage: 'repeating-linear-gradient(90deg, rgba(255,255,255,0.3) 0px, transparent 1px, transparent 80px), repeating-linear-gradient(0deg, rgba(255,255,255,0.3) 0px, transparent 1px, transparent 80px)', pointerEvents: 'none' }} />
+    - Line 1743: <div style={{ height: 64, width: 64, background: `linear-gradient(135deg, ${accent}, ${accent2})`, borderRadius: 12, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 20px ${accent}40` }}>
+    - Line 1761: <div style={{ width: 200, height: 8, borderRadius: 4, background: 'rgba(255,255,255,0.08)', overflow: 'hidden' }}>
+    - Line 1763: style={{ height: '100%', background: `linear-gradient(90deg, ${accent}, ${accent2})`, borderRadius: 4, boxShadow: `0 0 10px ${accent}80` }} />
+    - Line 1782: background: `linear-gradient(135deg, ${si === 0 ? accent : si === stages.length - 1 ? gold : accent2}, ${si === 0 ? accent2 : si === stages.length - 1 ? '#7C3AED' : accent})`,
+    - Line 1803: <div key={di} style={{ borderRadius: 10, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 12 }}>
+    - Line 1813: background: isCurrent ? `${accent}15` : isDone ? 'rgba(0,255,100,0.05)' : 'rgba(255,255,255,0.01)',
+    - Line 1820: background: isDone ? '#10B981' : isCurrent ? accent : 'rgba(255,255,255,0.15)',
+    - Line 1836: {isCurrent && <span style={{ fontFamily: 'Orbitron', fontSize: 8, fontWeight: 900, color: accent, letterSpacing: '0.15em', background: `${accent}15`, padding: '2px 8px', borderRadius: 4 }}>LIVE</span>}
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
+========================================================================
+COMPONENT: EventDetailsOverlay (FFWSOverlays.jsx:1869-2088)
+========================================================================
+
+(1) HARDCODED COLORS AND DESIGN TOKENS:
+  * Uses design tokens? Yes
+  * Hardcoded colors found:
+    - Line 1875: #7C3AED (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const accent = '#7C3AED';
+    - Line 1876: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const accent2 = '#3B82F6';
+    - Line 1877: #3B82F6 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: const gold = '#3B82F6';
+    - Line 1927: #131127 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(ellipse at 30% 20%, #131127 0%, #0D0B1A 60%, #0D0B1A 100%)',
+    - Line 1927: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(ellipse at 30% 20%, #131127 0%, #0D0B1A 60%, #0D0B1A 100%)',
+    - Line 1927: #0D0B1A (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: background: 'radial-gradient(ellipse at 30% 20%, #131127 0%, #0D0B1A 60%, #0D0B1A 100%)',
+    - Line 1999: #10B981 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 28, fontWeight: 900, color: currentState === 'in_game' ? '#10B981' : accent, letterSpacing: '0.05em', textTransform: 'uppercase' }}>{currentState.replace('_', ' ')}</div>
+    - Line 2040: #A0A0B0 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 22, fontWeight: 900, color: pos === '1' ? gold : pos === '2' ? '#A0A0B0' : pos === '3' ? '#B87333' : '#fff' }}>#{pos}</div>
+    - Line 2040: #B87333 (should be replaced with design tokens like t.p, t.s or design?.accentColor)
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 22, fontWeight: 900, color: pos === '1' ? gold : pos === '2' ? '#A0A0B0' : pos === '3' ? '#B87333' : '#fff' }}>#{pos}</div>
+    - Line 1945: rgba(255,255,255,0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <img src={tLogo} alt="" style={{ height: 90, objectFit: 'contain', filter: 'drop-shadow(0 0 15px rgba(255,255,255,0.25))' }} onError={e => { e.target.style.display = 'none'; }} />
+    - Line 1953: rgba(255,255,255,0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 56, fontWeight: 900, color: '#fff', letterSpacing: '0.08em', lineHeight: 1, textShadow: '0 0 30px rgba(255,255,255,0.1)' }}>{tName.toUpperCase()}</div>
+    - Line 1958: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em' }}>{sponsorLabel.toUpperCase()}</span>
+    - Line 1959: rgba(255,255,255,0.15) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <img src={sponsorLogo} alt="" style={{ height: 55, objectFit: 'contain', filter: 'drop-shadow(0 0 10px rgba(255,255,255,0.15))' }} onError={e => { e.target.style.display = 'none'; }} />
+    - Line 1970: rgba(124, 58, 237, 0.04) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: borderRadius: 20, border: `1px solid ${accent}30`, background: 'rgba(124, 58, 237, 0.04)',
+    - Line 1988: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', marginBottom: 6 }}>MAP</div>
+    - Line 1993: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', marginBottom: 6 }}>DAY</div>
+    - Line 1998: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.25em', marginBottom: 6 }}>STATUS</div>
+    - Line 2004: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 24, fontWeight: 700, color: 'rgba(255,255,255,0.3)', letterSpacing: '0.1em' }}>No active match</div>
+    - Line 2009: rgba(255,255,255,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ marginTop: 20, paddingTop: 20, borderTop: '1px solid rgba(255,255,255,0.06)' }}>
+    - Line 2010: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.3em', marginBottom: 8 }}>UP NEXT</div>
+    - Line 2013: rgba(255,255,255,0.7) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Orbitron', fontSize: 18, fontWeight: 800, color: 'rgba(255,255,255,0.7)' }}>{nextMap}</span>
+    - Line 2014: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: {nextStage && <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>· {nextStage}</span>}
+    - Line 2015: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: {nextDay && <span style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)' }}>· {nextDay}</span>}
+    - Line 2035: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 24 }}>
+    - Line 2035: rgba(255,255,255,0.02) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 24 }}>
+    - Line 2039: rgba(255,255,255,0.03) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div key={pos} style={{ flex: 1, textAlign: 'center', borderRadius: 10, padding: '12px 8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    - Line 2039: rgba(255,255,255,0.06) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div key={pos} style={{ flex: 1, textAlign: 'center', borderRadius: 10, padding: '12px 8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    - Line 2041: rgba(255,255,255,0.6) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 14, fontWeight: 800, color: 'rgba(255,255,255,0.6)', marginTop: 4 }}>{pts} PTS</div>
+    - Line 2050: rgba(255,199,0,0.2) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ borderRadius: 16, border: '1px solid rgba(255,199,0,0.2)', background: 'rgba(255,199,0,0.04)', padding: 20 }}>
+    - Line 2050: rgba(255,199,0,0.04) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ borderRadius: 16, border: '1px solid rgba(255,199,0,0.2)', background: 'rgba(255,199,0,0.04)', padding: 20 }}>
+    - Line 2054: rgba(255,199,0,0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', borderRadius: 8, background: 'rgba(255,199,0,0.05)', border: '1px solid rgba(255,199,0,0.1)' }}>
+    - Line 2054: rgba(255,199,0,0.1) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', borderRadius: 8, background: 'rgba(255,199,0,0.05)', border: '1px solid rgba(255,199,0,0.1)' }}>
+    - Line 2064: rgba(255,255,255,0.08) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 24, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    - Line 2064: rgba(255,255,255,0.02) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 24, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+    - Line 2067: rgba(255,255,255,0.3) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: {currentMatchNum}<span style={{ fontSize: 24, color: 'rgba(255,255,255,0.3)' }}> / {totalMatches || tournament?.total_matches || '?'}</span>
+    - Line 2069: rgba(255,255,255,0.4) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ fontFamily: 'Orbitron', fontSize: 11, fontWeight: 700, color: 'rgba(255,255,255,0.4)', letterSpacing: '0.2em', marginTop: 6 }}>MATCHES PLAYED</div>
+    - Line 2075: rgba(255,255,255,0.05) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', paddingTop: 24, marginTop: 24, borderTop: '1px solid rgba(255,255,255,0.05)' }}>
+    - Line 2076: rgba(255,255,255,0.25) (should be replaced with rgba(t.p, ...) or rgba(t.s, ...))
+      Code: <span style={{ fontFamily: 'Orbitron', fontSize: 10, fontWeight: 700, color: 'rgba(255,255,255,0.25)', letterSpacing: '0.3em' }}>
+
+(2) OLD ORANGE COLORS (#FF6B00, #FF8C00, orange, amber):
+  * Clear of old orange/amber colors. NexOverlays purple/blue are used instead.
+
+(3) BACKGROUND CONSISTENCY:
+  * Backgrounds specified in code:
+    - Line 1927: background: 'radial-gradient(ellipse at 30% 20%, #131127 0%, #0D0B1A 60%, #0D0B1A 100%)',
+    - Line 1931: <div style={{ position: 'absolute', top: '15%', right: '10%', width: 500, height: 500, background: `radial-gradient(circle, ${accent}12 0%, transparent 70%)`, filter: 'blur(80px)', pointerEvents: 'none' }} />
+    - Line 1932: <div style={{ position: 'absolute', bottom: '10%', left: '5%', width: 400, height: 400, background: `radial-gradient(circle, ${accent2}10 0%, transparent 70%)`, filter: 'blur(60px)', pointerEvents: 'none' }} />
+    - Line 1935: <div style={{ position: 'absolute', top: 0, left: 0, width: '100%', height: 6, background: `linear-gradient(90deg, ${accent}, ${accent2}, ${gold})`, boxShadow: `0 0 20px ${accent}50` }} />
+    - Line 1947: <div style={{ height: 90, width: 90, background: `linear-gradient(135deg, ${accent}, ${accent2})`, borderRadius: 16, display: 'flex', alignItems: 'center', justifyContent: 'center', boxShadow: `0 0 25px ${accent}40` }}>
+    - Line 1970: borderRadius: 20, border: `1px solid ${accent}30`, background: 'rgba(124, 58, 237, 0.04)',
+    - Line 1974: <div style={{ position: 'absolute', top: -50, right: -50, width: 200, height: 200, background: `radial-gradient(circle, ${accent}10 0%, transparent 70%)`, pointerEvents: 'none' }} />
+    - Line 2035: <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 24 }}>
+    - Line 2039: <div key={pos} style={{ flex: 1, textAlign: 'center', borderRadius: 10, padding: '12px 8px', background: 'rgba(255,255,255,0.03)', border: '1px solid rgba(255,255,255,0.06)' }}>
+    - Line 2050: <div style={{ borderRadius: 16, border: '1px solid rgba(255,199,0,0.2)', background: 'rgba(255,199,0,0.04)', padding: 20 }}>
+    - Line 2054: <div key={i} style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '6px 10px', borderRadius: 8, background: 'rgba(255,199,0,0.05)', border: '1px solid rgba(255,199,0,0.1)' }}>
+    - Line 2064: <div style={{ borderRadius: 16, border: '1px solid rgba(255,255,255,0.08)', background: 'rgba(255,255,255,0.02)', padding: 24, flex: 1, display: 'flex', flexDirection: 'column', justifyContent: 'center' }}>
+
+(4) FONTS CONSISTENCY:
+  * Fonts defined: Orbitron
+  * Rules check: Orbitron for display, Rajdhani for body, Teko for numbers.
+  * Fonts conform to style guide (or uses default styling).
+
