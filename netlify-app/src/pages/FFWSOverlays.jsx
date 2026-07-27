@@ -38,7 +38,7 @@ export function EliminatedTeamBanner({ team, design }) {
           }}>
             <div style={{
               position: 'absolute', inset: 0,
-              background: '#7C3AED',
+              background: design?.accentColor || '#7C3AED',
               clipPath: 'polygon(0 0, 100% 0, 75% 100%, 0 100%)',
             }} />
             <div style={{

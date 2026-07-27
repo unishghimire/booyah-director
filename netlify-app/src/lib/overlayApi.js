@@ -112,6 +112,9 @@ export const overlayApi = {
   saveDiscordWebhook:       (d) => call('saveDiscordWebhook', d),
   testDiscordWebhook:       (d) => call('testDiscordWebhook', d),
   postDiscord:              (d) => call('postDiscord', d),
+  // ORS (Open Result Service) API configuration
+  saveOrsConfig:            (d) => call('saveOrsConfig', d),
+  getOrsConfig:             () => call('getOrsConfig'),
 };
 
 // ── Data normaliser ───────────────────────────────────────────────────────────
