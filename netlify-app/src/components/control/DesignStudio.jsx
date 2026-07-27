@@ -10,16 +10,15 @@
  *  4. Overlay Style  — Default | FF Classic
  *  5. Branding       — tournament name, subtitle, game label, logo
  *  6. Casters        — names + handles for caster screen
- *  7. PIN settings   — change Director / Inputer access PINs
+ *  7. Discord webhooks
  *  8. Live preview   — mini preview bar
  */
 import React, { useState, useEffect } from 'react';
 import { overlayApi } from '@/lib/overlayApi';
-import { getPins, setPins } from '@/lib/auth';
 import toast from 'react-hot-toast';
 import {
   Paintbrush, Check, Layers, Type, Eye, Mic2,
-  Lock, RefreshCw, Save, RotateCcw, Map,
+ RefreshCw, Save, RotateCcw, Map,
   Image, FolderOpen, BotMessageSquare, TestTube2, Link, Trash2, Trophy, Users, BarChart3, Star, Zap
 } from 'lucide-react';
 import ImageUpload from '@/components/ImageUpload';
@@ -451,9 +450,6 @@ export default function DesignStudio(props) {
   const [saving, setSaving] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  // PIN change state
-  const [pins, setPinsState] = useState({ director:'', inputer:'' });
-  const [pinSaved, setPinSaved] = useState(false);
 
   useEffect(() => {
     overlayApi.getDesign()
@@ -479,18 +475,7 @@ export default function DesignStudio(props) {
   };
 
   const reset = () => { setDesign(DEFAULT_DESIGN); toast('Design reset to defaults'); };
-
-  const savePins = async () => {
-    const current = await getPins();
-    const next = { ...current };
-    if (pins.director?.length === 4) next.director = pins.director;
-    if (pins.inputer?.length === 4)  next.inputer  = pins.inputer;
-    await setPins(next);
-    setPinsState({ director:'', inputer:'' });
-    setPinSaved(true);
-    setTimeout(() => setPinSaved(false), 2000);
-    toast.success('PINs updated! Refresh each panel to lock again.');
-  };
+;
 
   if (loading) return <div className="p-6 text-xs text-gray-600">Loading design settings…</div>;
 
@@ -834,30 +819,6 @@ export default function DesignStudio(props) {
             </div>
           ))}
         </div>
-      </Section>
-
-      {/* ── PIN SETTINGS ── */}
-      <Section title="ACCESS PINs" icon={Lock}>
-        <p className="mb-3 text-[10px] text-gray-500">Enter a new 4-digit PIN to change it. Leave blank to keep current.</p>
-        <div className="grid grid-cols-2 gap-3 mb-3">
-          <div>
-            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-[#7C3AED]">Director PIN</label>
-            <input type="password" value={pins.director} onChange={e => { if (e.target.value.length <= 4 && /^\d*$/.test(e.target.value)) setPinsState(p=>({...p, director:e.target.value})); }}
-              placeholder="New 4-digit PIN" maxLength={4}
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-black text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 tracking-[0.5em]" />
-          </div>
-          <div>
-            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-blue-400">Inputer PIN</label>
-            <input type="password" value={pins.inputer} onChange={e => { if (e.target.value.length <= 4 && /^\d*$/.test(e.target.value)) setPinsState(p=>({...p, inputer:e.target.value})); }}
-              placeholder="New 4-digit PIN" maxLength={4}
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-black text-white placeholder-gray-600 outline-none focus:border-blue-500/40 tracking-[0.5em]" />
-          </div>
-        </div>
-        <button onClick={savePins}
-          className={`w-full rounded-xl py-2.5 text-sm font-black transition-all ${pinSaved ? 'bg-green-600 text-white' : 'bg-white/10 text-gray-300 hover:bg-white/20'}`}>
-          {pinSaved ? '✓ PINs Updated!' : 'Save PINs'}
-        </button>
-        <p className="mt-2 text-[9px] text-gray-700">Default: Director=1234, Inputer=5678</p>
       </Section>
 
       {/* ── DISCORD WEBHOOKS ── */}

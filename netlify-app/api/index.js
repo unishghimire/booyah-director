@@ -627,27 +627,7 @@ module.exports = async (req, res) => {
       }
     }
 
-    // ── GENERATE SHARE TOKEN ──────────────────────────────────────────────
-    if (route === 'generateShareToken') {
-      const dbBaseUrl = (process.env.FIREBASE_DATABASE_URL || '').replace(/\/$/, '');
-      const secret = process.env.FIREBASE_DATABASE_SECRET;
-      if (!secret || !dbBaseUrl) return ok({ token: null, shareToken: null, error: 'Database not configured' });
-
-      try {
-        const token = genId() + genId();
-        // Write mapping token -> uid
-        await fetch(`${dbBaseUrl}/booyah_admin/share_tokens/${token}.json?auth=${secret}`, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(uid)
-        });
-        // Write user -> token
-        await fetch(`${dbBaseUrl}/booyah_admin/users/${uid}/shareToken.json?auth=${secret}`, {
-          method: 'PUT', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify(token)
-        });
-        return ok({ token });
-      } catch (e) {
-        return err(500, 'Failed to generate share token');
-      }
-    }
+ }
 
     // ── SAVE / UPDATE / GET DESIGN ────────────────────────────────────────
     if (route === 'saveDesign' || route === 'updateDesign') {
