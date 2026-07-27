@@ -259,7 +259,6 @@ export const OVERLAYS = [
   { id: 'casters',          label: 'CASTERS',           icon: Mic2,          transparent: false, desc: 'Caster & analyst profiles' },
   { id: 'mvp',              label: 'MVP REVEAL',        icon: Star,          transparent: false, desc: 'Match MVP player full-screen' },
   { id: 'champions',        label: 'CHAMPIONS!',        icon: Crown,         transparent: false, desc: 'Tournament winner reveal' },
-  { id: 'booyah',           label: 'BOOYAH!',           icon: Trophy,        transparent: false, desc: 'Booyah / champions celebration screen' },
   { id: 'roadmap',          label: 'TOURNAMENT ROADMAP', icon: Map,         transparent: false, desc: 'Tournament schedule — stages, days, matches' },
   { id: 'event-details',    label: 'EVENT DETAILS',     icon: Info,         transparent: false, desc: 'Tournament info — format, placement points, stats' },
 

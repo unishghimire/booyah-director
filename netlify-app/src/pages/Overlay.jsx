@@ -2329,55 +2329,26 @@ export default function Overlay() {
   if (!ready) return <div style={{ width:1920, height:1080, position:'relative', overflow:'hidden' }}><OverlayLoading /></div>;
 
   const screens = {
-    scoreboard: (
-      <>
-        <FFBoardV2 teams={teams} players={players} currentMatch={currentMatch} design={design} />
-        <MatchInfoChip currentMatch={currentMatch} design={design} />
-      </>
-    ),
-    standings:       <FullStandings teams={teams} design={design} />,
-    full_standings:  <FullStandings teams={teams} design={design} />,
-    killfeed:       <KillFeedScreen killFeed={killFeed} design={design} />,
-    kill_feed:      <KillFeedScreen killFeed={killFeed} design={design} />,
-    maplabel:        <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
-    map_label:       <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
-    'today-matches': <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />,
-    today_matches:   <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />,
-    teams:           <PointRushStandings teams={teams} design={design} />,
-    teams_today:     <PointRushStandings teams={teams} design={design} />,
-    casters:         <CastersScreen design={design} />,
-    casters_screen:  <CastersScreen design={design} />,
-    'upcoming-map':  <UpcomingMap   match={currentMatch} design={design} />,
-    upcoming_map:    <UpcomingMap   match={currentMatch} design={design} />,
-    'elim-alert':    <EliminationAlert eliminations={eliminations} design={design} />,
-    elim_alert:      <EliminationAlert eliminations={eliminations} design={design} />,
-    elimination:     <EliminationAlert eliminations={eliminations} design={design} />,
-    elimination_alert: <EliminationAlert eliminations={eliminations} design={design} />,
-    pre_match_map:   <PreMatchMap   match={currentMatch} teams={teams} design={design} />,
-    mvp:             <MVPScreen     players={players} teams={teams} design={design} overlayState={overlayState} />,
-    mvp_screen:      <MVPScreen     players={players} teams={teams} design={design} overlayState={overlayState} />,
-    champions:       <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
-    champion:        <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
-    booyah:          <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
-    team_roster:     <TeamRosterScreen teams={teams} players={players} design={design} />,
-    teamroster:      <TeamRosterScreen teams={teams} players={players} design={design} />,
-    'game-intro':    <GameIntroBanner currentMatch={currentMatch} design={design} />,
-    game_intro:      <GameIntroBanner currentMatch={currentMatch} design={design} />,
-    schedule:        <MatchScheduleGrid design={design} />,
-    match_schedule:  <MatchScheduleGrid design={design} />,
     'ff-scoreboard': (
       <>
         <FFBoardV2 teams={teams} players={players} currentMatch={currentMatch} design={design} />
         <MatchInfoChip currentMatch={currentMatch} design={design} />
       </>
     ),
-    ff_scoreboard: (
-      <>
-        <FFBoardV2 teams={teams} players={players} currentMatch={currentMatch} design={design} />
-        <MatchInfoChip currentMatch={currentMatch} design={design} />
-      </>
-    ),
-    roadmap:         <RoadmapOverlay tournament={tournament} matches={matches} currentMatch={currentMatch} design={design} />,
+    standings:        <FullStandings teams={teams} design={design} />,
+    killfeed:         <KillFeedScreen killFeed={killFeed} design={design} />,
+    maplabel:         <PreMatchMap match={currentMatch} teams={teams} design={design} />,
+    'today-matches':  <TodaysMatches matches={currentMatch ? [currentMatch] : []} design={design} />,
+    teams:            <PointRushStandings teams={teams} design={design} />,
+    casters:          <CastersScreen design={design} />,
+    'upcoming-map':   <UpcomingMap match={currentMatch} design={design} />,
+    'elim-alert':     <EliminationAlert eliminations={eliminations} design={design} />,
+    mvp:              <MVPScreen players={players} teams={teams} design={design} overlayState={overlayState} />,
+    champions:        <ChampionsScreen teams={teams} design={design} overlayState={overlayState} />,
+    team_roster:      <TeamRosterScreen teams={teams} players={players} design={design} />,
+    'game-intro':     <GameIntroBanner currentMatch={currentMatch} design={design} />,
+    schedule:         <MatchScheduleGrid design={design} />,
+    roadmap:          <RoadmapOverlay tournament={tournament} matches={matches} currentMatch={currentMatch} design={design} />,
     'event-first_blood':  <EventBanner overlayState={overlayState} design={design} />,
     'event-double_kill':  <EventBanner overlayState={overlayState} design={design} />,
     'event-triple_kill':  <EventBanner overlayState={overlayState} design={design} />,
@@ -2390,8 +2361,7 @@ export default function Overlay() {
     'event-match_point':  <EventBanner overlayState={overlayState} design={design} />,
     'event-winner':       <EventBanner overlayState={overlayState} design={design} />,
     'event-mvp':          <EventBanner overlayState={overlayState} design={design} />,
-    'event-details': <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} championRush={championRush} />,
-    event_details:   <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} championRush={championRush} />,
+    'event-details':      <EventDetailsOverlay tournament={tournament} currentMatch={currentMatch} nextScheduledMatch={nextScheduledMatch} design={design} championRush={championRush} />,
   };
 
   const component = screens[screen] ?? screens[screen?.replace(/-/g,'_')] ?? null;

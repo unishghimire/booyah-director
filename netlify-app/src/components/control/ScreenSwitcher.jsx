@@ -26,7 +26,7 @@ export const SCREENS = [
   { key: 'ff-scoreboard',     label: 'FF SCOREBOARD',  icon: Zap,          desc: 'NexOverlays scoreboard + match info chip',  group: 'overlay' },
   { key: 'standings',         label: 'STANDINGS',      icon: Trophy,       desc: 'Full tournament standings',                  group: 'overlay' },
   { key: 'killfeed',          label: 'KILL FEED',      icon: Skull,        desc: 'Live kill feed — last 6 eliminations',       group: 'overlay' },
-  { key: 'elim_alert',        label: 'ELIM ALERT',     icon: AlertTriangle, desc: 'Last elimination popup',                    group: 'overlay' },
+  { key: 'elim-alert',        label: 'ELIM ALERT',     icon: AlertTriangle, desc: 'Last elimination popup',                    group: 'overlay' },
 ];
 
 export const GROUP_LABELS = {

@@ -174,9 +174,9 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
   const [elimBanner, setElimBanner] = useState(null);
   const elimTimerRef  = useRef(null);
 
-  const accent  = '#7C3AED';
-  const gold   = '#3B82F6';
-  const txtCol = '#FFFFFF';
+  const accent  = design?.accentColor  || '#7C3AED';
+  const gold   = design?.accentColor2 || '#3B82F6';
+  const txtCol = design?.textColor   || '#FFFFFF';
   const green  = '#10B981';
 
   // ── FFWS BROADCAST DIMENSIONS ──
