@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
-import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3, Eye, EyeOff, Map, Info, Wifi, WifiOff, RefreshCw } from 'lucide-react';
+import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3, Eye, EyeOff, Map, Info, Wifi, WifiOff, RefreshCw, Skull, Swords, Flame, Droplets, Wind, Package, Target, Octagon, AlertTriangle, Radio, Calendar, Clock } from 'lucide-react';
 import { useObsStore } from '@/lib/obsStore';
 import { obsService } from '@/lib/obsWebSocket';
 import { useAuth } from '@/lib/AuthContext';
@@ -242,20 +242,40 @@ function OBSSourceToggles() {
 }
 
 export const OVERLAYS = [
-  // Transparent overlays — sit on top of gameplay
-  { id: 'ff-scoreboard', label: 'FF SCOREBOARD',    icon: Monitor,    transparent: true,  desc: 'NexOverlays scoreboard + match info chip (dropdown + elim animations)' },
-  { id: 'standings',     label: 'FULL STANDINGS',   icon: Layers,     transparent: true,  desc: 'Full tournament points table' },
-  // Full-scene replacements — solid background
-  { id: 'game-intro',    label: 'GAME INTRO',       icon: Gamepad2,   transparent: false, desc: 'NexOverlays game intro banner with map + match number' },
-  { id: 'schedule',      label: 'MAP SCHEDULE',     icon: Grid3x3,    transparent: false, desc: 'NexOverlays match schedule grid with all maps' },
-  { id: 'teams',         label: 'TEAMS TODAY',      icon: Layers,     transparent: false, desc: 'Point Rush standings — dual column' },
-  { id: 'casters',       label: 'CASTERS',           icon: Mic2,       transparent: false, desc: 'Caster & analyst profiles' },
-  { id: 'mvp',           label: 'MVP REVEAL',        icon: Star,       transparent: false, desc: 'Match MVP player full-screen' },
-  { id: 'champions',     label: 'NEXOVERLAYS! CHAMPION',  icon: Crown,      transparent: false, desc: 'Tournament winner reveal' },
-  { id: 'maplabel',      label: 'MAP INTRO',         icon: Zap,        transparent: false, desc: 'Map name + teams pre-match' },
-  { id: 'team_roster',   label: 'TEAM ROSTER',       icon: Users,      transparent: false, desc: 'Full team + player photo roster, auto-slides every 6s' },
-  { id: 'roadmap',      label: 'TOURNAMENT ROADMAP', icon: Map,        transparent: false, desc: 'Full tournament schedule — stages, days, matches with live progress' },
-  { id: 'event-details', label: 'EVENT DETAILS',     icon: Info,      transparent: false, desc: 'Tournament info card — current match, format stats, placement points' },
+  // ── Transparent overlays — layer over gameplay ──
+  { id: 'ff-scoreboard',    label: 'FF SCOREBOARD',     icon: Monitor,       transparent: true,  desc: 'NexOverlays scoreboard + match info chip' },
+  { id: 'standings',        label: 'FULL STANDINGS',    icon: Layers,        transparent: true,  desc: 'Full tournament points table' },
+  { id: 'killfeed',         label: 'KILL FEED',         icon: Skull,         transparent: true,  desc: 'Live kill feed — last 6 eliminations' },
+  { id: 'elim-alert',       label: 'ELIM ALERT',        icon: AlertTriangle, transparent: true,  desc: 'Latest elimination popup banner' },
+
+  // ── Full-scene replacements — solid background ──
+  { id: 'game-intro',       label: 'GAME INTRO',        icon: Gamepad2,      transparent: false, desc: 'Game intro banner with map + match number' },
+  { id: 'maplabel',         label: 'MAP INTRO',         icon: Map,           transparent: false, desc: 'Map name + teams pre-match' },
+  { id: 'upcoming-map',     label: 'UPCOMING MAP',      icon: Clock,         transparent: false, desc: 'Next map preview card' },
+  { id: 'today-matches',    label: "TODAY'S MATCHES",  icon: Calendar,      transparent: false, desc: 'Match schedule for today' },
+  { id: 'schedule',         label: 'MAP SCHEDULE',     icon: Grid3x3,       transparent: false, desc: 'Full match schedule grid' },
+  { id: 'teams',            label: 'TEAMS TODAY',       icon: Users,         transparent: false, desc: 'Point Rush standings — dual column' },
+  { id: 'team_roster',      label: 'TEAM ROSTER',       icon: Users,         transparent: false, desc: 'Full team + player roster, auto-slides every 6s' },
+  { id: 'casters',          label: 'CASTERS',           icon: Mic2,          transparent: false, desc: 'Caster & analyst profiles' },
+  { id: 'mvp',              label: 'MVP REVEAL',        icon: Star,          transparent: false, desc: 'Match MVP player full-screen' },
+  { id: 'champions',        label: 'CHAMPIONS!',        icon: Crown,         transparent: false, desc: 'Tournament winner reveal' },
+  { id: 'booyah',           label: 'BOOYAH!',           icon: Trophy,        transparent: false, desc: 'Booyah / champions celebration screen' },
+  { id: 'roadmap',          label: 'TOURNAMENT ROADMAP', icon: Map,         transparent: false, desc: 'Tournament schedule — stages, days, matches' },
+  { id: 'event-details',    label: 'EVENT DETAILS',     icon: Info,         transparent: false, desc: 'Tournament info — format, placement points, stats' },
+
+  // ── Event banners — transparent, triggered overlays ──
+  { id: 'event-first_blood',  label: 'FIRST BLOOD',    icon: Droplets,      transparent: true,  desc: 'First elimination of the match' },
+  { id: 'event-double_kill', label: 'DOUBLE KILL',    icon: Swords,        transparent: true,  desc: 'Two quick eliminations' },
+  { id: 'event-triple_kill', label: 'TRIPLE KILL',     icon: Swords,        transparent: true,  desc: 'Three quick eliminations' },
+  { id: 'event-quadra_kill', label: 'QUADRA KILL',     icon: Swords,        transparent: true,  desc: 'Four quick eliminations' },
+  { id: 'event-penta_kill',  label: 'PENTA KILL',      icon: Flame,         transparent: true,  desc: 'Five quick eliminations' },
+  { id: 'event-team_wipe',   label: 'TEAM WIPE',       icon: Skull,         transparent: true,  desc: 'Full team elimination' },
+  { id: 'event-airdrop',     label: 'AIRDROP',         icon: Package,       transparent: true,  desc: 'Airdrop incoming alert' },
+  { id: 'event-final_circle',label: 'FINAL CIRCLE',    icon: Target,        transparent: true,  desc: 'Final zone alert' },
+  { id: 'event-safe_zone',   label: 'SAFE ZONE',       icon: Octagon,       transparent: true,  desc: 'Safe zone shrinking alert' },
+  { id: 'event-match_point', label: 'MATCH POINT',    icon: AlertTriangle, transparent: true,  desc: 'Match point triggered' },
+  { id: 'event-winner',      label: 'WINNER',          icon: Crown,         transparent: true,  desc: 'Winner announcement banner' },
+  { id: 'event-mvp',         label: 'EVENT MVP',       icon: Star,          transparent: true,  desc: 'MVP event banner' },
 ];
 
 export function CopyBtn({ text, id, copied, onCopy }) {

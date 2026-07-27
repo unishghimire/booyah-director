@@ -9,18 +9,23 @@ import toast from 'react-hot-toast';
 
 export const SCREENS = [
   // ── Full-scene replacements (solid background) ──
-  { key: 'maplabel',          label: 'MAP INTRO',     icon: Map,          desc: 'Map reveal + team list',    group: 'scene' },
-  { key: 'game-intro',        label: 'GAME INTRO',    icon: Gamepad2,     desc: 'NexOverlays game intro banner',   group: 'scene' },
-  { key: 'schedule',          label: 'MAP SCHEDULE',  icon: Grid3x3,     desc: 'NexOverlays match schedule grid',  group: 'scene' },
-  { key: 'teams',             label: 'TEAMS TODAY',    icon: Users,       desc: 'Point Rush standings',      group: 'scene' },
-  { key: 'casters',           label: 'CASTERS',       icon: Mic2,         desc: 'Caster introduction',       group: 'scene' },
-  { key: 'team_roster',       label: 'TEAM ROSTER',   icon: Users,        desc: 'Full team + player photo roster, auto-slides every 6s', group: 'scene' },
-  { key: 'mvp',               label: 'MVP',           icon: Star,         desc: 'MVP spotlight screen',      group: 'scene' },
-  { key: 'champions',         label: 'CHAMPIONS!',       icon: Trophy,       desc: 'Champions reveal',          group: 'scene' },
+  { key: 'game-intro',        label: 'GAME INTRO',     icon: Gamepad2,     desc: 'Game intro banner with map + match number',  group: 'scene' },
+  { key: 'maplabel',          label: 'MAP INTRO',      icon: Map,          desc: 'Map reveal + team list',                    group: 'scene' },
+  { key: 'upcoming-map',      label: 'UPCOMING MAP',   icon: Clock,        desc: 'Next map preview card',                     group: 'scene' },
+  { key: 'today-matches',     label: 'TODAY MATCHES',  icon: Calendar,     desc: 'Match schedule for today',                   group: 'scene' },
+  { key: 'schedule',          label: 'MAP SCHEDULE',   icon: Grid3x3,      desc: 'Full match schedule grid',                  group: 'scene' },
+  { key: 'teams',             label: 'TEAMS TODAY',    icon: Users,        desc: 'Point Rush standings',                      group: 'scene' },
+  { key: 'team_roster',       label: 'TEAM ROSTER',    icon: Users,        desc: 'Full team + player roster, auto-slides',    group: 'scene' },
+  { key: 'casters',           label: 'CASTERS',        icon: Mic2,         desc: 'Caster & analyst profiles',                 group: 'scene' },
+  { key: 'mvp',               label: 'MVP',            icon: Star,         desc: 'MVP spotlight screen',                       group: 'scene' },
+  { key: 'champions',         label: 'CHAMPIONS!',    icon: Crown,        desc: 'Champions reveal',                           group: 'scene' },
+  { key: 'roadmap',           label: 'ROADMAP',        icon: Map,          desc: 'Tournament schedule — stages, days, matches',group: 'scene' },
+  { key: 'event-details',     label: 'EVENT DETAILS', icon: Info,         desc: 'Tournament info — format, placement points', group: 'scene' },
   // ── Transparent overlays (layer over gameplay) ──
-  { key: 'ff-scoreboard',     label: 'FF SCOREBOARD', icon: Zap,         desc: 'NexOverlays scoreboard + match info chip (dropdown + elim animations)', group: 'overlay' },
-  { key: 'standings',         label: 'STANDINGS',     icon: Trophy,       desc: 'Full tournament standings', group: 'overlay' },
-  { key: 'elim_alert',        label: 'ELIM ALERT',    icon: AlertTriangle,desc: 'Last elimination popup',   group: 'overlay' },
+  { key: 'ff-scoreboard',     label: 'FF SCOREBOARD',  icon: Zap,          desc: 'NexOverlays scoreboard + match info chip',  group: 'overlay' },
+  { key: 'standings',         label: 'STANDINGS',      icon: Trophy,       desc: 'Full tournament standings',                  group: 'overlay' },
+  { key: 'killfeed',          label: 'KILL FEED',      icon: Skull,        desc: 'Live kill feed — last 6 eliminations',       group: 'overlay' },
+  { key: 'elim_alert',        label: 'ELIM ALERT',     icon: AlertTriangle, desc: 'Last elimination popup',                    group: 'overlay' },
 ];
 
 export const GROUP_LABELS = {
