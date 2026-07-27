@@ -100,7 +100,6 @@ export const overlayApi = {
   getDesign:                ()  => call('getDesign', {}, 'GET'),
   resetMatch:               (d) => call('resetMatch', d),
   updateTournament:         (d) => call('updateTournament', d),
-  importFromSheet:          (d) => call('importFromSheet', d),
   resetDatabase:            ()  => call('resetDatabase'),
   getUserRole:             ()  => call('getUserRole', {}, 'GET'),
   setUserRole:             (r) => call('setUserRole', { role: r }),

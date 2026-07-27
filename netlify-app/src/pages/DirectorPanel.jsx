@@ -16,7 +16,6 @@ import BroadcastDashboard from '@/components/control/BroadcastDashboard';
 import EventTimeline from '@/components/control/EventTimeline';
 import ThemeManager from '@/components/control/ThemeManager';
 import PlayerManager from '@/components/control/PlayerManager';
-import OCRRegionDesigner from '@/components/control/OCRRegionDesigner';
 import SoundManager from '@/components/control/SoundManager';
 import AnimationLibrary from '@/components/control/AnimationLibrary';
 import { useUndoRedo } from '@/lib/useUndoRedo';
@@ -168,7 +167,7 @@ export default function DirectorPanel() {
 
       const key = e.key.toLowerCase();
       // Tab switching with 1-9, 0, -, =
-      const tabKeys = { '1': 'dashboard', '2': 'live', '3': 'overlay', '4': 'match', '5': 'standings', '6': 'players', '7': 'design', '8': 'theme', '9': 'assets', 's': 'sound', 'a': 'animations', '0': 'ocr', '-': 'timeline', '=': 'setup' };
+      const tabKeys = { '1': 'dashboard', '2': 'live', '3': 'overlay', '4': 'match', '5': 'standings', '6': 'players', '7': 'design', '8': 'theme', '9': 'assets', 's': 'sound', 'a': 'animations', '-': 'timeline', '=': 'setup' };
       if (tabKeys[key]) { e.preventDefault(); setActiveTab(tabKeys[key]); return; }
 
       // Ctrl+Z = undo, Ctrl+Y / Ctrl+Shift+Z = redo
@@ -435,7 +434,6 @@ export default function DirectorPanel() {
           { id: 'assets', label: 'ASSETS', icon: Layers },
           { id: 'sound', label: 'SOUND', icon: Volume2 },
           { id: 'animations', label: 'ANIM', icon: Film },
-          { id: 'ocr', label: 'OCR', icon: Crosshair },
           { id: 'timeline', label: 'TIMELINE', icon: Clock },
           { id: 'setup', label: 'SETUP', icon: Settings2 },
         ].filter(t => canAccessTab(userRole, t.id, isOwner)).map((t) => {
@@ -1073,17 +1071,6 @@ export default function DirectorPanel() {
                     }
                   }}
                   tournament={data?.tournament}
-                />
-              </SectionBoundary>
-            )}
-
-            {activeTab === 'ocr' && (
-              <SectionBoundary label="OCR REGION DESIGNER">
-                <OCRRegionDesigner
-                  regions={[]}
-                  onSaveRegions={(regions) => {
-                    toast.success('OCR regions saved!');
-                  }}
                 />
               </SectionBoundary>
             )}

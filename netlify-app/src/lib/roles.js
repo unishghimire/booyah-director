@@ -8,7 +8,7 @@ export const ROLES = {
     label: 'Production Admin',
     description: 'Full access — setup, control, design, and configuration',
     color: '#7C3AED',
-    tabs: ['dashboard', 'live', 'overlay', 'match', 'standings', 'players', 'design', 'theme', 'assets', 'sound', 'animations', 'ocr', 'timeline', 'setup'],
+    tabs: ['dashboard', 'live', 'overlay', 'match', 'standings', 'players', 'design', 'theme', 'assets', 'sound', 'animations', 'timeline', 'setup'],
     canEdit: true,
     canDelete: true,
     canCreateTournament: true,

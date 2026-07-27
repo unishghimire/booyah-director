@@ -9,7 +9,6 @@ import AuthPage from '@/pages/AuthPage';
 import PricingPage from '@/pages/PricingPage';
 import { lazy, Suspense } from 'react';
 const DirectorPanel = lazy(() => import('./pages/DirectorPanel'));
-const DataInputer   = lazy(() => import('./pages/DataInputer'));
 const Overlay       = lazy(() => import('./pages/Overlay'));
 const OverlayLinks  = lazy(() => import('./pages/OverlayLinks'));
 
@@ -115,7 +114,6 @@ function BottomBar({ loc }) {
   const tabs = [
     { to: '/director',      label: 'DIRECTOR',     icon: Clapperboard, color: '#7C3AED' },
     { to: '/overlay-links', label: 'OBS LINKS',    icon: Monitor,      color: '#3B82F6' },
-    { to: '/inputer',       label: 'DATA INPUTER', icon: Keyboard,     color: '#3B82F6' },
   ];
 
   const active = (to) => loc.pathname === to || (loc.pathname === '/' && to === '/director');
@@ -191,8 +189,7 @@ function ShellLayout({ children }) {
             {[
               { to: '/director',      label: 'DIRECTOR',     icon: Clapperboard, color: '#7C3AED' },
               { to: '/overlay-links', label: 'OBS LINKS',    icon: Monitor,      color: '#3B82F6' },
-              { to: '/inputer',       label: 'DATA INPUTER', icon: Keyboard,     color: '#3B82F6' },
-            ].map(({ to, label, icon: Icon, color }) => {
+                      ].map(({ to, label, icon: Icon, color }) => {
               const isActive = loc.pathname === to || (loc.pathname === '/' && to === '/director');
               return (
                 <Link
@@ -286,7 +283,6 @@ function AppRoutes() {
     <Routes>
       <Route path="/" element={<Navigate to="/director" replace />} />
       <Route path="/director"      element={<PanelBoundary label="DIRECTOR"><Suspense fallback={<PageLoader />}><DirectorPanel /></Suspense></PanelBoundary>} />
-      <Route path="/inputer"       element={<PanelBoundary label="DATA INPUTER"><Suspense fallback={<PageLoader />}><DataInputer /></Suspense></PanelBoundary>} />
       <Route path="/overlay"       element={<Navigate to="/overlay/blank" replace />} />
       <Route path="/overlay/:screen" element={<PanelBoundary label="OVERLAY"><Suspense fallback={<PageLoader />}><Overlay /></Suspense></PanelBoundary>} />
       <Route path="/overlay-links" element={<PanelBoundary label="OBS LINKS"><Suspense fallback={<PageLoader />}><OverlayLinks /></Suspense></PanelBoundary>} />
