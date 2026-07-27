@@ -711,7 +711,7 @@ function KillFeedScreen({ killFeed = [], design }) {
         <div style={{ display:'flex', flexDirection:'column', padding:'4px 0' }}>
           
             {activeKills.map((kill, idx) => (
-              <div key={kill.id || `${kill.killer_name}-${kill.timestamp}-${idx}`}>
+              <div key={kill.id || `${kill.killer_name}-${kill.timestamp}-${idx}`}
                 style={{
                   display:'flex', alignItems:'center', padding:'10px 16px', gap:10,
                   borderBottom:'1px solid rgba(255,255,255,0.03)',
