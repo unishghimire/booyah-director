@@ -1097,8 +1097,8 @@ function EliminationAlert({ eliminations = [], design }) {
   return (
     <div style={{ position:'absolute', bottom:60, left:'50%', transform:'translateX(-50%)', width:640, zIndex:10 }}>
       
-        <div key={latest.id || latest.timestamp}>
-        >
+        <div key={latest.id || latest.timestamp}
+          style={{ animation:'nxScaleIn 0.4s ease-out' }}>
           <ThemedPanel design={design}>
             <div style={{ display:'flex', alignItems:'center', padding:'12px 24px', gap:20 }}>
               <div style={{ width:40, height:40, borderRadius:'50%', background:'rgba(239,68,68,0.1)', display:'flex', alignItems:'center', justifyContent:'center', border:'1px solid #ef4444' }}>
