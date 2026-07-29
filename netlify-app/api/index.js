@@ -627,7 +627,6 @@ module.exports = async (req, res) => {
       }
     }
 
- }
 
     // ── SAVE / UPDATE / GET DESIGN ────────────────────────────────────────
     if (route === 'saveDesign' || route === 'updateDesign') {
