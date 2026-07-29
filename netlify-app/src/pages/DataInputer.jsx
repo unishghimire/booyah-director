@@ -44,6 +44,15 @@ export default function DataInputer() {
   });
   const [pushingLive, setPushingLive] = useState(false);
 
+  // ── Data destructuring (must come BEFORE useMemo/useCallback that reference these) ──
+  const state = data?.overlayState || {};
+  const currentMatch = data?.currentMatch;
+  const tournament = data?.tournament;
+  const teams = data?.teams || [];
+  const players = data?.players || [];
+  const killFeed = data?.killFeed || [];
+  const eliminations = data?.eliminations || [];
+
   const hasStagedChanges = useMemo(() => {
     const hasKillDiff = players.some(p => {
       const stagedKill = stagedData.kills[p.id];
@@ -156,13 +165,7 @@ export default function DataInputer() {
     }
   };
 
-  const state = data?.overlayState || {};
-  const currentMatch = data?.currentMatch;
-  const tournament = data?.tournament;
-  const teams = data?.teams || [];
-  const players = data?.players || [];
-  const killFeed = data?.killFeed || [];
-  const eliminations = data?.eliminations || [];
+
 
   const handleRefresh = async () => {
     setRefreshing(true);
