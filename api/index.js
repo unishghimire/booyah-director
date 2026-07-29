@@ -2459,6 +2459,20 @@ module.exports = async (req, res) => {
     }
 
 
+
+    // ── ORS (Open Result Service) API Configuration ──
+    if (route === 'saveOrsConfig') {
+      const { api_key } = body;
+      if (typeof api_key !== 'string' || api_key.length > 500) return err(400, 'Invalid API key');
+      db.ors_config = { api_key: api_key || '', updated_at: Date.now() };
+      await saveDb(uid, db);
+      return ok({ success: true, message: 'ORS API key saved' });
+    }
+
+    if (route === 'getOrsConfig') {
+      return ok(db.ors_config || { api_key: '' });
+    }
+
     return err(404, `Unknown route: ${route}`);
   } catch (e) {
     console.error('[FATAL]', e?.message || e);
