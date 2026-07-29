@@ -86,7 +86,7 @@ export default function SheetImport({ tournamentId, onImported }) {
                     {[['A','Team Name','required'],['B','Logo URL (ImgBB)','optional'],['C','Color #hex','optional']].map(([c,l,r])=>(
                       <div key={c} className="flex items-center gap-2 mb-1">
                         <span className="font-mono text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-white">{c}</span>
-                        <span className={r==='required'?'text-orange-400 text-[9px]':'text-gray-500 text-[9px]'}>{l}</span>
+                        <span className={r==='required'?'text-[#7C3AED] text-[9px]':'text-gray-500 text-[9px]'}>{l}</span>
                         <span className="text-[8px] text-gray-600 ml-auto">{r}</span>
                       </div>
                     ))}
@@ -96,7 +96,7 @@ export default function SheetImport({ tournamentId, onImported }) {
                     {[['A','Player Name','required'],['B','Team Name','required'],['C','Role / IGN','optional'],['D','Photo URL (ImgBB)','optional']].map(([c,l,r])=>(
                       <div key={c} className="flex items-center gap-2 mb-1">
                         <span className="font-mono text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-white">{c}</span>
-                        <span className={r==='required'?'text-orange-400 text-[9px]':'text-gray-500 text-[9px]'}>{l}</span>
+                        <span className={r==='required'?'text-[#7C3AED] text-[9px]':'text-gray-500 text-[9px]'}>{l}</span>
                         <span className="text-[8px] text-gray-600 ml-auto">{r}</span>
                       </div>
                     ))}

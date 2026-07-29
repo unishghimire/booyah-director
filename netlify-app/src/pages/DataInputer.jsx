@@ -269,9 +269,9 @@ export default function DataInputer() {
           </div>
           <div className="h-3 w-[1px] bg-white/10" />
           <div className="flex items-center gap-1.5">
-            <Skull className="h-3.5 w-3.5 text-orange-400" />
+            <Skull className="h-3.5 w-3.5 text-[#3B82F6]" />
             <span className="font-orbitron text-[10px] font-black text-white">
-              PLAYERS ALIVE: <span className="text-orange-400 font-mono">{totalAlivePlayers}/{players.length}</span>
+              PLAYERS ALIVE: <span className="text-[#3B82F6] font-mono">{totalAlivePlayers}/{players.length}</span>
             </span>
           </div>
         </div>
@@ -850,7 +850,7 @@ function TeamInputCard({
               KILLS: {team.total_tournament_kills || 0}
             </span>
             <span className="text-[10px] text-gray-500 font-bold">//</span>
-            <span className="text-[10px] font-black text-orange-400">
+            <span className="text-[10px] font-black text-[#3B82F6]">
               PTS: {team.total_tournament_points || 0}
             </span>
           </div>

@@ -11,6 +11,7 @@ import { lazy, Suspense } from 'react';
 const DirectorPanel = lazy(() => import('./pages/DirectorPanel'));
 const Overlay       = lazy(() => import('./pages/Overlay'));
 const OverlayLinks  = lazy(() => import('./pages/OverlayLinks'));
+const DataInputer   = lazy(() => import('./pages/DataInputer'));
 
 const PageLoader = () => (
   <div className="flex h-screen items-center justify-center bg-[#060915]">
@@ -113,6 +114,7 @@ function TopHeader() {
 function BottomBar({ loc }) {
   const tabs = [
     { to: '/director',      label: 'DIRECTOR',     icon: Clapperboard, color: '#7C3AED' },
+    { to: '/inputer',      label: 'INPUTER',       icon: Keyboard,     color: '#06b6d4' },
     { to: '/overlay-links', label: 'OBS LINKS',    icon: Monitor,      color: '#3B82F6' },
   ];
 
@@ -188,6 +190,7 @@ function ShellLayout({ children }) {
           <nav className="flex-1 space-y-1.5 p-2 overflow-y-auto user-select-none">
             {[
               { to: '/director',      label: 'DIRECTOR',     icon: Clapperboard, color: '#7C3AED' },
+              { to: '/inputer',      label: 'INPUTER',       icon: Keyboard,     color: '#06b6d4' },
               { to: '/overlay-links', label: 'OBS LINKS',    icon: Monitor,      color: '#3B82F6' },
                       ].map(({ to, label, icon: Icon, color }) => {
               const isActive = loc.pathname === to || (loc.pathname === '/' && to === '/director');
@@ -286,6 +289,7 @@ function AppRoutes() {
       <Route path="/overlay"       element={<Navigate to="/overlay/blank" replace />} />
       <Route path="/overlay/:screen" element={<PanelBoundary label="OVERLAY"><Suspense fallback={<PageLoader />}><Overlay /></Suspense></PanelBoundary>} />
       <Route path="/overlay-links" element={<PanelBoundary label="OBS LINKS"><Suspense fallback={<PageLoader />}><OverlayLinks /></Suspense></PanelBoundary>} />
+      <Route path="/inputer"      element={<PanelBoundary label="INPUTER"><Suspense fallback={<PageLoader />}><DataInputer /></Suspense></PanelBoundary>} />
       <Route path="/control-panel" element={<Navigate to="/director" replace />} />
       <Route path="*"              element={<Navigate to="/director" replace />} />
     </Routes>
