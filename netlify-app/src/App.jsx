@@ -148,7 +148,7 @@ function ShellLayout({ children }) {
     return localStorage.getItem('sidebar_expanded') !== 'false';
   });
 
-  const isOverlay = loc.pathname.startsWith('/overlay');
+  const isOverlay = loc.pathname.startsWith('/overlay/');
   const hasShell = !loading && user && isSubscribed(user, subscription) && !isOverlay;
 
   if (!hasShell) {
@@ -245,7 +245,7 @@ function AppRoutes() {
   }
 
   // Overlay routes — always public, no auth needed
-  const isOverlay = window.location.pathname.startsWith('/overlay');
+  const isOverlay = window.location.pathname.startsWith('/overlay/');
   if (isOverlay) {
     return (
       <Routes>
