@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SectionBoundary, PanelBoundary, safeArray, safeNumber } from '@/components/ErrorBoundary';
-import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3, Eye, EyeOff, Map, Info, Wifi, WifiOff, RefreshCw, Skull, Swords, Flame, Droplets, Wind, Package, Target, Octagon, AlertTriangle, Radio, Calendar, Clock, Trophy } from 'lucide-react';
+import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3, Eye, EyeOff, Map, Info, Wifi, WifiOff, RefreshCw, Skull, Swords, Flame, Droplets, Wind, Package, Target, Octagon, AlertTriangle, Radio, Calendar, Clock, Trophy, Download, Upload, FileJson } from 'lucide-react';
 import { useObsStore } from '@/lib/obsStore';
 import { obsService } from '@/lib/obsWebSocket';
 import { useAuth } from '@/lib/AuthContext';
@@ -290,6 +290,243 @@ export function CopyBtn({ text, id, copied, onCopy }) {
   );
 }
 
+/* ═══ OBS Scene Export — Download + Push to OBS ═══ */
+function OBSSceneExport({ overlays, overlayUrl }) {
+  const { shareToken } = useAuth();
+  const connectionStatus = useObsStore(s => s.connectionStatus);
+  const availableScenes = useObsStore(s => s.availableScenes);
+  const [pushing, setPushing] = useState(false);
+  const [pushResult, setPushResult] = useState(null);
+  const [selectedScene, setSelectedScene] = useState('');
+  const base = window.location.origin;
+
+  // Generate OBS Scene Collection JSON (importable via OBS → Scene Collection → Import)
+  const generateSceneCollection = () => {
+    const transparent = overlays.filter(o => o.transparent);
+    const solid = overlays.filter(o => !o.transparent);
+
+    const sceneItems = [...transparent, ...solid].map((ov, i) => {
+      const url = overlayUrl(ov.id);
+      return {
+        sourceKind: "browser_source",
+        sourceName: `NEX_${ov.label.replace(/\s+/g, '_')}`,
+        sourceSettings: {
+          url: url,
+          width: 1920,
+          height: 1080,
+          reroute_audio: false,
+          shutdown: false,
+          css: ov.transparent
+            ? "body { background: transparent !important; margin: 0; padding: 0; overflow: hidden; }"
+            : "body { margin: 0; padding: 0; overflow: hidden; }",
+        },
+        visible: true,
+        locked: false,
+        pos: { x: 0, y: 0 },
+        scale: { x: 1.0, y: 1.0 },
+        rot: 0,
+      };
+    });
+
+    return {
+      version: "2.0",
+      name: "NexOverlays Broadcast",
+      sceneCollectionItems: [
+        {
+          sceneName: "NexOverlays — All Sources",
+          sceneItems: sceneItems,
+        },
+        ...transparent.map((ov, i) => ({
+          sceneName: `NEX_${ov.label.replace(/\s+/g, '_')}`,
+          sceneItems: [{
+            sourceKind: "browser_source",
+            sourceName: `NEX_${ov.label.replace(/\s+/g, '_')}`,
+            sourceSettings: {
+              url: overlayUrl(ov.id),
+              width: 1920,
+              height: 1080,
+              reroute_audio: false,
+              shutdown: false,
+              css: "body { background: transparent !important; margin: 0; padding: 0; overflow: hidden; }",
+            },
+            visible: true,
+            locked: false,
+            pos: { x: 0, y: 0 },
+            scale: { x: 1.0, y: 1.0 },
+            rot: 0,
+          }],
+        })),
+        ...solid.map((ov, i) => ({
+          sceneName: `NEX_${ov.label.replace(/\s+/g, '_')}`,
+          sceneItems: [{
+            sourceKind: "browser_source",
+            sourceName: `NEX_${ov.label.replace(/\s+/g, '_')}`,
+            sourceSettings: {
+              url: overlayUrl(ov.id),
+              width: 1920,
+              height: 1080,
+              reroute_audio: false,
+              shutdown: false,
+              css: "body { margin: 0; padding: 0; overflow: hidden; }",
+            },
+            visible: true,
+            locked: false,
+            pos: { x: 0, y: 0 },
+            scale: { x: 1.0, y: 1.0 },
+            rot: 0,
+          }],
+        })),
+      ],
+    };
+  };
+
+  const handleDownload = () => {
+    const collection = generateSceneCollection();
+    const blob = new Blob([JSON.stringify(collection, null, 2)], { type: 'application/json' });
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = `nexoverlays-obs-scenes-${new Date().toISOString().split('T')[0]}.json`;
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+    toast.success('OBS Scene Collection downloaded!');
+  };
+
+  const handlePushToOBS = async () => {
+    if (connectionStatus !== 'connected') {
+      toast.error('Connect to OBS WebSocket first');
+      return;
+    }
+    setPushing(true);
+    setPushResult(null);
+    let created = 0;
+    let skipped = 0;
+    let errors = 0;
+
+    try {
+      // Create a scene for each overlay, then add a browser source to it
+      for (const ov of overlays) {
+        const sceneName = `NEX_${ov.label.replace(/\s+/g, '_')}`;
+        const url = overlayUrl(ov.id);
+        const sourceName = sceneName; // same name for source and scene
+
+        try {
+          // Check if scene already exists
+          const existingScenes = useObsStore.getState().availableScenes;
+          if (!existingScenes.includes(sceneName)) {
+            await obsService.obs.call('CreateScene', { sceneName });
+            created++;
+          } else {
+            skipped++;
+          }
+
+          // Create browser source in the scene
+          await obsService.obs.call('CreateInput', {
+            sceneName,
+            inputName: sourceName,
+            inputKind: 'browser_source',
+            inputSettings: {
+              url,
+              width: 1920,
+              height: 1080,
+              reroute_audio: false,
+              shutdown: false,
+              css: ov.transparent
+                ? "body { background: transparent !important; margin: 0; padding: 0; overflow: hidden; }"
+                : "body { margin: 0; padding: 0; overflow: hidden; }",
+            },
+            sceneItemEnabled: true,
+          });
+        } catch (err) {
+          // If CreateInput fails, source might already exist — try to update URL
+          if (err?.code === 601 || err?.message?.includes('already exists')) {
+            try {
+              await obsService.obs.call('SetInputSettings', {
+                inputName: sourceName,
+                inputSettings: { url, width: 1920, height: 1080 },
+                overlay: true,
+              });
+              skipped++;
+            } catch {
+              errors++;
+            }
+          } else {
+            errors++;
+          }
+        }
+      }
+
+      // Refresh scene list
+      await obsService.refreshScenes();
+
+      const msg = `Pushed ${created} new scenes, ${skipped} already existed${errors > 0 ? `, ${errors} errors` : ''}`;
+      setPushResult({ created, skipped, errors });
+      toast.success(msg);
+    } catch (err) {
+      toast.error('Push failed: ' + (err.message || 'unknown'));
+    } finally {
+      setPushing(false);
+    }
+  };
+
+  return (
+    <div className="rounded-xl border border-[#7C3AED]/20 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
+      <div className="flex items-center gap-2 mb-4">
+        <FileJson className="h-4 w-4 text-[#7C3AED]" />
+        <span className="font-orbitron text-[10px] font-black text-[#7C3AED] tracking-widest">EXPORT TO OBS / STREAMING PLATFORM</span>
+      </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
+        {/* Download Scene Collection */}
+        <button
+          onClick={handleDownload}
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#3B82F6]/30 bg-[#3B82F6]/10 px-4 py-3 font-orbitron text-[10px] font-black tracking-widest text-[#3B82F6] hover:bg-[#3B82F6]/20 transition-all"
+        >
+          <Download className="h-4 w-4" />
+          DOWNLOAD OBS SCENE FILE
+        </button>
+
+        {/* Push to OBS via WebSocket */}
+        <button
+          onClick={handlePushToOBS}
+          disabled={pushing || connectionStatus !== 'connected'}
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#7C3AED]/30 bg-[#7C3AED]/10 px-4 py-3 font-orbitron text-[10px] font-black tracking-widest text-[#7C3AED] hover:bg-[#7C3AED]/20 transition-all disabled:opacity-40 disabled:cursor-not-allowed"
+        >
+          <Upload className="h-4 w-4" />
+          {pushing ? 'PUSHING...' : connectionStatus === 'connected' ? 'PUSH ALL TO OBS' : 'CONNECT OBS TO PUSH'}
+        </button>
+      </div>
+
+      {/* Push result */}
+      {pushResult && (
+        <div className="flex items-center gap-4 rounded-lg border border-white/5 bg-black/30 px-4 py-2 text-xs">
+          <span className="text-green-400 font-mono">✓ {pushResult.created} created</span>
+          <span className="text-yellow-400 font-mono">↻ {pushResult.skipped} existing</span>
+          {pushResult.errors > 0 && <span className="text-red-400 font-mono">✗ {pushResult.errors} errors</span>}
+        </div>
+      )}
+
+      {/* Instructions */}
+      <div className="mt-3 space-y-1.5 text-[11px] text-gray-400">
+        <p className="flex items-start gap-1.5">
+          <span className="text-[#3B82F6] font-bold">1.</span>
+          <span><span className="text-white font-bold">Download</span> → OBS → Scene Collection → Import → select the JSON file</span>
+        </p>
+        <p className="flex items-start gap-1.5">
+          <span className="text-[#7C3AED] font-bold">2.</span>
+          <span><span className="text-white font-bold">Push to OBS</span> — creates scenes + browser sources automatically via WebSocket (requires OBS connection above)</span>
+        </p>
+        <p className="flex items-start gap-1.5">
+          <span className="text-gray-600">3.</span>
+          <span>Each overlay becomes its own scene at 1920×1080 with proper transparent CSS</span>
+        </p>
+      </div>
+    </div>
+  );
+}
+
 export default function OverlayLinks() {
   const { shareToken } = useAuth();
   const [copied, setCopied] = useState(null);
@@ -479,6 +716,10 @@ export default function OverlayLinks() {
           })}
         </div>
       </div>
+
+
+      {/* ── Export to OBS / Live Stream Platforms ── */}
+      <OBSSceneExport overlays={OVERLAYS} overlayUrl={overlayUrl} />
 
       {/* OBS Source Visibility Controls */}
       <OBSSourceToggles />
