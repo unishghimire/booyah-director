@@ -19,7 +19,7 @@ import { obsService } from '@/lib/obsWebSocket';
    - Source visibility toggles fire SetSceneItemEnabled to OBS
 ──────────────────────────────────────────────────────────────────────────── */
 
-export default function BroadcastDashboard({ data, refresh, overlayApi, obsConnected, onSwitchScene }) {
+export default function BroadcastDashboard({ data, refresh, overlayApi, obsConnected }) {
   const {
     connectionStatus,
     currentProgramScene,

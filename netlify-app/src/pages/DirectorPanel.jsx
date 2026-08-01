@@ -7,7 +7,7 @@ import DesignStudio from '@/components/control/DesignStudio';
 import AssetManager from '@/components/control/AssetManager';
 import TournamentManager from '@/components/control/TournamentManager';
 import { useAuth } from '@/lib/AuthContext';
-import { OVERLAYS, CopyBtn } from './OverlayLinks';
+import { CopyBtn } from './OverlayLinks';
 import { SCREENS, GROUP_LABELS } from '@/components/control/ScreenSwitcher';
 import { useObsStore } from '@/lib/obsStore';
 import { obsService } from '@/lib/obsWebSocket';
@@ -303,13 +303,6 @@ export default function DirectorPanel() {
     toast.success('Export data copied to clipboard!');
   };
 
-  // Overlay Links functions and state duplicated for inline render
-  const base = window.location.origin;
-  const overlayUrl = (screen) =>
-    shareToken
-      ? `${base}/overlay/${screen}?token=${shareToken}`
-      : `${base}/overlay/${screen}`;
-
   const copy = (text, id) => {
     navigator.clipboard.writeText(text).then(() => {
       setCopied(id);
@@ -318,8 +311,6 @@ export default function DirectorPanel() {
     });
   };
 
-  const transparentOverlays = OVERLAYS.filter(o => o.transparent);
-  const solidOverlays = OVERLAYS.filter(o => !o.transparent);
 
   return (
     <div className="flex h-full flex-col bg-[#0D0B1A] text-white" style={{ fontFamily: "Rajdhani, sans-serif" }}>
@@ -602,122 +593,24 @@ export default function DirectorPanel() {
                     </div>
                   )}
 
-                  {/* Transparent Overlays */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="h-1.5 w-1.5 bg-[#3B82F6] rounded-full animate-pulse" />
-                      <span className="font-orbitron text-[10px] font-black text-[#3B82F6] tracking-widest">TRANSPARENT — LAYER OVER GAMEPLAY</span>
-                      <div className="h-px flex-1 bg-white/5" />
+                  {/* Link to full overlay URLs page */}
+                  <div className="rounded-xl border border-[#3B82F6]/20 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
+                    <div className="flex items-center justify-between">
+                      <div className="flex items-center gap-2">
+                        <div className="h-1.5 w-1.5 bg-[#3B82F6] rounded-full animate-pulse" />
+                        <span className="font-orbitron text-[10px] font-black text-[#3B82F6] tracking-widest">OVERLAY URLS & OBS EXPORT</span>
+                      </div>
+                      <a
+                        href="/overlay-links"
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center gap-1.5 rounded-lg border border-[#3B82F6]/30 bg-[#3B82F6]/10 px-3 py-1.5 font-orbitron text-[10px] font-black text-[#3B82F6] hover:bg-[#3B82F6]/20 transition-all"
+                      >
+                        <ExternalLink className="h-3.5 w-3.5" />
+                        OPEN OVERLAY LINKS
+                      </a>
                     </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {transparentOverlays.map((ov) => {
-                        const url = overlayUrl(ov.id);
-                        const Icon = ov.icon;
-                        return (
-                          <div
-                            key={ov.id}
-                            className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#3B82F6]/30 hover:shadow-[0_0_15px_rgba(59,130,246,0.05)] transition-all group"
-                          >
-                            <div>
-                              <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#3B82F6]/10 border border-[#3B82F6]/20 group-hover:bg-[#3B82F6]/20 transition-all">
-                                  <Icon className="h-4 w-4 text-[#3B82F6]" />
-                                </div>
-                                <div>
-                                  <h3 className="font-orbitron text-xs font-black text-white tracking-wider">{ov.label}</h3>
-                                  <p className="text-[10px] text-gray-400 mt-0.5">{ov.desc}</p>
-                                </div>
-                              </div>
-                              <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#3B82F6]/80 truncate">
-                                {url}
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
-                              <span className="font-orbitron text-[9px] font-bold text-gray-500 tracking-wider">1920×1080</span>
-                              <div className="flex gap-2">
-                                <CopyBtn text={url} id={ov.id} copied={copied} onCopy={copy} />
-                                <a
-                                  href={url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-[#3B82F6] hover:border-[#3B82F6]/30 transition-all"
-                                  title="Open Link"
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
-                                <a
-                                  href={url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="flex h-8 px-3 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/30 transition-all font-orbitron text-[9px] font-black tracking-wider"
-                                >
-                                  <Play className="h-3 w-3 mr-1" /> TEST
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
-                  </div>
-
-                  {/* Solid Scene Overlays */}
-                  <div>
-                    <div className="flex items-center gap-2 mb-4">
-                      <div className="h-1.5 w-1.5 bg-[#7C3AED] rounded-full animate-pulse" />
-                      <span className="font-orbitron text-[10px] font-black text-[#7C3AED] tracking-widest">FULL SCENE — REPLACE ENTIRE SCREEN</span>
-                      <div className="h-px flex-1 bg-white/5" />
-                    </div>
-                    <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                      {solidOverlays.map((ov) => {
-                        const url = overlayUrl(ov.id);
-                        const Icon = ov.icon;
-                        return (
-                          <div
-                            key={ov.id}
-                            className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#7C3AED]/30 hover:shadow-[0_0_15px_rgba(124,58,237,0.05)] transition-all group"
-                          >
-                            <div>
-                              <div className="flex items-center gap-3 mb-2">
-                                <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#7C3AED]/10 border border-[#7C3AED]/20 group-hover:bg-[#7C3AED]/20 transition-all">
-                                  <Icon className="h-4 w-4 text-[#7C3AED]" />
-                                </div>
-                                <div>
-                                  <h3 className="font-orbitron text-xs font-black text-white tracking-wider">{ov.label}</h3>
-                                  <p className="text-[10px] text-gray-400 mt-0.5">{ov.desc}</p>
-                                </div>
-                              </div>
-                              <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#7C3AED]/80 truncate">
-                                {url}
-                              </div>
-                            </div>
-                            <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
-                              <span className="font-orbitron text-[9px] font-bold text-gray-500 tracking-wider">1920×1080</span>
-                              <div className="flex gap-2">
-                                <CopyBtn text={url} id={ov.id} copied={copied} onCopy={copy} />
-                                <a
-                                  href={url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-[#7C3AED] hover:border-[#7C3AED]/30 transition-all"
-                                  title="Open Link"
-                                >
-                                  <ExternalLink className="h-4 w-4" />
-                                </a>
-                                <a
-                                  href={url}
-                                  target="_blank"
-                                  rel="noreferrer"
-                                  className="flex h-8 px-3 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/30 transition-all font-orbitron text-[9px] font-black tracking-wider"
-                                >
-                                  <Play className="h-3 w-3 mr-1" /> TEST
-                                </a>
-                              </div>
-                            </div>
-                          </div>
-                        );
-                      })}
-                    </div>
+                    <p className="text-[10px] text-gray-500 mt-2">All overlay browser source URLs, OBS scene export, and connection setup are on the dedicated Overlay Links page.</p>
                   </div>
                 </div>
               </SectionBoundary>
@@ -1033,10 +926,6 @@ export default function DirectorPanel() {
                   refresh={refresh}
                   overlayApi={overlayApi}
                   obsConnected={obsStatus === 'connected'}
-                  onSwitchScene={async (screen) => {
-                    await overlayApi.switchOverlayScreen({ screen });
-                    refresh();
-                  }}
                 />
               </SectionBoundary>
             )}
