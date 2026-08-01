@@ -634,7 +634,7 @@ export default function DataInputer() {
                             </span>
                             <span className="text-gray-500 font-medium">killed</span>
                             <span className="font-orbitron font-bold text-gray-400">
-                              {k.killed_name || 'Opponent'}
+                              {k.killed_player_name || 'Opponent'}
                             </span>
                           </div>
                           <span className="text-[9px] font-mono text-gray-600">
@@ -696,7 +696,7 @@ export default function DataInputer() {
                           <div className="flex items-center gap-2">
                             <Skull className="h-3.5 w-3.5 text-[#ef4444]" />
                             <span className="font-orbitron font-bold text-white">
-                              {e.player_name}
+                              {e.eliminated_player_name}
                             </span>
                             <span className="text-gray-600 font-bold">//</span>
                             <span className="font-orbitron text-[10px] font-black text-gray-500">

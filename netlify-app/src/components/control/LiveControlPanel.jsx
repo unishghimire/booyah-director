@@ -12,18 +12,22 @@ import { overlayApi } from '@/lib/overlayApi';
 const MAPS = ['Bermuda', 'Bermuda Remastered', 'Purgatory', 'Alpine', 'Kalahari', 'Nexterra', 'Solara'];
 const WEAPONS = ['AK', 'M4A1', 'AWM', 'M1887', 'MP40', 'UMP', 'XM1014', 'GROZA', 'SCAR', 'FAMAS', 'M14', 'SKS', 'Kar98k', 'Desert Eagle', 'P90', ' Thompson'];
 const SCENES = [
-  { key: 'setup_blank', label: 'STARTING SOON', icon: Radio, group: 'pre' },
-  { key: 'countdown', label: 'COUNTDOWN', icon: Activity, group: 'pre' },
-  { key: 'casters', label: 'CASTERS', icon: Users, group: 'pre' },
-  { key: 'sponsor', label: 'SPONSOR', icon: Star, group: 'pre' },
   { key: 'game-intro', label: 'MATCH INTRO', icon: Gamepad2, group: 'pre' },
   { key: 'maplabel', label: 'MAP INTRO', icon: Target, group: 'pre' },
+  { key: 'casters', label: 'CASTERS', icon: Users, group: 'pre' },
+  { key: 'roadmap', label: 'ROADMAP', icon: Map, group: 'pre' },
+  { key: 'event-details', label: 'EVENT INFO', icon: Info, group: 'pre' },
   { key: 'ff-scoreboard', label: 'LIVE', icon: Zap, group: 'live' },
   { key: 'standings', label: 'SCOREBOARD', icon: Trophy, group: 'live' },
   { key: 'teams', label: 'TEAMS TODAY', icon: Users, group: 'live' },
+  { key: 'killfeed', label: 'KILL FEED', icon: Skull, group: 'live' },
+  { key: 'elim-alert', label: 'ELIM ALERT', icon: AlertTriangle, group: 'live' },
+  { key: 'team_roster', label: 'TEAM ROSTER', icon: Users, group: 'live' },
   { key: 'mvp', label: 'MVP', icon: Star, group: 'post' },
   { key: 'champions', label: 'WINNER', icon: Crown, group: 'post' },
-  { key: 'break', label: 'BREAK', icon: Pause, group: 'post' },
+  { key: 'today-matches', label: 'TODAY MATCHES', icon: Calendar, group: 'post' },
+  { key: 'schedule', label: 'SCHEDULE', icon: Grid3x3, group: 'post' },
+  { key: 'upcoming-map', label: 'UPCOMING MAP', icon: Clock, group: 'post' },
 ];
 
 const EVENTS = [
