@@ -1,1 +1,8 @@
-{"mcpServers": {}}
+{
+  "mcpServers": {
+    "ponytail": {
+      "command": "node",
+      "args": ["/app/.agents/mcps/ponytail-mcp/index.js"]
+    }
+  }
+}
