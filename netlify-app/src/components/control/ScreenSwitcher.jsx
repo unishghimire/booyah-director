@@ -1,15 +1,10 @@
-import React, { useState } from 'react';
-import { SectionBoundary, safeArray, safeNumber, safeString } from '@/components/ErrorBoundary';
 import {
-  Monitor, Map, Crosshair, AlertTriangle, Star, Trophy,
-  LayoutList, Users, Mic2, Flag, Calendar, Eye, Gamepad2, Grid3x3, Zap,
+  Map, Crosshair, AlertTriangle, Star, Trophy,
+  Users, Mic2, Calendar, Gamepad2, Grid3x3, Zap,
   Clock, Crown, Info, Skull
 } from 'lucide-react';
-import { overlayApi } from '@/lib/overlayApi';
-import toast from 'react-hot-toast';
 
 export const SCREENS = [
-  // ── Full-scene replacements (solid background) ──
   { key: 'game-intro',        label: 'GAME INTRO',     icon: Gamepad2,     desc: 'Game intro banner with map + match number',  group: 'scene' },
   { key: 'maplabel',          label: 'MAP INTRO',      icon: Map,          desc: 'Map reveal + team list',                    group: 'scene' },
   { key: 'upcoming-map',      label: 'UPCOMING MAP',   icon: Clock,        desc: 'Next map preview card',                     group: 'scene' },
@@ -22,7 +17,6 @@ export const SCREENS = [
   { key: 'champions',         label: 'CHAMPIONS!',    icon: Crown,        desc: 'Champions reveal',                           group: 'scene' },
   { key: 'roadmap',           label: 'ROADMAP',        icon: Map,          desc: 'Tournament schedule — stages, days, matches',group: 'scene' },
   { key: 'event-details',     label: 'EVENT DETAILS', icon: Info,         desc: 'Tournament info — format, placement points', group: 'scene' },
-  // ── Transparent overlays (layer over gameplay) ──
   { key: 'ff-scoreboard',     label: 'FF SCOREBOARD',  icon: Zap,          desc: 'NexOverlays scoreboard + match info chip',  group: 'overlay' },
   { key: 'standings',         label: 'STANDINGS',      icon: Trophy,       desc: 'Full tournament standings',                  group: 'overlay' },
   { key: 'killfeed',          label: 'KILL FEED',      icon: Skull,        desc: 'Live kill feed — last 6 eliminations',       group: 'overlay' },
@@ -30,99 +24,6 @@ export const SCREENS = [
 ];
 
 export const GROUP_LABELS = {
-  scene:   { label: 'FULL SCENES',      color: '#7C3AED' },
-  overlay: { label: 'LIVE OVERLAYS',    color: '#3B82F6' },
+  scene:   { label: 'FULL SCENES',   color: '#7C3AED' },
+  overlay: { label: 'LIVE OVERLAYS',  color: '#3B82F6' },
 };
-
-export default function ScreenSwitcher({ currentScreen, onAction }) {
-  const [busy, setBusy] = useState(null);
-
-  const handleSwitch = async (screen) => {
-    if (busy) return;
-    setBusy(screen);
-    try {
-      await overlayApi.switchOverlayScreen({ screen });
-      toast.success(`▶ ${screen.replace(/_/g, ' ').toUpperCase()}`, { icon: '🎬' });
-      onAction?.();
-    } catch (err) {
-      toast.error(`Switch failed: ${err.message}`);
-    } finally {
-      setBusy(null);
-    }
-  };
-
-  const scenes   = SCREENS.filter(s => s.group === 'scene');
-  const overlays = SCREENS.filter(s => s.group === 'overlay');
-
-  const renderGroup = (items, groupKey) => {
-    const { label, color } = GROUP_LABELS[groupKey];
-    return (
-      <div className="space-y-1.5">
-        <p className="font-orbitron text-[9px] font-black tracking-widest" style={{ color }}>
-          {label}
-        </p>
-        <div className="grid grid-cols-2 gap-1.5">
-          {items.map(s => {
-            const Icon = s.icon;
-            const isActive = currentScreen === s.key;
-            const isBusy   = busy === s.key;
-            return (
-              <button
-                key={s.key}
-                onClick={() => !busy && handleSwitch(s.key)}
-                disabled={busy !== null}
-                title={s.desc}
-                className="flex flex-col items-start rounded-lg px-2.5 py-2 text-left transition-all disabled:opacity-40"
-                style={
-                  isActive
-                    ? { background: `${color}22`, border: `1px solid ${color}88`, boxShadow: `0 0 10px ${color}44` }
-                    : { background: 'rgba(255,255,255,0.04)', border: '1px solid rgba(255,255,255,0.07)' }
-                }
-              >
-                <div className="flex items-center gap-1.5 w-full">
-                  <Icon
-                    className="h-3 w-3 flex-shrink-0"
-                    style={{ color: isActive ? color : 'rgba(255,255,255,0.4)' }}
-                  />
-                  <span
-                    className="text-[10px] font-black tracking-wider truncate"
-                    style={{ color: isActive ? color : 'rgba(255,255,255,0.7)' }}
-                  >
-                    {isBusy ? '···' : s.label}
-                  </span>
-                  {isActive && (
-                    <span
-                      className="ml-auto h-1.5 w-1.5 rounded-full flex-shrink-0 animate-pulse"
-                      style={{ background: color }}
-                    />
-                  )}
-                </div>
-                {isActive && (
-                  <span className="mt-0.5 text-[9px] opacity-50" style={{ color }}>
-                    {s.desc}
-                  </span>
-                )}
-              </button>
-            );
-          })}
-        </div>
-      </div>
-    );
-  };
-
-  return (
-    <SectionBoundary label="SCREEN SWITCHER">
-      <div className="rounded-xl border border-white/10 bg-[#11111a] p-3 space-y-3">
-        <div className="flex items-center justify-between">
-          <h3 className="font-orbitron text-xs font-bold text-white">OVERLAY SCREEN</h3>
-          <span className="font-orbitron text-[9px] text-gray-500 tracking-widest">
-            LIVE: <span className="text-[#7C3AED]">{(currentScreen || 'STANDBY').replace(/_/g, ' ').toUpperCase()}</span>
-          </span>
-        </div>
-        {renderGroup(scenes, 'scene')}
-        <div className="h-px bg-white/5" />
-        {renderGroup(overlays, 'overlay')}
-      </div>
-    </SectionBoundary>
-  );
-}

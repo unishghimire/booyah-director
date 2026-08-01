@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import { BrowserRouter as Router, Routes, Route, Link, useLocation, Navigate } from 'react-router-dom';
-import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { Toaster } from 'react-hot-toast';
 import { AuthProvider, useAuth } from '@/lib/AuthContext';
 import ScrollToTop from '@/components/ScrollToTop';
@@ -22,14 +21,6 @@ import { useOverlayData } from '@/lib/overlayApi';
 import { Clapperboard, Keyboard, Monitor, ExternalLink, Zap, LogOut, ChevronLeft, ChevronRight } from 'lucide-react';
 import ConnectionStatusBar from '@/components/ConnectionStatusBar';
 
-const queryClient = new QueryClient({
-  defaultOptions: {
-    queries: {
-      retry: 1,
-      refetchOnWindowFocus: false,
-    },
-  },
-});
 
 const OWNER_EMAILS = (import.meta.env.VITE_OWNER_EMAILS || 'nex.unishghimire@gmail.com,unishghimire2@gmail.com')
   .split(',').map(e => e.trim().toLowerCase());
@@ -299,7 +290,7 @@ function AppRoutes() {
 /* ── Root ───────────────────────────────────────────────────────────────────── */
 export default function App() {
   return (
-    <QueryClientProvider client={queryClient}>
+    <>
       <Router>
         <ErrorBoundary label="APP">
           <AuthProvider>
@@ -322,6 +313,6 @@ export default function App() {
           error:   { iconTheme: { primary: '#ef4444', secondary: '#fff' } },
         }}
       />
-    </QueryClientProvider>
+    </>
   );
 }

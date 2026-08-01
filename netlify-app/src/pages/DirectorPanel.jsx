@@ -39,7 +39,7 @@ import {
 
 export default function DirectorPanel() {
   const { data, loading, refresh } = useOverlayData(true);
-  const { undo, redo, canUndo, canRedo, history, undoDepth, redoDepth } = useUndoRedo(data, overlayApi, refresh);
+  const { undo, redo, canUndo, canRedo } = useUndoRedo(data, overlayApi, refresh);
   const [activeTab, setActiveTab] = useState('dashboard');
   const [busy, setBusy] = useState(null);
   const [mapSelect, setMapSelect] = useState('Bermuda');
@@ -476,7 +476,6 @@ export default function DirectorPanel() {
                   data={data}
                   refresh={refresh}
                   overlayApi={overlayApi}
-                  obsConnected={obsStatus === 'connected'}
                   onSwitchScene={async (screen) => {
                     await overlayApi.switchOverlayScreen({ screen });
                     refresh();
@@ -925,7 +924,6 @@ export default function DirectorPanel() {
                   data={data}
                   refresh={refresh}
                   overlayApi={overlayApi}
-                  obsConnected={obsStatus === 'connected'}
                 />
               </SectionBoundary>
             )}
