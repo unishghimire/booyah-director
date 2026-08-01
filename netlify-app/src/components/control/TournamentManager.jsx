@@ -2,9 +2,9 @@ import React, { useState, useEffect } from 'react';
 import { SectionBoundary, safeArray } from '@/components/ErrorBoundary';
 import { useOverlayData, overlayApi as defaultOverlayApi } from '@/lib/overlayApi';
 import {
-  Trophy, Trash2, Play, Plus, Calendar, Users, Swords, CheckCircle,
-  AlertTriangle, X, Edit2, Check, Clock, Map, ChevronRight, Settings,
-  Grid, CalendarDays, BarChart4, Trash, Award, Shield, User, Save, Layers
+  Trophy, Trash2, Play, Plus, Users, Swords,
+  AlertTriangle, X, Edit2, Check, Clock, Map, Settings,
+  Grid, CalendarDays, Trash, Award, User, Save, Layers
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 

@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Zap, Sparkles, Eye, EyeOff, Save, RefreshCw, Play,
-  Film, Wand2, Settings2, Check, RotateCcw
+  Zap, Eye, EyeOff, Save, RefreshCw, Play,
+  Film, Wand2, RotateCcw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 

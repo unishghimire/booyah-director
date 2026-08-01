@@ -1,5 +1,5 @@
 import {
-  Map, Crosshair, AlertTriangle, Star, Trophy,
+  Map, AlertTriangle, Star, Trophy,
   Users, Mic2, Calendar, Gamepad2, Grid3x3, Zap,
   Clock, Crown, Info, Skull
 } from 'lucide-react';

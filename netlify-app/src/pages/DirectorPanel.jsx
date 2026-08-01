@@ -23,12 +23,11 @@ import { useUndoRedo } from '@/lib/useUndoRedo';
 import { ROLES, getRoleConfig, canAccessTab } from '@/lib/roles';
 
 import {
-  ExternalLink,
-  Eye, Paintbrush, Settings2, Trophy, Star, Crown,
-  Monitor, Copy, Radio, CheckCircle2, ChevronRight, ChevronDown,
-  Layers, Map, Crosshair, AlertTriangle, LayoutList, Volume2, Film, Undo2, Redo2, History,
-  Download, RefreshCw, Users, Sword, Shield, Flag,
-  Zap, Calendar, Mic2, Clock, BarChart2, Play, Activity, Palette,
+  ExternalLink, Paintbrush, Settings2, Trophy, Star, Crown,
+  Monitor, Copy, Radio, ChevronDown,
+  Layers, Map, Volume2, Film,
+  Download, RefreshCw, Users,
+  Zap, Clock, Play, Activity, Palette,
   RotateCcw, Trash2
 } from 'lucide-react';
 

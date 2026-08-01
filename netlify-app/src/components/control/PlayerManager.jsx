@@ -2,8 +2,7 @@ import React, { useState, useMemo, useRef } from 'react';
 import toast from 'react-hot-toast';
 import {
   Users, Search, Plus, Edit2, Trash2, X, Download, Upload,
-  Heart, Skull, Award, TrendingUp, Instagram, Youtube, Twitter,
-  Flag, ChevronDown, ChevronUp, Filter, Grid3x3, List
+  Heart, Skull, ChevronDown, ChevronUp, Grid3x3, List
 } from 'lucide-react';
 
 export default function PlayerManager({ data, refresh, overlayApi }) {

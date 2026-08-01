@@ -1,7 +1,7 @@
 import React, { useState, useEffect, useRef } from 'react';
 import {
-  Volume2, VolumeX, Play, Pause, Plus, Trash2, Music,
-  Save, RefreshCw, ChevronDown, Check
+  Volume2, VolumeX, Play, Pause, Trash2,
+  Save, RefreshCw, Check
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 

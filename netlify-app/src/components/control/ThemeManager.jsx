@@ -1,8 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { SectionBoundary } from '@/components/ErrorBoundary';
 import {
-  Palette, Check, ChevronDown, ChevronUp, Sliders, Sparkles,
-  Trophy, Swords, Monitor, Paintbrush, Plus, Copy
+  Palette, ChevronDown, ChevronUp, Sliders, Paintbrush, Plus, Copy
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 

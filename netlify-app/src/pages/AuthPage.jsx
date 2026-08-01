@@ -2,7 +2,7 @@ import { signInWithPopup, GoogleAuthProvider, signInWithEmailAndPassword, create
 import React, { useState, useEffect } from 'react';
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
-import { Eye, EyeOff, Zap, LogIn, UserPlus, Shield } from 'lucide-react';
+import { Eye, EyeOff, Zap, Shield } from 'lucide-react';
 
 /* Animated grid background particle dots */
 function GridBg() {

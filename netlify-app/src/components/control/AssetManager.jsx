@@ -14,19 +14,12 @@ import {
   X,
   Copy,
   Plus,
-  Check,
-  ChevronDown,
   RefreshCw,
   FileText,
-  Globe,
-  Calendar,
   Tag,
   HardDrive,
-  ExternalLink,
-  Volume2,
   Play,
   Pause,
-  Sliders,
   AlertCircle
 } from 'lucide-react';
 import toast from 'react-hot-toast';

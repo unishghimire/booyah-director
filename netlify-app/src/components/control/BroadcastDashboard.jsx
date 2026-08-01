@@ -1,9 +1,9 @@
 import React, { useState, useMemo, useEffect } from 'react';
 import toast from 'react-hot-toast';
 import {
-  Radio, Activity, Users, Wifi, Eye, Monitor, Skull, Heart,
+  Radio, Activity, Users, Wifi, Eye, Skull, Heart,
   Play, Square, Clock, ArrowRight, RefreshCw, Tv, Settings,
-  Zap, Link2, AlertCircle, ChevronRight, Layers, Power
+  Zap, Link2, AlertCircle, Layers, Power
 } from 'lucide-react';
 import { useObsStore } from '@/lib/obsStore';
 import { obsService } from '@/lib/obsWebSocket';
