@@ -3,7 +3,7 @@ import {
   Play, Pause, Square, RotateCcw, AlertTriangle, Plus, Minus,
   Skull, Heart, Crosshair, Trophy, Zap, Radio, Users, Target,
   ChevronDown, ChevronUp, Star, Crown,
-  Activity, Gamepad2, RefreshCw, Map, Info, Calendar, Grid3x3, Clock
+  Gamepad2, RefreshCw
 } from 'lucide-react';
 import toast from 'react-hot-toast';
 import { overlayApi } from '@/lib/overlayApi';
