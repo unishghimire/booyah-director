@@ -176,7 +176,7 @@ export default function SoundManager({ data, overlayApi, refresh }) {
             <div
               key={event.key}
               className={`nx-surface p-4 transition-colors ${
-                hasSound ? 'border-purple-500/30' : 'border-slate-800'
+                hasSound ? 'border-purple-500/30' : 'border-white/[0.06]'
               }`}
             >
               <div className="flex items-center gap-3 mb-3">

@@ -98,7 +98,7 @@ export default function ConnectionStatusBar() {
       {isOpen && (
         <div
           ref={popoverRef}
-          className="absolute left-1/2 -translate-x-1/2 top-2 mt-1 w-[320px] nx-glass rounded-xl p-4 shadow-2xl text-white z-[9999] nx-scale-in"
+          className="absolute left-1/2 -translate-x-1/2 top-2 mt-1 w-[320px] nx-glass rounded-xl p-4  text-white z-[9999] nx-scale-in"
         >
           {/* Header */}
           <div className="flex items-center justify-between mb-3 pb-2 nx-divider">

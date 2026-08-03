@@ -87,7 +87,7 @@ export default function SheetImport({ tournamentId, onImported }) {
                       <div key={c} className="flex items-center gap-2 mb-1">
                         <span className="font-mono text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-white">{c}</span>
                         <span className={r==='required'?'text-[#7C3AED] text-[9px]':'text-white/40 text-[9px]'}>{l}</span>
-                        <span className="text-[8px] text-gray-600 ml-auto">{r}</span>
+                        <span className="text-[8px] text-white/30 ml-auto">{r}</span>
                       </div>
                     ))}
                   </div>
@@ -97,12 +97,12 @@ export default function SheetImport({ tournamentId, onImported }) {
                       <div key={c} className="flex items-center gap-2 mb-1">
                         <span className="font-mono text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-white">{c}</span>
                         <span className={r==='required'?'text-[#7C3AED] text-[9px]':'text-white/40 text-[9px]'}>{l}</span>
-                        <span className="text-[8px] text-gray-600 ml-auto">{r}</span>
+                        <span className="text-[8px] text-white/30 ml-auto">{r}</span>
                       </div>
                     ))}
                   </div>
                 </div>
-                <p className="mt-2 text-gray-600">For Photo URLs — upload player images to imgbb.com and paste the direct link in column D.</p>
+                <p className="mt-2 text-white/30">For Photo URLs — upload player images to imgbb.com and paste the direct link in column D.</p>
               </div>
             </div>
 

@@ -161,7 +161,7 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
 
     return (
       <div 
-        className="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-wider font-orbitron border bg-black/40 border-white/5 transition-all duration-150"
+        className="inline-flex items-center gap-1.5 rounded-md px-2 py-0.5 text-[9px] font-black uppercase tracking-wider font-orbitron border bg-black/25 border-white/[0.06] transition-all duration-150"
         style={{ borderLeftColor: teamColor, borderLeftWidth: '3px' }}
       >
         {logo && (
@@ -178,9 +178,9 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
   };
 
   return (
-    <div className="rounded-xl border border-white/10 bg-[#131127] p-5 shadow-2xl text-white font-rajdhani select-none transition-all duration-300">
+    <div className="rounded-xl border border-white/[0.08] bg-[#131127] p-5  text-white font-rajdhani select-none transition-all duration-300">
       {/* HEADER BAR */}
-      <div className="flex items-center justify-between border-b border-white/5 pb-3.5 mb-4">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-3.5 mb-4">
         <div className="flex items-center gap-3">
           <div className="relative flex h-2.5 w-2.5">
             <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-[#22c55e] opacity-75"></span>
@@ -190,7 +190,7 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
             <h2 className="font-orbitron text-sm font-black tracking-widest text-white uppercase leading-none">
               NEXPLAY BROADCAST LOG
             </h2>
-            <p className="font-orbitron text-[8px] font-black uppercase tracking-widest text-gray-500 mt-1">
+            <p className="font-orbitron text-[8px] font-black uppercase tracking-widest text-white/40 mt-1">
               REAL-TIME EVENT TIMELINE
             </p>
           </div>
@@ -198,7 +198,7 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
         
         <button
           onClick={handleExport}
-          className="flex items-center gap-1.5 bg-[#04060E] border border-white/10 hover:border-[#7C3AED] hover:bg-[#7C3AED]/15 px-3.5 py-1.5 rounded-md font-orbitron text-[9px] font-black uppercase tracking-widest text-white transition-all duration-200"
+          className="flex items-center gap-1.5 bg-[#04060E] border border-white/[0.08] hover:border-[#7C3AED] hover:bg-[#7C3AED]/15 px-3.5 py-1.5 rounded-md font-orbitron text-[9px] font-black uppercase tracking-widest text-white transition-all duration-200"
         >
           <Download className="h-3 w-3 text-[#3B82F6]" />
           EXPORT LOG
@@ -209,7 +209,7 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
       <div className="grid grid-cols-1 lg:grid-cols-12 gap-4 mb-4 items-end">
         {/* Filter Pills */}
         <div className="lg:col-span-8 space-y-1.5">
-          <label className="block font-orbitron text-[8px] font-black uppercase tracking-widest text-gray-500">
+          <label className="block font-orbitron text-[8px] font-black uppercase tracking-widest text-white/40">
             FILTER BY TYPE
           </label>
           <div className="flex flex-wrap gap-1.5">
@@ -231,11 +231,11 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
                   className={`flex items-center gap-1.5 px-3 py-1.5 rounded-md font-orbitron text-[9px] font-black uppercase tracking-widest transition-all duration-150 border ${
                     isActive
                       ? 'bg-[#7C3AED] border-[#7C3AED] text-white shadow-lg shadow-[#7C3AED]/20'
-                      : 'bg-black/25 border-white/5 text-gray-400 hover:border-white/10 hover:text-white'
+                      : 'bg-black/25 border-white/[0.06] text-white/50 hover:border-white/[0.08] hover:text-white'
                   }`}
                 >
                   <span>{pill}</span>
-                  <span className={`font-teko text-[11px] px-1 rounded-sm ${isActive ? 'bg-white/25 text-white' : 'bg-white/5 text-gray-500'}`}>
+                  <span className={`font-teko text-[11px] px-1 rounded-sm ${isActive ? 'bg-white/25 text-white' : 'bg-white/5 text-white/40'}`}>
                     {count}
                   </span>
                 </button>
@@ -246,22 +246,22 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
 
         {/* Search Input */}
         <div className="lg:col-span-4 space-y-1.5">
-          <label className="block font-orbitron text-[8px] font-black uppercase tracking-widest text-gray-500">
+          <label className="block font-orbitron text-[8px] font-black uppercase tracking-widest text-white/40">
             SEARCH PLAYERS / TEAMS
           </label>
           <div className="relative">
-            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-500" />
+            <Search className="absolute left-2.5 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/40" />
             <input
               type="text"
               placeholder="SEARCH..."
               value={searchQuery}
               onChange={e => setSearchQuery(e.target.value)}
-              className="w-full rounded-md border border-white/10 bg-black/25 pl-8 pr-8 py-1.5 text-[10px] font-orbitron uppercase tracking-widest text-white placeholder-gray-600 focus:border-[#3B82F6] focus:outline-none transition-all duration-150"
+              className="w-full rounded-md border border-white/[0.08] bg-black/25 pl-8 pr-8 py-1.5 text-[10px] font-orbitron uppercase tracking-widest text-white placeholder-gray-600 focus:border-[#3B82F6] focus:outline-none transition-all duration-150"
             />
             {searchQuery && (
               <button
                 onClick={() => setSearchQuery('')}
-                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-gray-500 hover:text-white transition-colors"
+                className="absolute right-2.5 top-1/2 -translate-y-1/2 text-white/40 hover:text-white transition-colors"
               >
                 <X className="h-3 w-3" />
               </button>
@@ -271,7 +271,7 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
       </div>
 
       {/* FILTER SUMMARY */}
-      <div className="flex items-center justify-between border-t border-white/5 pt-3.5 pb-2 mb-2 text-[8px] font-orbitron font-black uppercase tracking-widest text-gray-500">
+      <div className="flex items-center justify-between border-t border-white/[0.06] pt-3.5 pb-2 mb-2 text-[8px] font-orbitron font-black uppercase tracking-widest text-white/40">
         <div className="flex items-center gap-1.5">
           <span>ACTIVE FILTER:</span>
           <span className="text-[#3B82F6]">{activeFilter}</span>
@@ -290,16 +290,16 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
       </div>
 
       {/* TIMELINE LIST CONTAINER */}
-      <div className="border border-white/5 rounded-lg bg-black/10 p-2">
+      <div className="border border-white/[0.06] rounded-lg bg-black/10 p-2">
         {filteredEvents.length === 0 ? (
           <div className="flex flex-col items-center justify-center py-16 text-center">
-            <div className="rounded-full bg-white/5 p-4 mb-3 border border-white/10">
-              <Clock className="h-8 w-8 text-gray-500 animate-pulse" />
+            <div className="rounded-full bg-white/5 p-4 mb-3 border border-white/[0.08]">
+              <Clock className="h-8 w-8 text-white/40 animate-pulse" />
             </div>
-            <h3 className="font-orbitron text-xs font-black tracking-widest text-gray-400 uppercase">
+            <h3 className="font-orbitron text-xs font-black tracking-widest text-white/50 uppercase">
               NO EVENTS RECORDED
             </h3>
-            <p className="text-[10px] text-gray-600 mt-1 uppercase tracking-widest">
+            <p className="text-[10px] text-white/30 mt-1 uppercase tracking-widest">
               Events will appear here when matches are active
             </p>
           </div>
@@ -359,7 +359,7 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
               return (
                 <div 
                   key={event.id} 
-                  className="relative flex items-center gap-4 py-2.5 px-3 rounded-lg hover:bg-white/5 transition-colors duration-150 border border-transparent hover:border-white/5"
+                  className="relative flex items-center gap-4 py-2.5 px-3 rounded-lg hover:bg-white/[0.04] transition-colors duration-150 border border-transparent hover:border-white/[0.06]"
                 >
                   {/* Vertical Timeline Dot & Line */}
                   <div className="relative flex flex-col items-center self-stretch justify-center w-4">
@@ -376,12 +376,12 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
                   </div>
 
                   {/* Time Badge (HH:MM:SS) */}
-                  <div className="font-teko text-sm text-gray-500 tracking-wider w-14 select-none leading-none">
+                  <div className="font-teko text-sm text-white/40 tracking-wider w-14 select-none leading-none">
                     {formatTime(event.timestamp)}
                   </div>
 
                   {/* Type Icon Container */}
-                  <div className={`flex h-6.5 w-6.5 items-center justify-center rounded border bg-black/40 ${typeBadgeClass} flex-shrink-0`}>
+                  <div className={`flex h-6.5 w-6.5 items-center justify-center rounded border bg-black/25 ${typeBadgeClass} flex-shrink-0`}>
                     <IconComponent className={`h-3 w-3 ${iconColor}`} />
                   </div>
 
@@ -398,7 +398,7 @@ export default function EventTimeline({ killEvents, eliminationEvents, matchEven
                         <>
                           {killerTeam && <TeamBadge team={killerTeam} />}
                           {killerTeam && victimTeam && (
-                            <span className="text-[8px] font-black tracking-widest text-gray-600 font-orbitron uppercase">VS</span>
+                            <span className="text-[8px] font-black tracking-widest text-white/30 font-orbitron uppercase">VS</span>
                           )}
                           {victimTeam && <TeamBadge team={victimTeam} />}
                           {!killerTeam && event.killer_team_name && <TeamBadge fallbackName={event.killer_team_name} />}

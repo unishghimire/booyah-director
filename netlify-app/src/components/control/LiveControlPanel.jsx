@@ -56,8 +56,8 @@ function MatchControl({ currentMatch, tournament, onStartMatch, onSetStatus }) {
   };
 
   return (
-    <div className="rounded-xl border border-white/5 bg-[#131127] p-5">
-      <div className="mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
+    <div className="rounded-xl border border-white/[0.06] bg-[#131127] p-5">
+      <div className="mb-4 flex items-center gap-2 border-b border-white/[0.06] pb-3">
         <div className="h-1.5 w-1.5 bg-[#7C3AED] rounded-full" />
         <span className="font-orbitron text-[10px] font-black text-[#7C3AED] tracking-widest">MATCH CONTROL</span>
         {currentMatch && (
@@ -69,18 +69,18 @@ function MatchControl({ currentMatch, tournament, onStartMatch, onSetStatus }) {
 
       <div className="grid grid-cols-2 gap-3 mb-4">
         <div>
-          <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1.5">MAP</label>
+          <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest mb-1.5">MAP</label>
           <select
             value={mapSelect}
             onChange={e => setMapSelect(e.target.value)}
-            className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 font-orbitron text-[11px] text-white focus:border-[#7C3AED]/50 outline-none"
+            className="w-full rounded-lg border border-white/[0.08] bg-black/25 px-3 py-2.5 font-orbitron text-[11px] text-white focus:border-[#7C3AED]/50 outline-none"
           >
             {MAPS.map(m => <option key={m} value={m}>{m.toUpperCase()}</option>)}
           </select>
         </div>
         <div>
-          <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1.5">MATCH #</label>
-          <div className="flex items-center justify-center rounded-lg border border-white/10 bg-black/40 px-3 py-2.5">
+          <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest mb-1.5">MATCH #</label>
+          <div className="flex items-center justify-center rounded-lg border border-white/[0.08] bg-black/25 px-3 py-2.5">
             <span className="font-orbitron text-lg font-black text-white">{tournament?.current_match_number || 0}</span>
           </div>
         </div>
@@ -95,26 +95,26 @@ function MatchControl({ currentMatch, tournament, onStartMatch, onSetStatus }) {
         </button>
         <button disabled={!currentMatch}
           onClick={() => onSetStatus('ongoing')}
-          className="flex flex-col items-center gap-1 rounded-lg bg-white/5 border border-white/10 px-3 py-3 hover:bg-white/10 disabled:opacity-30 transition-all">
+          className="flex flex-col items-center gap-1 rounded-lg bg-white/5 border border-white/[0.08] px-3 py-3 hover:bg-white/10 disabled:opacity-30 transition-all">
           <Pause className="h-4 w-4 text-[#f59e0b]" />
-          <span className="font-orbitron text-[8px] font-black tracking-wider text-gray-400">PAUSE</span>
+          <span className="font-orbitron text-[8px] font-black tracking-wider text-white/50">PAUSE</span>
         </button>
         <button disabled={!currentMatch}
           onClick={() => onSetStatus('ongoing')}
-          className="flex flex-col items-center gap-1 rounded-lg bg-white/5 border border-white/10 px-3 py-3 hover:bg-white/10 disabled:opacity-30 transition-all">
+          className="flex flex-col items-center gap-1 rounded-lg bg-white/5 border border-white/[0.08] px-3 py-3 hover:bg-white/10 disabled:opacity-30 transition-all">
           <RefreshCw className="h-4 w-4 text-[#22c55e]" />
-          <span className="font-orbitron text-[8px] font-black tracking-wider text-gray-400">RESUME</span>
+          <span className="font-orbitron text-[8px] font-black tracking-wider text-white/50">RESUME</span>
         </button>
         <button disabled={!currentMatch}
           onClick={() => onSetStatus('completed')}
-          className="flex flex-col items-center gap-1 rounded-lg bg-white/5 border border-white/10 px-3 py-3 hover:bg-white/10 disabled:opacity-30 transition-all">
+          className="flex flex-col items-center gap-1 rounded-lg bg-white/5 border border-white/[0.08] px-3 py-3 hover:bg-white/10 disabled:opacity-30 transition-all">
           <Square className="h-4 w-4 text-red-400" />
-          <span className="font-orbitron text-[8px] font-black tracking-wider text-gray-400">END</span>
+          <span className="font-orbitron text-[8px] font-black tracking-wider text-white/50">END</span>
         </button>
         <button disabled={!currentMatch}
-          className="flex flex-col items-center gap-1 rounded-lg bg-white/5 border border-white/10 px-3 py-3 hover:bg-white/10 disabled:opacity-30 transition-all">
+          className="flex flex-col items-center gap-1 rounded-lg bg-white/5 border border-white/[0.08] px-3 py-3 hover:bg-white/10 disabled:opacity-30 transition-all">
           <RotateCcw className="h-4 w-4 text-[#3B82F6]" />
-          <span className="font-orbitron text-[8px] font-black tracking-wider text-gray-400">RESTART</span>
+          <span className="font-orbitron text-[8px] font-black tracking-wider text-white/50">RESTART</span>
         </button>
         <button
           className="flex flex-col items-center gap-1 rounded-lg bg-red-500/10 border border-red-500/30 px-3 py-3 hover:bg-red-500/20 transition-all">
@@ -142,8 +142,8 @@ function AliveCounter({ teams, onEliminate, onRevive }) {
   const [localAlive, setLocalAlive] = useState(totalCount || 48);
 
   return (
-    <div className="rounded-xl border border-white/5 bg-[#131127] p-5">
-      <div className="mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
+    <div className="rounded-xl border border-white/[0.06] bg-[#131127] p-5">
+      <div className="mb-4 flex items-center gap-2 border-b border-white/[0.06] pb-3">
         <div className="h-1.5 w-1.5 bg-[#22c55e] rounded-full animate-pulse" />
         <span className="font-orbitron text-[10px] font-black text-[#22c55e] tracking-widest">ALIVE COUNTER</span>
       </div>
@@ -156,7 +156,7 @@ function AliveCounter({ teams, onEliminate, onRevive }) {
         </button>
         <div className="text-center">
           <div className="font-orbitron text-5xl font-black text-white leading-none">{localAlive}</div>
-          <div className="font-orbitron text-[9px] font-black text-gray-500 tracking-widest mt-1">ALIVE / {totalCount || 48} TOTAL</div>
+          <div className="font-orbitron text-[9px] font-black text-white/40 tracking-widest mt-1">ALIVE / {totalCount || 48} TOTAL</div>
         </div>
         <button
           onClick={() => setLocalAlive(Math.min(totalCount || 48, localAlive + 1))}
@@ -180,11 +180,11 @@ function TeamControlGrid({ teams, players, onKill, onEliminate, onRevive, onPlac
   }, [teams]);
 
   return (
-    <div className="rounded-xl border border-white/5 bg-[#131127] p-5">
-      <div className="mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
+    <div className="rounded-xl border border-white/[0.06] bg-[#131127] p-5">
+      <div className="mb-4 flex items-center gap-2 border-b border-white/[0.06] pb-3">
         <div className="h-1.5 w-1.5 bg-[#3B82F6] rounded-full" />
         <span className="font-orbitron text-[10px] font-black text-[#3B82F6] tracking-widest">TEAM CONTROL</span>
-        <span className="ml-auto font-orbitron text-[9px] text-gray-500">{sortedTeams.length} TEAMS</span>
+        <span className="ml-auto font-orbitron text-[9px] text-white/40">{sortedTeams.length} TEAMS</span>
       </div>
 
       <div className="max-h-[500px] overflow-y-auto space-y-1.5 pr-1">
@@ -195,7 +195,7 @@ function TeamControlGrid({ teams, players, onKill, onEliminate, onRevive, onPlac
           const isExpanded = expandedTeam === team.id;
 
           return (
-            <div key={team.id} className="rounded-lg border border-white/5 bg-black/20 overflow-hidden">
+            <div key={team.id} className="rounded-lg border border-white/[0.06] bg-black/20 overflow-hidden">
               {/* Team row */}
               <div className="flex items-center gap-2 px-3 py-2.5">
                 {/* Rank */}
@@ -203,10 +203,10 @@ function TeamControlGrid({ teams, players, onKill, onEliminate, onRevive, onPlac
                   {idx + 1}
                 </span>
                 {/* Logo */}
-                <div className="h-7 w-7 flex-shrink-0 rounded bg-white/5 border border-white/10 flex items-center justify-center">
+                <div className="h-7 w-7 flex-shrink-0 rounded bg-white/5 border border-white/[0.08] flex items-center justify-center">
                   {team.logo_url
                     ? <img src={team.logo_url} alt="" className="h-5 w-5 object-contain" onError={e => e.target.style.display = 'none'} />
-                    : <span className="font-orbitron text-[10px] font-black text-gray-500">{(team.name || 'T')[0]}</span>}
+                    : <span className="font-orbitron text-[10px] font-black text-white/40">{(team.name || 'T')[0]}</span>}
                 </div>
                 {/* Name */}
                 <span className="flex-1 font-orbitron text-[11px] font-black text-white truncate"
@@ -246,18 +246,18 @@ function TeamControlGrid({ teams, players, onKill, onEliminate, onRevive, onPlac
                 {/* Expand */}
                 <button onClick={() => setExpandedTeam(isExpanded ? null : team.id)}
                   className="flex h-6 w-6 items-center justify-center rounded hover:bg-white/10 transition-all">
-                  {isExpanded ? <ChevronUp className="h-3.5 w-3.5 text-gray-400" /> : <ChevronDown className="h-3.5 w-3.5 text-gray-400" />}
+                  {isExpanded ? <ChevronUp className="h-3.5 w-3.5 text-white/50" /> : <ChevronDown className="h-3.5 w-3.5 text-white/50" />}
                 </button>
               </div>
 
               {/* Expanded player controls */}
               {isExpanded && (
-                <div className="border-t border-white/5 bg-black/30 px-3 py-2 space-y-1">
+                <div className="border-t border-white/[0.06] bg-black/20 px-3 py-2 space-y-1">
                   {teamPlayers.map(p => (
                     <div key={p.id} className="flex items-center gap-2 py-1.5">
                       <div className="h-2 w-2 rounded-full flex-shrink-0" style={{ background: p.is_alive ? '#22c55e' : '#666' }} />
                       <span className="flex-1 text-[11px] text-gray-300 truncate">{p.name}</span>
-                      <span className="font-orbitron text-[9px] text-gray-500 w-6 text-center">{p.current_match_kills || 0}K</span>
+                      <span className="font-orbitron text-[9px] text-white/40 w-6 text-center">{p.current_match_kills || 0}K</span>
                       <button
                         onClick={() => onEliminate(p)}
                         disabled={!p.is_alive}
@@ -283,7 +283,7 @@ function TeamControlGrid({ teams, players, onKill, onEliminate, onRevive, onPlac
         })}
         {sortedTeams.length === 0 && (
           <div className="text-center py-8">
-            <p className="font-orbitron text-[10px] text-gray-600 tracking-widest">NO TEAMS — ADD TEAMS IN SETUP TAB</p>
+            <p className="font-orbitron text-[10px] text-white/30 tracking-widest">NO TEAMS — ADD TEAMS IN SETUP TAB</p>
           </div>
         )}
       </div>
@@ -321,11 +321,11 @@ function KillFeedCreator({ teams, players, onSubmit }) {
     finally { setBusy(false); }
   };
 
-  const selectStyle = "w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 font-orbitron text-[11px] text-white focus:border-[#7C3AED]/50 outline-none";
+  const selectStyle = "w-full rounded-lg border border-white/[0.08] bg-black/25 px-3 py-2.5 font-orbitron text-[11px] text-white focus:border-[#7C3AED]/50 outline-none";
 
   return (
-    <div className="rounded-xl border border-white/5 bg-[#131127] p-5">
-      <div className="mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
+    <div className="rounded-xl border border-white/[0.06] bg-[#131127] p-5">
+      <div className="mb-4 flex items-center gap-2 border-b border-white/[0.06] pb-3">
         <div className="h-1.5 w-1.5 bg-red-500 rounded-full" />
         <span className="font-orbitron text-[10px] font-black text-red-400 tracking-widest">KILL FEED CREATOR</span>
       </div>
@@ -334,14 +334,14 @@ function KillFeedCreator({ teams, players, onSubmit }) {
         {/* Killer team */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1.5">KILLER TEAM</label>
+            <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest mb-1.5">KILLER TEAM</label>
             <select value={killerTeamId} onChange={e => { setKillerTeamId(e.target.value); setKillerPlayerId(''); }} className={selectStyle}>
               <option value="">SELECT...</option>
               {(teams || []).map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1.5">KILLER PLAYER</label>
+            <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest mb-1.5">KILLER PLAYER</label>
             <select value={killerPlayerId} onChange={e => setKillerPlayerId(e.target.value)} className={selectStyle} disabled={!killerTeamId}>
               <option value="">SELECT...</option>
               {killerPlayers.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -351,7 +351,7 @@ function KillFeedCreator({ teams, players, onSubmit }) {
 
         {/* Weapon */}
         <div>
-          <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1.5">WEAPON</label>
+          <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest mb-1.5">WEAPON</label>
           <select value={weapon} onChange={e => setWeapon(e.target.value)} className={selectStyle}>
             {WEAPONS.map(w => <option key={w} value={w}>{w}</option>)}
           </select>
@@ -360,14 +360,14 @@ function KillFeedCreator({ teams, players, onSubmit }) {
         {/* Victim team */}
         <div className="grid grid-cols-2 gap-3">
           <div>
-            <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1.5">VICTIM TEAM</label>
+            <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest mb-1.5">VICTIM TEAM</label>
             <select value={victimTeamId} onChange={e => { setVictimTeamId(e.target.value); setVictimPlayerId(''); }} className={selectStyle}>
               <option value="">SELECT...</option>
               {(teams || []).map(t => <option key={t.id} value={t.id}>{t.name}</option>)}
             </select>
           </div>
           <div>
-            <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1.5">VICTIM PLAYER</label>
+            <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest mb-1.5">VICTIM PLAYER</label>
             <select value={victimPlayerId} onChange={e => setVictimPlayerId(e.target.value)} className={selectStyle} disabled={!victimTeamId}>
               <option value="">SELECT...</option>
               {victimPlayers.map(p => <option key={p.id} value={p.id}>{p.name}</option>)}
@@ -379,7 +379,7 @@ function KillFeedCreator({ teams, players, onSubmit }) {
         <button
           onClick={() => setHeadshot(!headshot)}
           className={`flex items-center gap-2 rounded-lg px-3 py-2 font-orbitron text-[10px] font-black tracking-wider transition-all w-full justify-center border ${
-            headshot ? 'bg-[#7C3AED]/15 border-[#7C3AED]/40 text-[#7C3AED]' : 'bg-white/5 border-white/10 text-gray-400'
+            headshot ? 'bg-[#7C3AED]/15 border-[#7C3AED]/40 text-[#7C3AED]' : 'bg-white/5 border-white/[0.08] text-white/50'
           }`}>
           <Crosshair className="h-3.5 w-3.5" />
           {headshot ? 'HEADSHOT: ON' : 'HEADSHOT: OFF'}
@@ -389,7 +389,7 @@ function KillFeedCreator({ teams, players, onSubmit }) {
         <button
           onClick={handleSubmit}
           disabled={busy || !killerPlayerId || !victimPlayerId}
-          className="w-full rounded-lg bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] px-4 py-3 font-orbitron text-[10px] font-black tracking-widest text-white hover:from-[#6D28D9] hover:to-[#2563EB] disabled:opacity-30 transition-all">
+          className="w-full rounded-lg bg-[#7C3AED] px-4 py-3 font-orbitron text-[10px] font-black tracking-widest text-white hover:bg-[#6D28D9] disabled:opacity-30 transition-all">
           {busy ? 'SUBMITTING...' : '▶ SUBMIT KILL'}
         </button>
       </div>
@@ -410,8 +410,8 @@ function EventButtons({ onEvent }) {
   };
 
   return (
-    <div className="rounded-xl border border-white/5 bg-[#131127] p-5">
-      <div className="mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
+    <div className="rounded-xl border border-white/[0.06] bg-[#131127] p-5">
+      <div className="mb-4 flex items-center gap-2 border-b border-white/[0.06] pb-3">
         <div className="h-1.5 w-1.5 bg-[#7C3AED] rounded-full" />
         <span className="font-orbitron text-[10px] font-black text-[#7C3AED] tracking-widest">EVENT TRIGGERS</span>
       </div>
@@ -423,7 +423,7 @@ function EventButtons({ onEvent }) {
               key={ev.key}
               onClick={() => handleEvent(ev.key)}
               disabled={busy === ev.key}
-              className="flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2.5 font-orbitron text-[9px] font-black tracking-wider transition-all hover:bg-white/5 disabled:opacity-50"
+              className="flex items-center justify-center gap-1.5 rounded-lg border px-3 py-2.5 font-orbitron text-[9px] font-black tracking-wider transition-all hover:bg-white/[0.04] disabled:opacity-50"
               style={{ borderColor: ev.color + '40', color: ev.color }}>
               {busy === ev.key ? <RefreshCw className="h-3 w-3 animate-spin" /> : null}
               {ev.label}
@@ -454,8 +454,8 @@ function SceneManager({ currentScreen, onSwitch, obsConnected }) {
   };
 
   return (
-    <div className="rounded-xl border border-white/5 bg-[#131127] p-5">
-      <div className="mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
+    <div className="rounded-xl border border-white/[0.06] bg-[#131127] p-5">
+      <div className="mb-4 flex items-center gap-2 border-b border-white/[0.06] pb-3">
         <div className="h-1.5 w-1.5 bg-[#7C3AED] rounded-full" />
         <span className="font-orbitron text-[10px] font-black text-[#7C3AED] tracking-widest">SCENE MANAGER</span>
         {obsConnected && (
@@ -519,8 +519,8 @@ function SafeZoneControls({ onZone }) {
   };
 
   return (
-    <div className="rounded-xl border border-white/5 bg-[#131127] p-5">
-      <div className="mb-4 flex items-center gap-2 border-b border-white/5 pb-3">
+    <div className="rounded-xl border border-white/[0.06] bg-[#131127] p-5">
+      <div className="mb-4 flex items-center gap-2 border-b border-white/[0.06] pb-3">
         <div className="h-1.5 w-1.5 bg-[#f59e0b] rounded-full" />
         <span className="font-orbitron text-[10px] font-black text-[#f59e0b] tracking-widest">SAFE ZONE</span>
       </div>
@@ -530,7 +530,7 @@ function SafeZoneControls({ onZone }) {
             key={z.key}
             onClick={() => handleZone(z.key)}
             disabled={busy === z.key}
-            className="rounded-lg border px-3 py-3 font-orbitron text-[9px] font-black tracking-wider transition-all hover:bg-white/5 disabled:opacity-50"
+            className="rounded-lg border px-3 py-3 font-orbitron text-[9px] font-black tracking-wider transition-all hover:bg-white/[0.04] disabled:opacity-50"
             style={{ borderColor: z.color + '40', color: z.color }}>
             {z.label}
           </button>

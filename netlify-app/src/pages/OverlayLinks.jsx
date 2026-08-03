@@ -176,9 +176,9 @@ function OBSSourceToggles() {
   if (connectionStatus !== 'connected') {
     return (
       <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-md p-6 text-center">
-        <WifiOff className="h-8 w-8 text-gray-600 mx-auto mb-2" />
+        <WifiOff className="h-8 w-8 text-white/30 mx-auto mb-2" />
         <p className="font-orbitron text-[10px] font-black text-white/40 tracking-widest">OBS NOT CONNECTED</p>
-        <p className="text-xs text-gray-600 mt-1">Connect to OBS WebSocket above to control source visibility</p>
+        <p className="text-xs text-white/30 mt-1">Connect to OBS WebSocket above to control source visibility</p>
       </div>
     );
   }
@@ -213,9 +213,9 @@ function OBSSourceToggles() {
                   <span className="font-orbitron text-[10px] font-black tracking-wider" style={{ color: isLive ? '#22c55e' : 'rgba(255,255,255,0.7)' }}>
                     {scene}
                   </span>
-                  <span className="font-orbitron text-[8px] text-gray-600">({sceneSources.length} sources)</span>
+                  <span className="font-orbitron text-[8px] text-white/30">({sceneSources.length} sources)</span>
                 </div>
-                <Eye className="h-3 w-3 text-gray-600" />
+                <Eye className="h-3 w-3 text-white/30" />
               </button>
               {isExpanded && sceneSources.length > 0 && (
                 <div className="border-t border-white/[0.06] px-3 py-2 space-y-1">
@@ -228,7 +228,7 @@ function OBSSourceToggles() {
                       <span className="text-[11px] text-white/50">{src.name}</span>
                       {src.visible
                         ? <Eye className="h-3.5 w-3.5 text-[#22c55e]" />
-                        : <EyeOff className="h-3.5 w-3.5 text-gray-600" />}
+                        : <EyeOff className="h-3.5 w-3.5 text-white/30" />}
                     </button>
                   ))}
                 </div>
@@ -519,7 +519,7 @@ function OBSSceneExport({ overlays, overlayUrl }) {
           <span><span className="text-white font-bold">Push to OBS</span> — creates scenes + browser sources automatically via WebSocket (requires OBS connection above)</span>
         </p>
         <p className="flex items-start gap-1.5">
-          <span className="text-gray-600">3.</span>
+          <span className="text-white/30">3.</span>
           <span>Each overlay becomes its own scene at 1920×1080 with proper transparent CSS</span>
         </p>
       </div>

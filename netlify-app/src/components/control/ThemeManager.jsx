@@ -153,21 +153,21 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
 
   return (
     <SectionBoundary label="THEME MANAGER">
-      <div className="rounded-xl border border-white/10 bg-[#131127] p-5 space-y-5 text-white font-rajdhani font-semibold">
+      <div className="rounded-xl border border-white/[0.08] bg-[#131127] p-5 space-y-5 text-white font-rajdhani font-semibold">
         {/* Component Header */}
         <div className="flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Palette className="h-5 w-5 text-[#7C3AED]" />
             <h2 className="font-orbitron text-sm font-bold tracking-wider text-white">THEME MANAGER</h2>
           </div>
-          <span className="font-orbitron text-[9px] font-black text-gray-500 tracking-widest uppercase">
+          <span className="font-orbitron text-[9px] font-black text-white/40 tracking-widest uppercase">
             STUDIO CONTROL
           </span>
         </div>
 
         {/* 1. PREVIEW PANEL */}
         <div className="space-y-1.5">
-          <p className="font-orbitron text-[9px] font-black text-gray-400 tracking-widest uppercase">
+          <p className="font-orbitron text-[9px] font-black text-white/50 tracking-widest uppercase">
             LIVE BROADCAST OVERLAY PREVIEW
           </p>
           <div 
@@ -210,7 +210,7 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
                       <div className="text-[9px] font-bold text-white tracking-wide truncate">GRAND FINALS - MAP 3</div>
                     </div>
                   </div>
-                  <span className="text-[8px] font-orbitron font-black text-white/40 tracking-widest px-1.5 py-0.5 rounded border border-white/5 bg-white/5 flex-shrink-0">
+                  <span className="text-[8px] font-orbitron font-black text-white/40 tracking-widest px-1.5 py-0.5 rounded border border-white/[0.06] bg-white/5 flex-shrink-0">
                     LIVE
                   </span>
                 </div>
@@ -295,7 +295,7 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
 
         {/* 2. THEME GRID */}
         <div className="space-y-1.5">
-          <p className="font-orbitron text-[9px] font-black text-gray-400 tracking-widest uppercase">
+          <p className="font-orbitron text-[9px] font-black text-white/50 tracking-widest uppercase">
             SELECT PRESET THEME
           </p>
           <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3">
@@ -325,7 +325,7 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
                   className={`relative flex flex-col justify-between text-left p-3.5 rounded-xl border transition-all duration-300 disabled:opacity-40 group cursor-pointer focus:outline-none ${
                     isSelected
                       ? 'border-[#7C3AED] bg-[#1a1738] shadow-[0_0_15px_rgba(124,58,237,0.25)]'
-                      : 'border-white/10 bg-[#131127] hover:border-white/20 hover:bg-[#1a1835]'
+                      : 'border-white/[0.08] bg-[#131127] hover:border-white/20 hover:bg-[#1a1835]'
                   }`}
                 >
                   {/* Card Name & Badges */}
@@ -371,7 +371,7 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
                         title="Accent Color"
                       />
                     </div>
-                    <span className="text-[7px] font-orbitron font-black tracking-widest text-gray-500 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                    <span className="text-[7px] font-orbitron font-black tracking-widest text-white/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
                       PREVIEW
                     </span>
                   </div>
@@ -382,11 +382,11 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
         </div>
 
         {/* 3. CUSTOM THEME BUILDER (COLLAPSIBLE) */}
-        <div className="border border-white/5 rounded-xl bg-black/20 overflow-hidden">
+        <div className="border border-white/[0.06] rounded-xl bg-black/20 overflow-hidden">
           <button
             type="button"
             onClick={() => setIsCustomOpen(!isCustomOpen)}
-            className="flex items-center justify-between w-full px-4 py-3 bg-black/40 hover:bg-black/60 transition-all duration-300 text-left focus:outline-none"
+            className="flex items-center justify-between w-full px-4 py-3 bg-black/25 hover:bg-black/60 transition-all duration-300 text-left focus:outline-none"
           >
             <div className="flex items-center gap-2">
               <Sliders className="h-4 w-4 text-[#7C3AED]" />
@@ -395,13 +395,13 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
               </span>
             </div>
             <div className="flex items-center gap-2">
-              <span className="text-[9px] text-gray-500 uppercase tracking-wider font-semibold">
+              <span className="text-[9px] text-white/40 uppercase tracking-wider font-semibold">
                 {isCustomOpen ? 'COLLAPSE' : 'EXPAND'}
               </span>
               {isCustomOpen ? (
-                <ChevronUp className="h-4 w-4 text-gray-400" />
+                <ChevronUp className="h-4 w-4 text-white/50" />
               ) : (
-                <ChevronDown className="h-4 w-4 text-gray-400" />
+                <ChevronDown className="h-4 w-4 text-white/50" />
               )}
             </div>
           </button>
@@ -413,10 +413,10 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
               opacity: isCustomOpen ? 1 : 0,
             }}
           >
-            <form onSubmit={handleApplyCustom} className="p-4 border-t border-white/5 space-y-4">
+            <form onSubmit={handleApplyCustom} className="p-4 border-t border-white/[0.06] space-y-4">
               {/* Copy/Reset Action Bar */}
               <div className="flex items-center justify-between bg-white/5 px-3 py-2 rounded-lg">
-                <span className="text-[10px] text-gray-400 uppercase tracking-wider">
+                <span className="text-[10px] text-white/50 uppercase tracking-wider">
                   Quick Action: Tweak active/selected colors
                 </span>
                 <button
@@ -431,18 +431,18 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
 
               {/* Theme Name input */}
               <div className="space-y-1.5">
-                <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase">
+                <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase">
                   CUSTOM THEME NAME
                 </label>
                 <div className="relative">
-                  <Paintbrush className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-gray-500" />
+                  <Paintbrush className="absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-white/40" />
                   <input
                     type="text"
                     required
                     value={customTheme.name}
                     onChange={(e) => handleCustomFieldChange('name', e.target.value)}
                     placeholder="Enter custom theme name..."
-                    className="w-full rounded-lg border border-white/10 bg-black/40 py-2.5 pl-9 pr-4 font-orbitron text-[11px] text-white tracking-wider outline-none focus:border-[#7C3AED]/60"
+                    className="w-full rounded-lg border border-white/[0.08] bg-black/25 py-2.5 pl-9 pr-4 font-orbitron text-[11px] text-white tracking-wider outline-none focus:border-[#7C3AED]/60"
                   />
                 </div>
               </div>
@@ -450,7 +450,7 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
               {/* Color Pickers Grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-5 gap-3.5 pt-1">
                 {/* Primary Picker */}
-                <div className="flex items-center gap-2 bg-[#131127] border border-white/5 p-2 rounded-lg">
+                <div className="flex items-center gap-2 bg-[#131127] border border-white/[0.06] p-2 rounded-lg">
                   <div
                     className="relative w-8 h-8 rounded-full border border-white/20 cursor-pointer overflow-hidden flex-shrink-0 transition-transform duration-200 hover:scale-105"
                     style={{ backgroundColor: customTheme.primary }}
@@ -463,13 +463,13 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
                     />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase leading-none mb-0.5">PRIMARY</span>
+                    <span className="font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase leading-none mb-0.5">PRIMARY</span>
                     <span className="text-[10px] font-mono text-white/80 font-bold tracking-wide truncate">{customTheme.primary.toUpperCase()}</span>
                   </div>
                 </div>
 
                 {/* Secondary Picker */}
-                <div className="flex items-center gap-2 bg-[#131127] border border-white/5 p-2 rounded-lg">
+                <div className="flex items-center gap-2 bg-[#131127] border border-white/[0.06] p-2 rounded-lg">
                   <div
                     className="relative w-8 h-8 rounded-full border border-white/20 cursor-pointer overflow-hidden flex-shrink-0 transition-transform duration-200 hover:scale-105"
                     style={{ backgroundColor: customTheme.secondary }}
@@ -482,13 +482,13 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
                     />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase leading-none mb-0.5">SECONDARY</span>
+                    <span className="font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase leading-none mb-0.5">SECONDARY</span>
                     <span className="text-[10px] font-mono text-white/80 font-bold tracking-wide truncate">{customTheme.secondary.toUpperCase()}</span>
                   </div>
                 </div>
 
                 {/* Accent Picker */}
-                <div className="flex items-center gap-2 bg-[#131127] border border-white/5 p-2 rounded-lg">
+                <div className="flex items-center gap-2 bg-[#131127] border border-white/[0.06] p-2 rounded-lg">
                   <div
                     className="relative w-8 h-8 rounded-full border border-white/20 cursor-pointer overflow-hidden flex-shrink-0 transition-transform duration-200 hover:scale-105"
                     style={{ backgroundColor: customTheme.accent }}
@@ -501,13 +501,13 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
                     />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase leading-none mb-0.5">ACCENT</span>
+                    <span className="font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase leading-none mb-0.5">ACCENT</span>
                     <span className="text-[10px] font-mono text-white/80 font-bold tracking-wide truncate">{customTheme.accent.toUpperCase()}</span>
                   </div>
                 </div>
 
                 {/* Background Picker */}
-                <div className="flex items-center gap-2 bg-[#131127] border border-white/5 p-2 rounded-lg">
+                <div className="flex items-center gap-2 bg-[#131127] border border-white/[0.06] p-2 rounded-lg">
                   <div
                     className="relative w-8 h-8 rounded-full border border-white/20 cursor-pointer overflow-hidden flex-shrink-0 transition-transform duration-200 hover:scale-105"
                     style={{ backgroundColor: customTheme.bg }}
@@ -520,13 +520,13 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
                     />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase leading-none mb-0.5">BACKGROUND</span>
+                    <span className="font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase leading-none mb-0.5">BACKGROUND</span>
                     <span className="text-[10px] font-mono text-white/80 font-bold tracking-wide truncate">{customTheme.bg.toUpperCase()}</span>
                   </div>
                 </div>
 
                 {/* Card Picker */}
-                <div className="flex items-center gap-2 bg-[#131127] border border-white/5 p-2 rounded-lg">
+                <div className="flex items-center gap-2 bg-[#131127] border border-white/[0.06] p-2 rounded-lg">
                   <div
                     className="relative w-8 h-8 rounded-full border border-white/20 cursor-pointer overflow-hidden flex-shrink-0 transition-transform duration-200 hover:scale-105"
                     style={{ backgroundColor: customTheme.card }}
@@ -539,7 +539,7 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
                     />
                   </div>
                   <div className="flex flex-col min-w-0">
-                    <span className="font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase leading-none mb-0.5">CARD</span>
+                    <span className="font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase leading-none mb-0.5">CARD</span>
                     <span className="text-[10px] font-mono text-white/80 font-bold tracking-wide truncate">{customTheme.card.toUpperCase()}</span>
                   </div>
                 </div>
@@ -562,7 +562,7 @@ export default function ThemeManager({ currentTheme, onApplyTheme, tournament })
           <button
             type="button"
             onClick={handleApplySelected}
-            className="w-full rounded-xl bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] py-3.5 text-xs font-orbitron font-black tracking-widest text-white hover:from-[#6D28D9] hover:to-[#2563EB] active:scale-[0.99] transition-all duration-300 shadow-lg shadow-[#7C3AED]/10 flex items-center justify-center gap-2 uppercase"
+            className="w-full rounded-xl bg-[#7C3AED] py-3.5 text-xs font-orbitron font-black tracking-widest text-white hover:bg-[#6D28D9] active:scale-[0.99] transition-all duration-300 shadow-lg shadow-[#7C3AED]/10 flex items-center justify-center gap-2 uppercase"
           >
             <Palette className="h-4 w-4" />
             APPLY THEME TO TOURNAMENT

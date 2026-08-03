@@ -402,7 +402,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
   return (
     <div className="min-h-screen bg-[#04060E] text-white font-rajdhani p-6 selection:bg-[#7C3AED]/30">
       {/* ─── Header Section ─── */}
-      <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/5 pb-4">
+      <div className="mb-6 flex flex-col md:flex-row md:items-center justify-between gap-4 border-b border-white/[0.06] pb-4">
         <div>
           <div className="flex items-center gap-2.5">
             <span className="flex h-2.5 w-2.5 items-center justify-center">
@@ -416,16 +416,16 @@ export default function AssetManager({ data, refresh, overlayApi }) {
               NEXPLAY STUDIO v2.6
             </span>
           </div>
-          <p className="text-xs text-gray-400 font-medium tracking-wide mt-1">
+          <p className="text-xs text-white/50 font-medium tracking-wide mt-1">
             Manage overlays, soundscapes, dynamic fonts, partner logo rosters, and broadcast assets.
           </p>
         </div>
 
         {/* Global Storage Stats */}
-        <div className="flex items-center gap-4 bg-[#131127] border border-white/5 rounded-xl px-4 py-2.5">
+        <div className="flex items-center gap-4 bg-[#131127] border border-white/[0.06] rounded-xl px-4 py-2.5">
           <HardDrive className="h-5 w-5 text-purple-400" />
           <div>
-            <p className="text-[9px] font-black uppercase tracking-widest text-gray-400">STUDIO STORAGE</p>
+            <p className="text-[9px] font-black uppercase tracking-widest text-white/50">STUDIO STORAGE</p>
             <p className="font-teko text-lg text-white font-medium leading-none mt-0.5">
               {formatBytes(assets.reduce((sum, a) => sum + a.size, 0))} / 10 GB
             </p>
@@ -440,8 +440,8 @@ export default function AssetManager({ data, refresh, overlayApi }) {
         <div className="space-y-6">
           
           {/* Categories list */}
-          <div className="rounded-xl border border-white/5 bg-[#131127] p-4">
-            <h2 className="font-orbitron text-[10px] font-black tracking-widest text-purple-400 uppercase mb-3 pb-1 border-b border-white/5">
+          <div className="rounded-xl border border-white/[0.06] bg-[#131127] p-4">
+            <h2 className="font-orbitron text-[10px] font-black tracking-widest text-purple-400 uppercase mb-3 pb-1 border-b border-white/[0.06]">
               ASSET CATEGORIES
             </h2>
             <div className="space-y-1">
@@ -451,14 +451,14 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                 className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold transition-all ${
                   selectedCategory === 'ALL'
                     ? 'bg-[#7C3AED]/15 border border-[#7C3AED]/30 text-white'
-                    : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                    : 'text-white/50 hover:text-white hover:bg-white/[0.04] border border-transparent'
                 }`}
               >
                 <div className="flex items-center gap-2.5">
-                  <Folder className={`h-4 w-4 ${selectedCategory === 'ALL' ? 'text-[#7C3AED]' : 'text-gray-500'}`} />
+                  <Folder className={`h-4 w-4 ${selectedCategory === 'ALL' ? 'text-[#7C3AED]' : 'text-white/40'}`} />
                   <span className="font-orbitron tracking-wide">ALL MEDIA</span>
                 </div>
-                <span className="font-teko text-sm bg-black/30 border border-white/5 rounded px-2 text-gray-300">
+                <span className="font-teko text-sm bg-black/20 border border-white/[0.06] rounded px-2 text-gray-300">
                   {categoryCounts['ALL']}
                 </span>
               </button>
@@ -474,7 +474,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                     className={`flex w-full items-center justify-between rounded-lg px-3 py-2 text-xs font-bold transition-all ${
                       isActive
                         ? 'bg-[#7C3AED]/15 border border-[#7C3AED]/30 text-white'
-                        : 'text-gray-400 hover:text-white hover:bg-white/5 border border-transparent'
+                        : 'text-white/50 hover:text-white hover:bg-white/[0.04] border border-transparent'
                     }`}
                   >
                     <div className="flex items-center gap-2.5">
@@ -484,7 +484,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                       />
                       <span className="font-orbitron tracking-wide">{cat.label}</span>
                     </div>
-                    <span className="font-teko text-sm bg-black/30 border border-white/5 rounded px-2 text-gray-300">
+                    <span className="font-teko text-sm bg-black/20 border border-white/[0.06] rounded px-2 text-gray-300">
                       {categoryCounts[cat.key] || 0}
                     </span>
                   </button>
@@ -494,8 +494,8 @@ export default function AssetManager({ data, refresh, overlayApi }) {
           </div>
 
           {/* Dynamic Tag Filters Cloud */}
-          <div className="rounded-xl border border-white/5 bg-[#131127] p-4">
-            <h2 className="font-orbitron text-[10px] font-black tracking-widest text-purple-400 uppercase mb-3 pb-1 border-b border-white/5 flex justify-between items-center">
+          <div className="rounded-xl border border-white/[0.06] bg-[#131127] p-4">
+            <h2 className="font-orbitron text-[10px] font-black tracking-widest text-purple-400 uppercase mb-3 pb-1 border-b border-white/[0.06] flex justify-between items-center">
               <span>FILTER BY TAG</span>
               {selectedTags.length > 0 && (
                 <button
@@ -507,7 +507,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
               )}
             </h2>
             {allTags.length === 0 ? (
-              <p className="text-[10px] text-gray-500 italic">No tags registered.</p>
+              <p className="text-[10px] text-white/40 italic">No tags registered.</p>
             ) : (
               <div className="flex flex-wrap gap-1.5 max-h-[160px] overflow-y-auto pr-1">
                 {allTags.map(tag => {
@@ -519,7 +519,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                       className={`px-2 py-0.5 rounded text-[10px] font-bold uppercase transition-all flex items-center gap-1 ${
                         isSelected
                           ? 'bg-[#7C3AED] text-white border border-[#7C3AED]'
-                          : 'bg-black/30 text-gray-400 border border-white/5 hover:border-white/20 hover:text-white'
+                          : 'bg-black/20 text-white/50 border border-white/[0.06] hover:border-white/20 hover:text-white'
                       }`}
                     >
                       <span>#{tag}</span>
@@ -544,7 +544,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
             className={`relative rounded-xl border-2 border-dashed p-6 text-center cursor-pointer transition-all duration-200 overflow-hidden ${
               isDragActive
                 ? 'border-[#7C3AED] bg-[#7C3AED]/5 shadow-[0_0_20px_rgba(124,58,237,0.1)]'
-                : 'border-white/10 bg-[#131127] hover:border-white/20'
+                : 'border-white/[0.08] bg-[#131127] hover:border-white/20'
             }`}
           >
             {/* Visual gradient light beam sweep */}
@@ -558,7 +558,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                 <p className="font-orbitron text-xs font-black tracking-widest text-white uppercase">
                   DRAG & DROP BROADCAST MEDIA
                 </p>
-                <p className="text-[11px] text-gray-500 mt-1">
+                <p className="text-[11px] text-white/40 mt-1">
                   Supports Images (PNG, JPG, WebP), Videos (MP4, WEBM), Audio (MP3, WAV), Fonts (TTF, WOFF2), Lottie (JSON)
                 </p>
               </div>
@@ -580,7 +580,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
 
           {/* Active Uploading Simulators Progress Section */}
           {uploadingFiles.length > 0 && (
-            <div className="rounded-xl border border-white/5 bg-[#131127] p-4 space-y-3">
+            <div className="rounded-xl border border-white/[0.06] bg-[#131127] p-4 space-y-3">
               <div className="flex items-center gap-2">
                 <RefreshCw className="h-3.5 w-3.5 text-purple-400 animate-spin" />
                 <span className="font-orbitron text-[9px] font-black tracking-widest text-purple-400 uppercase">
@@ -589,15 +589,15 @@ export default function AssetManager({ data, refresh, overlayApi }) {
               </div>
               <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
                 {uploadingFiles.map(file => (
-                  <div key={file.id} className="rounded-lg bg-black/40 border border-white/5 p-3 space-y-2">
+                  <div key={file.id} className="rounded-lg bg-black/25 border border-white/[0.06] p-3 space-y-2">
                     <div className="flex justify-between items-start gap-3">
                       <span className="text-xs font-bold text-gray-200 truncate pr-4">{file.name}</span>
-                      <span className="font-mono text-[10px] text-gray-400 shrink-0">{formatBytes(file.size)}</span>
+                      <span className="font-mono text-[10px] text-white/50 shrink-0">{formatBytes(file.size)}</span>
                     </div>
                     <div className="flex items-center gap-3">
                       <div className="flex-1 bg-white/5 rounded-full h-1.5 overflow-hidden">
                         <div
-                          className="bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] h-full rounded-full transition-all duration-150"
+                          className="bg-[#7C3AED] h-full rounded-full transition-all duration-150"
                           style={{ width: `${file.progress}%` }}
                         />
                       </div>
@@ -610,21 +610,21 @@ export default function AssetManager({ data, refresh, overlayApi }) {
           )}
 
           {/* ─── Search, Filters & Sorters Panel ─── */}
-          <div className="flex flex-col md:flex-row items-center gap-3 bg-[#131127] border border-white/5 rounded-xl p-3">
+          <div className="flex flex-col md:flex-row items-center gap-3 bg-[#131127] border border-white/[0.06] rounded-xl p-3">
             {/* Search Input */}
             <div className="relative flex-1 w-full">
-              <Search className="absolute left-3 top-2.5 h-4 w-4 text-gray-500" />
+              <Search className="absolute left-3 top-2.5 h-4 w-4 text-white/40" />
               <input
                 type="text"
                 placeholder="Search file names or tags..."
                 value={searchQuery}
                 onChange={e => setSearchQuery(e.target.value)}
-                className="w-full rounded-lg border border-white/5 bg-black/40 py-2 pl-9 pr-4 font-rajdhani text-xs text-white focus:border-[#7C3AED]/40 focus:outline-none transition-all placeholder:text-gray-600"
+                className="w-full rounded-lg border border-white/[0.06] bg-black/25 py-2 pl-9 pr-4 font-rajdhani text-xs text-white focus:border-[#7C3AED]/40 focus:outline-none transition-all placeholder:text-white/30"
               />
               {searchQuery && (
                 <button
                   onClick={() => setSearchQuery('')}
-                  className="absolute right-3 top-2.5 text-gray-500 hover:text-white"
+                  className="absolute right-3 top-2.5 text-white/40 hover:text-white"
                 >
                   <X className="h-4 w-4" />
                 </button>
@@ -633,11 +633,11 @@ export default function AssetManager({ data, refresh, overlayApi }) {
 
             {/* Sort Dropdown */}
             <div className="flex items-center gap-2 w-full md:w-auto shrink-0 justify-end">
-              <span className="text-[10px] font-black text-gray-500 tracking-wider font-orbitron shrink-0">SORT BY</span>
+              <span className="text-[10px] font-black text-white/40 tracking-wider font-orbitron shrink-0">SORT BY</span>
               <select
                 value={sortBy}
                 onChange={e => setSortBy(e.target.value)}
-                className="rounded-lg border border-white/5 bg-black/40 px-3 py-2 font-orbitron text-[10px] font-bold text-gray-300 outline-none focus:border-[#7C3AED]/40 cursor-pointer"
+                className="rounded-lg border border-white/[0.06] bg-black/25 px-3 py-2 font-orbitron text-[10px] font-bold text-gray-300 outline-none focus:border-[#7C3AED]/40 cursor-pointer"
               >
                 <option value="DATE_DESC">NEWEST UPLOAD</option>
                 <option value="DATE_ASC">OLDEST UPLOAD</option>
@@ -651,14 +651,14 @@ export default function AssetManager({ data, refresh, overlayApi }) {
 
           {/* ─── Assets Grid ─── */}
           {filteredAndSortedAssets.length === 0 ? (
-            <div className="flex flex-col items-center justify-center p-12 rounded-xl border border-white/5 bg-[#131127] text-center min-h-[350px]">
+            <div className="flex flex-col items-center justify-center p-12 rounded-xl border border-white/[0.06] bg-[#131127] text-center min-h-[350px]">
               <div className="h-14 w-14 rounded-full bg-white/5 flex items-center justify-center mb-4">
-                <AlertCircle className="h-6 w-6 text-gray-500 animate-pulse" />
+                <AlertCircle className="h-6 w-6 text-white/40 animate-pulse" />
               </div>
               <h3 className="font-orbitron text-xs font-black tracking-widest text-white uppercase">
                 NO ASSETS ENCOUNTERED
               </h3>
-              <p className="text-[11px] text-gray-500 mt-1 max-w-sm leading-relaxed">
+              <p className="text-[11px] text-white/40 mt-1 max-w-sm leading-relaxed">
                 Refine your filters, clear search terms, or drag some fresh broadcast elements into the upload terminal above.
               </p>
               {(selectedCategory !== 'ALL' || searchQuery !== '' || selectedTags.length > 0) && (
@@ -684,10 +684,10 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                 return (
                   <div
                     key={asset.id}
-                    className="group relative rounded-xl border border-white/5 bg-[#131127] overflow-hidden transition-all duration-200 hover:border-[#7C3AED]/40 hover:shadow-[0_4px_20px_rgba(124,58,237,0.15)] flex flex-col h-full"
+                    className="group relative rounded-xl border border-white/[0.06] bg-[#131127] overflow-hidden transition-all duration-200 hover:border-[#7C3AED]/40 hover:shadow-[0_4px_20px_rgba(124,58,237,0.15)] flex flex-col h-full"
                   >
                     {/* Media Thumbnail Container */}
-                    <div className="aspect-video w-full bg-black/60 relative overflow-hidden flex items-center justify-center select-none border-b border-white/5 shrink-0">
+                    <div className="aspect-video w-full bg-black/60 relative overflow-hidden flex items-center justify-center select-none border-b border-white/[0.06] shrink-0">
                       {isImage && asset.url ? (
                         <img
                           src={asset.url}
@@ -722,7 +722,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                           >
                             <Icon className="h-5 w-5" style={{ color: catInfo.color }} />
                           </div>
-                          <span className="font-orbitron text-[8px] font-black text-gray-500 tracking-widest mt-2">
+                          <span className="font-orbitron text-[8px] font-black text-white/40 tracking-widest mt-2">
                             {asset.category}
                           </span>
                         </div>
@@ -750,7 +750,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                         </button>
                         <button
                           onClick={() => handleCopyUrl(asset.url, asset.name)}
-                          className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#131127] border border-white/10 hover:border-white/30 text-gray-300 hover:text-white transition-all"
+                          className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#131127] border border-white/[0.08] hover:border-white/30 text-gray-300 hover:text-white transition-all"
                           title="Copy CDN URL"
                         >
                           <Copy className="h-4 w-4" />
@@ -761,7 +761,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                             download={asset.name}
                             target="_blank"
                             rel="noreferrer"
-                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#131127] border border-white/10 hover:border-white/30 text-gray-300 hover:text-white transition-all"
+                            className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#131127] border border-white/[0.08] hover:border-white/30 text-gray-300 hover:text-white transition-all"
                             title="Download File"
                           >
                             <Download className="h-4 w-4" />
@@ -791,7 +791,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                             {formatBytes(asset.size)}
                           </span>
                           <span className="h-1 w-1 rounded-full bg-gray-600" />
-                          <span className="font-teko text-[11px] text-gray-400">
+                          <span className="font-teko text-[11px] text-white/50">
                             {asset.dimensions !== 'N/A' ? asset.dimensions : 'RAW FORMAT'}
                           </span>
                         </div>
@@ -803,7 +803,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                           {asset.tags.slice(0, 3).map(tag => (
                             <span
                               key={tag}
-                              className="text-[9px] font-bold text-gray-500 uppercase bg-black/20 border border-white/5 px-1.5 py-0.5 rounded"
+                              className="text-[9px] font-bold text-white/40 uppercase bg-black/20 border border-white/[0.06] px-1.5 py-0.5 rounded"
                             >
                               #{tag}
                             </span>
@@ -827,18 +827,18 @@ export default function AssetManager({ data, refresh, overlayApi }) {
       {/* ─── Asset Details & Interactive Preview Modal ─── */}
       {previewAsset && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/80 backdrop-blur-sm transition-all duration-300">
-          <div className="relative w-full max-w-4xl bg-[#131127] border border-white/10 rounded-2xl overflow-hidden shadow-2xl flex flex-col md:grid md:grid-cols-12 max-h-[90vh]">
+          <div className="relative w-full max-w-4xl bg-[#131127] border border-white/[0.08] rounded-2xl overflow-hidden  flex flex-col md:grid md:grid-cols-12 max-h-[90vh]">
             
             {/* Modal Close Button */}
             <button
               onClick={() => setPreviewAsset(null)}
-              className="absolute top-4 right-4 z-20 flex h-8 w-8 items-center justify-center rounded-lg bg-black/40 hover:bg-black/80 border border-white/15 hover:border-white/30 text-gray-300 hover:text-white transition-all"
+              className="absolute top-4 right-4 z-20 flex h-8 w-8 items-center justify-center rounded-lg bg-black/25 hover:bg-black/80 border border-white/15 hover:border-white/30 text-gray-300 hover:text-white transition-all"
             >
               <X className="h-4 w-4" />
             </button>
 
             {/* Left Column (Span 7): Large preview element */}
-            <div className="md:col-span-7 bg-[#04060E] p-6 flex flex-col justify-center items-center relative border-b md:border-b-0 md:border-r border-white/5 min-h-[300px] overflow-y-auto">
+            <div className="md:col-span-7 bg-[#04060E] p-6 flex flex-col justify-center items-center relative border-b md:border-b-0 md:border-r border-white/[0.06] min-h-[300px] overflow-y-auto">
               
               {/* Image Previewer */}
               {(previewAsset.category.includes('IMAGE') || previewAsset.category === 'LOGOS' || previewAsset.category === 'SPONSORS') && previewAsset.url ? (
@@ -846,7 +846,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                   <img
                     src={previewAsset.url}
                     alt={previewAsset.name}
-                    className="max-h-[320px] max-w-full object-contain rounded-lg border border-white/5 shadow-inner"
+                    className="max-h-[320px] max-w-full object-contain rounded-lg border border-white/[0.06] shadow-inner"
                   />
                 </div>
               ) : previewAsset.category === 'BACKGROUND VIDEOS' && previewAsset.url ? (
@@ -858,9 +858,9 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                     autoPlay
                     muted
                     loop
-                    className="w-full max-h-[280px] object-contain rounded-lg border border-white/5 bg-black"
+                    className="w-full max-h-[280px] object-contain rounded-lg border border-white/[0.06] bg-black"
                   />
-                  <p className="text-[10px] text-gray-500 text-center font-mono">
+                  <p className="text-[10px] text-white/40 text-center font-mono">
                     Resolves live looping. Right-click player to inspect telemetry.
                   </p>
                 </div>
@@ -904,7 +904,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
               ) : previewAsset.category === 'FONTS' ? (
                 /* Font Previewer with dynamic typography text area and sizing */
                 <div className="w-full space-y-4">
-                  <div className="bg-black/40 border border-white/5 rounded-xl p-4 flex flex-col justify-center min-h-[140px]">
+                  <div className="bg-black/25 border border-white/[0.06] rounded-xl p-4 flex flex-col justify-center min-h-[140px]">
                     <p
                       style={{ fontSize: `${fontSize}px` }}
                       className="text-center font-bold text-white tracking-wide break-words outline-none"
@@ -912,9 +912,9 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                       {fontSampleText}
                     </p>
                   </div>
-                  <div className="space-y-3 bg-[#131127] border border-white/5 p-4 rounded-xl">
+                  <div className="space-y-3 bg-[#131127] border border-white/[0.06] p-4 rounded-xl">
                     <div>
-                      <label className="flex justify-between font-orbitron text-[8px] font-black tracking-widest text-gray-400 mb-1">
+                      <label className="flex justify-between font-orbitron text-[8px] font-black tracking-widest text-white/50 mb-1">
                         <span>PREVIEW SIZE</span>
                         <span className="text-cyan-400">{fontSize}PX</span>
                       </label>
@@ -924,18 +924,18 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                         max="64"
                         value={fontSize}
                         onChange={e => setFontSize(parseInt(e.target.value))}
-                        className="w-full accent-cyan-400 bg-black/40 h-1.5 rounded-lg appearance-none outline-none cursor-pointer"
+                        className="w-full accent-cyan-400 bg-black/25 h-1.5 rounded-lg appearance-none outline-none cursor-pointer"
                       />
                     </div>
                     <div>
-                      <label className="block font-orbitron text-[8px] font-black tracking-widest text-gray-400 mb-1">
+                      <label className="block font-orbitron text-[8px] font-black tracking-widest text-white/50 mb-1">
                         EDIT PREVIEW TEXT
                       </label>
                       <input
                         type="text"
                         value={fontSampleText}
                         onChange={e => setFontSampleText(e.target.value)}
-                        className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2 font-rajdhani text-xs text-white focus:outline-none focus:border-cyan-400/40"
+                        className="w-full rounded-lg border border-white/[0.06] bg-black/25 px-3 py-2 font-rajdhani text-xs text-white focus:outline-none focus:border-cyan-400/40"
                       />
                     </div>
                   </div>
@@ -950,8 +950,8 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                     SVG / ANIMATION BLUEPRINT PREVIEW
                   </p>
                   
-                  <div className="bg-black/60 border border-white/5 rounded-xl p-4 font-mono text-[10px] text-green-400 h-[140px] overflow-y-auto space-y-1">
-                    <p className="text-gray-500">{`{/* Animation Manifest */}`}</p>
+                  <div className="bg-black/60 border border-white/[0.06] rounded-xl p-4 font-mono text-[10px] text-green-400 h-[140px] overflow-y-auto space-y-1">
+                    <p className="text-white/40">{`{/* Animation Manifest */}`}</p>
                     <p>{`"v": "5.7.4",`}</p>
                     <p>{`"fr": 60,`}</p>
                     <p>{`"ip": 0, "op": 120,`}</p>
@@ -978,24 +978,24 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                 </div>
 
                 {/* Info Metadata Block */}
-                <div className="rounded-xl border border-white/5 bg-black/30 p-3.5 space-y-3.5">
+                <div className="rounded-xl border border-white/[0.06] bg-black/20 p-3.5 space-y-3.5">
                   <div className="grid grid-cols-2 gap-3.5">
                     <div>
-                      <p className="font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase">FILE SIZE</p>
+                      <p className="font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase">FILE SIZE</p>
                       <p className="font-teko text-[17px] text-white font-medium leading-none mt-1">{formatBytes(previewAsset.size)}</p>
                     </div>
                     <div>
-                      <p className="font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase">DIMENSIONS</p>
+                      <p className="font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase">DIMENSIONS</p>
                       <p className="font-teko text-[17px] text-white font-medium leading-none mt-1">{previewAsset.dimensions || 'N/A'}</p>
                     </div>
                     <div>
-                      <p className="font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase">DATE INGESTED</p>
+                      <p className="font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase">DATE INGESTED</p>
                       <p className="font-teko text-[17px] text-white font-medium leading-none mt-1">
                         {new Date(previewAsset.date).toLocaleDateString()}
                       </p>
                     </div>
                     <div>
-                      <p className="font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase">MIME TYPE</p>
+                      <p className="font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase">MIME TYPE</p>
                       <p className="font-teko text-[17px] text-white font-medium leading-none mt-1 truncate max-w-[120px]" title={previewAsset.type}>
                         {previewAsset.type.toUpperCase() || 'BINARY'}
                       </p>
@@ -1003,14 +1003,14 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                   </div>
 
                   {/* Category Adjust Dropdown */}
-                  <div className="border-t border-white/5 pt-3">
-                    <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase mb-1.5">
+                  <div className="border-t border-white/[0.06] pt-3">
+                    <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase mb-1.5">
                       REASSIGN BROADCAST CATEGORY
                     </label>
                     <select
                       value={previewAsset.category}
                       onChange={e => handleAssetCategoryChange(previewAsset.id, e.target.value)}
-                      className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2 font-orbitron text-[10px] font-bold text-gray-300 outline-none focus:border-[#7C3AED]/40 cursor-pointer"
+                      className="w-full rounded-lg border border-white/[0.06] bg-black/25 px-3 py-2 font-orbitron text-[10px] font-bold text-gray-300 outline-none focus:border-[#7C3AED]/40 cursor-pointer"
                     >
                       {CATEGORIES.map(c => (
                         <option key={c.key} value={c.key}>{c.label}</option>
@@ -1021,22 +1021,22 @@ export default function AssetManager({ data, refresh, overlayApi }) {
 
                 {/* Editable Tags Management */}
                 <div>
-                  <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase mb-1.5">
+                  <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase mb-1.5">
                     ASSET CLOUD TAGS
                   </label>
                   <div className="flex flex-wrap gap-1.5 mb-2 max-h-[80px] overflow-y-auto pr-1">
                     {previewAsset.tags.length === 0 ? (
-                      <span className="text-[10px] text-gray-600 italic">No tags associated</span>
+                      <span className="text-[10px] text-white/30 italic">No tags associated</span>
                     ) : (
                       previewAsset.tags.map(t => (
                         <span
                           key={t}
-                          className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-black/30 border border-white/5 text-gray-300 flex items-center gap-1.5"
+                          className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-black/20 border border-white/[0.06] text-gray-300 flex items-center gap-1.5"
                         >
                           <span>#{t}</span>
                           <button
                             onClick={() => handleRemoveTag(previewAsset.id, t)}
-                            className="text-gray-500 hover:text-red-400"
+                            className="text-white/40 hover:text-red-400"
                           >
                             <X className="h-3 w-3" />
                           </button>
@@ -1057,7 +1057,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                           handleAddTag(previewAsset.id, newTagInput);
                         }
                       }}
-                      className="flex-1 rounded-lg border border-white/5 bg-black/40 px-3 py-1.5 font-rajdhani text-xs text-white focus:outline-none focus:border-[#7C3AED]/40 placeholder:text-gray-600"
+                      className="flex-1 rounded-lg border border-white/[0.06] bg-black/25 px-3 py-1.5 font-rajdhani text-xs text-white focus:outline-none focus:border-[#7C3AED]/40 placeholder:text-white/30"
                     />
                     <button
                       onClick={() => handleAddTag(previewAsset.id, newTagInput)}
@@ -1070,7 +1070,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
 
                 {/* Places Referenced Section */}
                 <div>
-                  <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest uppercase mb-1.5">
+                  <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest uppercase mb-1.5">
                     BROADCAST REFERENCES
                   </label>
                   <div className="space-y-1 max-h-[110px] overflow-y-auto pr-1">
@@ -1078,7 +1078,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                       previewAsset.usedIn.map((place, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center gap-2 p-1.5 rounded bg-black/10 border border-white/5 text-[11px] text-gray-300 font-bold"
+                          className="flex items-center gap-2 p-1.5 rounded bg-black/10 border border-white/[0.06] text-[11px] text-gray-300 font-bold"
                         >
                           <span className="h-1.5 w-1.5 rounded-full bg-green-500 animate-pulse shrink-0" />
                           <span className="truncate">{place}</span>
@@ -1096,7 +1096,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
               </div>
 
               {/* Modal Actions Footer */}
-              <div className="mt-6 pt-4 border-t border-white/5 flex items-center gap-2.5">
+              <div className="mt-6 pt-4 border-t border-white/[0.06] flex items-center gap-2.5">
                 <button
                   onClick={() => handleCopyUrl(previewAsset.url, previewAsset.name)}
                   className="flex-1 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] py-2.5 font-orbitron text-[10px] font-black tracking-widest text-white transition-all uppercase flex items-center justify-center gap-1.5"
@@ -1106,7 +1106,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                 </button>
                 <button
                   onClick={() => setPreviewAsset(null)}
-                  className="rounded-lg bg-white/5 border border-white/10 hover:bg-white/10 px-4 py-2.5 font-orbitron text-[10px] font-black tracking-widest text-gray-300 hover:text-white transition-all uppercase"
+                  className="rounded-lg bg-white/5 border border-white/[0.08] hover:bg-white/10 px-4 py-2.5 font-orbitron text-[10px] font-black tracking-widest text-gray-300 hover:text-white transition-all uppercase"
                 >
                   DISMISS
                 </button>

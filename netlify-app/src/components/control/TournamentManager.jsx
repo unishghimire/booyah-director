@@ -607,7 +607,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
               {/* Scrollable Tournament List */}
               <div className="space-y-3 max-h-[450px] overflow-y-auto pr-1">
                 {tournaments.length === 0 ? (
-                  <div className="text-center py-8 text-gray-500 font-rajdhani text-sm">
+                  <div className="text-center py-8 text-white/40 font-rajdhani text-sm">
                     No tournaments available. Create one to begin.
                   </div>
                 ) : (
@@ -633,7 +633,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                         </div>
 
                         {/* Stats mini grid */}
-                        <div className="flex items-center justify-between mt-3 text-[10px] text-gray-400 font-rajdhani font-semibold">
+                        <div className="flex items-center justify-between mt-3 text-[10px] text-white/50 font-rajdhani font-semibold">
                           <div className="flex items-center gap-1">
                             <Users className="h-3 w-3 text-[#3B82F6]" />
                             <span>{t.team_count || 12} Teams</span>
@@ -676,9 +676,9 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
           <div className="lg:col-span-3 space-y-6">
             {!selectedTournament ? (
               <div className="flex flex-col items-center justify-center py-20 nx-surface text-center">
-                <Trophy className="h-16 w-16 text-gray-600 mb-4 animate-bounce" />
-                <h3 className="font-orbitron text-base font-black tracking-widest text-gray-400 uppercase">NO TOURNAMENT SELECTED</h3>
-                <p className="font-rajdhani text-sm text-gray-500 mt-2 max-w-sm">
+                <Trophy className="h-16 w-16 text-white/30 mb-4 animate-bounce" />
+                <h3 className="font-orbitron text-base font-black tracking-widest text-white/50 uppercase">NO TOURNAMENT SELECTED</h3>
+                <p className="font-rajdhani text-sm text-white/40 mt-2 max-w-sm">
                   Select an existing tournament from the sidebar or click "NEW TOURNAMENT" to configure your broadcast studio.
                 </p>
                 <button
@@ -694,7 +694,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                 {/* ── HEADER & INLINE NAME EDIT ── */}
                 <div className="nx-surface p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex-1 w-full">
-                    <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1">
+                    <span className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1">
                       CHAMPIONSHIP DETAILS
                     </span>
                     {isEditingName ? (
@@ -730,7 +730,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                             setEditingNameValue(selectedTournament.name);
                             setIsEditingName(true);
                           }}
-                          className="text-gray-400 hover:text-white p-1 hover:bg-white/5 rounded transition-all"
+                          className="text-white/50 hover:text-white p-1 hover:bg-white/[0.04] rounded transition-all"
                           title="Edit Name"
                         >
                           <Edit2 className="h-3.5 w-3.5" />
@@ -760,7 +760,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                   {/* Stat 1: Total Teams */}
                   <div className="nx-surface p-4 flex items-center justify-between">
                     <div>
-                      <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1">
+                      <span className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1">
                         TOTAL TEAMS
                       </span>
                       <span className="text-3xl font-bold tracking-tight text-white leading-none" style={{ fontFamily: 'Teko, sans-serif' }}>
@@ -775,7 +775,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                   {/* Stat 2: Total Matches */}
                   <div className="nx-surface p-4 flex items-center justify-between">
                     <div>
-                      <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1">
+                      <span className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1">
                         TOTAL MATCHES
                       </span>
                       <span className="text-3xl font-bold tracking-tight text-white leading-none" style={{ fontFamily: 'Teko, sans-serif' }}>
@@ -790,7 +790,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                   {/* Stat 3: Current Match # */}
                   <div className="nx-surface p-4 flex items-center justify-between">
                     <div>
-                      <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1">
+                      <span className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1">
                         CURRENT MATCH
                       </span>
                       <span className="text-3xl font-bold tracking-tight text-white leading-none" style={{ fontFamily: 'Teko, sans-serif' }}>
@@ -805,7 +805,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                   {/* Stat 4: Total Kills */}
                   <div className="nx-surface p-4 flex items-center justify-between">
                     <div>
-                      <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1">
+                      <span className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1">
                         TOTAL KILLS
                       </span>
                       <span className="text-3xl font-bold tracking-tight text-white leading-none" style={{ fontFamily: 'Teko, sans-serif' }}>
@@ -833,7 +833,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       <div className="space-y-4">
                         {/* Points per kill */}
                         <div>
-                          <label className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1.5">
+                          <label className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1.5">
                             POINTS PER KILL
                           </label>
                           <input
@@ -847,7 +847,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
                         {/* Total matches */}
                         <div>
-                          <label className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1.5">
+                          <label className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1.5">
                             TOTAL MATCHES
                           </label>
                           <input
@@ -861,17 +861,17 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
                         {/* Current Match Display */}
                         <div>
-                          <label className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1.5">
+                          <label className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1.5">
                             CURRENT MATCH (LIVE DISPLAY)
                           </label>
-                          <div className="w-full bg-black/20 border border-white/[0.06] rounded-lg px-3 py-2 text-xs font-bold text-gray-500 font-orbitron">
+                          <div className="w-full bg-black/20 border border-white/[0.06] rounded-lg px-3 py-2 text-xs font-bold text-white/40 font-orbitron">
                             {selectedTournament.current_match_number || 1}
                           </div>
                         </div>
 
                         {/* Status selector */}
                         <div>
-                          <label className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1.5">
+                          <label className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1.5">
                             TOURNAMENT STATUS
                           </label>
                           <select
@@ -887,7 +887,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-white/[0.06] text-[11px] font-rajdhani text-gray-500">
+                    <div className="pt-4 border-t border-white/[0.06] text-[11px] font-rajdhani text-white/40">
                       * Status: Setting status to <span className="text-[#7C3AED]">ACTIVE</span> switches the live overlay scoreboard feed to this championship.
                     </div>
                   </div>
@@ -899,7 +899,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                         <Award className="h-4 w-4 text-[#3B82F6]" />
                         <h4 className="font-orbitron text-xs font-black tracking-wider text-gray-200">PLACEMENT POINTS</h4>
                       </div>
-                      <span className="text-[9px] font-black tracking-widest text-gray-500 uppercase font-rajdhani">
+                      <span className="text-[9px] font-black tracking-widest text-white/40 uppercase font-rajdhani">
                         RANKS 1-24
                       </span>
                     </div>
@@ -912,7 +912,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                         
                         // Highlights
                         let highlightClass = 'border-white/[0.06] bg-black/20 hover:border-white/15';
-                        let badgeColor = 'text-gray-400';
+                        let badgeColor = 'text-white/50';
                         if (rank === 1) {
                           highlightClass = 'border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50';
                           badgeColor = 'text-amber-400';
@@ -960,7 +960,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       className={`flex items-center gap-1.5 px-4 py-3 border-b-2 transition-all duration-300 ${
                         activeTab === 'stages'
                           ? 'border-[#7C3AED] text-[#7C3AED]'
-                          : 'border-transparent text-gray-400 hover:text-white hover:border-white/[0.08]'
+                          : 'border-transparent text-white/50 hover:text-white hover:border-white/[0.08]'
                       }`}
                     >
                       <Layers className="h-4 w-4" />
@@ -971,7 +971,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       className={`flex items-center gap-1.5 px-4 py-3 border-b-2 transition-all duration-300 ${
                         activeTab === 'schedule'
                           ? 'border-[#7C3AED] text-[#7C3AED]'
-                          : 'border-transparent text-gray-400 hover:text-white hover:border-white/[0.08]'
+                          : 'border-transparent text-white/50 hover:text-white hover:border-white/[0.08]'
                       }`}
                     >
                       <CalendarDays className="h-4 w-4" />
@@ -982,7 +982,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       className={`flex items-center gap-1.5 px-4 py-3 border-b-2 transition-all duration-300 ${
                         activeTab === 'groups'
                           ? 'border-[#7C3AED] text-[#7C3AED]'
-                          : 'border-transparent text-gray-400 hover:text-white hover:border-white/[0.08]'
+                          : 'border-transparent text-white/50 hover:text-white hover:border-white/[0.08]'
                       }`}
                     >
                       <Grid className="h-4 w-4" />
@@ -995,7 +995,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                     <div className="space-y-4">
                       <div className="space-y-3">
                         {safeArray(selectedTournament.stages).length === 0 ? (
-                          <p className="text-gray-500 font-rajdhani text-sm py-4">No stages added yet.</p>
+                          <p className="text-white/40 font-rajdhani text-sm py-4">No stages added yet.</p>
                         ) : (
                           safeArray(selectedTournament.stages).map((stage) => (
                             <div
@@ -1014,7 +1014,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                               <div className="flex flex-wrap items-center gap-3">
                                 {/* Match count */}
                                 <div className="flex items-center gap-2">
-                                  <span className="text-[8px] font-black tracking-widest text-gray-400 uppercase font-rajdhani">MATCH COUNT</span>
+                                  <span className="text-[8px] font-black tracking-widest text-white/50 uppercase font-rajdhani">MATCH COUNT</span>
                                   <input
                                     type="number"
                                     min="1"
@@ -1026,7 +1026,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
                                 {/* Status */}
                                 <div className="flex items-center gap-2">
-                                  <span className="text-[8px] font-black tracking-widest text-gray-400 uppercase font-rajdhani">STATUS</span>
+                                  <span className="text-[8px] font-black tracking-widest text-white/50 uppercase font-rajdhani">STATUS</span>
                                   <select
                                     value={stage.status}
                                     onChange={(e) => handleUpdateStage(stage.id, 'status', e.target.value)}
@@ -1053,7 +1053,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
                       <button
                         onClick={handleAddStage}
-                        className="active:scale-[0.98] flex items-center justify-center gap-1.5 w-full border border-dashed border-white/15 hover:border-[#7C3AED]/50 hover:bg-[#7C3AED]/5 py-2.5 rounded-lg text-xs font-orbitron font-bold text-gray-400 hover:text-[#7C3AED] transition-all"
+                        className="active:scale-[0.98] flex items-center justify-center gap-1.5 w-full border border-dashed border-white/15 hover:border-[#7C3AED]/50 hover:bg-[#7C3AED]/5 py-2.5 rounded-lg text-xs font-orbitron font-bold text-white/50 hover:text-[#7C3AED] transition-all"
                       >
                         <Plus className="h-4 w-4" />
                         ADD TOURNAMENT STAGE
@@ -1066,7 +1066,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                     <div className="space-y-4">
                       <div className="space-y-3 max-h-[350px] overflow-y-auto pr-1">
                         {safeArray(selectedTournament.schedule).length === 0 ? (
-                          <p className="text-gray-500 font-rajdhani text-sm py-4">No scheduled matches.</p>
+                          <p className="text-white/40 font-rajdhani text-sm py-4">No scheduled matches.</p>
                         ) : (
                           safeArray(selectedTournament.schedule).map((match) => (
                             <div
@@ -1081,7 +1081,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                 
                                 {/* Stage Picker */}
                                 <div className="flex flex-col">
-                                  <span className="text-[8px] font-black tracking-widest text-gray-500 uppercase font-rajdhani">STAGE</span>
+                                  <span className="text-[8px] font-black tracking-widest text-white/40 uppercase font-rajdhani">STAGE</span>
                                   <select
                                     value={match.stage}
                                     onChange={(e) => handleUpdateMatch(match.id, 'stage', e.target.value)}
@@ -1099,7 +1099,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
                               {/* Time Input */}
                               <div className="flex flex-col">
-                                <span className="text-[8px] font-black tracking-widest text-gray-500 uppercase font-rajdhani">TIME</span>
+                                <span className="text-[8px] font-black tracking-widest text-white/40 uppercase font-rajdhani">TIME</span>
                                 <input
                                   type="text"
                                   placeholder="e.g. 18:00"
@@ -1111,7 +1111,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
                               {/* Map Dropdown */}
                               <div className="flex flex-col">
-                                <span className="text-[8px] font-black tracking-widest text-gray-500 uppercase font-rajdhani">MAP</span>
+                                <span className="text-[8px] font-black tracking-widest text-white/40 uppercase font-rajdhani">MAP</span>
                                 <select
                                   value={match.map}
                                   onChange={(e) => handleUpdateMatch(match.id, 'map', e.target.value)}
@@ -1125,7 +1125,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
                               {/* Status Dropdown */}
                               <div className="flex flex-col">
-                                <span className="text-[8px] font-black tracking-widest text-gray-500 uppercase font-rajdhani">STATUS</span>
+                                <span className="text-[8px] font-black tracking-widest text-white/40 uppercase font-rajdhani">STATUS</span>
                                 <select
                                   value={match.status}
                                   onChange={(e) => handleUpdateMatch(match.id, 'status', e.target.value)}
@@ -1152,7 +1152,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
                       <button
                         onClick={handleAddMatch}
-                        className="active:scale-[0.98] flex items-center justify-center gap-1.5 w-full border border-dashed border-white/15 hover:border-[#3B82F6]/50 hover:bg-[#3B82F6]/5 py-2.5 rounded-lg text-xs font-orbitron font-bold text-gray-400 hover:text-[#3B82F6] transition-all"
+                        className="active:scale-[0.98] flex items-center justify-center gap-1.5 w-full border border-dashed border-white/15 hover:border-[#3B82F6]/50 hover:bg-[#3B82F6]/5 py-2.5 rounded-lg text-xs font-orbitron font-bold text-white/50 hover:text-[#3B82F6] transition-all"
                       >
                         <Plus className="h-4 w-4" />
                         ADD MATCH TO SCHEDULE
@@ -1201,7 +1201,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                               {/* Group Header */}
                               <div className="bg-[#1a1835] px-3 py-2 border-b border-white/[0.06] flex items-center justify-between">
                                 <span className="font-orbitron text-xs font-black text-white">GROUP {gLetter}</span>
-                                <span className="px-1.5 py-0.5 bg-white/5 text-[9px] font-bold rounded text-gray-400">
+                                <span className="px-1.5 py-0.5 bg-white/5 text-[9px] font-bold rounded text-white/50">
                                   {list.length}
                                 </span>
                               </div>
@@ -1209,7 +1209,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                               {/* Dropzone Area */}
                               <div className="flex-1 p-2 space-y-2 overflow-y-auto max-h-[220px]">
                                 {list.length === 0 ? (
-                                  <div className="h-full flex items-center justify-center py-6 text-center text-[10px] font-rajdhani text-gray-600 border border-dashed border-white/[0.06] rounded-lg">
+                                  <div className="h-full flex items-center justify-center py-6 text-center text-[10px] font-rajdhani text-white/30 border border-dashed border-white/[0.06] rounded-lg">
                                     Drag Teams Here
                                   </div>
                                 ) : (
@@ -1225,7 +1225,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                       {/* Selection control for mobile/unassigned */}
                                       <button
                                         onClick={() => moveTeamToGroup(team, 'unassigned')}
-                                        className="text-gray-500 hover:text-red-400 p-0.5 transition-colors"
+                                        className="text-white/40 hover:text-red-400 p-0.5 transition-colors"
                                         title="Unassign"
                                       >
                                         <X className="h-3 w-3" />
@@ -1242,13 +1242,13 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       {/* Unassigned Pool Drawer */}
                       <div className="p-4 bg-black/30 border border-white/[0.06] rounded-xl">
                         <div className="flex items-center justify-between mb-3">
-                          <span className="text-[10px] font-black tracking-widest text-gray-400 uppercase font-rajdhani">
+                          <span className="text-[10px] font-black tracking-widest text-white/50 uppercase font-rajdhani">
                             UNASSIGNED TEAMS POOL ({unassignedTeams.length})
                           </span>
                         </div>
 
                         {unassignedTeams.length === 0 ? (
-                          <p className="text-gray-600 text-xs font-rajdhani font-medium">All teams assigned to groups.</p>
+                          <p className="text-white/30 text-xs font-rajdhani font-medium">All teams assigned to groups.</p>
                         ) : (
                           <div className="flex flex-wrap gap-2">
                             {unassignedTeams.map((team) => (
@@ -1264,7 +1264,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                 <select
                                   value="unassigned"
                                   onChange={(e) => moveTeamToGroup(team, e.target.value)}
-                                  className="bg-black/40 border border-white/[0.08] rounded text-[10px] text-gray-400 px-1 py-0.5 focus:outline-none"
+                                  className="bg-black/40 border border-white/[0.08] rounded text-[10px] text-white/50 px-1 py-0.5 focus:outline-none"
                                 >
                                   <option value="unassigned" disabled>Assign</option>
                                   <option value="A">Group A</option>
@@ -1302,7 +1302,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                 </div>
                 <button
                   onClick={() => setShowCreateForm(false)}
-                  className="text-gray-400 hover:text-white p-1 rounded hover:bg-white/5 transition-all"
+                  className="text-white/50 hover:text-white p-1 rounded hover:bg-white/[0.04] transition-all"
                 >
                   <X className="h-5 w-5" />
                 </button>
@@ -1312,7 +1312,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
               <div className="p-6 space-y-4 max-h-[75vh] overflow-y-auto">
                 {/* Name */}
                 <div>
-                  <label className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1.5">
+                  <label className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1.5">
                     TOURNAMENT NAME
                   </label>
                   <input
@@ -1327,7 +1327,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                 {/* Total Matches & Points Per Kill */}
                 <div className="grid grid-cols-2 gap-4">
                   <div>
-                    <label className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1.5">
+                    <label className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1.5">
                       TOTAL MATCHES
                     </label>
                     <input
@@ -1340,7 +1340,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                   </div>
 
                   <div>
-                    <label className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1.5">
+                    <label className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani block mb-1.5">
                       POINTS PER KILL
                     </label>
                     <input
@@ -1356,7 +1356,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                 {/* Placement points previews */}
                 <div>
                   <div className="flex items-center justify-between mb-1.5">
-                    <label className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani">
+                    <label className="text-[9px] font-black tracking-widest text-white/50 uppercase font-rajdhani">
                       PLACEMENT POINTS CONFIG (DEFAULT PRESETS)
                     </label>
                   </div>
@@ -1366,14 +1366,14 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                     <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-yellow-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#1</span><span>12 PTS</span></div>
                     <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-slate-300"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#2</span><span>9 PTS</span></div>
                     <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-amber-600"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#3</span><span>8 PTS</span></div>
-                    <div className="flex justify-between text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#4</span><span>7 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#5</span><span>6 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#6</span><span>5 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#7</span><span>4 PTS</span></div>
-                    <div className="flex justify-between text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#8</span><span>3 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#9</span><span>2 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#10</span><span>1 PTS</span></div>
-                    <div className="col-span-2 text-center text-gray-500 font-medium">Rank 11-24 = 0 PTS</div>
+                    <div className="flex justify-between text-white/50"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#4</span><span>7 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-white/50"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#5</span><span>6 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-white/50"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#6</span><span>5 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-white/50"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#7</span><span>4 PTS</span></div>
+                    <div className="flex justify-between text-white/50"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#8</span><span>3 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-white/50"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#9</span><span>2 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-white/50"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#10</span><span>1 PTS</span></div>
+                    <div className="col-span-2 text-center text-white/40 font-medium">Rank 11-24 = 0 PTS</div>
                   </div>
                 </div>
 
@@ -1383,7 +1383,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
               <div className="flex items-center justify-end gap-3 bg-black/20 p-4 border-t border-white/[0.08] font-orbitron text-xs font-bold">
                 <button
                   onClick={() => setShowCreateForm(false)}
-                  className="px-4 py-2 border border-white/[0.08] rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                  className="px-4 py-2 border border-white/[0.08] rounded-lg text-white/50 hover:text-white hover:bg-white/[0.04] transition-all"
                 >
                   CANCEL
                 </button>
@@ -1407,14 +1407,14 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
               <h3 className="font-orbitron font-black text-sm tracking-widest text-white uppercase">
                 DELETE TOURNAMENT?
               </h3>
-              <p className="font-rajdhani text-xs text-gray-400 mt-2 leading-relaxed">
+              <p className="font-rajdhani text-xs text-white/50 mt-2 leading-relaxed">
                 This action is permanent and will delete all configuration settings, stages, schedules, and group listings from local storage and the cloud server.
               </p>
               
               <div className="flex items-center justify-center gap-3 mt-6 font-orbitron text-xs font-bold">
                 <button
                   onClick={() => setConfirmDeleteId(null)}
-                  className="px-4 py-2 border border-white/[0.08] rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                  className="px-4 py-2 border border-white/[0.08] rounded-lg text-white/50 hover:text-white hover:bg-white/[0.04] transition-all"
                 >
                   CANCEL
                 </button>

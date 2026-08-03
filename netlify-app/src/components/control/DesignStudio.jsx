@@ -96,10 +96,10 @@ function Section({ title, icon: Icon, children }) {
   return (
     <div className="rounded-xl border border-white/[0.08] nx-surface overflow-hidden">
       <button onClick={() => setOpen(o=>!o)}
-        className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-white/5 transition-all border-b border-white/[0.06]">
+        className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-white/[0.04] transition-all border-b border-white/[0.06]">
         <Icon className="h-3.5 w-3.5 text-[#7C3AED]" />
         <span className="font-orbitron text-[11px] font-black text-white tracking-wider">{title}</span>
-        <span className="ml-auto text-gray-600 text-xs">{open ? '▲' : '▼'}</span>
+        <span className="ml-auto text-white/30 text-xs">{open ? '▲' : '▼'}</span>
       </button>
       {open && <div className="p-4">{children}</div>}
     </div>
@@ -108,12 +108,12 @@ function Section({ title, icon: Icon, children }) {
 
 function ColorPicker({ label, value, onChange }) {
   return (
-    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2.5 hover:bg-white/5 transition-all">
+    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2.5 hover:bg-white/[0.04] transition-all">
       <input type="color" value={value || '#000000'} onChange={e => onChange(e.target.value)}
         className="h-8 w-8 cursor-pointer rounded-lg border-0 bg-transparent" />
       <div>
-        <p className="text-[10px] font-black uppercase tracking-wider text-gray-400">{label}</p>
-        <p className="font-mono text-[10px] text-gray-600">{value}</p>
+        <p className="text-[10px] font-black uppercase tracking-wider text-white/50">{label}</p>
+        <p className="font-mono text-[10px] text-white/30">{value}</p>
       </div>
     </label>
   );
@@ -143,7 +143,7 @@ function BackgroundsSection({ design, upd }) {
             className={`px-3 py-1.5 text-[10px] font-orbitron font-bold tracking-wider rounded-lg transition-all ${
               activeTab === t.key.toUpperCase()
                 ? "bg-[#7C3AED]/10 text-[#7C3AED] border border-[#7C3AED]/20"
-                : "text-gray-400 hover:text-white hover:bg-white/5 border border-transparent"
+                : "text-white/50 hover:text-white hover:bg-white/[0.04] border border-transparent"
             }`}
           >
             {t.label}
@@ -164,7 +164,7 @@ function BackgroundsSection({ design, upd }) {
               name={`bg-${t.key}`}
               size="md"
             />
-            <p className="text-[10px] text-gray-500 leading-normal">
+            <p className="text-[10px] text-white/40 leading-normal">
               Replaces the default animated gradient background for this screen. Upload 1920×1080 PNG/JPG.
             </p>
             {url && (
@@ -204,10 +204,10 @@ function ImageManagementSection({ design, upd, teams = [], players = [] }) {
         </p>
         <div className="max-h-[300px] overflow-y-auto space-y-3 pr-1 custom-scrollbar">
           {teams.length === 0 ? (
-            <p className="text-[10px] text-gray-600 italic">No teams available. Note: Add teams prop to parent if missing.</p>
+            <p className="text-[10px] text-white/30 italic">No teams available. Note: Add teams prop to parent if missing.</p>
           ) : (
             teams.map(team => (
-              <div key={team.id} className="flex items-center justify-between gap-4 p-2 rounded-lg bg-white/2 hover:bg-white/5 transition-all">
+              <div key={team.id} className="flex items-center justify-between gap-4 p-2 rounded-lg bg-white/2 hover:bg-white/[0.04] transition-all">
                 <span className="font-orbitron text-xs font-bold text-white max-w-[150px] truncate">{team.name}</span>
                 <div className="w-[180px]">
                   <ImageUpload
@@ -231,13 +231,13 @@ function ImageManagementSection({ design, upd, teams = [], players = [] }) {
         </p>
         <div className="max-h-[400px] overflow-y-auto space-y-3 pr-1 custom-scrollbar">
           {players.length === 0 ? (
-            <p className="text-[10px] text-gray-600 italic">No players available. Note: Add players prop to parent if missing.</p>
+            <p className="text-[10px] text-white/30 italic">No players available. Note: Add players prop to parent if missing.</p>
           ) : (
             players.map(player => {
               const team = teams.find(t => t.id === player.teamId || t.name === player.teamName || t.id === player.team_id);
               const teamBadge = team ? team.name : player.teamName || "NO TEAM";
               return (
-                <div key={player.id} className="flex items-center justify-between gap-4 p-2 rounded-lg bg-white/2 hover:bg-white/5 transition-all">
+                <div key={player.id} className="flex items-center justify-between gap-4 p-2 rounded-lg bg-white/2 hover:bg-white/[0.04] transition-all">
                   <div className="flex flex-col gap-0.5 min-w-0 flex-1">
                     <span className="font-orbitron text-xs font-bold text-white truncate">{player.name}</span>
                     <span className="inline-block self-start text-[8px] font-black tracking-wider px-1.5 py-0.5 rounded bg-[#7C3AED]/10 text-[#7C3AED] uppercase font-orbitron">{teamBadge}</span>
@@ -278,7 +278,7 @@ function DiscordSection({ tournament }) {
 
   if (!tournament) return (
     <div className="rounded-xl border border-white/[0.06] bg-black/20 p-5 text-center">
-      <p className="text-[11px] text-gray-500 font-orbitron">No active tournament. Create one first.</p>
+      <p className="text-[11px] text-white/40 font-orbitron">No active tournament. Create one first.</p>
     </div>
   );
 
@@ -337,17 +337,17 @@ function DiscordSection({ tournament }) {
       }`}>
         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-gray-600'}`} />
         <div>
-          <p className={`font-orbitron text-[10px] font-black tracking-wider ${isConnected ? 'text-emerald-400' : 'text-gray-500'}`}>
+          <p className={`font-orbitron text-[10px] font-black tracking-wider ${isConnected ? 'text-emerald-400' : 'text-white/40'}`}>
             {isConnected ? 'WEBHOOK CONNECTED' : 'NOT CONFIGURED'}
           </p>
           {isConnected && tournament?.discord_channel_name && (
-            <p className="text-[9px] text-gray-500 mt-0.5">#{tournament.discord_channel_name}</p>
+            <p className="text-[9px] text-white/40 mt-0.5">#{tournament.discord_channel_name}</p>
           )}
         </div>
         {isConnected && (
           <button
             onClick={() => { setWebhookUrl(''); setChannelName(''); overlayApi.saveDiscordWebhook({ tournament_id: tournament.id, discord_webhook_url: '', discord_channel_name: '' }).catch(()=>{}); }}
-            className="ml-auto text-gray-600 hover:text-red-400 transition-colors"
+            className="ml-auto text-white/30 hover:text-red-400 transition-colors"
             title="Remove webhook"
           >
             <Trash2 className="w-3.5 h-3.5" />
@@ -358,7 +358,7 @@ function DiscordSection({ tournament }) {
       {/* Webhook config */}
       <div className="space-y-3">
         <div>
-          <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wider text-gray-500">
+          <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wider text-white/40">
             <Link className="inline w-3 h-3 mr-1" />
             DISCORD WEBHOOK URL
           </label>
@@ -369,10 +369,10 @@ function DiscordSection({ tournament }) {
             placeholder="https://discord.com/api/webhooks/..."
             className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-[11px] font-mono text-white placeholder-gray-600 outline-none focus:border-[#5865F2]/50 transition-colors"
           />
-          <p className="mt-1 text-[9px] text-gray-600">In Discord: Channel Settings → Integrations → Webhooks → New Webhook → Copy URL</p>
+          <p className="mt-1 text-[9px] text-white/30">In Discord: Channel Settings → Integrations → Webhooks → New Webhook → Copy URL</p>
         </div>
         <div>
-          <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wider text-gray-500">CHANNEL NAME (optional label)</label>
+          <label className="mb-1.5 block text-[9px] font-black uppercase tracking-wider text-white/40">CHANNEL NAME (optional label)</label>
           <input
             type="text"
             value={channelName}
@@ -403,14 +403,14 @@ function DiscordSection({ tournament }) {
       {/* Post buttons */}
       {isConnected && (
         <div className="space-y-2">
-          <p className="text-[9px] font-orbitron font-black tracking-widest text-gray-500 uppercase">POST TO DISCORD NOW</p>
+          <p className="text-[9px] font-orbitron font-black tracking-widest text-white/40 uppercase">POST TO DISCORD NOW</p>
           <div className="grid grid-cols-2 gap-2">
             {POST_BUTTONS.map(({ type, label, icon: Icon, color }) => (
               <button
                 key={type}
                 onClick={() => post(type, label)}
                 disabled={!!posting}
-                className="flex items-center justify-center gap-2 rounded-xl border border-white/8 bg-black/30 px-3 py-3 font-orbitron text-[10px] font-black tracking-wider transition-all hover:bg-white/5 disabled:opacity-40"
+                className="flex items-center justify-center gap-2 rounded-xl border border-white/8 bg-black/30 px-3 py-3 font-orbitron text-[10px] font-black tracking-wider transition-all hover:bg-white/[0.04] disabled:opacity-40"
                 style={{ color: posting === type ? '#fff' : color, borderColor: posting === type ? color + '44' : undefined }}
               >
                 {posting === type
@@ -421,14 +421,14 @@ function DiscordSection({ tournament }) {
               </button>
             ))}
           </div>
-          <p className="text-[9px] text-gray-600 text-center">Posts a rich embed to your Discord channel instantly</p>
+          <p className="text-[9px] text-white/30 text-center">Posts a rich embed to your Discord channel instantly</p>
         </div>
       )}
 
       {/* How to get webhook URL guide */}
       {!isConnected && (
         <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4 space-y-2">
-          <p className="font-orbitron text-[10px] font-black text-gray-400 tracking-wider">HOW TO GET A WEBHOOK URL</p>
+          <p className="font-orbitron text-[10px] font-black text-white/50 tracking-wider">HOW TO GET A WEBHOOK URL</p>
           {[
             '1. Open your Discord server',
             '2. Right-click the channel → Edit Channel',
@@ -436,7 +436,7 @@ function DiscordSection({ tournament }) {
             '4. Click "New Webhook" → Copy Webhook URL',
             '5. Paste it above and click Save',
           ].map((step, i) => (
-            <p key={i} className="text-[10px] text-gray-500">{step}</p>
+            <p key={i} className="text-[10px] text-white/40">{step}</p>
           ))}
         </div>
       )}
@@ -477,7 +477,7 @@ export default function DesignStudio(props) {
   const reset = () => { setDesign(DEFAULT_DESIGN); toast('Design reset to defaults'); };
 ;
 
-  if (loading) return <div className="p-6 text-xs text-gray-600">Loading design settings…</div>;
+  if (loading) return <div className="p-6 text-xs text-white/30">Loading design settings…</div>;
 
   return (
     <div className="space-y-4">
@@ -513,7 +513,7 @@ export default function DesignStudio(props) {
         <div className="grid grid-cols-3 gap-2">
           {FONTS.map(f => (
             <button key={f.key} onClick={() => upd('fontStyle', f.key)}
-              className={`rounded-xl py-3 text-center transition-all border ${design?.fontStyle === f.key ? 'border-[#7C3AED] bg-[#7C3AED]/20 text-[#9D5CFF]' : 'border-white/[0.08] bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}>
+              className={`rounded-xl py-3 text-center transition-all border ${design?.fontStyle === f.key ? 'border-[#7C3AED] bg-[#7C3AED]/20 text-[#9D5CFF]' : 'border-white/[0.08] bg-white/5 text-white/50 hover:bg-white/10 hover:text-white'}`}>
               <p className="text-base font-black" style={{ fontFamily: f.key === 'impact' ? 'Impact' : f.key === 'rajdhani' ? 'Rajdhani' : 'Orbitron' }}>ESPORT</p>
               <p className="mt-0.5 text-[9px] opacity-70">{f.label}</p>
             </button>
@@ -523,7 +523,7 @@ export default function DesignStudio(props) {
 
       {/* ── OVERLAY STYLE ── */}
       <Section title="OVERLAY LAYOUT THEME" icon={Layers}>
-        <p className="mb-3 text-[10px] text-gray-500 leading-relaxed">
+        <p className="mb-3 text-[10px] text-white/40 leading-relaxed">
           Choose a visual layout for all overlays. Same data & structure — completely different look.
         </p>
         <div className="grid grid-cols-1 gap-2">
@@ -583,7 +583,7 @@ export default function DesignStudio(props) {
                       <span className="font-orbitron text-[10px] font-black" style={{ color: isActive ? s.preview.p : '#fff' }}>{s.label}</span>
                       {isActive && <Check size={10} style={{ color: s.preview.p, flexShrink: 0 }} />}
                     </div>
-                    <p className="mt-0.5 text-[9px] text-gray-500 leading-tight">{s.desc}</p>
+                    <p className="mt-0.5 text-[9px] text-white/40 leading-tight">{s.desc}</p>
                   </div>
 
                   {/* Color swatches */}
@@ -596,18 +596,18 @@ export default function DesignStudio(props) {
             );
           })}
         </div>
-        <p className="mt-3 text-[9px] text-gray-600 leading-relaxed">
+        <p className="mt-3 text-[9px] text-white/30 leading-relaxed">
           ℹ️ Custom Colours below override accent colors for the Default theme only.
         </p>
       </Section>
 
       {/* ── MAP IMAGES ── */}
       <Section title="MAP IMAGES" icon={Map}>
-        <p className="mb-3 text-[10px] text-gray-500">Upload custom map images to replace the defaults. These appear in the pre-match map overlay and scoreboard screens.</p>
+        <p className="mb-3 text-[10px] text-white/40">Upload custom map images to replace the defaults. These appear in the pre-match map overlay and scoreboard screens.</p>
         <div className="grid grid-cols-2 gap-3">
           {MAPS.map(mapName => (
             <div key={mapName} className="rounded-xl border border-white/8 bg-black/20 p-3">
-              <p className="font-orbitron text-[9px] font-black text-gray-400 mb-2 tracking-wider">{mapName.toUpperCase()}</p>
+              <p className="font-orbitron text-[9px] font-black text-white/50 mb-2 tracking-wider">{mapName.toUpperCase()}</p>
               <ImageUpload
                 value={(design?.mapImages || {})[mapName] || ''}
                 onChange={(url) => upd('mapImages', { ...(design?.mapImages || {}), [mapName]: url })}
@@ -620,7 +620,7 @@ export default function DesignStudio(props) {
         </div>
         <button
           onClick={() => upd('mapImages', {})}
-          className="mt-3 w-full rounded-lg border border-white/[0.08] py-2 text-[10px] font-orbitron text-gray-500 hover:text-white hover:border-white/20 transition-all"
+          className="mt-3 w-full rounded-lg border border-white/[0.08] py-2 text-[10px] font-orbitron text-white/40 hover:text-white hover:border-white/20 transition-all"
         >
           Reset All Map Images to Defaults
         </button>
@@ -646,7 +646,7 @@ export default function DesignStudio(props) {
             { key:'gameLabel',          label:'Game Label',         placeholder:'MATCH' },
           ].map(({ key, label, placeholder }) => (
             <div key={key}>
-              <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">{label}</label>
+              <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-white/30">{label}</label>
               <input value={design?.[key] || ''} onChange={e => upd(key, e.target.value)} placeholder={placeholder}
                 className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
             </div>
@@ -670,7 +670,7 @@ export default function DesignStudio(props) {
       {/* ── OVERLAY TEXT (Game Intro / Schedule / Match Info) ── */}
       <Section title="OVERLAY TEXT" icon={Eye}>
         <div className="space-y-3">
-          <p className="text-[10px] text-gray-500 leading-normal">
+          <p className="text-[10px] text-white/40 leading-normal">
             Customize all text labels across your broadcast overlays. Changes push live to OBS instantly.
           </p>
           {[
@@ -701,7 +701,7 @@ export default function DesignStudio(props) {
             { key:'todayScheduleTitle',  label:"Today's Schedule Title", placeholder:"TODAY'S SCHEDULE" },
           ].map(({ key, label, placeholder }) => (
             <div key={key}>
-              <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">{label}</label>
+              <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-white/30">{label}</label>
               <input value={design?.[key] || ''} onChange={e => upd(key, e.target.value)} placeholder={placeholder}
                 className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
             </div>
@@ -712,13 +712,13 @@ export default function DesignStudio(props) {
       {/* ── POINT RUSH STANDINGS ── */}
       <Section title="POINT RUSH GFX" icon={Trophy}>
         <div className="space-y-4">
-          <p className="text-[10px] text-gray-500 leading-normal">
+          <p className="text-[10px] text-white/40 leading-normal">
             Customize the Point Rush Standings overlay screen. All changes push live to OBS instantly.
           </p>
 
           {/* Header text */}
           <div>
-            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Header Title</label>
+            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-white/30">Header Title</label>
             <input value={design?.pointRush?.headerText || ''} onChange={e => upd("pointRush", { ...design?.pointRush, headerText: e.target.value })}
               placeholder="POINT RUSH STANDINGS"
               className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
@@ -726,7 +726,7 @@ export default function DesignStudio(props) {
 
           {/* Footer text */}
           <div>
-            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Footer Text</label>
+            <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-white/30">Footer Text</label>
             <input value={design?.pointRush?.footerText || ''} onChange={e => upd("pointRush", { ...design?.pointRush, footerText: e.target.value })}
               placeholder="#Rise to THE SUMMIT"
               className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
@@ -734,10 +734,10 @@ export default function DesignStudio(props) {
 
           {/* Gradient colors */}
           <div className="rounded-xl border border-white/8 bg-black/20 p-3 space-y-3">
-            <p className="text-[9px] font-orbitron font-black tracking-widest text-gray-400 uppercase border-b border-white/[0.06] pb-1.5">Background Gradient</p>
+            <p className="text-[9px] font-orbitron font-black tracking-widest text-white/50 uppercase border-b border-white/[0.06] pb-1.5">Background Gradient</p>
             <div className="grid grid-cols-3 gap-2">
               <div>
-                <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Start</label>
+                <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-white/30">Start</label>
                 <div className="flex items-center gap-2">
                   <input type="color" value={design?.pointRush?.gradientStart || '#1e3a8a'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientStart: e.target.value })}
                     className="w-10 h-10 rounded-lg border border-white/[0.08] bg-transparent cursor-pointer" />
@@ -746,7 +746,7 @@ export default function DesignStudio(props) {
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Mid</label>
+                <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-white/30">Mid</label>
                 <div className="flex items-center gap-2">
                   <input type="color" value={design?.pointRush?.gradientMid || '#7c3aed'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientMid: e.target.value })}
                     className="w-10 h-10 rounded-lg border border-white/[0.08] bg-transparent cursor-pointer" />
@@ -755,7 +755,7 @@ export default function DesignStudio(props) {
                 </div>
               </div>
               <div>
-                <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">End</label>
+                <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-white/30">End</label>
                 <div className="flex items-center gap-2">
                   <input type="color" value={design?.pointRush?.gradientEnd || '#ec4899'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientEnd: e.target.value })}
                     className="w-10 h-10 rounded-lg border border-white/[0.08] bg-transparent cursor-pointer" />
@@ -769,8 +769,8 @@ export default function DesignStudio(props) {
           {/* Hazard tape toggle */}
           <div className="flex items-center justify-between rounded-xl border border-white/8 bg-black/20 p-3">
             <div>
-              <label className="block text-[9px] font-black uppercase tracking-wider text-gray-600">Hazard Tape Corners</label>
-              <p className="text-[9px] text-gray-600 mt-0.5">Yellow/black diagonal stripes in screen corners</p>
+              <label className="block text-[9px] font-black uppercase tracking-wider text-white/30">Hazard Tape Corners</label>
+              <p className="text-[9px] text-white/30 mt-0.5">Yellow/black diagonal stripes in screen corners</p>
             </div>
             <button
               type="button"
@@ -798,7 +798,7 @@ export default function DesignStudio(props) {
         <div className="space-y-3">
           {(design?.casters || [{},{},{}]).slice(0,3).map((c, i) => (
             <div key={i} className="rounded-xl border border-white/[0.08] bg-black/20 p-3 space-y-2">
-              <p className="text-[9px] font-black uppercase tracking-wider text-gray-600">Caster {i + 1}</p>
+              <p className="text-[9px] font-black uppercase tracking-wider text-white/30">Caster {i + 1}</p>
               <div className="grid grid-cols-3 gap-2">
                 <input value={c?.name || ''} onChange={e => updCaster(i, 'name', e.target.value)}
                   placeholder={`Name ${i+1}`}
@@ -861,7 +861,7 @@ export default function DesignStudio(props) {
       {/* ── SAVE / RESET ── */}
       <div className="flex gap-3">
         <button onClick={reset}
-          className="active:scale-[0.98] flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] px-4 py-3 text-sm font-bold text-gray-400 hover:text-white hover:border-white/20 transition-all">
+          className="active:scale-[0.98] flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] px-4 py-3 text-sm font-bold text-white/50 hover:text-white hover:border-white/20 transition-all">
           <RotateCcw className="h-3.5 w-3.5" /> Reset
         </button>
         <button onClick={save} disabled={saving}
@@ -966,7 +966,7 @@ function TournamentSettingsSection({ tournament, onAction }) {
             {saving ? '...' : 'SAVE'}
           </button>
         </div>
-        <p className="text-[9px] text-gray-500 leading-normal">
+        <p className="text-[9px] text-white/40 leading-normal">
           Once a team crosses {threshold > 0 ? threshold : 'the threshold'} pts, they must win a Booyah (1st place) in a subsequent match to be crowned champions. Gold highlight appears on eligible teams in overlays.
         </p>
       </div>
@@ -978,12 +978,12 @@ function TournamentSettingsSection({ tournament, onAction }) {
             <Zap className="h-3.5 w-3.5 text-[#3B82F6]" />
             <span className="font-orbitron text-[10px] font-bold text-[#3B82F6] tracking-wider">POINT RUSH CARRYOVERS</span>
           </div>
-          <span className="text-[10px] text-gray-500">{showHeadstart ? '▲' : '▼'}</span>
+          <span className="text-[10px] text-white/40">{showHeadstart ? '▲' : '▼'}</span>
         </button>
 
         {showHeadstart && (
           <div className="space-y-2">
-            <p className="text-[9px] text-gray-500 leading-normal">
+            <p className="text-[9px] text-white/40 leading-normal">
               Assign bonus starting points to teams based on their previous stage placement. These are added to each team's total tournament points.
             </p>
             <button onClick={autoCalcHeadstart}
@@ -994,17 +994,17 @@ function TournamentSettingsSection({ tournament, onAction }) {
               <div className="space-y-1.5 max-h-48 overflow-y-auto">
                 {headstartTeams.map((t, i) => (
                   <div key={i} className="flex items-center gap-2">
-                    <span className="font-orbitron text-[9px] font-bold text-gray-500 w-6 text-right">#{t.rank}</span>
+                    <span className="font-orbitron text-[9px] font-bold text-white/40 w-6 text-right">#{t.rank}</span>
                     <span className="flex-1 text-[10px] text-gray-300 truncate">{t.teamName}</span>
                     <input type="number" min={0} value={t.points}
                       onChange={e => updateHeadstartPoint(i, e.target.value)}
                       className="w-16 rounded border border-white/[0.08] bg-black/40 px-2 py-1 text-[10px] text-white text-center outline-none focus:border-[#3B82F6]/50" />
-                    <span className="text-[8px] text-gray-600 w-6">pts</span>
+                    <span className="text-[8px] text-white/30 w-6">pts</span>
                   </div>
                 ))}
               </div>
             ) : (
-              <p className="text-[10px] text-gray-600 italic">No teams or standings available. Create teams and play matches first.</p>
+              <p className="text-[10px] text-white/30 italic">No teams or standings available. Create teams and play matches first.</p>
             )}
             <button onClick={applyHeadstart} disabled={saving}
               className="active:scale-[0.98] w-full rounded-lg bg-[#3B82F6]/15 border border-[#3B82F6]/30 py-2 text-[10px] font-orbitron font-black text-[#3B82F6] hover:bg-[#3B82F6]/25 transition-all disabled:opacity-50">

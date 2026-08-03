@@ -155,7 +155,7 @@ export default function AnimationLibrary({ data, overlayApi, refresh }) {
       </div>
 
       {/* Preview Canvas */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-6 flex items-center justify-center min-h-[120px]">
+      <div className="bg-[#131127] border border-white/[0.06] rounded-xl p-6 flex items-center justify-center min-h-[120px]">
         <div
           ref={previewRef}
           className="px-8 py-4 rounded-lg bg-gradient-to-r from-purple-500/20 to-blue-500/20 border border-purple-500/40"
@@ -169,7 +169,7 @@ export default function AnimationLibrary({ data, overlayApi, refresh }) {
 
       {/* Default Animations */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-        <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div className="bg-[#131127] border border-white/[0.06] rounded-xl p-4">
           <label className="text-sm font-medium text-slate-300 mb-2 block flex items-center gap-2">
             <Eye className="w-4 h-4 text-emerald-400" /> Default Entrance Animation
           </label>
@@ -179,7 +179,7 @@ export default function AnimationLibrary({ data, overlayApi, refresh }) {
               setConfig(prev => ({ ...prev, defaultEntrance: e.target.value }));
               triggerPreview(e.target.value);
             }}
-            className="w-full bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-purple-500/50 focus:outline-none"
+            className="w-full bg-slate-950/60 border border-white/[0.06] rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-purple-500/50 focus:outline-none"
           >
             {ANIMATIONS.map(a => (
               <option key={a.key} value={a.key}>{a.label} — {a.category}</option>
@@ -187,7 +187,7 @@ export default function AnimationLibrary({ data, overlayApi, refresh }) {
           </select>
         </div>
 
-        <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+        <div className="bg-[#131127] border border-white/[0.06] rounded-xl p-4">
           <label className="text-sm font-medium text-slate-300 mb-2 block flex items-center gap-2">
             <EyeOff className="w-4 h-4 text-amber-400" /> Default Exit Animation
           </label>
@@ -197,7 +197,7 @@ export default function AnimationLibrary({ data, overlayApi, refresh }) {
               setConfig(prev => ({ ...prev, defaultExit: e.target.value }));
               triggerPreview(e.target.value);
             }}
-            className="w-full bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-purple-500/50 focus:outline-none"
+            className="w-full bg-slate-950/60 border border-white/[0.06] rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-purple-500/50 focus:outline-none"
           >
             {ANIMATIONS.filter(a => !a.css.includes('infinite')).map(a => (
               <option key={a.key} value={a.key}>{a.label} — {a.category}</option>
@@ -207,7 +207,7 @@ export default function AnimationLibrary({ data, overlayApi, refresh }) {
       </div>
 
       {/* Speed Control */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-4">
+      <div className="bg-[#131127] border border-white/[0.06] rounded-xl p-4">
         <div className="flex items-center justify-between mb-3">
           <label className="text-sm font-medium text-slate-300 flex items-center gap-2">
             <Zap className="w-4 h-4 text-yellow-400" /> Animation Speed
@@ -266,8 +266,8 @@ export default function AnimationLibrary({ data, overlayApi, refresh }) {
           return (
             <div
               key={anim.key}
-              className={`relative bg-slate-900/60 border rounded-xl p-4 cursor-pointer transition-all hover:border-purple-500/40 ${
-                isSelected ? 'border-purple-500/60 shadow-[0_0_12px_rgba(124,58,237,0.2)]' : 'border-slate-800'
+              className={`relative bg-[#131127] border rounded-xl p-4 cursor-pointer transition-all hover:border-purple-500/40 ${
+                isSelected ? 'border-purple-500/60 shadow-[0_0_12px_rgba(124,58,237,0.2)]' : 'border-white/[0.06]'
               }`}
               onClick={() => triggerPreview(anim.key)}
             >
@@ -305,7 +305,7 @@ export default function AnimationLibrary({ data, overlayApi, refresh }) {
       </div>
 
       {/* Event Animation Overrides */}
-      <div className="bg-slate-900/60 border border-slate-800 rounded-xl p-5">
+      <div className="bg-[#131127] border border-white/[0.06] rounded-xl p-5">
         <div className="flex items-center gap-2 mb-4">
           <Wand2 className="w-4 h-4 text-purple-400" />
           <h3 className="text-sm font-semibold text-white">Event Animation Overrides</h3>
@@ -319,7 +319,7 @@ export default function AnimationLibrary({ data, overlayApi, refresh }) {
               <select
                 value={config.eventOverrides?.[event.key] || ''}
                 onChange={(e) => setEventAnim(event.key, e.target.value)}
-                className="flex-1 bg-slate-950/60 border border-slate-800 rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-purple-500/50 focus:outline-none"
+                className="flex-1 bg-slate-950/60 border border-white/[0.06] rounded-lg px-3 py-2 text-sm text-slate-200 focus:border-purple-500/50 focus:outline-none"
               >
                 <option value="">Default ({getAnimByKey(config.defaultEntrance)?.label || 'None'})</option>
                 {ANIMATIONS.map(a => (

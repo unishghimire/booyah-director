@@ -54,7 +54,7 @@ export default function ImageUpload({
   return (
     <div className={className}>
       {label && (
-        <p className="font-orbitron text-[10px] font-black tracking-widest text-gray-400 uppercase mb-2">
+        <p className="font-orbitron text-[10px] font-black tracking-widest text-white/50 uppercase mb-2">
           {label}
         </p>
       )}
@@ -96,7 +96,7 @@ export default function ImageUpload({
         {uploading ? (
           <>
             <Loader2 className="h-6 w-6 text-[#7C3AED] animate-spin" />
-            <span className="font-orbitron text-[9px] text-gray-400 tracking-wider">UPLOADING...</span>
+            <span className="font-orbitron text-[9px] text-white/50 tracking-wider">UPLOADING...</span>
           </>
         ) : success ? (
           <>
@@ -120,15 +120,15 @@ export default function ImageUpload({
           </div>
         ) : (
           <>
-            <ImageIcon className="h-6 w-6 text-gray-600" />
+            <ImageIcon className="h-6 w-6 text-white/30" />
             {size !== 'sm' && (
-              <span className="text-xs text-gray-500">Drag & drop or click to upload</span>
+              <span className="text-xs text-white/40">Drag & drop or click to upload</span>
             )}
             <div className="flex items-center gap-1 flex-wrap justify-center">
               {['PNG', 'JPG', 'WebP'].map(f => (
-                <span key={f} className="rounded border border-white/5 bg-white/5 px-1.5 py-0.5 font-mono text-[9px] text-gray-600">{f}</span>
+                <span key={f} className="rounded border border-white/[0.06] bg-white/5 px-1.5 py-0.5 font-mono text-[9px] text-white/30">{f}</span>
               ))}
-              <span className="font-orbitron text-[9px] text-gray-600 ml-1">· Max 32MB</span>
+              <span className="font-orbitron text-[9px] text-white/30 ml-1">· Max 32MB</span>
             </div>
           </>
         )}

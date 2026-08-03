@@ -211,7 +211,7 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
                         ? 'bg-red-500/15 border-red-500/40 text-red-300'
                         : isPreview
                         ? 'bg-blue-500/15 border-blue-500/40 text-blue-300'
-                        : 'border-white/[0.08] text-white/60 hover:bg-white/5 hover:text-white'
+                        : 'border-white/[0.08] text-white/60 hover:bg-white/[0.04] hover:text-white'
                     }`}
                     title="Click = Preview, Double-click = Take to Program"
                   >
@@ -270,7 +270,7 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
                 <button
                   key={src.id || src.name}
                   onClick={() => handleToggleSource(selectedScene || currentProgramScene, src.name)}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 border-b border-white/[0.06] hover:bg-white/5 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 border-b border-white/[0.06] hover:bg-white/[0.04] transition-colors"
                 >
                   <span className="w-2 h-2 rounded-full" style={{ background: src.visible ? '#22c55e' : '#6b7280' }} />
                   <span className={`text-[11px] font-medium flex-1 text-left ${src.visible ? 'text-white' : 'text-white/30 line-through'}`}>{src.name}</span>

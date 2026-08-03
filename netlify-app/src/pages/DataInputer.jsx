@@ -1078,7 +1078,7 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction, stag
                 }
               }}
               disabled={stagedKills <= 0}
-              className="px-2 py-1 text-white/50 hover:text-white hover:bg-white/5 active:scale-90 transition-all font-bold text-xs"
+              className="px-2 py-1 text-white/50 hover:text-white hover:bg-white/[0.04] active:scale-90 transition-all font-bold text-xs"
             >
               -
             </button>
@@ -1098,7 +1098,7 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction, stag
                   return { ...prev, kills: newKills };
                 });
               }}
-              className="px-2 py-1 text-white/50 hover:text-white hover:bg-white/5 active:scale-90 transition-all font-bold text-xs"
+              className="px-2 py-1 text-white/50 hover:text-white hover:bg-white/[0.04] active:scale-90 transition-all font-bold text-xs"
             >
               +
             </button>

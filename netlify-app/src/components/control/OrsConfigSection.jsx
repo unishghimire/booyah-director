@@ -39,30 +39,30 @@ export default function OrsConfigSection() {
   if (loading) return null;
 
   return (
-    <div className="mt-6 bg-slate-900/60 border border-slate-800 rounded-xl p-5">
+    <div className="mt-6 bg-[#131127] border border-white/[0.06] rounded-xl p-5">
       <h3 className="font-orbitron text-[10px] font-black tracking-widest text-[#7C3AED] mb-1 flex items-center gap-2">
         <Key className="h-4 w-4" /> ORS API CONFIGURATION
       </h3>
-      <p className="text-xs text-gray-500 mb-4">
+      <p className="text-xs text-white/40 mb-4">
         Enter your Open Result Service API key to enable automated result reporting.
       </p>
 
       <div className="space-y-4">
         <div>
-          <label className="block text-[10px] font-orbitron font-bold tracking-wider text-gray-400 mb-1.5">API KEY</label>
+          <label className="block text-[10px] font-orbitron font-bold tracking-wider text-white/50 mb-1.5">API KEY</label>
           <div className="flex items-center gap-2">
-            <Key className="h-3.5 w-3.5 text-gray-600 shrink-0" />
+            <Key className="h-3.5 w-3.5 text-white/30 shrink-0" />
             <input
               type={showKey ? 'text' : 'password'}
               value={apiKey}
               onChange={e => setApiKey(e.target.value)}
               placeholder="Enter ORS API key"
-              className="flex-1 rounded-lg border border-white/10 bg-white/5 px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:border-[#7C3AED] focus:outline-none font-mono"
+              className="flex-1 rounded-lg border border-white/[0.08] bg-white/5 px-3 py-2.5 text-sm text-white placeholder-gray-600 focus:border-[#7C3AED] focus:outline-none font-mono"
             />
             <button
               type="button"
               onClick={() => setShowKey(!showKey)}
-              className="shrink-0 rounded-lg border border-white/10 bg-white/5 p-2.5 text-gray-400 hover:text-white hover:bg-white/10 transition-all"
+              className="shrink-0 rounded-lg border border-white/[0.08] bg-white/5 p-2.5 text-white/50 hover:text-white hover:bg-white/10 transition-all"
             >
               {showKey ? <EyeOff className="h-3.5 w-3.5" /> : <Eye className="h-3.5 w-3.5" />}
             </button>
