@@ -66,7 +66,6 @@ export const ROLES = {
   },
 };
 
-export const DEFAULT_ROLE = 'admin';
 
 /**
  * Get the role config for a user. Admins (owner emails) always get admin role.

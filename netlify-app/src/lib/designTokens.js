@@ -81,39 +81,15 @@ export const FONTS = {
   stat:     "'Teko', ui-sans-serif, system-ui, sans-serif",
 };
 
-export const FONT_SIZES = {
-  xs:   10,
-  sm:   12,
-  base: 14,
-  lg:   16,
-  xl:   20,
-  xxl:  28,
-  huge: 48,
-  mega: 72,
-};
 
 // ═════════════════════════════════════════════════════
 // SPACING & RADIUS
 // ═════════════════════════════════════════════════════
-export const SPACE = { xs: 4, sm: 8, md: 12, lg: 16, xl: 24, xxl: 32, mega: 48 };
 export const RADIUS = { none: 0, sm: 4, md: 8, lg: 12, xl: 16, pill: 9999 };
 
 // ═════════════════════════════════════════════════════
 // CLIP PATHS — Angular broadcast aesthetics
 // ═════════════════════════════════════════════════════
-export const CLIPS = {
-  angularL:    'polygon(10px 0, 100% 0, 100% 100%, 0 100%)',
-  angularR:    'polygon(0 0, calc(100% - 10px) 0, 100% 100%, 0 100%)',
-  angularTL:   'polygon(0 0, 100% 0, calc(100% - 12px) 100%, 0 100%)',
-  angularTR:   'polygon(12px 0, 100% 0, 100% 100%, 0 100%)',
-  angularBoth: 'polygon(10px 0, 100% 0, calc(100% - 10px) 100%, 0 100%)',
-  arrowR:      'polygon(0 0, calc(100% - 14px) 0, 100% 50%, calc(100% - 14px) 100%, 0 100%)',
-  arrowL:      'polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 50%)',
-  diagonal:    'polygon(0 0, 100% 0, 85% 100%, 0 100%)',
-  diagonalR:   'polygon(15% 0, 100% 0, 100% 100%, 0 100%)',
-  hex:         'polygon(25% 0%, 75% 0%, 100% 50%, 75% 100%, 25% 100%, 0% 50%)',
-  tag:         'polygon(0 0, calc(100% - 12px) 0, 100% 100%, 0 100%)',
-};
 
 // ═════════════════════════════════════════════════════
 // DESIGN TOKEN MERGE — combines defaults with user config
@@ -151,27 +127,3 @@ export function getTheme(design = {}) {
  * Returns inline style object for common overlay containers.
  * Use: style={TOKENS.overlayContainer}
  */
-export const STYLES = {
-  overlayContainer: {
-    width: 1920,
-    height: 1080,
-    position: 'relative',
-    overflow: 'hidden',
-    background: 'transparent',
-  },
-  cardBase: {
-    background: COLORS.bgCard,
-    borderRadius: RADIUS.lg,
-    boxShadow: COLORS.shadowCard,
-  },
-  glassPanel: {
-    background: COLORS.bgGlass,
-    backdropFilter: 'blur(12px)',
-    border: `1px solid ${COLORS.borderSubtle}`,
-    borderRadius: RADIUS.lg,
-  },
-  headerGradient: {
-    background: COLORS.gradHeader,
-    boxShadow: COLORS.glowPurpleSm,
-  },
-};

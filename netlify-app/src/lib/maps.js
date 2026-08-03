@@ -8,7 +8,6 @@
 
 // No default URLs — all dead 3rd-party CDNs are unreliable
 // Upload your map images via DesignStudio → Maps tab
-export const MAP_IMAGES_DEFAULT = {};
 
 export const MAPS = ['Bermuda','Bermuda 2.0','Kalahari','Purgatory','Alpine','Nexterra','Solara'];
 
