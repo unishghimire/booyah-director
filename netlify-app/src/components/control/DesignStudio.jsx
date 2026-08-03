@@ -94,9 +94,9 @@ const DEFAULT_DESIGN = {
 function Section({ title, icon: Icon, children }) {
   const [open, setOpen] = useState(true);
   return (
-    <div className="rounded-xl border border-white/10 bg-[#0f0f1a] overflow-hidden">
+    <div className="rounded-xl border border-white/[0.08] nx-surface overflow-hidden">
       <button onClick={() => setOpen(o=>!o)}
-        className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-white/5 transition-all border-b border-white/5">
+        className="flex w-full items-center gap-2 px-4 py-3 text-left hover:bg-white/5 transition-all border-b border-white/[0.06]">
         <Icon className="h-3.5 w-3.5 text-[#7C3AED]" />
         <span className="font-orbitron text-[11px] font-black text-white tracking-wider">{title}</span>
         <span className="ml-auto text-gray-600 text-xs">{open ? '▲' : '▼'}</span>
@@ -108,7 +108,7 @@ function Section({ title, icon: Icon, children }) {
 
 function ColorPicker({ label, value, onChange }) {
   return (
-    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 hover:bg-white/5 transition-all">
+    <label className="flex cursor-pointer items-center gap-3 rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2.5 hover:bg-white/5 transition-all">
       <input type="color" value={value || '#000000'} onChange={e => onChange(e.target.value)}
         className="h-8 w-8 cursor-pointer rounded-lg border-0 bg-transparent" />
       <div>
@@ -134,7 +134,7 @@ function BackgroundsSection({ design, upd }) {
   return (
     <div className="space-y-4">
       {/* Small tab-bar */}
-      <div className="flex border-b border-white/5 pb-1 gap-1 overflow-x-auto">
+      <div className="flex border-b border-white/[0.06] pb-1 gap-1 overflow-x-auto">
         {tabs.map(t => (
           <button
             key={t.key}
@@ -199,7 +199,7 @@ function ImageManagementSection({ design, upd, teams = [], players = [] }) {
 
       {/* TEAM LOGOS */}
       <div className="rounded-xl border border-white/8 bg-black/20 p-3">
-        <p className="font-orbitron text-[10px] font-black tracking-widest text-gray-400 uppercase mb-3 border-b border-white/5 pb-1.5">
+        <p className="nx-section-label mb-3 border-b border-white/[0.06] pb-1.5">
           TEAM LOGOS
         </p>
         <div className="max-h-[300px] overflow-y-auto space-y-3 pr-1 custom-scrollbar">
@@ -226,7 +226,7 @@ function ImageManagementSection({ design, upd, teams = [], players = [] }) {
 
       {/* PLAYER PHOTOS */}
       <div className="rounded-xl border border-white/8 bg-black/20 p-3">
-        <p className="font-orbitron text-[10px] font-black tracking-widest text-gray-400 uppercase mb-3 border-b border-white/5 pb-1.5">
+        <p className="nx-section-label mb-3 border-b border-white/[0.06] pb-1.5">
           PLAYER PHOTOS
         </p>
         <div className="max-h-[400px] overflow-y-auto space-y-3 pr-1 custom-scrollbar">
@@ -277,7 +277,7 @@ function DiscordSection({ tournament }) {
   }, [tournament?.id]);
 
   if (!tournament) return (
-    <div className="rounded-xl border border-white/5 bg-black/20 p-5 text-center">
+    <div className="rounded-xl border border-white/[0.06] bg-black/20 p-5 text-center">
       <p className="text-[11px] text-gray-500 font-orbitron">No active tournament. Create one first.</p>
     </div>
   );
@@ -333,7 +333,7 @@ function DiscordSection({ tournament }) {
       <div className={`flex items-center gap-3 rounded-xl border p-3 ${
         isConnected
           ? 'border-emerald-500/20 bg-emerald-500/5'
-          : 'border-white/5 bg-black/20'
+          : 'border-white/[0.06] bg-black/20'
       }`}>
         <div className={`w-2 h-2 rounded-full flex-shrink-0 ${isConnected ? 'bg-emerald-400 animate-pulse' : 'bg-gray-600'}`} />
         <div>
@@ -367,7 +367,7 @@ function DiscordSection({ tournament }) {
             value={webhookUrl}
             onChange={e => setWebhookUrl(e.target.value)}
             placeholder="https://discord.com/api/webhooks/..."
-            className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-[11px] font-mono text-white placeholder-gray-600 outline-none focus:border-[#5865F2]/50 transition-colors"
+            className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-[11px] font-mono text-white placeholder-gray-600 outline-none focus:border-[#5865F2]/50 transition-colors"
           />
           <p className="mt-1 text-[9px] text-gray-600">In Discord: Channel Settings → Integrations → Webhooks → New Webhook → Copy URL</p>
         </div>
@@ -378,13 +378,13 @@ function DiscordSection({ tournament }) {
             value={channelName}
             onChange={e => setChannelName(e.target.value)}
             placeholder="e.g. #tournament-updates"
-            className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-[#5865F2]/50 transition-colors"
+            className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-sm text-white placeholder-gray-600 outline-none focus:border-[#5865F2]/50 transition-colors"
           />
         </div>
         <div className="flex gap-2">
           <button
             onClick={save} disabled={saving}
-            className="flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-[11px] font-orbitron font-black tracking-wider text-white transition-all disabled:opacity-50"
+            className="active:scale-[0.98] flex-1 flex items-center justify-center gap-2 rounded-xl py-2.5 text-[11px] font-orbitron font-black tracking-wider text-white transition-all disabled:opacity-50"
             style={{ background: 'linear-gradient(135deg, #5865F2, #7289da)' }}
           >
             {saving ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <Save className="w-3.5 h-3.5" />}
@@ -392,7 +392,7 @@ function DiscordSection({ tournament }) {
           </button>
           <button
             onClick={test} disabled={testing || !webhookUrl.trim()}
-            className="flex items-center justify-center gap-2 px-4 rounded-xl border border-white/10 text-[11px] font-orbitron font-black tracking-wider text-gray-300 hover:border-white/20 hover:text-white transition-all disabled:opacity-40"
+            className="active:scale-[0.98] flex items-center justify-center gap-2 px-4 rounded-xl border border-white/[0.08] text-[11px] font-orbitron font-black tracking-wider text-gray-300 hover:border-white/20 hover:text-white transition-all disabled:opacity-40"
           >
             {testing ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : <TestTube2 className="w-3.5 h-3.5" />}
             TEST
@@ -427,7 +427,7 @@ function DiscordSection({ tournament }) {
 
       {/* How to get webhook URL guide */}
       {!isConnected && (
-        <div className="rounded-xl border border-white/5 bg-black/20 p-4 space-y-2">
+        <div className="rounded-xl border border-white/[0.06] bg-black/20 p-4 space-y-2">
           <p className="font-orbitron text-[10px] font-black text-gray-400 tracking-wider">HOW TO GET A WEBHOOK URL</p>
           {[
             '1. Open your Discord server',
@@ -486,11 +486,11 @@ export default function DesignStudio(props) {
         <div className="grid grid-cols-2 gap-2">
           {PRESETS.map(p => (
             <button key={p.label} onClick={() => setDesign(d => ({ ...d, ...p }))}
-              className="flex items-center gap-3 rounded-xl border border-white/10 bg-black/20 px-3 py-2.5 text-left hover:bg-white/10 hover:border-white/20 transition-all group">
+              className="flex items-center gap-3 rounded-xl border border-white/[0.08] bg-black/20 px-3 py-2.5 text-left hover:bg-white/10 hover:border-white/20 transition-all group">
               <div className="flex gap-1 flex-shrink-0">
                 <span className="h-5 w-3 rounded-sm" style={{ background: p.accentColor }} />
                 <span className="h-5 w-3 rounded-sm" style={{ background: p.accentColor2 }} />
-                <span className="h-5 w-3 rounded-sm border border-white/10" style={{ background: p.bgColor }} />
+                <span className="h-5 w-3 rounded-sm border border-white/[0.08]" style={{ background: p.bgColor }} />
               </div>
               <span className="text-[11px] font-bold text-gray-300 group-hover:text-white">{p.label}</span>
             </button>
@@ -513,7 +513,7 @@ export default function DesignStudio(props) {
         <div className="grid grid-cols-3 gap-2">
           {FONTS.map(f => (
             <button key={f.key} onClick={() => upd('fontStyle', f.key)}
-              className={`rounded-xl py-3 text-center transition-all border ${design?.fontStyle === f.key ? 'border-[#7C3AED] bg-[#7C3AED]/20 text-[#9D5CFF]' : 'border-white/10 bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}>
+              className={`rounded-xl py-3 text-center transition-all border ${design?.fontStyle === f.key ? 'border-[#7C3AED] bg-[#7C3AED]/20 text-[#9D5CFF]' : 'border-white/[0.08] bg-white/5 text-gray-400 hover:bg-white/10 hover:text-white'}`}>
               <p className="text-base font-black" style={{ fontFamily: f.key === 'impact' ? 'Impact' : f.key === 'rajdhani' ? 'Rajdhani' : 'Orbitron' }}>ESPORT</p>
               <p className="mt-0.5 text-[9px] opacity-70">{f.label}</p>
             </button>
@@ -620,7 +620,7 @@ export default function DesignStudio(props) {
         </div>
         <button
           onClick={() => upd('mapImages', {})}
-          className="mt-3 w-full rounded-lg border border-white/10 py-2 text-[10px] font-orbitron text-gray-500 hover:text-white hover:border-white/20 transition-all"
+          className="mt-3 w-full rounded-lg border border-white/[0.08] py-2 text-[10px] font-orbitron text-gray-500 hover:text-white hover:border-white/20 transition-all"
         >
           Reset All Map Images to Defaults
         </button>
@@ -648,7 +648,7 @@ export default function DesignStudio(props) {
             <div key={key}>
               <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">{label}</label>
               <input value={design?.[key] || ''} onChange={e => upd(key, e.target.value)} placeholder={placeholder}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
+                className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
             </div>
           ))}
 
@@ -703,7 +703,7 @@ export default function DesignStudio(props) {
             <div key={key}>
               <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">{label}</label>
               <input value={design?.[key] || ''} onChange={e => upd(key, e.target.value)} placeholder={placeholder}
-                className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
+                className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
             </div>
           ))}
         </div>
@@ -721,7 +721,7 @@ export default function DesignStudio(props) {
             <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Header Title</label>
             <input value={design?.pointRush?.headerText || ''} onChange={e => upd("pointRush", { ...design?.pointRush, headerText: e.target.value })}
               placeholder="POINT RUSH STANDINGS"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
+              className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
           </div>
 
           {/* Footer text */}
@@ -729,38 +729,38 @@ export default function DesignStudio(props) {
             <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Footer Text</label>
             <input value={design?.pointRush?.footerText || ''} onChange={e => upd("pointRush", { ...design?.pointRush, footerText: e.target.value })}
               placeholder="#Rise to THE SUMMIT"
-              className="w-full rounded-xl border border-white/10 bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
+              className="w-full rounded-xl border border-white/[0.08] bg-black/40 px-3 py-2.5 text-sm font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/40 transition-colors" />
           </div>
 
           {/* Gradient colors */}
           <div className="rounded-xl border border-white/8 bg-black/20 p-3 space-y-3">
-            <p className="text-[9px] font-orbitron font-black tracking-widest text-gray-400 uppercase border-b border-white/5 pb-1.5">Background Gradient</p>
+            <p className="text-[9px] font-orbitron font-black tracking-widest text-gray-400 uppercase border-b border-white/[0.06] pb-1.5">Background Gradient</p>
             <div className="grid grid-cols-3 gap-2">
               <div>
                 <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Start</label>
                 <div className="flex items-center gap-2">
                   <input type="color" value={design?.pointRush?.gradientStart || '#1e3a8a'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientStart: e.target.value })}
-                    className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
+                    className="w-10 h-10 rounded-lg border border-white/[0.08] bg-transparent cursor-pointer" />
                   <input value={design?.pointRush?.gradientStart || '#1e3a8a'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientStart: e.target.value })}
-                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-[#7C3AED]/30" />
+                    className="flex-1 rounded-lg border border-white/[0.08] bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-[#7C3AED]/30" />
                 </div>
               </div>
               <div>
                 <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">Mid</label>
                 <div className="flex items-center gap-2">
                   <input type="color" value={design?.pointRush?.gradientMid || '#7c3aed'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientMid: e.target.value })}
-                    className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
+                    className="w-10 h-10 rounded-lg border border-white/[0.08] bg-transparent cursor-pointer" />
                   <input value={design?.pointRush?.gradientMid || '#7c3aed'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientMid: e.target.value })}
-                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-[#7C3AED]/30" />
+                    className="flex-1 rounded-lg border border-white/[0.08] bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-[#7C3AED]/30" />
                 </div>
               </div>
               <div>
                 <label className="mb-1 block text-[9px] font-black uppercase tracking-wider text-gray-600">End</label>
                 <div className="flex items-center gap-2">
                   <input type="color" value={design?.pointRush?.gradientEnd || '#ec4899'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientEnd: e.target.value })}
-                    className="w-10 h-10 rounded-lg border border-white/10 bg-transparent cursor-pointer" />
+                    className="w-10 h-10 rounded-lg border border-white/[0.08] bg-transparent cursor-pointer" />
                   <input value={design?.pointRush?.gradientEnd || '#ec4899'} onChange={e => upd("pointRush", { ...design?.pointRush, gradientEnd: e.target.value })}
-                    className="flex-1 rounded-lg border border-white/10 bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-[#7C3AED]/30" />
+                    className="flex-1 rounded-lg border border-white/[0.08] bg-black/30 px-2 py-1.5 text-[10px] font-mono text-white outline-none focus:border-[#7C3AED]/30" />
                 </div>
               </div>
             </div>
@@ -797,18 +797,18 @@ export default function DesignStudio(props) {
       <Section title="CASTERS" icon={Mic2}>
         <div className="space-y-3">
           {(design?.casters || [{},{},{}]).slice(0,3).map((c, i) => (
-            <div key={i} className="rounded-xl border border-white/10 bg-black/20 p-3 space-y-2">
+            <div key={i} className="rounded-xl border border-white/[0.08] bg-black/20 p-3 space-y-2">
               <p className="text-[9px] font-black uppercase tracking-wider text-gray-600">Caster {i + 1}</p>
               <div className="grid grid-cols-3 gap-2">
                 <input value={c?.name || ''} onChange={e => updCaster(i, 'name', e.target.value)}
                   placeholder={`Name ${i+1}`}
-                  className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/30" />
+                  className="rounded-lg border border-white/[0.08] bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/30" />
                 <input value={c?.handle || ''} onChange={e => updCaster(i, 'handle', e.target.value)}
                   placeholder="@handle"
-                  className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/30" />
+                  className="rounded-lg border border-white/[0.08] bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/30" />
                 <input value={c?.role || ''} onChange={e => updCaster(i, 'role', e.target.value)}
                   placeholder="PLAY-BY-PLAY"
-                  className="rounded-lg border border-white/10 bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/30" />
+                  className="rounded-lg border border-white/[0.08] bg-black/30 px-2.5 py-2 text-xs font-bold text-white placeholder-gray-600 outline-none focus:border-[#7C3AED]/30" />
               </div>
               <ImageUpload
                 value={c?.photo || ''}
@@ -861,11 +861,11 @@ export default function DesignStudio(props) {
       {/* ── SAVE / RESET ── */}
       <div className="flex gap-3">
         <button onClick={reset}
-          className="flex items-center justify-center gap-2 rounded-xl border border-white/10 px-4 py-3 text-sm font-bold text-gray-400 hover:text-white hover:border-white/20 transition-all">
+          className="active:scale-[0.98] flex items-center justify-center gap-2 rounded-xl border border-white/[0.08] px-4 py-3 text-sm font-bold text-gray-400 hover:text-white hover:border-white/20 transition-all">
           <RotateCcw className="h-3.5 w-3.5" /> Reset
         </button>
         <button onClick={save} disabled={saving}
-          className="flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-black text-black transition-all disabled:opacity-50"
+          className="active:scale-[0.98] flex flex-1 items-center justify-center gap-2 rounded-xl py-3 text-sm font-black text-black transition-all disabled:opacity-50"
           style={{ background: saving ? (design?.accentColor || '#7C3AED') + 'aa' : (design?.accentColor || '#7C3AED') }}>
           {saving ? <><RefreshCw className="h-4 w-4 animate-spin" /> Saving…</> : <><Save className="h-4 w-4" /> Apply Design to Overlay</>}
         </button>
@@ -955,14 +955,14 @@ function TournamentSettingsSection({ tournament, onAction }) {
         </div>
         <div className="flex gap-2">
           <select value={threshold} onChange={e => setThreshold(Number(e.target.value))}
-            className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#7C3AED]/50">
+            className="flex-1 rounded-lg border border-white/[0.08] bg-black/40 px-3 py-2 text-sm text-white outline-none focus:border-[#7C3AED]/50">
             <option value={0}>Disabled</option>
             <option value={80}>80 Points</option>
             <option value={90}>90 Points</option>
             <option value={100}>100 Points</option>
           </select>
           <button onClick={saveThreshold} disabled={saving}
-            className="rounded-lg bg-[#3B82F6]/15 border border-[#3B82F6]/30 px-4 py-2 text-[10px] font-orbitron font-black text-[#3B82F6] hover:bg-[#3B82F6]/25 transition-all disabled:opacity-50">
+            className="active:scale-[0.98] rounded-lg bg-[#3B82F6]/15 border border-[#3B82F6]/30 px-4 py-2 text-[10px] font-orbitron font-black text-[#3B82F6] hover:bg-[#3B82F6]/25 transition-all disabled:opacity-50">
             {saving ? '...' : 'SAVE'}
           </button>
         </div>
@@ -987,7 +987,7 @@ function TournamentSettingsSection({ tournament, onAction }) {
               Assign bonus starting points to teams based on their previous stage placement. These are added to each team's total tournament points.
             </p>
             <button onClick={autoCalcHeadstart}
-              className="w-full rounded-lg border border-[#3B82F6]/20 bg-[#3B82F6]/5 py-1.5 text-[10px] font-orbitron font-bold text-[#3B82F6] hover:bg-[#3B82F6]/10 transition-all">
+              className="active:scale-[0.98] w-full rounded-lg border border-[#3B82F6]/20 bg-[#3B82F6]/5 py-1.5 text-[10px] font-orbitron font-bold text-[#3B82F6] hover:bg-[#3B82F6]/10 transition-all">
               AUTO-CALC FROM RANK (Garena Rules)
             </button>
             {headstartTeams.length > 0 ? (
@@ -998,7 +998,7 @@ function TournamentSettingsSection({ tournament, onAction }) {
                     <span className="flex-1 text-[10px] text-gray-300 truncate">{t.teamName}</span>
                     <input type="number" min={0} value={t.points}
                       onChange={e => updateHeadstartPoint(i, e.target.value)}
-                      className="w-16 rounded border border-white/10 bg-black/40 px-2 py-1 text-[10px] text-white text-center outline-none focus:border-[#3B82F6]/50" />
+                      className="w-16 rounded border border-white/[0.08] bg-black/40 px-2 py-1 text-[10px] text-white text-center outline-none focus:border-[#3B82F6]/50" />
                     <span className="text-[8px] text-gray-600 w-6">pts</span>
                   </div>
                 ))}
@@ -1007,7 +1007,7 @@ function TournamentSettingsSection({ tournament, onAction }) {
               <p className="text-[10px] text-gray-600 italic">No teams or standings available. Create teams and play matches first.</p>
             )}
             <button onClick={applyHeadstart} disabled={saving}
-              className="w-full rounded-lg bg-[#3B82F6]/15 border border-[#3B82F6]/30 py-2 text-[10px] font-orbitron font-black text-[#3B82F6] hover:bg-[#3B82F6]/25 transition-all disabled:opacity-50">
+              className="active:scale-[0.98] w-full rounded-lg bg-[#3B82F6]/15 border border-[#3B82F6]/30 py-2 text-[10px] font-orbitron font-black text-[#3B82F6] hover:bg-[#3B82F6]/25 transition-all disabled:opacity-50">
               {saving ? 'APPLYING...' : 'APPLY HEADSTART POINTS'}
             </button>
           </div>

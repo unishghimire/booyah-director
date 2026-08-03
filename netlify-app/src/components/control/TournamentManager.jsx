@@ -589,15 +589,15 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
   return (
     <SectionBoundary label="TOURNAMENT MANAGER">
-      <div className="min-h-[500px] w-full bg-[#04060E] text-white p-4 sm:p-6 rounded-2xl border border-white/5 shadow-2xl">
+      <div className="min-h-[500px] w-full bg-[#04060E] text-white p-4 sm:p-6 rounded-2xl border border-white/[0.06] ">
         
         {/* Layout Grid */}
         <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
           
           {/* ── SECTION 1: TOURNAMENT LIST (LEFT SIDEBAR) ── */}
-          <div className="lg:col-span-1 bg-[#131127] rounded-xl border border-white/5 p-4 flex flex-col justify-between">
+          <div className="lg:col-span-1 nx-surface p-4 flex flex-col justify-between">
             <div>
-              <div className="flex items-center justify-between border-b border-white/10 pb-3 mb-4">
+              <div className="flex items-center justify-between border-b border-white/[0.08] pb-3 mb-4">
                 <div className="flex items-center gap-2">
                   <Trophy className="h-5 w-5 text-[#7C3AED]" />
                   <h3 className="font-orbitron font-black text-sm tracking-wider">CHAMPIONSHIPS</h3>
@@ -620,7 +620,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                         className={`group relative p-3 rounded-lg border cursor-pointer transition-all duration-300 ${
                           isSelected
                             ? 'border-[#7C3AED] bg-[#7C3AED]/5 shadow-[0_0_15px_rgba(124,58,237,0.15)]'
-                            : 'border-white/5 bg-[#1a1835]/40 hover:border-white/20 hover:bg-[#1a1835]/70'
+                            : 'border-white/[0.06] bg-[#1a1835]/40 hover:border-white/20 hover:bg-[#1a1835]/70'
                         }`}
                       >
                         <div className="flex items-start justify-between gap-2">
@@ -650,7 +650,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                             e.stopPropagation();
                             setConfirmDeleteId(t.id);
                           }}
-                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity p-1 bg-black/40 rounded border border-white/5"
+                          className="absolute top-2 right-2 opacity-0 group-hover:opacity-100 hover:text-red-500 transition-opacity p-1 bg-black/40 rounded border border-white/[0.06]"
                           title="Delete tournament"
                         >
                           <Trash2 className="h-3 w-3" />
@@ -675,7 +675,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
           {/* ── SECTION 2 & 3: TOURNAMENT DETAILS (MAIN AREA) ── */}
           <div className="lg:col-span-3 space-y-6">
             {!selectedTournament ? (
-              <div className="flex flex-col items-center justify-center py-20 bg-[#131127] rounded-xl border border-white/5 text-center">
+              <div className="flex flex-col items-center justify-center py-20 nx-surface text-center">
                 <Trophy className="h-16 w-16 text-gray-600 mb-4 animate-bounce" />
                 <h3 className="font-orbitron text-base font-black tracking-widest text-gray-400 uppercase">NO TOURNAMENT SELECTED</h3>
                 <p className="font-rajdhani text-sm text-gray-500 mt-2 max-w-sm">
@@ -692,7 +692,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
               <div className="space-y-6">
                 
                 {/* ── HEADER & INLINE NAME EDIT ── */}
-                <div className="bg-[#131127] rounded-xl border border-white/5 p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+                <div className="nx-surface p-4 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
                   <div className="flex-1 w-full">
                     <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1">
                       CHAMPIONSHIP DETAILS
@@ -703,11 +703,11 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                           type="text"
                           value={editingNameValue}
                           onChange={(e) => setEditingNameValue(e.target.value)}
-                          className="flex-1 bg-black/40 border border-white/10 rounded px-3 py-1.5 font-orbitron text-sm font-black text-[#7C3AED] uppercase tracking-wide focus:outline-none focus:border-[#7C3AED]"
+                          className="flex-1 bg-black/40 border border-white/[0.08] rounded px-3 py-1.5 font-orbitron text-sm font-black text-[#7C3AED] uppercase tracking-wide focus:outline-none focus:border-[#7C3AED]"
                         />
                         <button
                           onClick={handleUpdateName}
-                          className="bg-[#22c55e] hover:bg-green-600 text-white p-2 rounded"
+                          className="active:scale-[0.98] bg-[#22c55e] hover:bg-green-600 text-white p-2 rounded"
                           title="Save Name"
                         >
                           <Check className="h-4 w-4" />
@@ -746,7 +746,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                     <button
                       onClick={handleSaveSettings}
                       disabled={savingSettings}
-                      className="flex items-center gap-1.5 px-4 py-2 bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] hover:opacity-90 font-orbitron text-xs font-black tracking-widest rounded-lg shadow-lg shadow-[#7C3AED]/10 transition-all disabled:opacity-50"
+                      className="active:scale-[0.98] flex items-center gap-1.5 px-4 py-2 bg-[#7C3AED] hover:opacity-90 font-orbitron text-xs font-black tracking-widest rounded-lg shadow-lg shadow-[#7C3AED]/10 transition-all disabled:opacity-50"
                     >
                       <Save className="h-3.5 w-3.5" />
                       {savingSettings ? 'SAVING...' : 'SAVE SETTINGS'}
@@ -758,7 +758,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                 <div className="grid grid-cols-2 sm:grid-cols-4 gap-4">
                   
                   {/* Stat 1: Total Teams */}
-                  <div className="bg-[#131127] rounded-xl border border-white/5 p-4 flex items-center justify-between">
+                  <div className="nx-surface p-4 flex items-center justify-between">
                     <div>
                       <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1">
                         TOTAL TEAMS
@@ -773,7 +773,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                   </div>
 
                   {/* Stat 2: Total Matches */}
-                  <div className="bg-[#131127] rounded-xl border border-white/5 p-4 flex items-center justify-between">
+                  <div className="nx-surface p-4 flex items-center justify-between">
                     <div>
                       <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1">
                         TOTAL MATCHES
@@ -788,7 +788,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                   </div>
 
                   {/* Stat 3: Current Match # */}
-                  <div className="bg-[#131127] rounded-xl border border-white/5 p-4 flex items-center justify-between">
+                  <div className="nx-surface p-4 flex items-center justify-between">
                     <div>
                       <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1">
                         CURRENT MATCH
@@ -803,7 +803,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                   </div>
 
                   {/* Stat 4: Total Kills */}
-                  <div className="bg-[#131127] rounded-xl border border-white/5 p-4 flex items-center justify-between">
+                  <div className="nx-surface p-4 flex items-center justify-between">
                     <div>
                       <span className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1">
                         TOTAL KILLS
@@ -823,9 +823,9 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                 <div className="grid grid-cols-1 md:grid-cols-5 gap-6">
                   
                   {/* Left Column: Basic configuration */}
-                  <div className="md:col-span-2 bg-[#131127] rounded-xl border border-white/5 p-5 space-y-4 flex flex-col justify-between">
+                  <div className="md:col-span-2 nx-surface p-5 space-y-4 flex flex-col justify-between">
                     <div>
-                      <div className="flex items-center gap-2 border-b border-white/5 pb-2 mb-4">
+                      <div className="flex items-center gap-2 border-b border-white/[0.06] pb-2 mb-4">
                         <Settings className="h-4 w-4 text-[#7C3AED]" />
                         <h4 className="font-orbitron text-xs font-black tracking-wider text-gray-200">SETTINGS</h4>
                       </div>
@@ -841,7 +841,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                             min="0"
                             value={selectedTournament.points_per_kill ?? 1}
                             onChange={(e) => handleConfigChange('points_per_kill', e.target.value)}
-                            className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-[#7C3AED] transition-all"
+                            className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-[#7C3AED] transition-all"
                           />
                         </div>
 
@@ -855,7 +855,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                             min="1"
                             value={selectedTournament.total_matches ?? 6}
                             onChange={(e) => handleConfigChange('total_matches', e.target.value)}
-                            className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-[#7C3AED] transition-all"
+                            className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-[#7C3AED] transition-all"
                           />
                         </div>
 
@@ -864,7 +864,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                           <label className="text-[9px] font-black tracking-widest text-gray-400 uppercase font-rajdhani block mb-1.5">
                             CURRENT MATCH (LIVE DISPLAY)
                           </label>
-                          <div className="w-full bg-black/20 border border-white/5 rounded-lg px-3 py-2 text-xs font-bold text-gray-500 font-orbitron">
+                          <div className="w-full bg-black/20 border border-white/[0.06] rounded-lg px-3 py-2 text-xs font-bold text-gray-500 font-orbitron">
                             {selectedTournament.current_match_number || 1}
                           </div>
                         </div>
@@ -877,7 +877,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                           <select
                             value={selectedTournament.status || 'setup'}
                             onChange={(e) => handleConfigChange('status', e.target.value)}
-                            className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-[#7C3AED] transition-all"
+                            className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-3 py-2 text-xs font-bold text-white focus:outline-none focus:border-[#7C3AED] transition-all"
                           >
                             <option value="setup">Setup (Waiting to start)</option>
                             <option value="active">Active (Currently Live)</option>
@@ -887,14 +887,14 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       </div>
                     </div>
 
-                    <div className="pt-4 border-t border-white/5 text-[11px] font-rajdhani text-gray-500">
+                    <div className="pt-4 border-t border-white/[0.06] text-[11px] font-rajdhani text-gray-500">
                       * Status: Setting status to <span className="text-[#7C3AED]">ACTIVE</span> switches the live overlay scoreboard feed to this championship.
                     </div>
                   </div>
 
                   {/* Right Column: PLACEMENT POINTS TABLE */}
-                  <div className="md:col-span-3 bg-[#131127] rounded-xl border border-white/5 p-5">
-                    <div className="flex items-center justify-between border-b border-white/5 pb-2 mb-4">
+                  <div className="md:col-span-3 nx-surface p-5">
+                    <div className="flex items-center justify-between border-b border-white/[0.06] pb-2 mb-4">
                       <div className="flex items-center gap-2">
                         <Award className="h-4 w-4 text-[#3B82F6]" />
                         <h4 className="font-orbitron text-xs font-black tracking-wider text-gray-200">PLACEMENT POINTS</h4>
@@ -911,7 +911,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                         const points = selectedTournament.placement_points_config?.[rank] ?? 0;
                         
                         // Highlights
-                        let highlightClass = 'border-white/5 bg-black/20 hover:border-white/15';
+                        let highlightClass = 'border-white/[0.06] bg-black/20 hover:border-white/15';
                         let badgeColor = 'text-gray-400';
                         if (rank === 1) {
                           highlightClass = 'border-amber-500/30 bg-amber-500/5 hover:border-amber-500/50';
@@ -940,7 +940,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                               min="0"
                               value={points}
                               onChange={(e) => handlePlacementPointsChange(rank, e.target.value)}
-                              className="w-11 bg-[#1a1835] border border-white/10 rounded px-1 py-0.5 text-center text-xs font-bold text-white focus:outline-none focus:border-[#3B82F6]"
+                              className="w-11 bg-[#1a1835] border border-white/[0.08] rounded px-1 py-0.5 text-center text-xs font-bold text-white focus:outline-none focus:border-[#3B82F6]"
                             />
                           </div>
                         );
@@ -951,16 +951,16 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                 </div>
 
                 {/* ── STAGE/SCHEDULE/GROUPS TABBED MANAGER ── */}
-                <div className="bg-[#131127] rounded-xl border border-white/5 p-5">
+                <div className="nx-surface p-5">
                   
                   {/* Tabs bar */}
-                  <div className="flex border-b border-white/10 mb-4 font-orbitron text-xs font-black tracking-widest uppercase">
+                  <div className="flex border-b border-white/[0.08] mb-4 font-orbitron text-xs font-black tracking-widest uppercase">
                     <button
                       onClick={() => setActiveTab('stages')}
                       className={`flex items-center gap-1.5 px-4 py-3 border-b-2 transition-all duration-300 ${
                         activeTab === 'stages'
                           ? 'border-[#7C3AED] text-[#7C3AED]'
-                          : 'border-transparent text-gray-400 hover:text-white hover:border-white/10'
+                          : 'border-transparent text-gray-400 hover:text-white hover:border-white/[0.08]'
                       }`}
                     >
                       <Layers className="h-4 w-4" />
@@ -971,7 +971,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       className={`flex items-center gap-1.5 px-4 py-3 border-b-2 transition-all duration-300 ${
                         activeTab === 'schedule'
                           ? 'border-[#7C3AED] text-[#7C3AED]'
-                          : 'border-transparent text-gray-400 hover:text-white hover:border-white/10'
+                          : 'border-transparent text-gray-400 hover:text-white hover:border-white/[0.08]'
                       }`}
                     >
                       <CalendarDays className="h-4 w-4" />
@@ -982,7 +982,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       className={`flex items-center gap-1.5 px-4 py-3 border-b-2 transition-all duration-300 ${
                         activeTab === 'groups'
                           ? 'border-[#7C3AED] text-[#7C3AED]'
-                          : 'border-transparent text-gray-400 hover:text-white hover:border-white/10'
+                          : 'border-transparent text-gray-400 hover:text-white hover:border-white/[0.08]'
                       }`}
                     >
                       <Grid className="h-4 w-4" />
@@ -1000,14 +1000,14 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                           safeArray(selectedTournament.stages).map((stage) => (
                             <div
                               key={stage.id}
-                              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-black/20 rounded-lg border border-white/5"
+                              className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 p-3 bg-black/20 rounded-lg border border-white/[0.06]"
                             >
                               <div className="flex-1">
                                 <input
                                   type="text"
                                   value={stage.name}
                                   onChange={(e) => handleUpdateStage(stage.id, 'name', e.target.value)}
-                                  className="bg-transparent border border-transparent hover:border-white/10 focus:border-[#7C3AED] rounded px-2 py-1 text-sm font-bold text-white font-orbitron uppercase tracking-wider focus:outline-none focus:bg-[#1a1835]"
+                                  className="bg-transparent border border-transparent hover:border-white/[0.08] focus:border-[#7C3AED] rounded px-2 py-1 text-sm font-bold text-white font-orbitron uppercase tracking-wider focus:outline-none focus:bg-[#1a1835]"
                                 />
                               </div>
 
@@ -1020,7 +1020,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                     min="1"
                                     value={stage.matchCount}
                                     onChange={(e) => handleUpdateStage(stage.id, 'matchCount', Number(e.target.value) || 0)}
-                                    className="w-14 bg-[#1a1835] border border-white/10 rounded px-2 py-1 text-xs text-center text-white focus:outline-none"
+                                    className="w-14 bg-[#1a1835] border border-white/[0.08] rounded px-2 py-1 text-xs text-center text-white focus:outline-none"
                                   />
                                 </div>
 
@@ -1030,7 +1030,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                   <select
                                     value={stage.status}
                                     onChange={(e) => handleUpdateStage(stage.id, 'status', e.target.value)}
-                                    className="bg-[#1a1835] border border-white/10 rounded px-2 py-1 text-xs text-white focus:outline-none"
+                                    className="bg-[#1a1835] border border-white/[0.08] rounded px-2 py-1 text-xs text-white focus:outline-none"
                                   >
                                     <option value="setup">Setup</option>
                                     <option value="active">Active</option>
@@ -1053,7 +1053,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
                       <button
                         onClick={handleAddStage}
-                        className="flex items-center justify-center gap-1.5 w-full border border-dashed border-white/15 hover:border-[#7C3AED]/50 hover:bg-[#7C3AED]/5 py-2.5 rounded-lg text-xs font-orbitron font-bold text-gray-400 hover:text-[#7C3AED] transition-all"
+                        className="active:scale-[0.98] flex items-center justify-center gap-1.5 w-full border border-dashed border-white/15 hover:border-[#7C3AED]/50 hover:bg-[#7C3AED]/5 py-2.5 rounded-lg text-xs font-orbitron font-bold text-gray-400 hover:text-[#7C3AED] transition-all"
                       >
                         <Plus className="h-4 w-4" />
                         ADD TOURNAMENT STAGE
@@ -1071,7 +1071,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                           safeArray(selectedTournament.schedule).map((match) => (
                             <div
                               key={match.id}
-                              className="flex flex-wrap items-center justify-between gap-4 p-3 bg-black/20 rounded-lg border border-white/5 text-xs font-rajdhani font-semibold text-gray-300"
+                              className="flex flex-wrap items-center justify-between gap-4 p-3 bg-black/20 rounded-lg border border-white/[0.06] text-xs font-rajdhani font-semibold text-gray-300"
                             >
                               {/* Match Number in Teko */}
                               <div className="flex items-center gap-3">
@@ -1085,7 +1085,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                   <select
                                     value={match.stage}
                                     onChange={(e) => handleUpdateMatch(match.id, 'stage', e.target.value)}
-                                    className="bg-[#1a1835] border border-white/10 rounded px-2 py-1 text-[11px] text-white focus:outline-none"
+                                    className="bg-[#1a1835] border border-white/[0.08] rounded px-2 py-1 text-[11px] text-white focus:outline-none"
                                   >
                                     {safeArray(selectedTournament.stages).map(s => (
                                       <option key={s.id} value={s.name}>{s.name}</option>
@@ -1105,7 +1105,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                   placeholder="e.g. 18:00"
                                   value={match.time}
                                   onChange={(e) => handleUpdateMatch(match.id, 'time', e.target.value)}
-                                  className="w-20 bg-[#1a1835] border border-white/10 rounded px-2 py-1 text-center text-white focus:outline-none"
+                                  className="w-20 bg-[#1a1835] border border-white/[0.08] rounded px-2 py-1 text-center text-white focus:outline-none"
                                 />
                               </div>
 
@@ -1115,7 +1115,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                 <select
                                   value={match.map}
                                   onChange={(e) => handleUpdateMatch(match.id, 'map', e.target.value)}
-                                  className="bg-[#1a1835] border border-white/10 rounded px-2 py-1 text-[11px] text-white focus:outline-none"
+                                  className="bg-[#1a1835] border border-white/[0.08] rounded px-2 py-1 text-[11px] text-white focus:outline-none"
                                 >
                                   {MAP_OPTIONS.map(map => (
                                     <option key={map} value={map}>{map}</option>
@@ -1129,7 +1129,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                 <select
                                   value={match.status}
                                   onChange={(e) => handleUpdateMatch(match.id, 'status', e.target.value)}
-                                  className="bg-[#1a1835] border border-white/10 rounded px-2 py-1 text-[11px] text-white focus:outline-none"
+                                  className="bg-[#1a1835] border border-white/[0.08] rounded px-2 py-1 text-[11px] text-white focus:outline-none"
                                 >
                                   <option value="scheduled">Scheduled</option>
                                   <option value="live">Live</option>
@@ -1152,7 +1152,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
 
                       <button
                         onClick={handleAddMatch}
-                        className="flex items-center justify-center gap-1.5 w-full border border-dashed border-white/15 hover:border-[#3B82F6]/50 hover:bg-[#3B82F6]/5 py-2.5 rounded-lg text-xs font-orbitron font-bold text-gray-400 hover:text-[#3B82F6] transition-all"
+                        className="active:scale-[0.98] flex items-center justify-center gap-1.5 w-full border border-dashed border-white/15 hover:border-[#3B82F6]/50 hover:bg-[#3B82F6]/5 py-2.5 rounded-lg text-xs font-orbitron font-bold text-gray-400 hover:text-[#3B82F6] transition-all"
                       >
                         <Plus className="h-4 w-4" />
                         ADD MATCH TO SCHEDULE
@@ -1165,7 +1165,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                     <div className="space-y-6">
                       
                       {/* Roster & Add Team Section */}
-                      <div className="p-4 bg-black/20 border border-white/5 rounded-lg">
+                      <div className="p-4 bg-black/20 border border-white/[0.06] rounded-lg">
                         <div className="flex items-center gap-2 mb-3">
                           <User className="h-4 w-4 text-[#7C3AED]" />
                           <h5 className="font-orbitron text-xs font-bold text-gray-300">ADD TO TOURNAMENT ROSTER</h5>
@@ -1176,11 +1176,11 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                             placeholder="Enter Esports Team Name..."
                             value={newTeamName}
                             onChange={(e) => setNewTeamName(e.target.value)}
-                            className="flex-1 bg-[#1a1835] border border-white/10 rounded-lg px-3 py-1.5 text-xs text-white font-rajdhani focus:outline-none focus:border-[#7C3AED]"
+                            className="flex-1 bg-[#1a1835] border border-white/[0.08] rounded-lg px-3 py-1.5 text-xs text-white font-rajdhani focus:outline-none focus:border-[#7C3AED]"
                           />
                           <button
                             onClick={handleAddTeamToRoster}
-                            className="bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-4 py-1.5 rounded-lg text-xs font-orbitron font-bold transition-all flex items-center justify-center gap-1"
+                            className="active:scale-[0.98] bg-[#7C3AED] hover:bg-[#6D28D9] text-white px-4 py-1.5 rounded-lg text-xs font-orbitron font-bold transition-all flex items-center justify-center gap-1"
                           >
                             <Plus className="h-3.5 w-3.5" /> ADD TEAM
                           </button>
@@ -1196,10 +1196,10 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                               key={gLetter}
                               onDragOver={handleDragOver}
                               onDrop={(e) => handleDrop(e, gLetter)}
-                              className="flex flex-col bg-black/40 border border-white/5 rounded-xl overflow-hidden min-h-[180px] transition-all hover:border-[#7C3AED]/20"
+                              className="flex flex-col bg-black/40 border border-white/[0.06] rounded-xl overflow-hidden min-h-[180px] transition-all hover:border-[#7C3AED]/20"
                             >
                               {/* Group Header */}
-                              <div className="bg-[#1a1835] px-3 py-2 border-b border-white/5 flex items-center justify-between">
+                              <div className="bg-[#1a1835] px-3 py-2 border-b border-white/[0.06] flex items-center justify-between">
                                 <span className="font-orbitron text-xs font-black text-white">GROUP {gLetter}</span>
                                 <span className="px-1.5 py-0.5 bg-white/5 text-[9px] font-bold rounded text-gray-400">
                                   {list.length}
@@ -1209,7 +1209,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                               {/* Dropzone Area */}
                               <div className="flex-1 p-2 space-y-2 overflow-y-auto max-h-[220px]">
                                 {list.length === 0 ? (
-                                  <div className="h-full flex items-center justify-center py-6 text-center text-[10px] font-rajdhani text-gray-600 border border-dashed border-white/5 rounded-lg">
+                                  <div className="h-full flex items-center justify-center py-6 text-center text-[10px] font-rajdhani text-gray-600 border border-dashed border-white/[0.06] rounded-lg">
                                     Drag Teams Here
                                   </div>
                                 ) : (
@@ -1218,7 +1218,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                       key={team}
                                       draggable
                                       onDragStart={(e) => handleDragStart(e, team)}
-                                      className="flex items-center justify-between p-2 bg-[#131127] rounded border border-white/5 cursor-grab active:cursor-grabbing hover:border-white/10 transition-all text-xs font-rajdhani font-bold text-gray-200"
+                                      className="flex items-center justify-between p-2 bg-[#131127] rounded border border-white/[0.06] cursor-grab active:cursor-grabbing hover:border-white/[0.08] transition-all text-xs font-rajdhani font-bold text-gray-200"
                                     >
                                       <span className="truncate">{team}</span>
                                       
@@ -1240,7 +1240,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       </div>
 
                       {/* Unassigned Pool Drawer */}
-                      <div className="p-4 bg-black/30 border border-white/5 rounded-xl">
+                      <div className="p-4 bg-black/30 border border-white/[0.06] rounded-xl">
                         <div className="flex items-center justify-between mb-3">
                           <span className="text-[10px] font-black tracking-widest text-gray-400 uppercase font-rajdhani">
                             UNASSIGNED TEAMS POOL ({unassignedTeams.length})
@@ -1256,7 +1256,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                 key={team}
                                 draggable
                                 onDragStart={(e) => handleDragStart(e, team)}
-                                className="flex items-center gap-2 p-1.5 bg-[#131127] hover:bg-[#1c1a3b] rounded-lg border border-white/5 cursor-grab active:cursor-grabbing transition-all text-xs font-rajdhani font-bold text-gray-300"
+                                className="flex items-center gap-2 p-1.5 bg-[#131127] hover:bg-[#1c1a3b] rounded-lg border border-white/[0.06] cursor-grab active:cursor-grabbing transition-all text-xs font-rajdhani font-bold text-gray-300"
                               >
                                 <span className="truncate max-w-[120px]">{team}</span>
                                 
@@ -1264,7 +1264,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                                 <select
                                   value="unassigned"
                                   onChange={(e) => moveTeamToGroup(team, e.target.value)}
-                                  className="bg-black/40 border border-white/10 rounded text-[10px] text-gray-400 px-1 py-0.5 focus:outline-none"
+                                  className="bg-black/40 border border-white/[0.08] rounded text-[10px] text-gray-400 px-1 py-0.5 focus:outline-none"
                                 >
                                   <option value="unassigned" disabled>Assign</option>
                                   <option value="A">Group A</option>
@@ -1292,10 +1292,10 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
         {/* ── MODAL 1: NEW TOURNAMENT CREATION ── */}
         {showCreateForm && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
-            <div className="w-full max-w-lg bg-[#131127] rounded-2xl border border-white/10 shadow-2xl overflow-hidden">
+            <div className="w-full max-w-lg nx-surface-elevated overflow-hidden">
               
               {/* Modal Header */}
-              <div className="flex items-center justify-between bg-black/20 p-4 border-b border-white/10 font-orbitron">
+              <div className="flex items-center justify-between bg-black/20 p-4 border-b border-white/[0.08] font-orbitron">
                 <div className="flex items-center gap-2">
                   <Trophy className="h-5 w-5 text-[#7C3AED]" />
                   <h3 className="text-sm font-black tracking-widest text-white uppercase">CREATE NEW TOURNAMENT</h3>
@@ -1320,7 +1320,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                     placeholder="NexPlay Pro League..."
                     value={newTournamentData.name}
                     onChange={(e) => setNewTournamentData(prev => ({ ...prev, name: e.target.value }))}
-                    className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#7C3AED] transition-all"
+                    className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#7C3AED] transition-all"
                   />
                 </div>
 
@@ -1335,7 +1335,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       min="1"
                       value={newTournamentData.total_matches}
                       onChange={(e) => setNewTournamentData(prev => ({ ...prev, total_matches: parseInt(e.target.value) || 1 }))}
-                      className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#7C3AED] transition-all"
+                      className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#7C3AED] transition-all"
                     />
                   </div>
 
@@ -1348,7 +1348,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                       min="0"
                       value={newTournamentData.points_per_kill}
                       onChange={(e) => setNewTournamentData(prev => ({ ...prev, points_per_kill: parseInt(e.target.value) || 0 }))}
-                      className="w-full bg-black/40 border border-white/10 rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#7C3AED] transition-all"
+                      className="w-full bg-black/40 border border-white/[0.08] rounded-lg px-3 py-2 text-xs text-white focus:outline-none focus:border-[#7C3AED] transition-all"
                     />
                   </div>
                 </div>
@@ -1362,17 +1362,17 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
                   </div>
                   
                   {/* Miniature placement list */}
-                  <div className="grid grid-cols-4 gap-1.5 p-3 bg-black/20 border border-white/5 rounded-lg text-[10px] font-rajdhani font-black tracking-wider">
-                    <div className="flex justify-between border-r border-white/5 pr-1.5 text-yellow-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#1</span><span>12 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/5 pr-1.5 text-slate-300"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#2</span><span>9 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/5 pr-1.5 text-amber-600"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#3</span><span>8 PTS</span></div>
+                  <div className="grid grid-cols-4 gap-1.5 p-3 bg-black/20 border border-white/[0.06] rounded-lg text-[10px] font-rajdhani font-black tracking-wider">
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-yellow-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#1</span><span>12 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-slate-300"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#2</span><span>9 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-amber-600"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#3</span><span>8 PTS</span></div>
                     <div className="flex justify-between text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#4</span><span>7 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/5 pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#5</span><span>6 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/5 pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#6</span><span>5 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/5 pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#7</span><span>4 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#5</span><span>6 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#6</span><span>5 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#7</span><span>4 PTS</span></div>
                     <div className="flex justify-between text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#8</span><span>3 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/5 pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#9</span><span>2 PTS</span></div>
-                    <div className="flex justify-between border-r border-white/5 pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#10</span><span>1 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#9</span><span>2 PTS</span></div>
+                    <div className="flex justify-between border-r border-white/[0.06] pr-1.5 text-gray-400"><span style={{ fontFamily: 'Teko, sans-serif' }} className="text-sm">#10</span><span>1 PTS</span></div>
                     <div className="col-span-2 text-center text-gray-500 font-medium">Rank 11-24 = 0 PTS</div>
                   </div>
                 </div>
@@ -1380,16 +1380,16 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
               </div>
 
               {/* Modal Actions */}
-              <div className="flex items-center justify-end gap-3 bg-black/20 p-4 border-t border-white/10 font-orbitron text-xs font-bold">
+              <div className="flex items-center justify-end gap-3 bg-black/20 p-4 border-t border-white/[0.08] font-orbitron text-xs font-bold">
                 <button
                   onClick={() => setShowCreateForm(false)}
-                  className="px-4 py-2 border border-white/10 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                  className="px-4 py-2 border border-white/[0.08] rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all"
                 >
                   CANCEL
                 </button>
                 <button
                   onClick={handleCreateTournament}
-                  className="px-5 py-2 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white transition-all shadow-md shadow-[#7C3AED]/20"
+                  className="active:scale-[0.98] px-5 py-2 rounded-lg bg-[#7C3AED] hover:bg-[#6D28D9] text-white transition-all shadow-md shadow-[#7C3AED]/20"
                 >
                   CREATE TOURNAMENT
                 </button>
@@ -1402,7 +1402,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
         {/* ── MODAL 2: DELETE CONFIRMATION ── */}
         {confirmDeleteId && (
           <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80 backdrop-blur-sm p-4 animate-fadeIn">
-            <div className="w-full max-w-sm bg-[#131127] rounded-xl border border-red-500/20 shadow-2xl p-5 text-center">
+            <div className="w-full max-w-sm nx-surface-elevated border border-red-500/20 p-5 text-center">
               <AlertTriangle className="h-12 w-12 text-red-500 mx-auto mb-3" />
               <h3 className="font-orbitron font-black text-sm tracking-widest text-white uppercase">
                 DELETE TOURNAMENT?
@@ -1414,7 +1414,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
               <div className="flex items-center justify-center gap-3 mt-6 font-orbitron text-xs font-bold">
                 <button
                   onClick={() => setConfirmDeleteId(null)}
-                  className="px-4 py-2 border border-white/10 rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all"
+                  className="px-4 py-2 border border-white/[0.08] rounded-lg text-gray-400 hover:text-white hover:bg-white/5 transition-all"
                 >
                   CANCEL
                 </button>

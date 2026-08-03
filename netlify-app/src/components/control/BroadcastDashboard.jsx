@@ -151,8 +151,7 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
       </div>
 
       {/* ── OBS CONNECTION BAR ── */}
-      <div className="flex items-center gap-3 px-4 py-3 rounded-lg border" style={{
-        background: '#131127',
+      <div className="flex items-center gap-3 px-4 py-3 nx-surface" style={{
         borderColor: connectionStatus === 'connected' ? 'rgba(34,197,94,0.2)' : 'rgba(239,68,68,0.2)',
       }}>
         <div className="flex items-center gap-2">
@@ -166,10 +165,10 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
         <div className="flex-1" />
         {connectionStatus === 'connected' ? (
           <>
-            <button onClick={handleRefreshObs} className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/5 text-white/60 hover:bg-white/10 transition-all text-[10px] font-orbitron font-bold tracking-wider">
+            <button onClick={handleRefreshObs} className="active:scale-[0.98] flex items-center gap-1.5 px-3 py-1.5 rounded bg-white/5 text-white/60 hover:bg-white/10 transition-all text-[10px] font-orbitron font-bold tracking-wider">
               <RefreshCw className="w-3 h-3" /> REFRESH SCENES
             </button>
-            <button onClick={handleDisconnect} className="flex items-center gap-1.5 px-3 py-1.5 rounded bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 transition-all text-[10px] font-orbitron font-bold tracking-wider">
+            <button onClick={handleDisconnect} className="active:scale-[0.98] flex items-center gap-1.5 px-3 py-1.5 rounded bg-red-500/15 border border-red-500/30 text-red-400 hover:bg-red-500/25 transition-all text-[10px] font-orbitron font-bold tracking-wider">
               <Power className="w-3 h-3" /> DISCONNECT
             </button>
           </>
@@ -184,11 +183,11 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
       {connectionStatus === 'connected' ? (
         <div className="grid grid-cols-3 gap-3">
           {/* OBS SCENE LIST */}
-          <div className="col-span-2 rounded-lg border border-white/5 overflow-hidden" style={{ background: '#131127' }}>
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5">
+          <div className="col-span-2 nx-surface overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06]">
               <div className="flex items-center gap-2">
                 <Layers className="w-3.5 h-3.5 text-purple-400" />
-                <span className="font-orbitron text-[9px] font-black tracking-widest text-white">OBS SCENES</span>
+                <span className="nx-section-label text-white">OBS SCENES</span>
                 <span className="px-2 py-0.5 rounded-full bg-white/5 text-[8px] font-orbitron font-bold text-white/40">{availableScenes.length}</span>
               </div>
             </div>
@@ -212,7 +211,7 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
                         ? 'bg-red-500/15 border-red-500/40 text-red-300'
                         : isPreview
                         ? 'bg-blue-500/15 border-blue-500/40 text-blue-300'
-                        : 'border-white/10 text-white/60 hover:bg-white/5 hover:text-white'
+                        : 'border-white/[0.08] text-white/60 hover:bg-white/5 hover:text-white'
                     }`}
                     title="Click = Preview, Double-click = Take to Program"
                   >
@@ -226,7 +225,7 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
               })}
             </div>
             {/* TAKE BUTTON */}
-            <div className="flex items-center justify-center gap-3 px-4 py-3 border-t border-white/5">
+            <div className="flex items-center justify-center gap-3 px-4 py-3 border-t border-white/[0.06]">
               <div className="flex items-center gap-2 text-[10px] text-white/40">
                 <span className="font-orbitron text-[8px] font-bold tracking-widest">PREVIEW:</span>
                 <span className="font-orbitron text-[10px] font-bold text-blue-400">{currentPreviewScene || '—'}</span>
@@ -237,7 +236,7 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
               <button
                 onClick={handleTake}
                 disabled={takeBusy || !currentPreviewScene || currentPreviewScene === currentProgramScene}
-                className="flex items-center gap-2 px-8 py-2.5 rounded-lg font-orbitron text-[10px] font-black tracking-widest transition-all disabled:opacity-30 disabled:cursor-not-allowed"
+                className="active:scale-[0.98] flex items-center gap-2 px-8 py-2.5 rounded-lg font-orbitron text-[10px] font-black tracking-widest transition-all disabled:opacity-30 disabled:cursor-not-allowed"
                 style={{ background: 'linear-gradient(135deg, #22c55e, #16a34a)', color: '#fff', boxShadow: '0 0 15px rgba(34,197,94,0.3)' }}
               >
                 {takeBusy ? <><Clock className="w-3 h-3 animate-spin" /><span>TAKING...</span></> : <><Zap className="w-3 h-3" /><span>TAKE</span></>}
@@ -246,16 +245,16 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
           </div>
 
           {/* SOURCE VISIBILITY PANEL */}
-          <div className="rounded-lg border border-white/5 overflow-hidden" style={{ background: '#131127' }}>
-            <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5">
+          <div className="nx-surface overflow-hidden">
+            <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06]">
               <div className="flex items-center gap-2">
                 <Settings className="w-3 h-3 text-white/40" />
-                <span className="font-orbitron text-[9px] font-black tracking-widest text-white">SOURCES</span>
+                <span className="nx-section-label text-white">SOURCES</span>
               </div>
               <select
                 value={selectedScene || currentProgramScene || ''}
                 onChange={(e) => setSelectedScene(e.target.value)}
-                className="bg-transparent text-[9px] font-orbitron font-bold text-white border border-white/10 rounded px-2 py-1 outline-none cursor-pointer max-w-[120px]"
+                className="bg-transparent text-[9px] font-orbitron font-bold text-white border border-white/[0.08] rounded px-2 py-1 outline-none cursor-pointer max-w-[120px]"
               >
                 <option value="" className="bg-[#131127]">— Select Scene —</option>
                 {availableScenes.map(s => <option key={s} value={s} className="bg-[#131127]">{s}</option>)}
@@ -271,7 +270,7 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
                 <button
                   key={src.id || src.name}
                   onClick={() => handleToggleSource(selectedScene || currentProgramScene, src.name)}
-                  className="w-full flex items-center gap-3 px-4 py-2.5 border-b border-white/5 hover:bg-white/5 transition-colors"
+                  className="w-full flex items-center gap-3 px-4 py-2.5 border-b border-white/[0.06] hover:bg-white/5 transition-colors"
                 >
                   <span className="w-2 h-2 rounded-full" style={{ background: src.visible ? '#22c55e' : '#6b7280' }} />
                   <span className={`text-[11px] font-medium flex-1 text-left ${src.visible ? 'text-white' : 'text-white/30 line-through'}`}>{src.name}</span>
@@ -285,7 +284,7 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
         </div>
       ) : (
         /* ── DISCONNECTED STATE ── */
-        <div className="flex flex-col items-center justify-center py-16 gap-4 rounded-lg border border-white/5" style={{ background: '#131127' }}>
+        <div className="flex flex-col items-center justify-center py-16 gap-4 nx-surface">
           <div className="w-16 h-16 rounded-full flex items-center justify-center" style={{ background: 'rgba(239,68,68,0.1)' }}>
             <Wifi className="w-8 h-8 text-red-500/50" />
           </div>
@@ -302,8 +301,8 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
       {/* ── DATA OVERVIEW (always visible) ── */}
       <div className="grid grid-cols-2 gap-3">
         {/* TOURNAMENT + MATCH STATS */}
-        <div className="rounded-lg border border-white/5 p-3" style={{ background: '#131127' }}>
-          <span className="font-orbitron text-[9px] font-black tracking-widest text-white/40 mb-2 block">TOURNAMENT DATA</span>
+        <div className="nx-surface p-3">
+          <span className="nx-section-label text-white/40 mb-2 block">TOURNAMENT DATA</span>
           <div className="grid grid-cols-2 gap-2">
             <DataStat label="TOURNAMENT" value={tournament?.name || 'None'} badge={tournamentStatus.toUpperCase()} badgeColor={tournamentStatusColor} />
             <DataStat label="MATCH #" value={tournament?.current_match_number || 0} badge={matchState.toUpperCase()} badgeColor={matchStateColor} />
@@ -318,18 +317,18 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
             <button onClick={() => overlayApi?.updateMatchState?.({ state: 'ended' }).then(() => { toast.success('Match ended'); refresh?.(); }).catch(e => toast.error(e.message))} className="flex-1 flex items-center justify-center gap-1.5 px-3 py-2 rounded bg-red-500/15 border border-red-500/30 text-red-400 font-orbitron text-[9px] font-bold tracking-wider hover:bg-red-500/25 transition-all">
               <Square className="w-3 h-3" /> END MATCH
             </button>
-            <button onClick={refresh} className="flex items-center justify-center gap-1.5 px-3 py-2 rounded bg-blue-500/15 border border-blue-500/30 text-blue-400 font-orbitron text-[9px] font-bold tracking-wider hover:bg-blue-500/25 transition-all">
+            <button onClick={refresh} className="active:scale-[0.98] flex items-center justify-center gap-1.5 px-3 py-2 rounded bg-blue-500/15 border border-blue-500/30 text-blue-400 font-orbitron text-[9px] font-bold tracking-wider hover:bg-blue-500/25 transition-all">
               <RefreshCw className="w-3 h-3" />
             </button>
           </div>
         </div>
 
         {/* RECENT EVENTS FEED */}
-        <div className="rounded-lg border border-white/5 overflow-hidden" style={{ background: '#131127' }}>
-          <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/5">
+        <div className="nx-surface overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-white/[0.06]">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-purple-500" />
-              <span className="font-orbitron text-[9px] font-black tracking-widest text-white">RECENT EVENTS</span>
+              <span className="nx-section-label text-white">RECENT EVENTS</span>
             </div>
             <span className="font-orbitron text-[8px] font-bold text-white/30">{recentEvents.length}</span>
           </div>
@@ -342,7 +341,7 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
             ) : recentEvents.map((evt, i) => {
               const Icon = evt.icon;
               return (
-                <div key={i} className="flex items-center gap-3 px-4 py-2 border-b border-white/5">
+                <div key={i} className="flex items-center gap-3 px-4 py-2 border-b border-white/[0.06]">
                   <span className="font-orbitron text-[8px] font-bold text-white/30 w-12">{formatTime(evt.ts)}</span>
                   <div className="flex items-center justify-center w-5 h-5 rounded-full flex-shrink-0" style={{ background: `${evt.color}20` }}>
                     <Icon className="w-2.5 h-2.5" style={{ color: evt.color }} />
@@ -358,25 +357,25 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
       {/* ── OBS CONNECTION MODAL ── */}
       {showObsConfig && (
         <div className="fixed inset-0 z-50 flex items-center justify-center" style={{ background: 'rgba(0,0,0,0.7)' }} onClick={() => setShowObsConfig(false)}>
-          <div className="w-full max-w-md rounded-xl border border-white/10 p-5" style={{ background: '#131127' }} onClick={e => e.stopPropagation()}>
+          <div className="w-full max-w-md nx-surface-elevated p-5" onClick={e => e.stopPropagation()}>
             <div className="flex items-center justify-between mb-4">
               <span className="font-orbitron text-[10px] font-black tracking-widest text-white">CONNECT TO OBS WEBSOCKET</span>
               <button onClick={() => setShowObsConfig(false)} className="text-white/40 hover:text-white text-lg">x</button>
             </div>
             <div className="flex flex-col gap-3">
               <div className="flex flex-col gap-1">
-                <label className="font-orbitron text-[8px] font-black tracking-widest text-white/40">OBS ADDRESS (IP:PORT)</label>
-                <input value={addrInput} onChange={e => setAddrInput(e.target.value)} placeholder="localhost:4455" className="w-full px-3 py-2 rounded-lg border border-white/10 text-[11px] text-white outline-none" style={{ background: '#0F1127' }} />
+                <label className="nx-section-label text-[8px]">OBS ADDRESS (IP:PORT)</label>
+                <input value={addrInput} onChange={e => setAddrInput(e.target.value)} placeholder="localhost:4455" className="w-full px-3 py-2 rounded-lg border border-white/[0.08] text-[11px] text-white outline-none" style={{ background: '#0F1127' }} />
               </div>
               <div className="flex flex-col gap-1">
-                <label className="font-orbitron text-[8px] font-black tracking-widest text-white/40">PASSWORD (optional)</label>
-                <input type="password" value={passInput} onChange={e => setPassInput(e.target.value)} placeholder="OBS WebSocket password" className="w-full px-3 py-2 rounded-lg border border-white/10 text-[11px] text-white outline-none" style={{ background: '#0F1127' }} />
+                <label className="nx-section-label text-[8px]">PASSWORD (optional)</label>
+                <input type="password" value={passInput} onChange={e => setPassInput(e.target.value)} placeholder="OBS WebSocket password" className="w-full px-3 py-2 rounded-lg border border-white/[0.08] text-[11px] text-white outline-none" style={{ background: '#0F1127' }} />
               </div>
               <div className="flex items-center gap-2 px-3 py-2 rounded-lg" style={{ background: 'rgba(59,130,246,0.08)' }}>
                 <AlertCircle className="w-3.5 h-3.5 text-blue-400 flex-shrink-0" />
                 <span className="text-[10px] text-white/50">Enable WebSocket Server in OBS → Tools → WebSocket Server Settings. Default port is 4455 for OBS 30+.</span>
               </div>
-              <button onClick={handleConnect} className="flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-orbitron text-[10px] font-black tracking-widest" style={{ background: '#7C3AED', color: '#fff' }}>
+              <button onClick={handleConnect} className="active:scale-[0.98] flex items-center justify-center gap-2 px-4 py-2.5 rounded-lg font-orbitron text-[10px] font-black tracking-widest" style={{ background: '#7C3AED', color: '#fff' }}>
                 <Link2 className="w-3.5 h-3.5" /> CONNECT
               </button>
             </div>
@@ -389,10 +388,10 @@ export default function BroadcastDashboard({ data, refresh, overlayApi }) {
 
 function StatusCard({ icon: Icon, label, value, badge, badgeColor }) {
   return (
-    <div className="rounded-lg border border-white/5 p-3" style={{ background: '#131127' }}>
+    <div className="nx-surface p-3">
       <div className="flex items-center gap-1.5 mb-2">
         <Icon className="w-3 h-3 text-white/30" />
-        <span className="font-orbitron text-[8px] font-black tracking-widest text-white/40">{label}</span>
+        <span className="nx-section-label text-[8px]">{label}</span>
       </div>
       <p className="text-sm font-bold text-white truncate mb-1">{value}</p>
       <div className="flex items-center gap-1.5">
@@ -405,7 +404,7 @@ function StatusCard({ icon: Icon, label, value, badge, badgeColor }) {
 
 function DataStat({ label, value, badge, badgeColor }) {
   return (
-    <div className="rounded-lg border border-white/5 p-2.5" style={{ background: '#0F1127' }}>
+    <div className="rounded-lg border border-white/[0.06] p-2.5" style={{ background: '#0F1127' }}>
       <p className="font-orbitron text-[7px] font-black tracking-widest text-white/40 mb-1">{label}</p>
       <p className="text-sm font-bold text-white truncate">{value}</p>
       <div className="flex items-center gap-1 mt-1">
