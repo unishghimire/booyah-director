@@ -71,15 +71,15 @@ export default function ConnectionStatusBar() {
   if (connectionStatus === 'connected') {
     barColor = 'bg-[#22c55e]';
     statusText = 'Connected';
-    glowClass = 'shadow-[0_0_10px_#22c55e]';
+    glowClass = '';
   } else if (connectionStatus === 'connecting') {
     barColor = 'bg-[#f59e0b] animate-pulse';
     statusText = 'Connecting...';
-    glowClass = 'shadow-[0_0_10px_#f59e0b]';
+    glowClass = '';
   } else if (connectionStatus === 'error') {
     barColor = 'bg-[#ef4444]';
     statusText = 'Connection Error';
-    glowClass = 'shadow-[0_0_10px_#ef4444]';
+    glowClass = '';
   }
 
   return (
@@ -98,25 +98,25 @@ export default function ConnectionStatusBar() {
       {isOpen && (
         <div
           ref={popoverRef}
-          className="absolute left-1/2 -translate-x-1/2 top-2 mt-1 w-[320px] bg-[#0d0b1a] border border-[#7C3AED]/30 rounded-lg p-4 shadow-2xl text-white z-[9999] nx-scale-in"
+          className="absolute left-1/2 -translate-x-1/2 top-2 mt-1 w-[320px] nx-glass rounded-xl p-4 shadow-2xl text-white z-[9999] nx-scale-in"
         >
           {/* Header */}
-          <div className="flex items-center justify-between mb-3 pb-2 border-b border-white/10">
+          <div className="flex items-center justify-between mb-3 pb-2 nx-divider">
             <div className="flex items-center gap-1.5">
               <Settings className="w-4 h-4 text-[#7C3AED]" />
-              <h4 className="font-orbitron text-xs font-black tracking-widest text-[#7C3AED]">OBS WEBSOCKET</h4>
+              <h4 className="font-orbitron text-xs font-black tracking-widest text-[#9D5CFF]">OBS WEBSOCKET</h4>
             </div>
             <button
               onClick={() => setIsOpen(false)}
-              className="text-white/40 hover:text-white transition-colors p-0.5 rounded"
+              className="text-white/40 hover:text-white transition-colors p-0.5 rounded active:scale-90"
             >
               <X className="w-4 h-4" />
             </button>
           </div>
 
           {/* Connection Status Indicator inside Popover */}
-          <div className="flex items-center justify-between bg-black/30 px-3 py-2 rounded mb-4 border border-white/5">
-            <span className="text-[10px] font-orbitron font-bold tracking-wider text-white/60">STATUS</span>
+          <div className="flex items-center justify-between bg-black/20 px-3 py-2 rounded-lg mb-4 border border-white/[0.06]">
+            <span className="nx-section-label">STATUS</span>
             <div className="flex items-center gap-1.5">
               <span className={`w-2 h-2 rounded-full ${barColor.split(' ')[0]}`} />
               <span className="font-orbitron text-[11px] font-black tracking-widest">
@@ -128,7 +128,7 @@ export default function ConnectionStatusBar() {
           {/* Form */}
           <form onSubmit={handleConnect} className="space-y-3">
             <div>
-              <label className="block text-[9px] font-orbitron font-bold tracking-widest text-white/40 mb-1">
+              <label className="nx-section-label block mb-1.5">
                 WEB_SOCKET_ADDRESS
               </label>
               <div className="relative">
@@ -138,13 +138,13 @@ export default function ConnectionStatusBar() {
                   value={address}
                   onChange={(e) => setAddress(e.target.value)}
                   placeholder="localhost:4455"
-                  className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 pl-8 text-xs font-orbitron text-white focus:outline-none focus:border-[#7C3AED]/60 transition-colors"
+                  className="w-full bg-black/25 border border-white/[0.06] rounded-lg px-3 py-2 pl-8 text-xs font-rajdhani text-white focus:outline-none focus:border-[#7C3AED]/50 focus:ring-2 focus:ring-[#7C3AED]/12 transition-all"
                 />
               </div>
             </div>
 
             <div>
-              <label className="block text-[9px] font-orbitron font-bold tracking-widest text-white/40 mb-1">
+              <label className="nx-section-label block mb-1.5">
                 PASSWORD
               </label>
               <div className="relative">
@@ -154,13 +154,13 @@ export default function ConnectionStatusBar() {
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••"
-                  className="w-full bg-black/40 border border-white/10 rounded px-3 py-2 pl-8 text-xs font-orbitron text-white focus:outline-none focus:border-[#7C3AED]/60 transition-colors"
+                  className="w-full bg-black/25 border border-white/[0.06] rounded-lg px-3 py-2 pl-8 text-xs font-rajdhani text-white focus:outline-none focus:border-[#7C3AED]/50 focus:ring-2 focus:ring-[#7C3AED]/12 transition-all"
                 />
               </div>
             </div>
 
             {errorMsg && (
-              <div className="flex items-center gap-1.5 text-red-400 bg-red-500/10 border border-red-500/20 p-2 rounded text-[10px]">
+              <div className="flex items-center gap-1.5 text-red-400 bg-red-500/8 border border-red-500/15 p-2 rounded-lg text-[10px]">
                 <AlertTriangle className="w-3.5 h-3.5 shrink-0" />
                 <span className="font-medium">{errorMsg}</span>
               </div>
@@ -170,7 +170,7 @@ export default function ConnectionStatusBar() {
               <button
                 type="submit"
                 disabled={connectionStatus === 'connecting'}
-                className="flex-1 flex items-center justify-center gap-1.5 bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] hover:from-[#8B5CF6] hover:to-[#60A5FA] text-white py-1.5 rounded text-xs font-orbitron font-black tracking-wider transition-all disabled:opacity-50"
+                className="flex-1 flex items-center justify-center gap-1.5 bg-[#7C3AED] hover:bg-[#6D28D9] text-white py-1.5 rounded-lg text-xs font-orbitron font-black tracking-wider transition-all active:scale-[0.98] disabled:opacity-50"
               >
                 <Power className="w-3.5 h-3.5" /> CONNECT
               </button>
@@ -178,7 +178,7 @@ export default function ConnectionStatusBar() {
                 <button
                   type="button"
                   onClick={handleDisconnect}
-                  className="flex items-center justify-center bg-red-500/10 border border-red-500/30 hover:bg-red-500/20 text-red-400 px-3 py-1.5 rounded text-xs font-orbitron font-black tracking-wider transition-colors"
+                  className="flex items-center justify-center bg-red-500/8 border border-red-500/20 hover:bg-red-500/15 text-red-400 px-3 py-1.5 rounded-lg text-xs font-orbitron font-black tracking-wider transition-all active:scale-[0.98]"
                 >
                   DISCONNECT
                 </button>

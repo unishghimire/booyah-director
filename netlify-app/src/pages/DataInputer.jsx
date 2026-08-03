@@ -247,13 +247,13 @@ export default function DataInputer() {
             <span className="font-orbitron text-xs font-black uppercase text-white">
               {tournament?.name || 'CHAMPIONSHIP TOUR'}
             </span>
-            <span className="text-gray-500 font-bold text-xs">//</span>
+            <span className="text-white/40 font-bold text-xs">//</span>
             <span className="font-orbitron text-[10px] font-bold text-[#3B82F6] tracking-wider uppercase">
               {currentMatch ? `MATCH #${currentMatch.match_number}` : 'NO ACTIVE MATCH'}
             </span>
             {currentMatch?.map && (
               <>
-                <span className="text-gray-500 font-bold text-xs">//</span>
+                <span className="text-white/40 font-bold text-xs">//</span>
                 <span className="font-orbitron text-[10px] font-bold text-white tracking-wider uppercase">
                   {currentMatch.map}
                 </span>
@@ -283,7 +283,7 @@ export default function DataInputer() {
         <button
           onClick={handleRefresh}
           disabled={refreshing}
-          className="flex h-8 w-8 items-center justify-center rounded border border-white/10 bg-[#13131f] text-gray-400 hover:text-white transition-all"
+          className="flex h-8 w-8 items-center justify-center rounded border border-white/[0.08] bg-[#13131f] text-white/50 hover:text-white transition-all"
         >
           <RefreshCw className={`h-3.5 w-3.5 ${refreshing ? 'animate-spin text-[#3B82F6]' : ''}`} />
         </button>
@@ -295,7 +295,7 @@ export default function DataInputer() {
       {/* ─────────────────────────────────────────
          TAB BAR — 44px
       ───────────────────────────────────────── */}
-      <nav className="flex h-11 border-b border-white/5 bg-[#0c0c18] flex-shrink-0">
+      <nav className="flex h-11 border-b border-white/[0.06] bg-[#0c0c18] flex-shrink-0">
         {[
           { id: 'live', label: 'LIVE INPUT', icon: Crosshair },
           { id: 'teams', label: 'TEAMS / PLAYERS', icon: Users },
@@ -307,7 +307,7 @@ export default function DataInputer() {
             <button
               key={t.id}
               onClick={() => setActiveTab(t.id)}
-              className="flex items-center gap-2 px-6 font-orbitron text-[11px] font-black tracking-[0.15em] transition-all relative border-r border-white/5"
+              className="flex items-center gap-2 px-6 font-orbitron text-[11px] font-black tracking-[0.15em] transition-all relative border-r border-white/[0.06]"
               style={
                 isActive
                   ? {
@@ -357,7 +357,7 @@ export default function DataInputer() {
                         <h4 className="font-orbitron text-xs font-black text-amber-500 uppercase tracking-wider">
                           Staged Changes Pending
                         </h4>
-                        <p className="text-[10px] text-gray-400 mt-0.5">
+                        <p className="text-[10px] text-white/50 mt-0.5">
                           You have modified player kills, eliminations, or placements. Push to make them live.
                         </p>
                       </div>
@@ -365,7 +365,7 @@ export default function DataInputer() {
                     <div className="flex items-center gap-2">
                       <button
                         onClick={handleDiscardChanges}
-                        className="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 font-orbitron text-[10px] font-black text-gray-300 hover:bg-white/10 transition-all"
+                        className="rounded-lg border border-white/[0.08] bg-white/5 px-3 py-1.5 font-orbitron text-[10px] font-black text-gray-300 hover:bg-white/10 transition-all"
                       >
                         DISCARD
                       </button>
@@ -386,13 +386,13 @@ export default function DataInputer() {
 
                 {/* Search bar */}
                 <div className="relative">
-                  <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-gray-500" />
+                  <Search className="absolute left-3.5 top-1/2 h-4 w-4 -translate-y-1/2 text-white/40" />
                   <input
                     type="text"
                     placeholder="Search team or player..."
                     value={searchQuery}
                     onChange={(e) => setSearchQuery(e.target.value)}
-                    className="w-full rounded-xl border border-white/5 bg-[#0f0f1a] py-3.5 pl-11 pr-4 text-xs font-semibold text-white outline-none focus:border-[#3B82F6]/40 focus:bg-[#13131f] transition-all"
+                    className="w-full rounded-xl border border-white/[0.06] bg-[#0f0f1a] py-3.5 pl-11 pr-4 text-xs font-semibold text-white outline-none focus:border-[#3B82F6]/40 focus:bg-[#13131f] transition-all"
                   />
                 </div>
 
@@ -401,7 +401,7 @@ export default function DataInputer() {
                     <AlertTriangle className='h-5 w-5 text-yellow-400 flex-shrink-0' />
                     <div>
                       <p className='font-orbitron text-xs font-black text-yellow-400'>NO ACTIVE MATCH</p>
-                      <p className='text-[10px] text-gray-500 mt-0.5'>Start a match in the Director Panel before logging kills or eliminations.</p>
+                      <p className='text-[10px] text-white/40 mt-0.5'>Start a match in the Director Panel before logging kills or eliminations.</p>
                     </div>
                   </div>
                 )}
@@ -444,13 +444,13 @@ export default function DataInputer() {
 
                 {/* Add Team form */}
                 <div className="col-span-12 lg:col-span-5 flex flex-col gap-6">
-                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
+                  <div className="rounded-xl border border-white/[0.06] bg-[#0f0f1a] p-5">
                     <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-white mb-4">
                       ADD NEW TEAM
                     </h3>
                     <form onSubmit={handleAddTeam} className="space-y-4">
                       <div>
-                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-gray-500 uppercase mb-2">
+                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-white/40 uppercase mb-2">
                           Team Name *
                         </label>
                         <input
@@ -459,7 +459,7 @@ export default function DataInputer() {
                           value={newTeamName}
                           onChange={(e) => setNewTeamName(e.target.value)}
                           placeholder="e.g. TEAM LIQUID"
-                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#7C3AED]/40"
+                          className="w-full rounded-lg border border-white/[0.06] bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#7C3AED]/40"
                         />
                       </div>
                       <ImageUpload
@@ -470,7 +470,7 @@ export default function DataInputer() {
                       <button
                         type="submit"
                         disabled={teamAdding}
-                        className="w-full rounded-lg bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(124,58,237,0.2)] transition-all disabled:opacity-50"
+                        className="w-full rounded-lg bg-[#7C3AED] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(124,58,237,0.2)] transition-all disabled:opacity-50"
                       >
                         {teamAdding ? 'ADDING TEAM...' : 'CREATE TEAM'}
                       </button>
@@ -478,20 +478,20 @@ export default function DataInputer() {
                   </div>
 
                   {/* Add Player form */}
-                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
+                  <div className="rounded-xl border border-white/[0.06] bg-[#0f0f1a] p-5">
                     <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-white mb-4">
                       ADD PLAYER TO TEAM
                     </h3>
                     <form onSubmit={handleAddPlayer} className="space-y-4">
                       <div>
-                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-gray-500 uppercase mb-2">
+                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-white/40 uppercase mb-2">
                           Select Team *
                         </label>
                         <select
                           required
                           value={playerTeamId}
                           onChange={(e) => setPlayerTeamId(e.target.value)}
-                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#7C3AED]/40"
+                          className="w-full rounded-lg border border-white/[0.06] bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#7C3AED]/40"
                         >
                           <option value="">— select team —</option>
                           {safeArray(teams).map((t) => (
@@ -502,7 +502,7 @@ export default function DataInputer() {
                         </select>
                       </div>
                       <div>
-                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-gray-500 uppercase mb-2">
+                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-white/40 uppercase mb-2">
                           Player Name *
                         </label>
                         <input
@@ -511,11 +511,11 @@ export default function DataInputer() {
                           value={newPlayerName}
                           onChange={(e) => setNewPlayerName(e.target.value)}
                           placeholder="e.g. TSUNAMI"
-                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#7C3AED]/40"
+                          className="w-full rounded-lg border border-white/[0.06] bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#7C3AED]/40"
                         />
                       </div>
                       <div>
-                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-gray-500 uppercase mb-2">
+                        <label className="block font-orbitron text-[9px] font-black tracking-widest text-white/40 uppercase mb-2">
                           Role / IGN <span className="text-gray-700 normal-case">(optional)</span>
                         </label>
                         <input
@@ -523,7 +523,7 @@ export default function DataInputer() {
                           value={newPlayerRole}
                           onChange={(e) => setNewPlayerRole(e.target.value)}
                           placeholder="e.g. Assaulter, IGL..."
-                          className="w-full rounded-lg border border-white/5 bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#7C3AED]/40"
+                          className="w-full rounded-lg border border-white/[0.06] bg-black/40 px-3 py-2.5 text-xs font-semibold text-white outline-none focus:border-[#7C3AED]/40"
                         />
                       </div>
                       <ImageUpload
@@ -536,7 +536,7 @@ export default function DataInputer() {
                       <button
                         type="submit"
                         disabled={playerAdding}
-                        className="w-full rounded-lg bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(124,58,237,0.2)] transition-all disabled:opacity-50"
+                        className="w-full rounded-lg bg-[#7C3AED] py-3 font-orbitron text-[10px] font-black tracking-widest text-black hover:brightness-110 shadow-[0_0_12px_rgba(124,58,237,0.2)] transition-all disabled:opacity-50"
                       >
                         {playerAdding ? 'ADDING PLAYER...' : 'ADD PLAYER'}
                       </button>
@@ -546,7 +546,7 @@ export default function DataInputer() {
 
                 {/* Team roster view */}
                 <div className="col-span-12 lg:col-span-7 flex flex-col gap-6">
-                  <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
+                  <div className="rounded-xl border border-white/[0.06] bg-[#0f0f1a] p-5">
                     <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-white mb-4">
                       TEAMS LIST & ROSTERS
                     </h3>
@@ -558,7 +558,7 @@ export default function DataInputer() {
                         return (
                           <div
                             key={t.id}
-                            className="rounded-lg border border-white/5 bg-black/20 p-4 flex items-center justify-between"
+                            className="rounded-lg border border-white/[0.06] bg-black/20 p-4 flex items-center justify-between"
                           >
                             <div className="flex items-center gap-3">
                               {t.logo_url ? (
@@ -580,7 +580,7 @@ export default function DataInputer() {
                                 <p className="font-orbitron text-xs font-black text-white">
                                   {t.name}
                                 </p>
-                                <p className="text-[10px] text-gray-500 font-bold mt-0.5">
+                                <p className="text-[10px] text-white/40 font-bold mt-0.5">
                                   {teamPlayers.length} players registered
                                 </p>
                               </div>
@@ -589,7 +589,7 @@ export default function DataInputer() {
                               {safeArray(teamPlayers).map((p) => (
                                 <span
                                   key={p.id}
-                                  className="inline-block rounded-md bg-white/[0.04] px-2.5 py-1 text-[9px] font-bold text-gray-400 border border-white/5"
+                                  className="inline-block rounded-md bg-white/[0.04] px-2.5 py-1 text-[9px] font-bold text-white/50 border border-white/[0.06]"
                                 >
                                   {p.name}
                                 </span>
@@ -610,8 +610,8 @@ export default function DataInputer() {
               <SectionBoundary label="EVENT LOG">
               <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
                 {/* KILL LOG */}
-                <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
-                  <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
+                <div className="rounded-xl border border-white/[0.06] bg-[#0f0f1a] p-5">
+                  <div className="mb-4 flex items-center justify-between border-b border-white/[0.06] pb-4">
                     <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-[#7C3AED]">
                       KILL LOG
                     </h3>
@@ -619,25 +619,25 @@ export default function DataInputer() {
                   </div>
                   <div className="space-y-2 max-h-[500px] overflow-y-auto">
                     {killFeed.length === 0 ? (
-                      <p className="text-center text-[11px] text-gray-600 py-6">
+                      <p className="text-center text-[11px] text-white/30 py-6">
                         No kills logged in this match yet
                       </p>
                     ) : (
                       safeArray(killFeed).map((k, idx) => (
                         <div
                           key={idx}
-                          className="flex items-center justify-between bg-white/[0.02] border border-white/5 p-3 rounded-lg text-xs"
+                          className="flex items-center justify-between bg-white/[0.02] border border-white/[0.06] p-3 rounded-lg text-xs"
                         >
                           <div className="flex items-center gap-2">
                             <span className="font-orbitron font-bold text-[#7C3AED]">
                               {k.killer_name}
                             </span>
-                            <span className="text-gray-500 font-medium">killed</span>
-                            <span className="font-orbitron font-bold text-gray-400">
+                            <span className="text-white/40 font-medium">killed</span>
+                            <span className="font-orbitron font-bold text-white/50">
                               {k.killed_player_name || 'Opponent'}
                             </span>
                           </div>
-                          <span className="text-[9px] font-mono text-gray-600">
+                          <span className="text-[9px] font-mono text-white/30">
                             {new Date(k.timestamp || k.created_at || Date.now()).toLocaleTimeString()}
                           </span>
                         </div>
@@ -647,8 +647,8 @@ export default function DataInputer() {
                 </div>
 
                 {/* ELIMINATION LOG */}
-                <div className="rounded-xl border border-white/5 bg-[#0f0f1a] p-5">
-                  <div className="mb-4 flex items-center justify-between border-b border-white/5 pb-4">
+                <div className="rounded-xl border border-white/[0.06] bg-[#0f0f1a] p-5">
+                  <div className="mb-4 flex items-center justify-between border-b border-white/[0.06] pb-4">
                     <h3 className="font-orbitron text-xs font-black tracking-[0.25em] text-[#ef4444]">
                       ELIMINATION LOG
                     </h3>
@@ -656,7 +656,7 @@ export default function DataInputer() {
                   </div>
                   <div className="space-y-2 max-h-[500px] overflow-y-auto">
                     {stagedData.eliminations.length === 0 && eliminations.length === 0 ? (
-                      <p className="text-center text-[11px] text-gray-600 py-6">
+                      <p className="text-center text-[11px] text-white/30 py-6">
                         No eliminations logged in this match yet
                       </p>
                     ) : (
@@ -675,7 +675,7 @@ export default function DataInputer() {
                                 <span className="font-orbitron font-bold text-white">
                                   {player.name}
                                 </span>
-                                <span className="text-gray-600 font-bold">//</span>
+                                <span className="text-white/30 font-bold">//</span>
                                 <span className="font-orbitron text-[10px] font-black text-amber-500">
                                   PENDING ELIMINATION
                                 </span>
@@ -698,12 +698,12 @@ export default function DataInputer() {
                             <span className="font-orbitron font-bold text-white">
                               {e.eliminated_player_name}
                             </span>
-                            <span className="text-gray-600 font-bold">//</span>
-                            <span className="font-orbitron text-[10px] font-black text-gray-500">
+                            <span className="text-white/30 font-bold">//</span>
+                            <span className="font-orbitron text-[10px] font-black text-white/40">
                               ELIMINATED
                             </span>
                           </div>
-                          <span className="text-[9px] font-mono text-gray-600">
+                          <span className="text-[9px] font-mono text-white/30">
                             {new Date(e.timestamp || e.created_at || Date.now()).toLocaleTimeString()}
                           </span>
                         </div>
@@ -852,7 +852,7 @@ function TeamInputCard({
             <span className="text-[10px] font-bold" style={{ color: teamColor }}>
               KILLS: {team.total_tournament_kills || 0}
             </span>
-            <span className="text-[10px] text-gray-500 font-bold">//</span>
+            <span className="text-[10px] text-white/40 font-bold">//</span>
             <span className="text-[10px] font-black text-[#3B82F6]">
               PTS: {team.total_tournament_points || 0}
             </span>
@@ -891,7 +891,7 @@ function TeamInputCard({
         {!showConfirmDelete ? (
           <button
             onClick={() => setShowConfirmDelete(true)}
-            className="ml-2 flex-shrink-0 rounded p-1 text-gray-600 hover:text-red-400 hover:bg-red-950/20 transition-all"
+            className="ml-2 flex-shrink-0 rounded p-1 text-white/30 hover:text-red-400 hover:bg-red-950/20 transition-all"
           >
             <Trash2 className="h-3.5 w-3.5" />
           </button>
@@ -905,7 +905,7 @@ function TeamInputCard({
             </button>
             <button
               onClick={() => setShowConfirmDelete(false)}
-              className="rounded border border-white/10 px-1.5 py-0.5 text-[8px] font-bold text-gray-400"
+              className="rounded border border-white/[0.08] px-1.5 py-0.5 text-[8px] font-bold text-white/50"
             >
               NO
             </button>
@@ -916,7 +916,7 @@ function TeamInputCard({
       {/* Players list */}
       <div className="grid grid-cols-2 gap-2 p-3">
         {players.length === 0 ? (
-          <p className="col-span-2 py-3 text-center text-[10px] text-gray-600 font-medium">
+          <p className="col-span-2 py-3 text-center text-[10px] text-white/30 font-medium">
             No players registered
           </p>
         ) : (
@@ -955,8 +955,8 @@ function TeamInputCard({
 
       {/* Placement row (bottom) */}
       <div className="flex items-center gap-2 border-t border-white/[0.04] bg-black/20 px-3 py-2">
-        <Shield className={`h-3.5 w-3.5 flex-shrink-0 ${isStagedPlacementDiff ? 'text-amber-500' : 'text-gray-500'}`} />
-        <span className={`text-[9px] font-orbitron font-black flex-shrink-0 ${isStagedPlacementDiff ? 'text-amber-500' : 'text-gray-500'}`}>
+        <Shield className={`h-3.5 w-3.5 flex-shrink-0 ${isStagedPlacementDiff ? 'text-amber-500' : 'text-white/40'}`} />
+        <span className={`text-[9px] font-orbitron font-black flex-shrink-0 ${isStagedPlacementDiff ? 'text-amber-500' : 'text-white/40'}`}>
           PLACEMENT {isStagedPlacementDiff && '(STAGED)'}
         </span>
         <select
@@ -965,7 +965,7 @@ function TeamInputCard({
           className={`flex-1 rounded border px-2 py-1 text-[11px] font-semibold outline-none transition-all ${
             isStagedPlacementDiff
               ? 'border-amber-500/30 bg-amber-500/5 text-amber-400 focus:border-amber-500/50'
-              : 'border-white/10 bg-[#13131f] text-white focus:border-[#3B82F6]/40'
+              : 'border-white/[0.08] bg-[#13131f] text-white focus:border-[#3B82F6]/40'
           }`}
         >
           <option value="">— rank —</option>
@@ -1043,7 +1043,7 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction, stag
           )}
           <span
             className={`font-orbitron text-[10px] font-black truncate ${
-              stagedAlive ? 'text-white' : 'text-gray-500 line-through'
+              stagedAlive ? 'text-white' : 'text-white/40 line-through'
             }`}
           >
             {player.name}
@@ -1061,7 +1061,7 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction, stag
       {stagedAlive ? (
         <div className="flex gap-1">
           {/* Kill Stepper */}
-          <div className="flex-1 flex items-center bg-black/20 rounded border border-white/5 overflow-hidden">
+          <div className="flex-1 flex items-center bg-black/20 rounded border border-white/[0.06] overflow-hidden">
             <button
               onClick={() => {
                 if (stagedKills > 0) {
@@ -1078,7 +1078,7 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction, stag
                 }
               }}
               disabled={stagedKills <= 0}
-              className="px-2 py-1 text-gray-400 hover:text-white hover:bg-white/5 active:scale-90 transition-all font-bold text-xs"
+              className="px-2 py-1 text-white/50 hover:text-white hover:bg-white/5 active:scale-90 transition-all font-bold text-xs"
             >
               -
             </button>
@@ -1098,7 +1098,7 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction, stag
                   return { ...prev, kills: newKills };
                 });
               }}
-              className="px-2 py-1 text-gray-400 hover:text-white hover:bg-white/5 active:scale-90 transition-all font-bold text-xs"
+              className="px-2 py-1 text-white/50 hover:text-white hover:bg-white/5 active:scale-90 transition-all font-bold text-xs"
             >
               +
             </button>
@@ -1135,7 +1135,7 @@ function PlayerInputCard({ player, team, teamColor, currentMatch, onAction, stag
             <button
               onClick={handleRevive}
               disabled={busy !== null}
-              className="w-full rounded border border-white/5 bg-white/[0.02] hover:bg-white/[0.05] py-1 font-orbitron text-[9px] font-black text-gray-400 active:scale-95 transition-all"
+              className="w-full rounded border border-white/[0.06] bg-white/[0.02] hover:bg-white/[0.05] py-1 font-orbitron text-[9px] font-black text-white/50 active:scale-95 transition-all"
             >
               {busy === 'revive' ? '...' : 'REVIVE'}
             </button>

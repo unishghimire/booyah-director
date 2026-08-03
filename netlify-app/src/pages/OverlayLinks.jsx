@@ -13,7 +13,7 @@ function OverlayPreview({ url, label }) {
     <div className="relative">
       <button
         onClick={() => setShowPreview(!showPreview)}
-        className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/10 bg-white/5 py-1.5 font-orbitron text-[9px] font-black text-gray-400 hover:text-[#3B82F6] hover:border-[#3B82F6]/30 transition-all"
+        className="flex w-full items-center justify-center gap-1.5 rounded-lg border border-white/[0.08] bg-white/5 py-1.5 font-orbitron text-[9px] font-black text-white/50 hover:text-[#3B82F6] hover:border-[#3B82F6]/30 transition-all active:scale-[0.98]"
       >
         <Eye className="h-3 w-3" />
         {showPreview ? 'HIDE PREVIEW' : 'PREVIEW'}
@@ -44,12 +44,12 @@ function MaskedToken({ token }) {
   const [copied, setCopied] = useState(false);
   return (
     <div className="flex items-center gap-2">
-      <code className="flex-1 truncate rounded-lg border border-white/5 bg-black/40 px-3 py-2 font-mono text-xs text-[#3B82F6]">
+      <code className="flex-1 truncate rounded-lg border border-white/[0.06] bg-black/40 px-3 py-2 font-mono text-xs text-[#3B82F6]">
         {revealed ? token : '••••••••••••••••'}
       </code>
       <button
         onClick={() => setRevealed(!revealed)}
-        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-white transition-all"
+        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/5 text-white/50 hover:text-white transition-all active:scale-[0.98]"
         title={revealed ? 'Hide' : 'Reveal'}
       >
         {revealed ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
@@ -62,7 +62,7 @@ function MaskedToken({ token }) {
             setTimeout(() => setCopied(false), 2000);
           }).catch(() => toast.error('Failed to copy'));
         }}
-        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-white transition-all"
+        className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/5 text-white/50 hover:text-white transition-all active:scale-[0.98]"
         title="Copy Token"
       >
         {copied ? <CheckCircle2 className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
@@ -116,11 +116,11 @@ function OBSConnectionCard() {
   };
 
   return (
-    <div className="rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
+    <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-md p-4 ">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
           {connectionStatus === 'connected' ? <Wifi className="h-4 w-4 text-[#22c55e]" /> : <WifiOff className="h-4 w-4" style={{ color: statusColor }} />}
-          <span className="font-orbitron text-[10px] font-black text-gray-400 tracking-wider">OBS WEBSOCKET</span>
+          <span className="font-orbitron text-[10px] font-black text-white/50 tracking-wider">OBS WEBSOCKET</span>
         </div>
         <div className="flex items-center gap-2">
           <span className="h-2 w-2 rounded-full animate-pulse" style={{ background: statusColor }} />
@@ -129,34 +129,34 @@ function OBSConnectionCard() {
       </div>
       <div className="grid grid-cols-1 md:grid-cols-2 gap-3 mb-3">
         <div>
-          <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1">ADDRESS</label>
+          <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest mb-1">ADDRESS</label>
           <input
             value={addr}
             onChange={e => setAddr(e.target.value)}
             placeholder="localhost:4444"
-            className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 font-mono text-xs text-white outline-none focus:border-[#7C3AED]/50"
+            className="w-full rounded-lg border border-white/[0.08] bg-black/40 px-3 py-2 font-mono text-xs text-white outline-none focus:border-[#7C3AED]/50"
           />
         </div>
         <div>
-          <label className="block font-orbitron text-[8px] font-black text-gray-500 tracking-widest mb-1">PASSWORD</label>
+          <label className="block font-orbitron text-[8px] font-black text-white/40 tracking-widest mb-1">PASSWORD</label>
           <input
             type="password"
             value={pass}
             onChange={e => setPass(e.target.value)}
             placeholder="••••••"
-            className="w-full rounded-lg border border-white/10 bg-black/40 px-3 py-2 font-mono text-xs text-white outline-none focus:border-[#7C3AED]/50"
+            className="w-full rounded-lg border border-white/[0.08] bg-black/40 px-3 py-2 font-mono text-xs text-white outline-none focus:border-[#7C3AED]/50"
           />
         </div>
       </div>
       {connectionStatus === 'connected' ? (
-        <button onClick={handleDisconnect} className="w-full rounded-lg border border-[#ef4444]/30 bg-[#ef4444]/10 px-4 py-2.5 font-orbitron text-[10px] font-black tracking-widest text-[#ef4444] hover:bg-[#ef4444]/20 transition-all">
+        <button onClick={handleDisconnect} className="w-full rounded-lg border border-[#ef4444]/30 bg-[#ef4444]/10 px-4 py-2.5 font-orbitron text-[10px] font-black tracking-widest text-[#ef4444] hover:bg-[#ef4444]/20 transition-all active:scale-[0.98]">
           DISCONNECT
         </button>
       ) : (
         <button
           onClick={handleConnect}
           disabled={connecting}
-          className="w-full rounded-lg bg-gradient-to-r from-[#7C3AED] to-[#3B82F6] px-4 py-2.5 font-orbitron text-[10px] font-black tracking-widest text-white hover:from-[#6D28D9] hover:to-[#2563EB] transition-all disabled:opacity-50"
+          className="w-full rounded-lg bg-[#7C3AED] px-4 py-2.5 font-orbitron text-[10px] font-black tracking-widest text-white hover:bg-[#6D28D9] transition-all disabled:opacity-50"
         >
           {connecting ? 'CONNECTING...' : 'CONNECT TO OBS'}
         </button>
@@ -175,16 +175,16 @@ function OBSSourceToggles() {
 
   if (connectionStatus !== 'connected') {
     return (
-      <div className="rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-xl p-6 text-center">
+      <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-md p-6 text-center">
         <WifiOff className="h-8 w-8 text-gray-600 mx-auto mb-2" />
-        <p className="font-orbitron text-[10px] font-black text-gray-500 tracking-widest">OBS NOT CONNECTED</p>
+        <p className="font-orbitron text-[10px] font-black text-white/40 tracking-widest">OBS NOT CONNECTED</p>
         <p className="text-xs text-gray-600 mt-1">Connect to OBS WebSocket above to control source visibility</p>
       </div>
     );
   }
 
   return (
-    <div className="rounded-xl border border-[#22c55e]/20 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
+    <div className="rounded-xl border border-[#22c55e]/20 bg-white/[0.02] backdrop-blur-md p-4 ">
       <div className="flex items-center justify-between mb-4">
         <div className="flex items-center gap-2">
           <Wifi className="h-4 w-4 text-[#22c55e]" />
@@ -192,7 +192,7 @@ function OBSSourceToggles() {
         </div>
         <button
           onClick={() => obsService.refreshScenes()}
-          className="flex items-center gap-1 rounded-lg border border-white/10 bg-white/5 px-2.5 py-1.5 font-orbitron text-[9px] font-black text-gray-400 hover:text-white transition-all"
+          className="flex items-center gap-1 rounded-lg border border-white/[0.08] bg-white/5 px-2.5 py-1.5 font-orbitron text-[9px] font-black text-white/50 hover:text-white transition-all active:scale-[0.98]"
         >
           <RefreshCw className="h-3 w-3" /> REFRESH
         </button>
@@ -203,10 +203,10 @@ function OBSSourceToggles() {
           const isLive = currentProgramScene === scene;
           const isExpanded = expandedScene === scene;
           return (
-            <div key={scene} className="rounded-lg border border-white/5 bg-black/20 overflow-hidden">
+            <div key={scene} className="rounded-lg border border-white/[0.06] bg-black/20 overflow-hidden">
               <button
                 onClick={() => setExpandedScene(isExpanded ? null : scene)}
-                className="flex w-full items-center justify-between px-3 py-2.5 hover:bg-white/5 transition-all"
+                className="flex w-full items-center justify-between px-3 py-2.5 hover:bg-white/5 transition-all active:scale-[0.98]"
               >
                 <div className="flex items-center gap-2">
                   {isLive && <span className="h-1.5 w-1.5 rounded-full bg-[#22c55e] animate-pulse" />}
@@ -218,14 +218,14 @@ function OBSSourceToggles() {
                 <Eye className="h-3 w-3 text-gray-600" />
               </button>
               {isExpanded && sceneSources.length > 0 && (
-                <div className="border-t border-white/5 px-3 py-2 space-y-1">
+                <div className="border-t border-white/[0.06] px-3 py-2 space-y-1">
                   {sceneSources.map(src => (
                     <button
                       key={src.name}
                       onClick={() => obsService.toggleSourceVisibility(scene, src.name)}
-                      className="flex w-full items-center justify-between py-1.5 hover:bg-white/5 rounded px-2 transition-all"
+                      className="flex w-full items-center justify-between py-1.5 hover:bg-white/5 rounded px-2 transition-all active:scale-[0.98]"
                     >
-                      <span className="text-[11px] text-gray-400">{src.name}</span>
+                      <span className="text-[11px] text-white/50">{src.name}</span>
                       {src.visible
                         ? <Eye className="h-3.5 w-3.5 text-[#22c55e]" />
                         : <EyeOff className="h-3.5 w-3.5 text-gray-600" />}
@@ -281,7 +281,7 @@ export function CopyBtn({ text, id, copied, onCopy }) {
   return (
     <button
       onClick={() => onCopy(text, id)}
-      className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-white transition-all"
+      className="flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-lg border border-white/[0.08] bg-white/5 text-white/50 hover:text-white transition-all active:scale-[0.98]"
     >
       {copied === id
         ? <CheckCircle2 className="h-4 w-4 text-green-400" />
@@ -472,7 +472,7 @@ function OBSSceneExport({ overlays, overlayUrl }) {
   };
 
   return (
-    <div className="rounded-xl border border-[#7C3AED]/20 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
+    <div className="rounded-xl border border-[#7C3AED]/20 bg-white/[0.02] backdrop-blur-md p-4 ">
       <div className="flex items-center gap-2 mb-4">
         <FileJson className="h-4 w-4 text-[#7C3AED]" />
         <span className="font-orbitron text-[10px] font-black text-[#7C3AED] tracking-widest">EXPORT TO OBS / STREAMING PLATFORM</span>
@@ -482,7 +482,7 @@ function OBSSceneExport({ overlays, overlayUrl }) {
         {/* Download Scene Collection */}
         <button
           onClick={handleDownload}
-          className="flex items-center justify-center gap-2 rounded-lg border border-[#3B82F6]/30 bg-[#3B82F6]/10 px-4 py-3 font-orbitron text-[10px] font-black tracking-widest text-[#3B82F6] hover:bg-[#3B82F6]/20 transition-all"
+          className="flex items-center justify-center gap-2 rounded-lg border border-[#3B82F6]/30 bg-[#3B82F6]/10 px-4 py-3 font-orbitron text-[10px] font-black tracking-widest text-[#3B82F6] hover:bg-[#3B82F6]/20 transition-all active:scale-[0.98]"
         >
           <Download className="h-4 w-4" />
           DOWNLOAD OBS SCENE FILE
@@ -501,7 +501,7 @@ function OBSSceneExport({ overlays, overlayUrl }) {
 
       {/* Push result */}
       {pushResult && (
-        <div className="flex items-center gap-4 rounded-lg border border-white/5 bg-black/30 px-4 py-2 text-xs">
+        <div className="flex items-center gap-4 rounded-lg border border-white/[0.06] bg-black/30 px-4 py-2 text-xs">
           <span className="text-green-400 font-mono">✓ {pushResult.created} created</span>
           <span className="text-yellow-400 font-mono">↻ {pushResult.skipped} existing</span>
           {pushResult.errors > 0 && <span className="text-red-400 font-mono">✗ {pushResult.errors} errors</span>}
@@ -509,7 +509,7 @@ function OBSSceneExport({ overlays, overlayUrl }) {
       )}
 
       {/* Instructions */}
-      <div className="mt-3 space-y-1.5 text-[11px] text-gray-400">
+      <div className="mt-3 space-y-1.5 text-[11px] text-white/50">
         <p className="flex items-start gap-1.5">
           <span className="text-[#3B82F6] font-bold">1.</span>
           <span><span className="text-white font-bold">Download</span> → OBS → Scene Collection → Import → select the JSON file</span>
@@ -554,13 +554,13 @@ export default function OverlayLinks() {
     <div className="min-h-screen bg-[#09090f] text-white flex flex-col gap-6 p-6">
 
       {/* Header */}
-      <div className="flex items-center justify-between border-b border-white/5 pb-4">
+      <div className="flex items-center justify-between border-b border-white/[0.06] pb-4">
         <div>
           <h1 className="font-orbitron text-lg font-black text-white tracking-wider flex items-center gap-2">
             <span className="h-2 w-2 rounded-full bg-[#3B82F6] animate-pulse" />
             OBS OVERLAY URLs
           </h1>
-          <p className="font-orbitron text-[10px] text-gray-500 mt-1">ADD EACH AS A BROWSER SOURCE IN OBS STUDIO</p>
+          <p className="font-orbitron text-[10px] text-white/40 mt-1">ADD EACH AS A BROWSER SOURCE IN OBS STUDIO</p>
         </div>
         <div className="flex items-center gap-2 rounded-lg border border-[#3B82F6]/20 bg-[#3B82F6]/5 px-3 py-1.5">
           <div className="h-2 w-2 rounded-full bg-[#3B82F6] animate-pulse" />
@@ -569,12 +569,12 @@ export default function OverlayLinks() {
       </div>
 
       {/* OBS Setup Tip */}
-      <div className="rounded-xl border border-[#7C3AED]/20 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
+      <div className="rounded-xl border border-[#7C3AED]/20 bg-white/[0.02] backdrop-blur-md p-4 ">
         <p className="font-orbitron text-[10px] font-black text-[#7C3AED] tracking-wider mb-2 flex items-center gap-1.5">
           <span className="h-1.5 w-1.5 bg-[#7C3AED] rounded-full" />
           OBS SETUP — DO THIS ONCE PER SOURCE
         </p>
-        <div className="space-y-1.5 text-xs text-gray-400">
+        <div className="space-y-1.5 text-xs text-white/50">
           <p>1. OBS → <span className="text-white font-bold">Add → Browser Source</span> → paste the URL below</p>
           <p>2. Width: <span className="text-white font-bold font-mono">1920</span> · Height: <span className="text-white font-bold font-mono">1080</span></p>
           <p>3. For transparent overlays: enable <span className="text-white font-bold">Custom CSS</span> → <code className="text-[#3B82F6] font-mono">body {'{ background: transparent !important; }'}</code></p>
@@ -587,8 +587,8 @@ export default function OverlayLinks() {
 
       {/* Your Share Token (masked) */}
       {shareToken && (
-        <div className="rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-xl p-4 shadow-xl">
-          <p className="font-orbitron text-[10px] font-black text-gray-400 tracking-wider mb-2">YOUR UNIQUE SHARE TOKEN</p>
+        <div className="rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-md p-4 ">
+          <p className="font-orbitron text-[10px] font-black text-white/50 tracking-wider mb-2">YOUR UNIQUE SHARE TOKEN</p>
           <MaskedToken token={shareToken} />
         </div>
       )}
@@ -607,34 +607,34 @@ export default function OverlayLinks() {
             return (
               <div
                 key={ov.id}
-                className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#3B82F6]/30 hover:shadow-[0_0_15px_rgba(59,130,246,0.05)] transition-all group"
+                className="flex flex-col justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#3B82F6]/30 hover:shadow-[0_0_15px_rgba(59,130,246,0.05)] transition-all group"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#3B82F6]/10 border border-[#3B82F6]/20 group-hover:bg-[#3B82F6]/20 transition-all">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#3B82F6]/10 border border-[#3B82F6]/20 group-hover:bg-[#3B82F6]/20 transition-all active:scale-[0.98]">
                       <Icon className="h-4 w-4 text-[#3B82F6]" />
                     </div>
                     <div>
                       <h3 className="font-orbitron text-xs font-black text-white tracking-wider">{ov.label}</h3>
-                      <p className="text-[10px] text-gray-400 mt-0.5">{ov.desc}</p>
+                      <p className="text-[10px] text-white/50 mt-0.5">{ov.desc}</p>
                     </div>
                   </div>
-                  <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#3B82F6]/80 truncate">
+                  <div className="mt-3 rounded-lg bg-black/30 border border-white/[0.06] p-2 font-mono text-[10px] text-[#3B82F6]/80 truncate">
                     {url}
                   </div>
                 </div>
                 <div className="mt-3">
                   <OverlayPreview url={url} label={ov.label} />
                 </div>
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
-                  <span className="font-orbitron text-[9px] font-bold text-gray-500 tracking-wider">1920×1080</span>
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/[0.06]">
+                  <span className="font-orbitron text-[9px] font-bold text-white/40 tracking-wider">1920×1080</span>
                   <div className="flex gap-2">
                     <CopyBtn text={url} id={ov.id} copied={copied} onCopy={copy} />
                     <a
                       href={url}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-[#3B82F6] hover:border-[#3B82F6]/30 transition-all"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-white/5 text-white/50 hover:text-[#3B82F6] hover:border-[#3B82F6]/30 transition-all active:scale-[0.98]"
                       title="Open Link"
                     >
                       <ExternalLink className="h-4 w-4" />
@@ -643,7 +643,7 @@ export default function OverlayLinks() {
                       href={url}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex h-8 px-3 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/30 transition-all font-orbitron text-[9px] font-black tracking-wider"
+                      className="flex h-8 px-3 items-center justify-center rounded-lg border border-white/[0.08] bg-white/5 text-white/50 hover:text-white hover:border-white/30 transition-all font-orbitron text-[9px] font-black tracking-wider"
                     >
                       <Play className="h-3 w-3 mr-1" /> TEST
                     </a>
@@ -669,34 +669,34 @@ export default function OverlayLinks() {
             return (
               <div
                 key={ov.id}
-                className="flex flex-col justify-between rounded-xl border border-white/5 bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#3B82F6]/30 hover:shadow-[0_0_15px_rgba(59,130,246,0.05)] transition-all group"
+                className="flex flex-col justify-between rounded-xl border border-white/[0.06] bg-white/[0.02] backdrop-blur-[12px] p-4 hover:border-[#3B82F6]/30 hover:shadow-[0_0_15px_rgba(59,130,246,0.05)] transition-all group"
               >
                 <div>
                   <div className="flex items-center gap-3 mb-2">
-                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#3B82F6]/10 border border-[#3B82F6]/20 group-hover:bg-[#3B82F6]/20 transition-all">
+                    <div className="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg bg-[#3B82F6]/10 border border-[#3B82F6]/20 group-hover:bg-[#3B82F6]/20 transition-all active:scale-[0.98]">
                       <Icon className="h-4 w-4 text-[#3B82F6]" />
                     </div>
                     <div>
                       <h3 className="font-orbitron text-xs font-black text-white tracking-wider">{ov.label}</h3>
-                      <p className="text-[10px] text-gray-400 mt-0.5">{ov.desc}</p>
+                      <p className="text-[10px] text-white/50 mt-0.5">{ov.desc}</p>
                     </div>
                   </div>
-                  <div className="mt-3 rounded-lg bg-black/30 border border-white/5 p-2 font-mono text-[10px] text-[#3B82F6]/80 truncate">
+                  <div className="mt-3 rounded-lg bg-black/30 border border-white/[0.06] p-2 font-mono text-[10px] text-[#3B82F6]/80 truncate">
                     {url}
                   </div>
                 </div>
                 <div className="mt-3">
                   <OverlayPreview url={url} label={ov.label} />
                 </div>
-                <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/5">
-                  <span className="font-orbitron text-[9px] font-bold text-gray-500 tracking-wider">1920×1080</span>
+                <div className="flex items-center justify-between mt-4 pt-3 border-t border-white/[0.06]">
+                  <span className="font-orbitron text-[9px] font-bold text-white/40 tracking-wider">1920×1080</span>
                   <div className="flex gap-2">
                     <CopyBtn text={url} id={ov.id} copied={copied} onCopy={copy} />
                     <a
                       href={url}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-[#3B82F6] hover:border-[#3B82F6]/30 transition-all"
+                      className="flex h-8 w-8 items-center justify-center rounded-lg border border-white/[0.08] bg-white/5 text-white/50 hover:text-[#3B82F6] hover:border-[#3B82F6]/30 transition-all active:scale-[0.98]"
                       title="Open Link"
                     >
                       <ExternalLink className="h-4 w-4" />
@@ -705,7 +705,7 @@ export default function OverlayLinks() {
                       href={url}
                       target="_blank"
                       rel="noreferrer"
-                      className="flex h-8 px-3 items-center justify-center rounded-lg border border-white/10 bg-white/5 text-gray-400 hover:text-white hover:border-white/30 transition-all font-orbitron text-[9px] font-black tracking-wider"
+                      className="flex h-8 px-3 items-center justify-center rounded-lg border border-white/[0.08] bg-white/5 text-white/50 hover:text-white hover:border-white/30 transition-all font-orbitron text-[9px] font-black tracking-wider"
                     >
                       <Play className="h-3 w-3 mr-1" /> TEST
                     </a>

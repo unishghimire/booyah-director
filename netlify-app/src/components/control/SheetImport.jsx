@@ -47,7 +47,7 @@ export default function SheetImport({ tournamentId, onImported }) {
           </div>
           <div>
             <p className="font-orbitron text-xs font-black text-white tracking-wider">GOOGLE SHEETS IMPORT</p>
-            <p className="text-[10px] text-gray-500">Bulk-import teams & players — no service account needed</p>
+            <p className="text-[10px] text-white/40">Bulk-import teams & players — no service account needed</p>
           </div>
           <a href="https://docs.google.com/spreadsheets/create" target="_blank" rel="noopener noreferrer"
             className="ml-auto flex items-center gap-1 text-[10px] text-emerald-500/70 hover:text-emerald-400 transition-colors">
@@ -57,7 +57,7 @@ export default function SheetImport({ tournamentId, onImported }) {
 
         {/* Guide toggle */}
         <button onClick={() => setShowGuide(g => !g)}
-          className="w-full flex items-center justify-between rounded-lg border border-white/8 bg-black/30 px-3 py-2.5 text-[10px] font-orbitron text-gray-400 hover:text-white hover:border-white/15 transition-all">
+          className="w-full flex items-center justify-between rounded-lg border border-white/8 bg-black/30 px-3 py-2.5 text-[10px] font-orbitron text-white/50 hover:text-white hover:border-white/15 transition-all">
           <span className="flex items-center gap-2">
             <Info className="h-3.5 w-3.5 text-emerald-400" />
             HOW TO SET UP YOUR SHEET
@@ -72,7 +72,7 @@ export default function SheetImport({ tournamentId, onImported }) {
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 font-orbitron text-[9px] font-black text-emerald-400">1</span>
               <div>
                 <p className="font-orbitron font-black text-white mb-1">CREATE YOUR SHEET</p>
-                <p className="text-gray-400">Open Google Sheets and create a new spreadsheet. Add two tabs named exactly <span className="font-mono bg-white/10 px-1 rounded">Teams</span> and <span className="font-mono bg-white/10 px-1 rounded">Players</span>.</p>
+                <p className="text-white/50">Open Google Sheets and create a new spreadsheet. Add two tabs named exactly <span className="font-mono bg-white/10 px-1 rounded">Teams</span> and <span className="font-mono bg-white/10 px-1 rounded">Players</span>.</p>
               </div>
             </div>
 
@@ -86,7 +86,7 @@ export default function SheetImport({ tournamentId, onImported }) {
                     {[['A','Team Name','required'],['B','Logo URL (ImgBB)','optional'],['C','Color #hex','optional']].map(([c,l,r])=>(
                       <div key={c} className="flex items-center gap-2 mb-1">
                         <span className="font-mono text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-white">{c}</span>
-                        <span className={r==='required'?'text-[#7C3AED] text-[9px]':'text-gray-500 text-[9px]'}>{l}</span>
+                        <span className={r==='required'?'text-[#7C3AED] text-[9px]':'text-white/40 text-[9px]'}>{l}</span>
                         <span className="text-[8px] text-gray-600 ml-auto">{r}</span>
                       </div>
                     ))}
@@ -96,7 +96,7 @@ export default function SheetImport({ tournamentId, onImported }) {
                     {[['A','Player Name','required'],['B','Team Name','required'],['C','Role / IGN','optional'],['D','Photo URL (ImgBB)','optional']].map(([c,l,r])=>(
                       <div key={c} className="flex items-center gap-2 mb-1">
                         <span className="font-mono text-[9px] bg-white/10 px-1.5 py-0.5 rounded text-white">{c}</span>
-                        <span className={r==='required'?'text-[#7C3AED] text-[9px]':'text-gray-500 text-[9px]'}>{l}</span>
+                        <span className={r==='required'?'text-[#7C3AED] text-[9px]':'text-white/40 text-[9px]'}>{l}</span>
                         <span className="text-[8px] text-gray-600 ml-auto">{r}</span>
                       </div>
                     ))}
@@ -110,7 +110,7 @@ export default function SheetImport({ tournamentId, onImported }) {
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 font-orbitron text-[9px] font-black text-emerald-400">3</span>
               <div>
                 <p className="font-orbitron font-black text-white mb-1">MAKE IT PUBLIC</p>
-                <p className="text-gray-400">Click <span className="text-white font-bold">Share</span> at the top right → <span className="text-white font-bold">Change to anyone with the link</span> → set permission to <span className="text-emerald-400 font-bold">Viewer</span>. This is required.</p>
+                <p className="text-white/50">Click <span className="text-white font-bold">Share</span> at the top right → <span className="text-white font-bold">Change to anyone with the link</span> → set permission to <span className="text-emerald-400 font-bold">Viewer</span>. This is required.</p>
               </div>
             </div>
 
@@ -118,7 +118,7 @@ export default function SheetImport({ tournamentId, onImported }) {
               <span className="flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-emerald-500/20 font-orbitron text-[9px] font-black text-emerald-400">4</span>
               <div>
                 <p className="font-orbitron font-black text-white mb-1">PASTE URL BELOW & IMPORT</p>
-                <p className="text-gray-400">Copy the URL from your browser (the full <span className="font-mono text-emerald-300/70 text-[9px]">docs.google.com/spreadsheets/d/...</span> link) and paste it in the field below.</p>
+                <p className="text-white/50">Copy the URL from your browser (the full <span className="font-mono text-emerald-300/70 text-[9px]">docs.google.com/spreadsheets/d/...</span> link) and paste it in the field below.</p>
               </div>
             </div>
           </div>
@@ -129,7 +129,7 @@ export default function SheetImport({ tournamentId, onImported }) {
           <input type="url" value={url} onChange={e => setUrl(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && handleImport()}
             placeholder="https://docs.google.com/spreadsheets/d/YOUR_SHEET_ID/edit"
-            className="flex-1 rounded-lg border border-white/10 bg-black/40 px-3 py-2.5 text-[11px] text-white placeholder-gray-600 outline-none focus:border-emerald-500/50 font-mono transition-colors"
+            className="flex-1 rounded-lg border border-white/[0.08] bg-black/40 px-3 py-2.5 text-[11px] text-white placeholder-gray-600 outline-none focus:border-emerald-500/50 font-mono transition-colors"
           />
           <button onClick={handleImport} disabled={loading || !url.trim()}
             className="flex items-center gap-2 rounded-lg border border-emerald-500/40 bg-emerald-500/10 px-4 py-2.5 text-[11px] font-orbitron font-black text-emerald-400 hover:bg-emerald-500/20 transition-all disabled:opacity-40 whitespace-nowrap">

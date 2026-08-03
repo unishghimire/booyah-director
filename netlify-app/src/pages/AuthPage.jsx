@@ -77,7 +77,7 @@ export default function AuthPage() {
   };
 
   return (
-    <div style={{ minHeight:'100vh', background:'#060915', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
+    <div style={{ minHeight:'100vh', background:'#070611', display:'flex', alignItems:'center', justifyContent:'center', position:'relative', overflow:'hidden' }}>
       <GridBg />
 
       <div style={{ position:'relative', zIndex:10, width:'100%', maxWidth:420, padding:'0 20px' }}>
