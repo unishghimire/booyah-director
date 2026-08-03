@@ -662,7 +662,7 @@ export default function DataInputer() {
                     ) : (
                       <>
                         {/* Staged Eliminations */}
-                        {stagedData.eliminations.map((se) => {
+                        {(stagedData?.eliminations || []).map((se) => {
                           const player = players.find(p => p.id === se.playerId);
                           if (!player) return null;
                           return (

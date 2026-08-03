@@ -311,13 +311,13 @@ export default function DirectorPanel() {
           <div className="flex h-full items-center justify-center"><div className="h-8 w-8 rounded-full border-2 border-white/[0.06] border-t-[#7C3AED] animate-spin" /></div>
         ) : (
           <>
-            {activeTab === 'live' && (
+            {activeTab === 'live' && canAccessTab(userRole, 'live', isOwner) && (
               <SectionBoundary label="LIVE CONTROL">
                 <LiveControlPanel data={data} overlayApi={overlayApi} refresh={refresh} teams={teams} players={players} currentMatch={currentMatch} tournament={tournament} />
               </SectionBoundary>
             )}
 
-            {activeTab === 'overlay' && (
+            {activeTab === 'overlay' && canAccessTab(userRole, 'overlay', isOwner) && (
               <SectionBoundary label="OVERLAY MANAGER">
                 <div className="grid grid-cols-1 lg:grid-cols-3 gap-4">
                   <div className="lg:col-span-2 nx-surface p-4">
@@ -389,7 +389,7 @@ export default function DirectorPanel() {
               </SectionBoundary>
             )}
 
-            {activeTab === 'match' && (
+            {activeTab === 'match' && canAccessTab(userRole, 'match', isOwner) && (
               <SectionBoundary label="MATCH CONTROL">
                 <div className="max-w-3xl mx-auto space-y-4">
                   <div className="nx-surface p-5">
@@ -462,7 +462,7 @@ export default function DirectorPanel() {
               </SectionBoundary>
             )}
 
-            {activeTab === 'standings' && (
+            {activeTab === 'standings' && canAccessTab(userRole, 'standings', isOwner) && (
               <SectionBoundary label="STANDINGS & LEADERBOARD">
                 <div className="max-w-5xl mx-auto nx-surface overflow-hidden">
                   <div className="p-5 nx-divider flex justify-between items-center">
@@ -516,19 +516,19 @@ export default function DirectorPanel() {
               </SectionBoundary>
             )}
 
-            {activeTab === 'design' && (<SectionBoundary label="OVERLAY DESIGN STUDIO"><DesignStudio overlayState={state} tournament={tournament} teams={teams} players={players} onAction={refresh} /></SectionBoundary>)}
-            {activeTab === 'assets' && (<SectionBoundary label="STUDIO ASSET LIBRARY"><AssetManager data={data} refresh={refresh} overlayApi={overlayApi} /></SectionBoundary>)}
-            {activeTab === 'sound' && (<SectionBoundary label="SOUND MANAGER"><SoundManager data={data} overlayApi={overlayApi} refresh={refresh} /></SectionBoundary>)}
-            {activeTab === 'animations' && (<SectionBoundary label="ANIMATION LIBRARY"><AnimationLibrary data={data} overlayApi={overlayApi} refresh={refresh} /></SectionBoundary>)}
-            {activeTab === 'dashboard' && (<SectionBoundary label="BROADCAST DASHBOARD"><BroadcastDashboard data={data} refresh={refresh} overlayApi={overlayApi} /></SectionBoundary>)}
-            {activeTab === 'players' && (<SectionBoundary label="PLAYER MANAGEMENT"><PlayerManager data={data} refresh={refresh} overlayApi={overlayApi} /></SectionBoundary>)}
-            {activeTab === 'theme' && (
+            {activeTab === 'design' && canAccessTab(userRole, 'design', isOwner) && (<SectionBoundary label="OVERLAY DESIGN STUDIO"><DesignStudio overlayState={state} tournament={tournament} teams={teams} players={players} onAction={refresh} /></SectionBoundary>)}
+            {activeTab === 'assets' && canAccessTab(userRole, 'assets', isOwner) && (<SectionBoundary label="STUDIO ASSET LIBRARY"><AssetManager data={data} refresh={refresh} overlayApi={overlayApi} /></SectionBoundary>)}
+            {activeTab === 'sound' && canAccessTab(userRole, 'sound', isOwner) && (<SectionBoundary label="SOUND MANAGER"><SoundManager data={data} overlayApi={overlayApi} refresh={refresh} /></SectionBoundary>)}
+            {activeTab === 'animations' && canAccessTab(userRole, 'animations', isOwner) && (<SectionBoundary label="ANIMATION LIBRARY"><AnimationLibrary data={data} overlayApi={overlayApi} refresh={refresh} /></SectionBoundary>)}
+            {activeTab === 'dashboard' && canAccessTab(userRole, 'dashboard', isOwner) && (<SectionBoundary label="BROADCAST DASHBOARD"><BroadcastDashboard data={data} refresh={refresh} overlayApi={overlayApi} /></SectionBoundary>)}
+            {activeTab === 'players' && canAccessTab(userRole, 'players', isOwner) && (<SectionBoundary label="PLAYER MANAGEMENT"><PlayerManager data={data} refresh={refresh} overlayApi={overlayApi} /></SectionBoundary>)}
+            {activeTab === 'theme' && canAccessTab(userRole, 'theme', isOwner) && (
               <SectionBoundary label="THEME MANAGER">
                 <ThemeManager currentTheme={(data?.design?.theme_id || 'nexplay')} onApplyTheme={async (theme) => { try { await overlayApi.saveDesign({ theme_id: theme.id, primaryColor: theme.primary, secondaryColor: theme.secondary, bgColor: theme.bg, cardColor: theme.card, accentColor: theme.accent }); toast.success(`Theme: ${theme.name} applied!`); refresh(); } catch (e) { toast.error(e.message); } }} tournament={data?.tournament} />
               </SectionBoundary>
             )}
-            {activeTab === 'timeline' && (<SectionBoundary label="EVENT TIMELINE"><EventTimeline killEvents={data?.killFeed || []} eliminationEvents={data?.eliminations || []} matchEvents={[]} teams={data?.teams || []} /></SectionBoundary>)}
-            {activeTab === 'setup' && (
+            {activeTab === 'timeline' && canAccessTab(userRole, 'timeline', isOwner) && (<SectionBoundary label="EVENT TIMELINE"><EventTimeline killEvents={data?.killFeed || []} eliminationEvents={data?.eliminations || []} matchEvents={[]} teams={data?.teams || []} /></SectionBoundary>)}
+            {activeTab === 'setup' && canAccessTab(userRole, 'setup', isOwner) && (
               <SectionBoundary label="TOURNAMENT CONFIGURATION">
                 <div className="max-w-4xl mx-auto space-y-4">
                   <div className="nx-surface p-5">

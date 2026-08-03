@@ -5,7 +5,7 @@
  * It never throws — auth failure = null, not a 500 error.
  */
 
-const WEB_API_KEY = process.env.FIREBASE_WEB_API_KEY || 'AIzaSyBekqzqZv_iWvgAn9UCnpBGIw2675wr1gc';
+const WEB_API_KEY = process.env.FIREBASE_WEB_API_KEY || '';
 const OWNER_EMAILS = (process.env.OWNER_EMAILS || 'nex.unishghimire@gmail.com')
   .split(',').map(e => e.trim().toLowerCase()).filter(Boolean);
 

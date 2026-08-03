@@ -46,8 +46,9 @@ function isSubscribed(user, subscription) {
 function TopHeader() {
   const { user, subscription, logout } = useAuth();
   const { data: _navData } = useOverlayData(true);
-  const currentScreenName = _navData?.overlayState?.current_screen
-    ? _navData.overlayState.current_screen.replace(/_/g, ' ').toUpperCase()
+  const _screen = _navData?.overlayState?.current_screen;
+  const currentScreenName = _screen
+    ? _screen.replace(/_/g, ' ').toUpperCase()
     : 'STAND BY';
 
   return (
@@ -236,7 +237,8 @@ function AppRoutes() {
   }
 
   // Overlay routes — always public, no auth needed
-  const isOverlay = window.location.pathname.startsWith('/overlay/');
+  const location = useLocation();
+  const isOverlay = location.pathname.startsWith('/overlay/');
   if (isOverlay) {
     return (
       <Routes>

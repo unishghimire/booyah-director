@@ -503,7 +503,7 @@ function KillFeedScreen({ killFeed = [], design }) {
                 
                 {kill.killer_team_name && (
                   <span style={{ fontFamily:'Orbitron', fontSize:9, color:secondary, border:`1px solid ${secondary}40`, padding:'2px 6px', borderRadius:4, textTransform:'uppercase', letterSpacing:'0.05em' }}>
-                    {kill.killer_team_name.substring(0,8)}
+                    {String(kill.killer_team_name || "").substring(0,8)}
                   </span>
                 )}
 

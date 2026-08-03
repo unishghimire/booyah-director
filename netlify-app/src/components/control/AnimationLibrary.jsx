@@ -57,7 +57,7 @@ export default function AnimationLibrary({ data, overlayApi, refresh }) {
   useEffect(() => {
     if (data?.design?.animationConfig) {
       setConfig({
-        defaultEntrance: data.design.animationConfig.defaultEntrance || 'slide-right',
+        defaultEntrance: data?.design?.animationConfig?.defaultEntrance || 'slide-right',
         defaultExit: data.design.animationConfig.defaultExit || 'fade-in',
         speed: data.design.animationConfig.speed ?? 1.0,
         eventOverrides: data.design.animationConfig.eventOverrides || {},

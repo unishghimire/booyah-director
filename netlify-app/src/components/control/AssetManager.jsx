@@ -756,7 +756,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                         </button>
                         {asset.url && (
                           <a
-                            href={asset.url}
+                            href={(asset.url && /^https?:\/\//i.test(asset.url)) ? asset.url : "#"}
                             download={asset.name}
                             target="_blank"
                             rel="noreferrer"
@@ -1027,7 +1027,7 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                     {previewAsset.tags.length === 0 ? (
                       <span className="text-[10px] text-white/30 italic">No tags associated</span>
                     ) : (
-                      previewAsset.tags.map(t => (
+                      (previewAsset?.tags || []).map(t => (
                         <span
                           key={t}
                           className="px-2 py-0.5 rounded text-[10px] font-bold uppercase bg-black/20 border border-white/[0.06] text-gray-300 flex items-center gap-1.5"
@@ -1073,8 +1073,8 @@ export default function AssetManager({ data, refresh, overlayApi }) {
                     BROADCAST REFERENCES
                   </label>
                   <div className="space-y-1 max-h-[110px] overflow-y-auto pr-1">
-                    {previewAsset.usedIn && previewAsset.usedIn.length > 0 ? (
-                      previewAsset.usedIn.map((place, idx) => (
+                    {(previewAsset?.usedIn || []).length > 0 ? (
+                      (previewAsset?.usedIn || []).map((place, idx) => (
                         <div
                           key={idx}
                           className="flex items-center gap-2 p-1.5 rounded bg-black/10 border border-white/[0.06] text-[11px] text-gray-300 font-bold"
