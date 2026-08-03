@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { Crown, Zap, Check, LogOut, Tag, Sparkles, Star, AlertCircle, RefreshCw, Upload, CheckCircle2 } from 'lucide-react';
+import { Crown, Zap, Check, LogOut, Tag, Star, RefreshCw, Upload, CheckCircle2 } from 'lucide-react';
 import { useAuth } from '@/lib/AuthContext';
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';

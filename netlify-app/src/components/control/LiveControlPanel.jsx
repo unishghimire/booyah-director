@@ -1,7 +1,7 @@
 import React, { useState, useMemo, useRef } from 'react';
 import {
   Play, Pause, Square, RotateCcw, AlertTriangle, Plus, Minus,
-  Skull, Heart, Crosshair, Trophy, Zap, Radio, Users, Target,
+  Skull, Heart, Crosshair, Trophy, Zap, Users, Target,
   ChevronDown, ChevronUp, Star, Crown,
   Gamepad2, RefreshCw
 } from 'lucide-react';

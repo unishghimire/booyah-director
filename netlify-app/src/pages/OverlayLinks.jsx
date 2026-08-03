@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { SectionBoundary, PanelBoundary, safeArray } from '@/components/ErrorBoundary';
-import { Copy, CheckCircle2, ExternalLink, Monitor, Crosshair, Layers, Star, Crown, Mic2, Zap, Shield, Play, Users, Gamepad2, Grid3x3, Eye, EyeOff, Map, Info, Wifi, WifiOff, RefreshCw, Skull, Swords, Flame, Droplets, Wind, Package, Target, Octagon, AlertTriangle, Radio, Calendar, Clock, Trophy, Download, Upload, FileJson } from 'lucide-react';
+import { Copy, CheckCircle2, ExternalLink, Monitor, Layers, Star, Crown, Mic2, Play, Users, Gamepad2, Grid3x3, Eye, EyeOff, Map, Info, Wifi, WifiOff, RefreshCw, Skull, Swords, Flame, Droplets, Package, Target, Octagon, AlertTriangle, Calendar, Clock, Download, Upload, FileJson } from 'lucide-react';
 import { useObsStore } from '@/lib/obsStore';
 import { obsService } from '@/lib/obsWebSocket';
 import { useAuth } from '@/lib/AuthContext';

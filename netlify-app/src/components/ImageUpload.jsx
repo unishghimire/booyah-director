@@ -1,5 +1,5 @@
 import React, { useState, useRef } from 'react';
-import { Loader2, CheckCircle2, Image as ImageIcon, Edit3 } from 'lucide-react';
+import { Loader2, CheckCircle2, Edit3 } from 'lucide-react';
 import { uploadImage } from '@/lib/imageUpload';
 import toast from 'react-hot-toast';
 

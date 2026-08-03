@@ -26,8 +26,7 @@ import {
   ExternalLink, Paintbrush, Settings2, Trophy, Star, Crown,
   Monitor, Copy, Radio, ChevronDown,
   Layers, Map, Volume2, Film,
-  Download, RefreshCw, Users,
-  Zap, Clock, Play, Activity, Palette,
+  Download, RefreshCw, Users, Clock, Play, Activity, Palette,
   RotateCcw, Trash2
 } from 'lucide-react';
 

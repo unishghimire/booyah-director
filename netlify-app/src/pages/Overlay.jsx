@@ -18,7 +18,7 @@
 import { useParams, useSearchParams } from 'react-router-dom';
 import React, { useState, useEffect, useRef, useMemo } from 'react';
 // framer-motion removed from overlays — CSS animations only (prevents opacity:0 OBS bug)
-import { Skull, Star, Crown, Zap, Calendar, Users, MapPin, Award, XCircle, Mic2, Shield, Flame } from 'lucide-react';
+import { Skull, Calendar, Users, MapPin, Mic2, Flame } from 'lucide-react';
 import { MAP_IMAGES, getMapImages, setCustomMapImages } from '@/lib/maps';
 import { safeArray } from '@/components/ErrorBoundary';
 import { FFBoardV2, MatchInfoChip, GameIntroBanner, MatchScheduleGrid, PointRushStandings, RoadmapOverlay, EventDetailsOverlay } from '@/pages/FFWSOverlays';
