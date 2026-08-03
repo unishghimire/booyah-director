@@ -236,6 +236,10 @@ export function FFBoardV2({ teams = [], players = [], currentMatch, design }) {
       setElimBanner(queue[queue.length - 1]);
       elimTimerRef.current = setTimeout(() => setElimBanner(null), 5000);
     }
+    // Cleanup: clear timer on unmount to prevent state update on unmounted component
+    return () => {
+      if (elimTimerRef.current) clearTimeout(elimTimerRef.current);
+    };
   }, [rows]);
 
   const matchLabel = currentMatch?.match_number ? 'MATCH ' + currentMatch.match_number : (design?.matchLabel || 'MATCH 1');

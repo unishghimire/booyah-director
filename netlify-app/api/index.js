@@ -110,7 +110,7 @@ async function loadDb(uid) {
   try {
     const res = await fetch(fbUrl(uid), { signal: AbortSignal.timeout(5000) });
     if (!res.ok) {
-      console.error(`[db] Firebase read HTTP ${res.status} for uid=${uid}`);
+      console.error(`[db] Firebase read HTTP ${res.status}`);
       return _memStore.get(uid) || getDefaultDb();
     }
     const data = await res.json();
@@ -152,7 +152,7 @@ async function saveDb(uid, db) {
       signal: AbortSignal.timeout(5000),
     });
     if (!res.ok) {
-      console.error(`[db] Firebase write HTTP ${res.status} for uid=${uid}`);
+      console.error(`[db] Firebase write HTTP ${res.status}`);
       _memStore.set(uid, db); // cache anyway
       return false;
     }
@@ -370,10 +370,8 @@ module.exports = async (req, res) => {
       // Fallback: If no Bearer token, we authenticate overlay view via shareToken
       if (!uid && tokenParam) {
         // Direct query fallback for dev / OBS sources with authenticated URLs
-        if (query.uid) {
-          uid = query.uid;
-        } else if (process.env.VITE_DEV_MODE || process.env.DEV_UID) {
-          uid = process.env.DEV_UID || 'dev_fallback_uid';
+        if (process.env.NODE_ENV !== 'production' && process.env.DEV_UID) {
+          uid = process.env.DEV_UID;
         }
 
         if (!uid) {
@@ -418,9 +416,6 @@ module.exports = async (req, res) => {
             }
           }
         }
-      } else if (!uid && query.uid) {
-        // Direct ?uid= fallback even without token parameter
-        uid = query.uid;
       }
 
       if (!uid) {
@@ -820,7 +815,7 @@ module.exports = async (req, res) => {
 
     // ── SWITCH TOURNAMENT ─────────────────────────────────────────────────
     if (route === 'switchTournament') {
-      const { tournament_id } = body;
+      const tournament_id = sanitizeString(body.tournament_id, 100);
       if (!tournament_id) return err(400, 'tournament_id is required');
 
       const exists = db.tournaments.some(t => t.id === tournament_id);
@@ -839,7 +834,7 @@ module.exports = async (req, res) => {
 
     // ── DELETE TOURNAMENT ─────────────────────────────────────────────────
     if (route === 'deleteTournament') {
-      const { tournament_id } = body;
+      const tournament_id = sanitizeString(body.tournament_id, 100);
       if (!tournament_id) return err(400, 'tournament_id is required');
 
       const target = db.tournaments.find(t => t.id === tournament_id);
@@ -1333,7 +1328,8 @@ module.exports = async (req, res) => {
 
     // ── RESET MATCH ───────────────────────────────────────────────────────
     if (route === 'resetMatch') {
-      const { match_id, tournament_id } = body;
+      const match_id = sanitizeString(body.match_id, 100);
+      const tournament_id = sanitizeString(body.tournament_id, 100);
       if (match_id) {
         db.kill_events = db.kill_events.filter(k => k.match_id !== match_id);
         db.elimination_events = db.elimination_events.filter(e => e.match_id !== match_id);
@@ -1525,11 +1521,11 @@ module.exports = async (req, res) => {
         });
         if (!r.ok) {
           const txt = await r.text();
-          return err(400, `Discord rejected the webhook: ${r.status} — ${txt.slice(0,200)}`);
+          return err(400, `Discord rejected the webhook (HTTP ${r.status}). Please verify the URL is valid.`);
         }
         return ok({ success: true });
       } catch (e) {
-        return err(500, `Failed to reach Discord: ${e.message}`);
+        return err(500, 'Failed to reach Discord. Please check the webhook URL.');
       }
     }
 
@@ -1590,11 +1586,11 @@ module.exports = async (req, res) => {
         });
         if (!r.ok) {
           const txt = await r.text();
-          return err(400, `Discord error: ${r.status} — ${txt.slice(0,200)}`);
+          return err(400, `Discord API error (HTTP ${r.status}). Please verify the webhook URL.`);
         }
         return ok({ success: true, type });
       } catch (e) {
-        return err(500, `Failed to reach Discord: ${e.message}`);
+        return err(500, 'Failed to reach Discord. Please check the webhook URL.');
       }
     }
 

@@ -186,7 +186,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
         }
       }
     } catch (err) {
-      console.warn('Backend listTournaments failed, using local offline data', err);
+      // Backend listTournaments failed, using local offline data
       const storedGlobal = localStorage.getItem('nexplay_tournaments');
       const list = storedGlobal ? JSON.parse(storedGlobal) : DEFAULT_TOURNAMENTS;
       setTournaments(list);
@@ -294,7 +294,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
       toast.success('Tournament configuration saved!');
       if (activeRefresh) activeRefresh();
     } catch (e) {
-      console.warn('API update failed, saved settings locally', e);
+      // API update failed, saved settings locally
       toast.success('Configuration saved locally!');
     } finally {
       setSavingSettings(false);
@@ -465,7 +465,7 @@ export default function TournamentManager({ data, refresh, overlayApi }) {
         await api.addTeam({ tournament_id: selectedId, team_name: name });
       }
     } catch (e) {
-      console.warn('API addTeam failed, saving locally', e);
+      // API addTeam failed, saving locally
     }
 
     setTournaments(prev => {

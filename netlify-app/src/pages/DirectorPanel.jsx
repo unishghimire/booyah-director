@@ -551,7 +551,7 @@ export default function DirectorPanel() {
                     </div>
                     <div className="grid grid-cols-1 gap-1.5">
                       {Object.entries(ROLES).map(([key, r]) => (
-                        <button key={key} onClick={async () => { if (!isOwner) { toast.error('Only the owner can change roles'); return; } try { await overlayApi.setUserRole(key); setUserRole(key); toast.success(`Role changed to ${r.label}`); } catch (e) { toast.error('Failed to change role'); } }}
+                        <button key={key} onClick={async (e) => { e.currentTarget.disabled = true; if (!isOwner) { toast.error('Only the owner can change roles'); e.currentTarget.disabled = false; return; } try { await overlayApi.setUserRole(key); setUserRole(key); toast.success(`Role changed to ${r.label}`); } catch (e) { toast.error('Failed to change role'); } finally { e.currentTarget.disabled = false; } }}
                           className="flex items-center justify-between p-3 rounded-lg border transition-all text-left active:scale-[0.99]"
                           style={userRole === key ? { borderColor: r.color + '50', background: r.color + '08' } : { borderColor: 'rgba(255,255,255,0.04)', background: 'transparent' }}>
                           <div><p className="text-sm font-semibold" style={{ color: r.color }}>{r.label}</p><p className="text-[10px] text-white/30">{r.description}</p></div>

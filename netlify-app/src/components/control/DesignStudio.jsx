@@ -453,7 +453,7 @@ export default function DesignStudio(props) {
 
   useEffect(() => {
     overlayApi.getDesign()
-      .then(r => { setDesign({ ...DEFAULT_DESIGN, ...r.design }); setLoading(false); })
+      .then(r => { setDesign({ ...DEFAULT_DESIGN, ...r.design }); setLoading(false); }).catch(() => setLoading(false))
       .catch(() => setLoading(false));
   }, []);
 

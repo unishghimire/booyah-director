@@ -36,7 +36,7 @@ export default function PricingPage() {
     if (!adminUrl) { setPaymentInfoLoading(false); return; }
     fetch(adminUrl + '/api/payment-info')
       .then(r => r.json())
-      .then(d => { setPaymentInfo(d); setPaymentInfoLoading(false); })
+      .then(d => { setPaymentInfo(d); setPaymentInfoLoading(false); }).catch(() => setPaymentInfoLoading(false))
       .catch(() => setPaymentInfoLoading(false));
   }, []);
 

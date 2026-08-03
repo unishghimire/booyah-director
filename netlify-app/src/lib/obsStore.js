@@ -42,15 +42,16 @@ export const useObsStore = create((set, get) => ({
   
   // Persist settings to localStorage
   saveSettings: () => {
-    const { obsAddress, obsPassword } = get();
-    localStorage.setItem('obs_config', JSON.stringify({ obsAddress, obsPassword }));
+    // ponytail: OBS password not persisted to localStorage for security — user re-enters on reconnect
+    const { obsAddress } = get();
+    localStorage.setItem('obs_config', JSON.stringify({ obsAddress }));
   },
   loadSettings: () => {
     try {
       const saved = JSON.parse(localStorage.getItem('obs_config') || '{}');
       set({
         obsAddress: saved.obsAddress || 'localhost:4444',
-        obsPassword: saved.obsPassword || '',
+        obsPassword: '', // Never load password from storage — user must re-enter
         settingsLoaded: true,
       });
     } catch {
